@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+{% load bootstrap3 %}
+{% load url from future %}
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>D-PLACE</title>
+    <meta name="description" content="">
+    <meta name="author" content="Dan Leehr">
+    {% bootstrap_css %}
+    <style type="text/css">
+        body {
+            padding-top: 60px;
+        }
+    </style>
+    <!--[if lt IE 9]>
+    <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <script src="//code.jquery.com/jquery.js"></script>
+    {% bootstrap_javascript %}
+    {% block extra_head %}{% endblock %}
+</head>
+
+<body>
+{% block content %}
+{% endblock %}
+</body>
+</html>

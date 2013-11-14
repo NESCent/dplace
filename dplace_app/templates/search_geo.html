@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% load bootstrap3 %}
+{% block extra_head %}
+    <script src="http://openlayers.org/api/2.11/OpenLayers.js"></script>
+    <script src="/static/gis/js/OLMapWidget.js"></script>
+{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-7">
+            <h2>Search By Geography:</h2>
+            <form action="" method="post" class="form">
+                {{ form.as_p }}
+                {% csrf_token %}
+                <p><input type="submit" value="Search" class="btn btn-primary"></p>
+            </form>
+        </div>
+        {% if results|length %}
+        <div class="col-md-5">
+            <h2>Results:</h2>
+            <p>Searched region: {{ region }}</p>
+            <table class="table table-bordered table-condensed table-striped">
+            <tr><th>ISO Code</th><th>Societies</th></tr>
+                {% for row in results %}
+                    {% if row.societies|length %}
+                    <tr>
+                        <td class="iso_code">{{ row.isocode }}</td>
+                        <td>
+                        {% for society in row.societies %}
+                            <span class="society_name"><a href="{% url 'view_society' society.id %}">{{ society.name }}</a></span>
+                        {% endfor %}
+                        </td>
+                    </tr>
+                    {% endif %}
+                {% endfor %}
+            </table>
+            </div>
+        </div>
+{% endif %}
+    </div>
+</div>
+{% endblock %}
