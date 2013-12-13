@@ -8,3 +8,4 @@ numpy==1.7.1
 psycopg2==2.5.1
 six==1.4.1
 wsgiref==0.1.2
+South==0.8.4
