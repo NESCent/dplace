@@ -4,7 +4,7 @@ from django.contrib.gis.db import models
 # I think this maps language codes to geographic points.  unclear what LMP means in LMP_LAT/LMP_LON
 # Some points don't map to a 4326 point
 class ISOCode(models.Model):
-	iso_code = models.CharField('ISO Code', db_index=True, max_length=16)
+	iso_code = models.CharField('ISO Code', db_index=True, max_length=3)
 	location = models.PointField()
 	# For GeoDjango, must override the manager
 	objects = models.GeoManager()

@@ -4,7 +4,7 @@ DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
-    # ('Dan Leehr', 'dan.leehr@nescent.org'),
+    # ('Admin Name', 'email@domain.com'),
 )
 
 MANAGERS = ADMINS
@@ -127,6 +127,7 @@ INSTALLED_APPS = (
 	'bootstrap3',
 	'django.contrib.humanize',
 	'rest_framework',
+	'south',
 	'dplace_app',
 )
 
