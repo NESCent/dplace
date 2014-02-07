@@ -120,9 +120,9 @@ class Language(models.Model):
     iso_code = models.ForeignKey('ISOCode', related_name="languages")
     family = models.ForeignKey('LanguageFamily', related_name="languages")
     classification = models.ForeignKey('LanguageClassification', related_name="languages")
-    class1 = models.ForeignKey('LanguageClass', limit_choices_to={'level': 1})
-    class2 = models.ForeignKey('LanguageClass', limit_choices_to={'level': 2})
-    class3 = models.ForeignKey('LanguageClass', limit_choices_to={'level': 3})
+    class1 = models.ForeignKey('LanguageClass', limit_choices_to={'level': 1}, related_name="languages1")
+    class2 = models.ForeignKey('LanguageClass', limit_choices_to={'level': 2}, related_name="languages2")
+    class3 = models.ForeignKey('LanguageClass', limit_choices_to={'level': 3}, related_name="languages3")
     def __unicode__(self):
         return "Language: %s, ISO Code %s" (self.name, self.iso_code.iso_code)
     class Meta:
