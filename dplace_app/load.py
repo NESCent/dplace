@@ -20,6 +20,8 @@ def run(file_name=None, mode=None):
                     load_ea_var(dict_row)
                 elif mode == 'ea_vals':
                     load_ea_val(dict_row)
+                elif mode == 'langs':
+                    load_lang(dict_row)
         elif mode == 'ea_codes':
             load_ea_codes(csvfile)
 
@@ -213,6 +215,57 @@ def load_ea_val(val_row):
                 variable_value.save()
             except ObjectDoesNotExist:
                 print "Unable to find a code object for variable %d with value %s, skipping" % (number, value)
+
+def load_lang(lang_row):
+    # Extract values from dictionary
+    code = lang_row['ISO 693-3 code']
+    language_name = lang_row['Language name']
+    family_name = lang_row['FAMILY-CORRECTED']
+    classification_name = lang_row['Classification']
+    class_names = [lang_row['Class1'], lang_row['Class2'], lang_row['Class3']]
+
+    # ISO Code
+    isocode = iso_from_code(code) # Does not create new ISO Codes
+
+    # Family
+    try:
+        family = LanguageFamily.objects.get(name=family_name)
+    except ObjectDoesNotExist:
+        family = LanguageFamily(name=family_name)
+        family.save()
+
+    # Classification
+    try:
+        classification = LanguageClassification.objects.get(name=classification_name)
+    except ObjectDoesNotExist:
+        classification = LanguageClassification(name=classification_name)
+        classification.save()
+
+    # Classes
+    classes = []
+    for i in range(3):
+        level = i + 1
+        try:
+            classes.append(LanguageClass.objects.get(level=level,name=class_names[i]))
+        except ObjectDoesNotExist:
+            lang_class = LanguageClass(level=level, name=class_names[i])
+            lang_class.save()
+            classes.append(lang_class)
+
+    # Finally, create the Language
+    try:
+        language = Language.objects.get(iso_code=isocode)
+    except ObjectDoesNotExist:
+        language = Language(name=language_name,
+                            iso_code=isocode,
+                            family=family,
+                            classification=classification,
+                            class1=classes[0],
+                            class2=classes[1],
+                            class3=classes[2]
+        )
+        language.save()
+
 
 if __name__ == '__main__':
     run(sys.argv[1], sys.argv[2])
