@@ -109,6 +109,7 @@ class LanguageFamily(models.Model):
         return "Family: %s" % self.name
     class Meta:
         verbose_name = "Language Family"
+        verbose_name_plural = "Language Families"
 
 class LanguageClassification(models.Model):
     name = models.CharField(max_length=250, db_index=True, unique=True)
