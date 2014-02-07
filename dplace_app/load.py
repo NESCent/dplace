@@ -7,7 +7,7 @@ from dplace_app.models import *
 def run(file_name=None, mode=None):
     # read the csv file
     with open(file_name, 'rb') as csvfile:
-        if mode in ['iso', 'soc', 'env', 'ea_vars', 'ea_vals']:
+        if mode in ['iso', 'soc', 'env', 'ea_vars', 'ea_vals', 'langs']:
             csv_reader = csv.DictReader(csvfile)
             for dict_row in csv_reader:
                 if mode == 'iso':
@@ -226,6 +226,9 @@ def load_lang(lang_row):
 
     # ISO Code
     isocode = iso_from_code(code) # Does not create new ISO Codes
+    if isocode is None:
+        print "No ISO Code found in database for %s, skipping language" % code
+        return
 
     # Family
     try:
