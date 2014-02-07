@@ -117,7 +117,7 @@ class LanguageClassification(models.Model):
 
 class Language(models.Model):
     name = models.CharField(max_length=50, db_index=True)
-    iso_code = models.ForeignKey('ISOCode', related_name="languages")
+    iso_code = models.ForeignKey('ISOCode', related_name="languages", unique=True)
     family = models.ForeignKey('LanguageFamily', related_name="languages")
     classification = models.ForeignKey('LanguageClassification', related_name="languages")
     class1 = models.ForeignKey('LanguageClass', limit_choices_to={'level': 1}, related_name="languages1")
