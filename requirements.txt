@@ -3,7 +3,7 @@ django-appconf==0.6
 django-bootstrap3==2.0.0
 django-filter==0.7
 djangorestframework==2.3.8
--e git://github.com/dmeehan/django-rest-framework-gis.git#egg=djangorestframework-gis==0.1.beta
+djangorestframework-gis==0.1
 numpy==1.7.1
 psycopg2==2.5.1
 six==1.4.1
