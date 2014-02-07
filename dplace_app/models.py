@@ -92,3 +92,38 @@ class EAVariableValue(models.Model):
     class Meta:
         verbose_name = "Ethnographic Atlas Variable Coding"
         ordering = ('society', 'code')
+
+class LanguageClass(models.Model):
+    # max length 37
+    name = models.CharField(max_length=50, db_index=True, unique=True)
+    level = models.IntegerField(db_index=True);
+    def __unicode__(self):
+        return "Language Class %s, level %d" % (self.name, self.level)
+    class Meta:
+        verbose_name = "Language Class"
+        ordering= ('level', 'name')
+
+class LanguageFamily(models.Model):
+    name = models.CharField(max_length=30, db_index=True, unique=True)
+    def __unicode__(self):
+        return "Family: %s" % self.name
+    class Meta:
+        verbose_name = "Language Family"
+
+class LanguageClassification(models.Model):
+    name = models.CharField(max_length=250, db_index=True, unique=True)
+    def __unicode__(self):
+        return "Classification: %s" % self.name
+
+class Language(models.Model):
+    name = models.CharField(max_length=50, db_index=True)
+    iso_code = models.ForeignKey('ISOCode', related_name="languages")
+    family = models.ForeignKey('LanguageFamily', related_name="languages")
+    classification = models.ForeignKey('LanguageClassification', related_name="languages")
+    class1 = models.ForeignKey('LanguageClass', limit_choices_to={'level': 1})
+    class2 = models.ForeignKey('LanguageClass', limit_choices_to={'level': 2})
+    class3 = models.ForeignKey('LanguageClass', limit_choices_to={'level': 3})
+    def __unicode__(self):
+        return "Language: %s, ISO Code %s" (self.name, self.iso_code.iso_code)
+    class Meta:
+        verbose_name = "Language"
