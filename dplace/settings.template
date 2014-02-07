@@ -111,7 +111,7 @@ TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-	"/Users/dan/Code/django/dplace-models/dplace_app/templates",
+    "/Users/dan/Code/django/dplace-models/dplace_app/templates",
 )
 
 INSTALLED_APPS = (
@@ -121,14 +121,14 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-	'django.contrib.gis',
+    'django.contrib.gis',
     'django.contrib.admin',
     'django.contrib.admindocs',
-	'bootstrap3',
-	'django.contrib.humanize',
-	'rest_framework',
-	'south',
-	'dplace_app',
+    'bootstrap3',
+    'django.contrib.humanize',
+    'rest_framework',
+    'south',
+    'dplace_app',
 )
 
 
@@ -174,9 +174,9 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
     ],
-	'DEFAULT_FILTER_BACKENDS': [
-		'rest_framework.filters.DjangoFilterBackend',
-	],
-	#'PAGINATE_BY': 100,
-	#'PAGINATE_BY_PARAM': 'page_size',
+    'DEFAULT_FILTER_BACKENDS': [
+        'rest_framework.filters.DjangoFilterBackend',
+    ],
+    #'PAGINATE_BY': 100,
+    #'PAGINATE_BY_PARAM': 'page_size',
 }
