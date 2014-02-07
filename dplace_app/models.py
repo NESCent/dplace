@@ -124,6 +124,6 @@ class Language(models.Model):
     class2 = models.ForeignKey('LanguageClass', limit_choices_to={'level': 2}, related_name="languages2")
     class3 = models.ForeignKey('LanguageClass', limit_choices_to={'level': 3}, related_name="languages3")
     def __unicode__(self):
-        return "Language: %s, ISO Code %s" (self.name, self.iso_code.iso_code)
+        return "Language: %s, ISO Code %s" % (self.name, self.iso_code.iso_code)
     class Meta:
         verbose_name = "Language"
