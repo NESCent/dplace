@@ -93,10 +93,16 @@ class EAVariableValue(models.Model):
         verbose_name = "Ethnographic Atlas Variable Coding"
         ordering = ('society', 'code')
 
+CLASS_LEVELS = (
+    (1, 'Family'),
+    (2, 'Subfamily'),
+    (3, 'Subsubfamily')
+)
+
 class LanguageClass(models.Model):
     # max length 37
     name = models.CharField(max_length=50, db_index=True)
-    level = models.IntegerField(db_index=True);
+    level = models.IntegerField(db_index=True, choices=CLASS_LEVELS)
     def __unicode__(self):
         return "Language Class %s, level %d" % (self.name, self.level)
     class Meta:
@@ -111,20 +117,42 @@ class LanguageFamily(models.Model):
         verbose_name = "Language Family"
         verbose_name_plural = "Language Families"
 
+CLASSIFICATION_SCHEMES = (
+    ('E', 'Ethnologue17',),
+    ('R', 'Ethnologue17-Revised',),
+    #... any others as they become available. I can see a time in
+    # the not too distant future when we'll get better ones.
+)
+
 class LanguageClassification(models.Model):
+    scheme = models.CharField(max_length=1, choices=CLASSIFICATION_SCHEMES, default='E');
+    language = models.ForeignKey('Language')
+    # From 'Classification' column
     name = models.CharField(max_length=250, db_index=True, unique=True)
+    # From 'FAMILY-CORRECTED' column
+    family = models.ForeignKey('LanguageFamily', related_name="languages")
+    # From 'Class1', 'Class2', 'Class3'
+    class_family = models.ForeignKey('LanguageClass', limit_choices_to={'level': 1}, related_name="languages1", null=True)
+    class_subfamily = models.ForeignKey('LanguageClass', limit_choices_to={'level': 2}, related_name="languages2", null=True)
+    class_subsubfamily = models.ForeignKey('LanguageClass', limit_choices_to={'level': 3}, related_name="languages3", null=True)
     def __unicode__(self):
         return "Classification: %s" % self.name
+    class Meta:
+        index_together = [
+            ['class_family', 'class_subfamily', 'class_subsubfamily']
+        ]
 
 class Language(models.Model):
     name = models.CharField(max_length=50, db_index=True)
     iso_code = models.ForeignKey('ISOCode', related_name="languages", unique=True)
-    family = models.ForeignKey('LanguageFamily', related_name="languages", null=True)
-    classification = models.ForeignKey('LanguageClassification', related_name="languages", null=True)
-    class1 = models.ForeignKey('LanguageClass', limit_choices_to={'level': 1}, related_name="languages1", null=True)
-    class2 = models.ForeignKey('LanguageClass', limit_choices_to={'level': 2}, related_name="languages2", null=True)
-    class3 = models.ForeignKey('LanguageClass', limit_choices_to={'level': 3}, related_name="languages3", null=True)
+    # a language might belong to a given society.
+    # would be good to ask "which language does society A use" and
+    # "which socieity is language A spoken in"
+    # Note: This *might* need to be M2M with one language linking to multiple
+    # societies and vice-versa, but I suspect this won't be common?
+    society = models.ForeignKey('Society', related_name="languages", null=True)
     def __unicode__(self):
         return "Language: %s, ISO Code %s" % (self.name, self.iso_code.iso_code)
     class Meta:
         verbose_name = "Language"
+
