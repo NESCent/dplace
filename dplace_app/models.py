@@ -103,6 +103,7 @@ class LanguageClass(models.Model):
     # max length 37
     name = models.CharField(max_length=50, db_index=True)
     level = models.IntegerField(db_index=True, choices=CLASS_LEVELS)
+    parent = models.ForeignKey('self', null=True, default=None)
     def __unicode__(self):
         return "Language Class %s, level %d" % (self.name, self.level)
     class Meta:
