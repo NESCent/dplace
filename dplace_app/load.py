@@ -268,7 +268,6 @@ def load_lang(lang_row):
                                                 class_family=classes[0],
                                                 class_subfamily=classes[1],
                                                 class_subsubfamily=classes[2],
-                                                name=classification_name,
                                                 )
         classification.save()
 
