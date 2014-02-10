@@ -4,6 +4,8 @@ from django.contrib.gis.geos import Point
 from django.core.exceptions import ObjectDoesNotExist
 from dplace_app.models import *
 
+MISSING_CODES = []
+
 def run(file_name=None, mode=None):
     # read the csv file
     with open(file_name, 'rb') as csvfile:
@@ -24,6 +26,10 @@ def run(file_name=None, mode=None):
                     load_lang(dict_row)
         elif mode == 'ea_codes':
             load_ea_codes(csvfile)
+    if len(MISSING_CODES) > 0:
+        print "Missing ISO Codes:"
+        print '\n'.join(MISSING_CODES)
+
 
 def load_isocode(iso_dict):
     code = iso_dict['ISO']
@@ -227,7 +233,8 @@ def load_lang(lang_row):
     # ISO Code
     isocode = iso_from_code(code) # Does not create new ISO Codes
     if isocode is None:
-        print "No ISO Code found in database for %s, skipping language" % code
+        print "No ISO Code found in database for %s, skipping language %s" % (code, language_name)
+        add_missing_isocode(code)
         return
 
     # Language
@@ -271,7 +278,8 @@ def load_lang(lang_row):
                                                 )
         classification.save()
 
-
+def add_missing_isocode(isocode):
+    MISSING_CODES.append(isocode)
 
 if __name__ == '__main__':
     run(sys.argv[1], sys.argv[2])
