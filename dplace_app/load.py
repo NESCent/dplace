@@ -230,19 +230,20 @@ def load_lang(lang_row):
         print "No ISO Code found in database for %s, skipping language" % code
         return
 
+    # Language
+    try:
+        language = Language.objects.get(iso_code=isocode)
+    except ObjectDoesNotExist:
+        language = Language(name=language_name,
+                            iso_code=isocode
+                            )
+        language.save()
     # Family
     try:
         family = LanguageFamily.objects.get(name=family_name)
     except ObjectDoesNotExist:
         family = LanguageFamily(name=family_name)
         family.save()
-
-    # Classification
-    try:
-        classification = LanguageClassification.objects.get(name=classification_name)
-    except ObjectDoesNotExist:
-        classification = LanguageClassification(name=classification_name)
-        classification.save()
 
     # Classes
     classes = []
@@ -255,19 +256,22 @@ def load_lang(lang_row):
             lang_class.save()
             classes.append(lang_class)
 
-    # Finally, create the Language
+    # Finally, create the LanguageClassification
+    classification_scheme = 'R' # Ethnologue17-Revised
     try:
-        language = Language.objects.get(iso_code=isocode)
+        classification = LanguageClassification.objects.get(name=classification_name)
     except ObjectDoesNotExist:
-        language = Language(name=language_name,
-                            iso_code=isocode,
-                            family=family,
-                            classification=classification,
-                            class1=classes[0],
-                            class2=classes[1],
-                            class3=classes[2]
-        )
-        language.save()
+        classification = LanguageClassification(scheme=classification_scheme,
+                                                language=language,
+                                                name=classification_name,
+                                                family=family,
+                                                class_family=classes[0],
+                                                class_subfamily=classes[1],
+                                                class_subsubfamily=classes[2],
+                                                name=classification_name,
+                                                )
+        classification.save()
+
 
 
 if __name__ == '__main__':
