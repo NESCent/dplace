@@ -126,11 +126,11 @@ CLASSIFICATION_SCHEMES = (
 
 class LanguageClassification(models.Model):
     scheme = models.CharField(max_length=1, choices=CLASSIFICATION_SCHEMES, default='E');
-    language = models.ForeignKey('Language')
+    language = models.ForeignKey('Language', null=True)
     # From 'Classification' column
     name = models.CharField(max_length=250, db_index=True, unique=True)
     # From 'FAMILY-CORRECTED' column
-    family = models.ForeignKey('LanguageFamily', related_name="languages")
+    family = models.ForeignKey('LanguageFamily', related_name="languages", null=True)
     # From 'Class1', 'Class2', 'Class3'
     class_family = models.ForeignKey('LanguageClass', limit_choices_to={'level': 1}, related_name="languages1", null=True)
     class_subfamily = models.ForeignKey('LanguageClass', limit_choices_to={'level': 2}, related_name="languages2", null=True)
