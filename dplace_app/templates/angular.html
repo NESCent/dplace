@@ -3,19 +3,25 @@
     <!-- AngularJS -->
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.12/angular.min.js"></script>
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.12/angular-resource.min.js"></script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.12/angular-route.min.js"></script>
     <!-- Angular app script -->
     <script type="text/javascript" src="/static/js/app.js"></script>
     <!-- Angular Controllers -->
     <script type="text/javascript" src="/static/js/controllers/app.js"></script>
+    <script type="text/javascript" src="/static/js/controllers/search.js"></script>
+    <!-- Angular Services -->
+    <script type="text/javascript" src="/static/js/services.js"></script>
 {% endblock %}
 {% load bootstrap3 %}
 {% block content %}
 {% verbatim %}
     <!-- angular stuff here -->
     <div class="container" ng-controller="AppCtrl">
-        <p>{{ mymodel }}</p>
-        <input ng-model="mymodel" />
-        <p>This should say dplace: {{ myVar }}</p>
+        <ul class="nav nav-pills">
+            <li>
+                <a href="#/search">Search</a>
+            </li>
+        </ul>
 		<div ng-view></div>
 	</div>
 {% endverbatim %}

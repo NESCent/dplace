@@ -1,0 +1,18 @@
+<div>
+    <h3>Language Families</h3>
+    <span>Family:
+        <select ng-model="family" ng-change="setFamily(family)">
+            <option ng-repeat="family in families" value ="{{ family.id }}">{{ family.name }}</option>
+        </select>
+    </span>
+    <span ng-show="subfamilies.length">Subfamily:
+        <select ng-model="subfamily" ng-change="setSubfamily(subfamily)" >
+            <option ng-repeat="subfamily in subfamilies" value ="{{ subfamily.id }}">{{ subfamily.name }}</option>
+        </select>
+    </span>
+    <span ng-show="subsubfamilies.length">Subsubfamily:
+        <select ng-model="subsubfamily" ng-change="setSubsubfamily(subsubfamily)">
+            <option ng-repeat="subsubfamily in subsubfamilies" value ="{{ subsubfamily.id }}">{{ subsubfamily.name }}</option>
+        </select>
+    </span>
+</div>

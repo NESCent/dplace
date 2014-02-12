@@ -1,3 +1,3 @@
 function AppCtrl($scope) {
-    $scope.myVar = 'dplace app';
+    // Root controller for app
 }
