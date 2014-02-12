@@ -259,7 +259,11 @@ def load_lang(lang_row):
         try:
             classes.append(LanguageClass.objects.get(level=level,name=class_names[i]))
         except ObjectDoesNotExist:
-            lang_class = LanguageClass(level=level, name=class_names[i])
+            if len(classes) > 0:
+                parent = classes[-1]
+            else:
+                parent = None
+            lang_class = LanguageClass(level=level, name=class_names[i], parent=parent)
             lang_class.save()
             classes.append(lang_class)
 
