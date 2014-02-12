@@ -1,0 +1,16 @@
+.indent1 {
+    text-indent: 1rem;
+}
+
+.indent2 {
+    text-indent: 2rem;
+}
+
+.scrollable {
+    overflow: scroll;
+    height: 30rem;
+}
+
+label.light {
+    font-weight: normal;
+}

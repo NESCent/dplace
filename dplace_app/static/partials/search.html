@@ -1,18 +1,57 @@
-<div>
-    <h3>Language Families</h3>
-    <span>Family:
-        <select ng-model="family" ng-change="setFamily(family)">
-            <option ng-repeat="family in families" value ="{{ family.id }}">{{ family.name }}</option>
-        </select>
-    </span>
-    <span ng-show="subfamilies.length">Subfamily:
-        <select ng-model="subfamily" ng-change="setSubfamily(subfamily)" >
-            <option ng-repeat="subfamily in subfamilies" value ="{{ subfamily.id }}">{{ subfamily.name }}</option>
-        </select>
-    </span>
-    <span ng-show="subsubfamilies.length">Subsubfamily:
-        <select ng-model="subsubfamily" ng-change="setSubsubfamily(subsubfamily)">
-            <option ng-repeat="subsubfamily in subsubfamilies" value ="{{ subsubfamily.id }}">{{ subsubfamily.name }}</option>
-        </select>
-    </span>
+<div class="row">
+    <div class="family col-md-6">
+    <div class="row">
+        <span>
+            <p class="pull-left lead">Language Families</p>
+            <a class="pull-right btn btn-primary" href="" ng-click="clearLanguages()">Clear All</a>
+        </span>
+        </div>
+        <!-- Would be good to have an accordion here -->
+        <div class="scrollable well row">
+            <ul class="list-unstyled">
+                <li ng-repeat="family in families">
+                    <label class="light">
+                        <input type="checkbox"
+                               ng-model="family.selected"
+                               name="family_{{ family.id}}"
+                               ng-change="updateFamily(family)"/>
+                        {{ family.name }}
+                    </label>
+                    <div ng-show="family.selected">
+                        <ul class="list-unstyled indent1">
+                            <li ng-repeat="subfamily in family.subfamilies">
+                                <label class="light">
+                                <input type="checkbox"
+                                       ng-model="subfamily.selected"
+                                       name="subfamily_{{ subfamily.id }}"
+                                       ng-change="updateSubfamily(subfamily)"/>
+                                    {{ subfamily.name }}
+                                </label>
+                                <div ng-show="subfamily.selected">
+                                    <ul class="list-unstyled indent2">
+                                        <li ng-repeat="subsubfamily in subfamily.subsubfamilies">
+                                            <label class="light">
+                                            <input type="checkbox"
+                                                   ng-model="subsubfamily.selected"
+                                                   name="subfamily_{{ subsubfamily.id }}"
+                                                   />
+                                                {{ subsubfamily.name }}
+                                            </label>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="selections col-md-6">
+    <h3>Selections</h3>
+        <ul>
+            <li ng-repeat="selection in selections">{{ selection.name }}</li>
+        </ul>
+    </div>
+
 </div>
