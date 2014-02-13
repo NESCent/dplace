@@ -39,6 +39,10 @@ function SearchCtrl($scope, $routeParams, LanguageClass, FindSocieties) {
         $scope.updateSelection(subfamily);
     };
 
+    $scope.updateSubsubfamily = function(subsubfamily) {
+        $scope.updateSelection(subsubfamily);
+    };
+
     // This should be in another controller
     $scope.getSocieties = function(selections) {
         var ids = selections.map(function (selection) { return selection.id});

@@ -34,6 +34,7 @@
                                             <input type="checkbox"
                                                    ng-model="subsubfamily.selected"
                                                    name="subfamily_{{ subsubfamily.id }}"
+                                                   ng-change="updateSubsubfamily(subsubfamily)"
                                                    />
                                                 {{ subsubfamily.name }}
                                             </label>
