@@ -11,4 +11,15 @@ angular.module('dplaceServices', ['ngResource'])
                     }
                 }
             });
+    })
+    .factory('FindSocieties', function($resource) {
+        return $resource(
+            '/api/v1/find_societies',
+            {},{
+                find: {
+                    method: 'GET',
+                    isArray: true
+                }
+            }
+        )
     });

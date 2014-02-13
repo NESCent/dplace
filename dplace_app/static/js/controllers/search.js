@@ -1,4 +1,4 @@
-function SearchCtrl($scope, $routeParams, LanguageClass) {
+function SearchCtrl($scope, $routeParams, LanguageClass, FindSocieties) {
     $scope.selections = [];
     $scope.families = LanguageClass.query({level: 1});
 
@@ -41,7 +41,8 @@ function SearchCtrl($scope, $routeParams, LanguageClass) {
 
     // This should be in another controller
     $scope.getSocieties = function(selections) {
-
+        var ids = selections.map(function (selection) { return selection.id});
+        $scope.societies = FindSocieties.find({language_class_ids: ids})
     }
 
 }

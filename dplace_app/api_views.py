@@ -70,29 +70,29 @@ class LanguageViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Language.objects.all()
 
 # search/filter APIs
-@api_view(['GET','POST'])
+@api_view(['GET'])
 @permission_classes((IsAuthenticatedOrReadOnly,))
 def find_societies(request):
     """
     View to find the societies that match an input request.  Currently expects
     { language_class_ids: [1,2,3...] }
     """
-    data = JSONParser.parse(request.DATA)
-    language_class_ids = data['language_class_ids']
-    print "language class ids: %s" % ",".join(language_class_ids)
+    language_class_ids = request.QUERY_PARAMS.getlist('language_class_ids')
+    language_class_ids = [int(x) for x in language_class_ids]
     # Loop over the language class IDs to get classes
     language_classes = LanguageClass.objects.filter(pk__in=language_class_ids)
     # Classifications are related to classes
     language_classifications = []
     for language_class in language_classes:
-        language_classifications.append(language_class.languages1)
-        language_classifications.append(language_class.languages2)
-        language_classifications.append(language_class.languages3)
+        language_classifications += language_class.languages1.all()
+        language_classifications += language_class.languages2.all()
+        language_classifications += language_class.languages3.all()
     # Now get languages from classifications
+    iso_codes = []
     for language_classification in language_classifications:
-        iso_codes.append(language.iso_code)
+        iso_codes.append(language_classification.language.iso_code)
     # now get societies from ISO codes
     societies = Society.objects.filter(iso_code__in=iso_codes)
-    return Response({"societies": SocietySerializer(societies)})
+    return Response(SocietySerializer(societies).data)
 
 
