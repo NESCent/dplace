@@ -39,4 +39,9 @@ function SearchCtrl($scope, $routeParams, LanguageClass) {
         $scope.updateSelection(subfamily);
     };
 
+    // This should be in another controller
+    $scope.getSocieties = function(selections) {
+
+    }
+
 }
