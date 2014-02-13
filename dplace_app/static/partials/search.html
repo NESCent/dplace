@@ -2,7 +2,7 @@
     <div class="family col-md-5">
         <div class="row">
             <span>
-                <p class="pull-left lead">Language Families</p>
+                <p class="pull-left lead">Language Families <span ng-show="selections.length">({{ selections.length }})</span></p>
                 <a class="pull-right btn btn-primary" href="" ng-click="clearLanguages()">Clear All</a>
             </span>
         </div>
@@ -52,7 +52,7 @@
     <div class="results col-md-6">
         <div class="row">
             <span>
-                <p class="pull-left lead">Societies</p>
+                <p class="pull-left lead">Societies <span ng-show="societies.length">({{ societies.length }})</span></p>
                 <a class="pull-right btn btn-primary" href="" ng-click="getSocieties(selections)">Get Societies</a>
             </span>
         </div>
