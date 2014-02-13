@@ -1,5 +1,5 @@
 <div class="row">
-    <div class="family col-md-6">
+    <div class="family col-md-5">
         <div class="row">
             <span>
                 <p class="pull-left lead">Language Families</p>
@@ -47,20 +47,29 @@
             </ul>
         </div>
     </div>
+    <div class="col-md-1"></div>
     <div class="results col-md-6">
         <div class="row">
-            <p class="lead">Selections</p>
-            <ul>
-                <li ng-repeat="selection in selections">{{ selection.name }}</li>
-            </ul>
+            <span>
+                <p class="pull-left lead">Societies</p>
+                <a class="pull-right btn btn-primary" href="" ng-click="getSocieties(selections)">Get Societies</a>
+            </span>
         </div>
-        <div class="row">
-            <a ng-show="selections.length" class="btn btn-primary" href="" ng-click="getSocieties(selections)">Get Societies</a>
-        </div>
-        <div class="row well" ng-show="societies">
-            <ul>
-                <li ng-repeat="society in societies">{{ society.name }}</li>
-            </ul>
+        <div class="row" ng-show="societies.length">
+            <table class="table">
+                <tr>
+                    <th>Name</th>
+                    <th>Id</th>
+                    <th>ISO Code</th>
+                    <th>Location</th>
+                </tr>
+                <tr ng-repeat="society in societies">
+                    <td>{{ society.name }}</td>
+                    <td>{{ society.ext_id }}</td>
+                    <td>{{ society.iso_code }}</td>
+                    <td>{{ society.location.coordinates }}</td>
+                </tr>
+            </table>
 
         </div>
     </div>
