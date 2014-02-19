@@ -1,3 +1,4 @@
+<ng-include src="'/static/partials/navbar.html'"></ng-include>
 <div class="row">
     <div class="family col-md-5">
         <div class="row">
@@ -7,11 +8,11 @@
             </span>
         </div>
         <!-- Would be good to have an accordion here -->
-        <div class="scrollable row panel panel-default">
+        <div class="row panel panel-default">
             <div class="panel-heading">
                 <input ng-model="family_filter" class="form-control" placeholder="Filter Language Families"></input>
             </div>
-            <div class="panel-body">
+            <div class="panel-body scrollable">
                 <ul class="list-unstyled">
                     <li ng-repeat="family in families | filter:family_filter">
                         <label class="light">
@@ -61,8 +62,11 @@
                 <a class="pull-right btn btn-primary" href="" ng-click="getSocieties(selections)">Get Societies</a>
             </span>
         </div>
-        <div class="row" ng-show="societies.length">
-            <table class="table">
+        <div class="row">
+            <div ng-hide="societies.length">
+                <p class="text-center help-block search-help">Choose one or more language families, then click <strong>Get Societies</strong>.</p>
+            </div>
+            <table class="table" ng-show="societies.length">
                 <tr>
                     <th>Name</th>
                     <th>Id</th>
