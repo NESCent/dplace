@@ -126,6 +126,13 @@ class EAVariableCodedValue(models.Model):
     class Meta:
         verbose_name = "Ethnographic Atlas Variable Coded Value"
         ordering = ("variable", "coded_value")
+        index_together = [
+            ['variable','society'],
+            ['variable','coded_value'],
+            ['variable','code'],
+            ['society','coded_value'],
+            ['society','code'],
+        ]
 
 CLASS_LEVELS = (
     (1, 'Family'),
