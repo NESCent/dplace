@@ -6,5 +6,8 @@ function dplaceRouter($routeProvider) {
         .when('/search', {
             templateUrl: '/static/partials/search.html',
             controller: 'SearchCtrl'
-        });
+        })
+        .otherwise({
+	        redirectTo: '/search'
+	});
 }
