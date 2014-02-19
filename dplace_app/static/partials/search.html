@@ -62,8 +62,11 @@
                 <a class="pull-right btn btn-primary" href="" ng-click="getSocieties(selections)">Get Societies</a>
             </span>
         </div>
-        <div class="row" ng-show="societies.length">
-            <table class="table">
+        <div class="row">
+            <div ng-hide="societies.length">
+                <p class="text-center help-block search-help">Choose one or more language families, then click <strong>Get Societies</strong>.</p>
+            </div>
+            <table class="table" ng-show="societies.length">
                 <tr>
                     <th>Name</th>
                     <th>Id</th>
