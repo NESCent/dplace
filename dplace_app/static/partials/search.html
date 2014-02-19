@@ -1,0 +1,83 @@
+<div class="row">
+    <div class="family col-md-5">
+        <div class="row">
+            <span>
+                <p class="pull-left lead">Language Families <span ng-show="selections.length">({{ selections.length }})</span></p>
+                <a class="pull-right btn btn-primary" href="" ng-click="clearLanguages()">Clear All</a>
+            </span>
+        </div>
+        <!-- Would be good to have an accordion here -->
+        <div class="scrollable row panel panel-default">
+            <div class="panel-heading">
+                <input ng-model="family_filter" class="form-control" placeholder="Filter Language Families"></input>
+            </div>
+            <div class="panel-body">
+                <ul class="list-unstyled">
+                    <li ng-repeat="family in families | filter:family_filter">
+                        <label class="light">
+                            <input type="checkbox"
+                                   ng-model="family.selected"
+                                   name="family_{{ family.id}}"
+                                   ng-change="updateFamily(family)"/>
+                            {{ family.name }}
+                        </label>
+                        <div ng-show="family.selected">
+                            <ul class="list-unstyled indent1">
+                                <li ng-repeat="subfamily in family.subfamilies">
+                                    <label class="light">
+                                    <input type="checkbox"
+                                           ng-model="subfamily.selected"
+                                           name="subfamily_{{ subfamily.id }}"
+                                           ng-change="updateSubfamily(subfamily)"/>
+                                        {{ subfamily.name }}
+                                    </label>
+                                    <div ng-show="subfamily.selected">
+                                        <ul class="list-unstyled indent2">
+                                            <li ng-repeat="subsubfamily in subfamily.subsubfamilies">
+                                                <label class="light">
+                                                <input type="checkbox"
+                                                       ng-model="subsubfamily.selected"
+                                                       name="subfamily_{{ subsubfamily.id }}"
+                                                       ng-change="updateSubsubfamily(subsubfamily)"
+                                                       />
+                                                    {{ subsubfamily.name }}
+                                                </label>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-1"></div>
+    <div class="results col-md-6">
+        <div class="row">
+            <span>
+                <p class="pull-left lead">Societies <span ng-show="societies.length">({{ societies.length }})</span></p>
+                <a class="pull-right btn btn-primary" href="" ng-click="getSocieties(selections)">Get Societies</a>
+            </span>
+        </div>
+        <div class="row" ng-show="societies.length">
+            <table class="table">
+                <tr>
+                    <th>Name</th>
+                    <th>Id</th>
+                    <th>ISO Code</th>
+                    <th>Location</th>
+                </tr>
+                <tr ng-repeat="society in societies">
+                    <td>{{ society.name }}</td>
+                    <td>{{ society.ext_id }}</td>
+                    <td>{{ society.iso_code }}</td>
+                    <td>{{ society.location.coordinates }}</td>
+                </tr>
+            </table>
+
+        </div>
+    </div>
+
+</div>

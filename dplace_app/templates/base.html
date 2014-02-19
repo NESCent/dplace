@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 {% load bootstrap3 %}
 {% load url from future %}
-<html lang="en">
+<html lang="en" ng-app="dplace">
 <head>
     <meta charset="utf-8">
     <title>D-PLACE</title>
@@ -13,6 +13,8 @@
             padding-top: 60px;
         }
     </style>
+    {% load static from staticfiles %}
+    <link rel="stylesheet" type="text/css" href="{% static "css/dplace.css" %}">
     <!--[if lt IE 9]>
     <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->

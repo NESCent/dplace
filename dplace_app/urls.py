@@ -24,9 +24,11 @@ urlpatterns = patterns('dplace_app.views',
 	url(r'^$', RedirectView.as_view(url='search_geo/'), name='home'),
 	url(r'^search_geo/$', 'search_geo', name='search_geo'),
 	url(r'^society/(?P<society_id>\d+)/$', 'view_society', name='view_society'),
+    url(r'^angular/$', 'angular', name='angular'),
 	# API
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     url(r'^api/v1/', include(router.urls)),
+    url(r'^api/v1/find_societies', api_views.find_societies, name='find_societies'),
 )
 
 
