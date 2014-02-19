@@ -65,24 +65,67 @@ class Environmental(models.Model):
         verbose_name = "Environmental Data Set"
 
 class EAVariableDescription(models.Model):
-    number = models.IntegerField(unique=True)
-    name = models.CharField(max_length=200, db_index=True)
+    """
+    Variables in the Ethnographic Atlas have a number and are accompanied
+    by a description, e.g.
+
+        NUMBER: 6, DESCRIPTION: Mode of Marriage (Primary)
+
+    """
+    number = models.IntegerField(unique=True, default=0)
+    name = models.CharField(max_length=200, db_index=True, default='Unknown')
     def __unicode__(self):
         return "%d - %s" % (self.number, self.name)
     class Meta:
         verbose_name = "Ethnographic Atlas Variable"
         ordering=("number",)
 
+class EAVariableCodeDescription(models.Model):
+    """
+    Most of the variables in the Ethnographic Atlas are coded with
+    discrete values that map to a text description, e.g.
+
+        CODE: 3, DESCRIPTION: 26 - 35% Dependence
+
+    Some coded values to not map to a description, e.g. those that
+    represent a 4-digit year
+
+    This model is not used by every value in the EA.
+
+    """
+    variable = models.ForeignKey('EAVariableDescription', related_name="codes", db_index=True)
+    code = models.CharField(max_length=20, db_index=True, null=False, default='.')
+    description = models.CharField(max_length=500, default='Unknown')
+    def __unicode__(self):
+        return "%s - %s" % (self.code, self.description)
+    class Meta:
+        verbose_name = "Ethnographic Atlas Variable Code Description"
+        ordering = ("variable", "code")
+
 class EAVariableCodedValue(models.Model):
+    """
+    The values coded in the EA are typically discrete codes
+    that map to a description.  Some are not and
+    Most of the variables in the Ethnographic Atlas are coded with
+    discrete values that map to a text description, e.g.
+
+        CODE: 3, DESCRIPTION: 26 - 35% Dependence
+
+    Some coded values to not map to a description, e.g. those that
+    represent a 4-digit year
+
+    This model is not used by every code
+
+    """
     variable = models.ForeignKey('EAVariableDescription', related_name="values")
     societies = models.ManyToManyField('Society', limit_choices_to={'source__in': [x[0] for x in SOCIETY_SOURCES]})
-    code = models.CharField(max_length=20, db_index=True)
-    description = models.CharField(max_length=500)
+    coded_value = models.CharField(max_length=20, db_index=True, null=False, default='.')
+    code = models.ForeignKey('EAVariableCodeDescription', db_index=True, null=True)
     def __unicode__(self):
-        return "%s: %s - %s" % (self.variable.number, self.code, self.description)
+        return "%s" % self.coded_value
     class Meta:
         verbose_name = "Ethnographic Atlas Variable Coded Value"
-        ordering = ("variable", "code")
+        ordering = ("variable", "coded_value")
 
 CLASS_LEVELS = (
     (1, 'Family'),
