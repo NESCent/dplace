@@ -73,25 +73,16 @@ class EAVariableDescription(models.Model):
         verbose_name = "Ethnographic Atlas Variable"
         ordering=("number",)
 
-class EAVariableCodeDescription(models.Model):
-    variable = models.ForeignKey('EAVariableDescription', related_name="codes")
-    number = models.IntegerField() # Duplicate
+class EAVariableCodedValue(models.Model):
+    variable = models.ForeignKey('EAVariableDescription', related_name="values")
+    societies = models.ManyToManyField('Society', limit_choices_to={'source__in': [x[0] for x in SOCIETY_SOURCES]})
     code = models.CharField(max_length=20, db_index=True)
     description = models.CharField(max_length=500)
     def __unicode__(self):
-        return "%s: %s %s" % (self.variable, self.code, self.description)
+        return "%s: %s - %s" % (self.variable.number, self.code, self.description)
     class Meta:
-        verbose_name = "Ethnographic Atlas Variable Code Description"
-        ordering = ("number", "code")
-
-class EAVariableValue(models.Model):
-    code = models.ForeignKey('EAVariableCodeDescription', related_name="values")
-    society = models.ForeignKey('Society', related_name="values")
-    def __unicode__(self):
-        return "Society %d, Code: %d" % (self.society_id, self.code_id)
-    class Meta:
-        verbose_name = "Ethnographic Atlas Variable Coding"
-        ordering = ('society', 'code')
+        verbose_name = "Ethnographic Atlas Variable Coded Value"
+        ordering = ("variable", "code")
 
 CLASS_LEVELS = (
     (1, 'Family'),
