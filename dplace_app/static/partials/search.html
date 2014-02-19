@@ -7,11 +7,11 @@
             </span>
         </div>
         <!-- Would be good to have an accordion here -->
-        <div class="scrollable row panel panel-default">
+        <div class="row panel panel-default">
             <div class="panel-heading">
                 <input ng-model="family_filter" class="form-control" placeholder="Filter Language Families"></input>
             </div>
-            <div class="panel-body">
+            <div class="panel-body scrollable">
                 <ul class="list-unstyled">
                     <li ng-repeat="family in families | filter:family_filter">
                         <label class="light">
