@@ -18,12 +18,11 @@ class EAVariableCodeDescriptionViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = EAVariableCodeDescription.objects.all()
 
 # Can filter by code, code__variable, or society
-class EAVariableValueViewSet(viewsets.ReadOnlyModelViewSet):
-    serializer_class = EAVariableValueSerializer
-    # TODO: change code__variable to just variable and make it more user-friendly
-    filter_fields = ('code__variable', 'code', 'society')
+class EAVariableCodedValueViewSet(viewsets.ReadOnlyModelViewSet):
+    serializer_class = EAVariableCodedValueSerializer
+    filter_fields = ('variable','coded_value','code','society','code',)
     # Avoid additional database trips by select_related for foreign keys
-    queryset = EAVariableValue.objects.select_related('code').select_related('code__variable').all()
+    queryset = EAVariableCodedValue.objects.select_related('variable').select_related('code').all()
 
 class SocietyViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = SocietySerializer
@@ -41,7 +40,7 @@ class EnvironmentalViewSet(viewsets.ReadOnlyModelViewSet):
 
 class LanguageClassViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = LanguageClassSerializer
-    filter_fields = ('level', 'parent', 'name')
+    filter_fields = ('level', 'parent', 'name',)
     model = LanguageClass
     def get_queryset(self):
         queryset = LanguageClass.objects.all()
@@ -54,19 +53,19 @@ class LanguageClassViewSet(viewsets.ReadOnlyModelViewSet):
 
 class LanguageFamilyViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = LanguageFamilySerializer
-    filter_fields = ('name')
+    filter_fields = ('name',)
     queryset = LanguageFamily.objects.all()
 
 # Need an API to get classifications / languages for a class
 
 class LanguageClassificationViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = LanguageClassificationSerializer
-    filter_fields = ('scheme', 'language', 'name', 'family', 'class_family', 'class_subfamily', 'class_subsubfamily')
+    filter_fields = ('scheme', 'language', 'name', 'family', 'class_family', 'class_subfamily', 'class_subsubfamily',)
     queryset = LanguageClassification.objects.all()
 
 class LanguageViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = LanguageSerializer
-    filter_fields = ('name', 'iso_code__isocode', 'society__ext_id')
+    filter_fields = ('name', 'iso_code', 'society',)
     queryset = Language.objects.all()
 
 # search/filter APIs
