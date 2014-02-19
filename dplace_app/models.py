@@ -118,7 +118,7 @@ class EAVariableCodedValue(models.Model):
 
     """
     variable = models.ForeignKey('EAVariableDescription', related_name="values")
-    societies = models.ManyToManyField('Society', limit_choices_to={'source__in': [x[0] for x in SOCIETY_SOURCES]})
+    society = models.ForeignKey('Society', limit_choices_to={'source__in': [x[0] for x in SOCIETY_SOURCES]}, null=True)
     coded_value = models.CharField(max_length=20, db_index=True, null=False, default='.')
     code = models.ForeignKey('EAVariableCodeDescription', db_index=True, null=True)
     def __unicode__(self):
