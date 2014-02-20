@@ -2,21 +2,14 @@
 
 # Shell script to populate D-PLACE models with data from CSV files
 # CSV files are in a private Bitbucket repository under the NESCent organization
+# Should be run after activating virtualenv
 
 BASEDIR=$(dirname $0)
 
 REPO_SRC="git@bitbucket.org:nescent/dplace-datasets.git"
 REPO_DEST="${BASEDIR}/datasets"
 
-# Path to your virtualenv, you will likely need to change this
-ENV_PATH="${BASEDIR}/../env-dplace"
 DPLACE_PATH="${BASEDIR}"
-
-if [ ! -d "$ENV_PATH" ]; then
-  echo "ERROR: Virtualenv at '$ENV_PATH' not found"
-  echo "Please edit $0 and set the path to your Python Virtualenv"
-  exit -1
-fi
 
 ## Clone the repository
 if [ ! -d "$REPO_DEST" ]; then
@@ -26,9 +19,6 @@ else
   orig=`pwd`
   cd $REPO_DEST && git pull && cd "$orig"
 fi
-
-## Activate the virtualenv
-source "${ENV_PATH}/bin/activate"
 
 ## import the data
 
