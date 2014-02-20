@@ -106,7 +106,7 @@
                     <th>Location</th>
                 </tr>
                 <tr ng-repeat="society in societies">
-                    <td>{{ society.name }}</td>
+                    <td><a ng-href="/society/{{ society.id }}" target="_blank">{{ society.name }}</a></td>
                     <td>{{ society.ext_id }}</td>
                     <td>{{ society.iso_code }}</td>
                     <td>{{ society.location.coordinates }}</td>
