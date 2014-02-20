@@ -32,12 +32,12 @@ def view_society(request, society_id):
     environmentals = society.environmentals.all()
     ea_values = []
     # get ethnographic atlas data
-    for ea_value in society.values.select_related('code').select_related('code__variable').order_by('code__variable__number').all():
+    for ea_value in society.eavariablecodedvalue_set.select_related('code').select_related('variable').order_by('variable__number').all():
         ea_values.append({
-        'number': ea_value.code.variable.number,
-        'name': ea_value.code.variable.name,
-        'code': ea_value.code.code,
-        'description': ea_value.code.description,
+        'number': ea_value.variable.number,
+        'name': ea_value.variable.name,
+        'code': ea_value.coded_value,
+        'description': ea_value.get_description(),
         })
     return render(request,'society.html', {'society': society,
                                            'environmentals': environmentals,
