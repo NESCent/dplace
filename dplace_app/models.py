@@ -121,6 +121,11 @@ class EAVariableCodedValue(models.Model):
     society = models.ForeignKey('Society', limit_choices_to={'source__in': [x[0] for x in SOCIETY_SOURCES]}, null=True)
     coded_value = models.CharField(max_length=20, db_index=True, null=False, default='.')
     code = models.ForeignKey('EAVariableCodeDescription', db_index=True, null=True)
+    def get_description(self):
+        if self.code is not None:
+            return self.code.description
+        else:
+            return u''
     def __unicode__(self):
         return "%s" % self.coded_value
     class Meta:
