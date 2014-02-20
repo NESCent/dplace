@@ -12,6 +12,32 @@ angular.module('dplaceServices', ['ngResource'])
                 }
             });
     })
+    .factory('EAVariable', function ($resource) {
+        return $resource(
+            '/api/v1/variables/:id',
+            {page_size: 1000}, {
+                query: {
+                    method: 'GET',
+                    isArray: true,
+                    transformResponse: function(data, headers) {
+                        return JSON.parse(data).results;
+                    }
+                }
+            });
+    })
+    .factory('EACodeDescription', function ($resource) {
+        return $resource(
+            '/api/v1/codes/:id',
+            {page_size: 1000}, {
+                query: {
+                    method: 'GET',
+                    isArray: true,
+                    transformResponse: function(data, headers) {
+                        return JSON.parse(data).results;
+                    }
+                }
+            });
+    })
     .factory('FindSocieties', function($resource) {
         return $resource(
             '/api/v1/find_societies',

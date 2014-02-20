@@ -3,12 +3,13 @@
     <div class="family col-md-5">
         <div class="row">
             <span>
-                <p class="pull-left lead">Language Families <span ng-show="selections.length">({{ selections.length }})</span></p>
+                <p class="pull-left lead">Language Families <span ng-show="languageSelections.length">({{ selections.length }})</span></p>
                 <a class="pull-right btn btn-primary" href="" ng-click="clearLanguages()">Clear All</a>
             </span>
         </div>
         <!-- Would be good to have an accordion here -->
-        <div class="row panel panel-default">
+        <!-- Language Families -->
+        <div class="row panel panel-default language_families">
             <div class="panel-heading">
                 <input ng-model="family_filter" class="form-control" placeholder="Filter Language Families"></input>
             </div>
@@ -53,13 +54,44 @@
                 </ul>
             </div>
         </div>
+        <div class="row panel panel-default ea_variables">
+            <div class="panel-heading">
+                <input ng-model="eaFilter" class="form-control" placeholder="Filter Ethnographic Atlas Variables"></input>
+            </div>
+            <div class="panel-body scrollable">
+                <ul class="list-unstyled">
+                    <li ng-repeat="eaVariable in eaVariables | filter:eaFilter">
+                        <label class="light">
+                            <input type="checkbox"
+                                   ng-model="eaVariable.expanded"
+                                   name="ea_variable_{{ eaVariable.id }}"
+                                   ng-change="updateEAVariable(eaVariable)"/>
+                            {{ eaVariable.number }}: {{ eaVariable.name }}
+                        </label>
+                        <div ng-show="eaVariable.expanded">
+                            <ul class="list-unstyled indent1">
+                                <li ng-repeat="code in eaVariable.codes">
+                                    <label class="light">
+                                    <input type="checkbox"
+                                           ng-model="code.selected"
+                                           name="code_{{ code.id }}"
+                                           ng-change="updateCode(code)"/>
+                                        {{ code.code }}: {{ code.description }}
+                                    </label>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
     </div>
     <div class="col-md-1"></div>
     <div class="results col-md-6">
         <div class="row">
             <span>
                 <p class="pull-left lead">Societies <span ng-show="societies.length">({{ societies.length }})</span></p>
-                <a class="pull-right btn btn-primary" href="" ng-click="getSocieties(selections)">Get Societies</a>
+                <a class="pull-right btn btn-primary" href="" ng-click="getSocieties()">Get Societies</a>
             </span>
         </div>
         <div class="row">

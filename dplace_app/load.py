@@ -117,6 +117,10 @@ def load_society(society_dict):
         society.save()
 
 def load_ea_var(var_dict):
+    """
+    Variables are loaded form ea_variable_names.csv for simplicity,
+    but there is more detailed information in ea_codes.csv
+    """
     number = int(var_dict['Variable number'])
     found_vars = EAVariableDescription.objects.filter(number=number)
     if len(found_vars) == 0:
@@ -187,7 +191,6 @@ def load_ea_codes(csvfile=None):
                 # This won't help for things that specify a range or include the word or
                 description = row[DESCRIPTION_COLUMN].strip()
                 code_description = EAVariableCodeDescription(variable=variable,
-                                                             number=number,
                                                              code=code,
                                                              description=description)
                 code_description.save()
@@ -214,13 +217,20 @@ def load_ea_val(val_row):
             number = int(key[1:])
             value = val_row[key].strip()
             try:
-                code = EAVariableCodeDescription.objects.get(number=number,code=value)
-                variable_value = EAVariableValue(code=code,
-                                                 society=society,
-                                                 )
-                variable_value.save()
+                variable = EAVariableDescription.objects.get(number=number)
             except ObjectDoesNotExist:
-                print "Unable to find a code object for variable %d with value %s, skipping" % (number, value)
+                print "Attempting to load EA values for variable %d but did not find an existing EAVariableDescription object" % number
+                continue
+            try:
+                # Check for Code description if it exists.
+                code = EAVariableCodeDescription.objects.get(variable=variable,code=value)
+            except ObjectDoesNotExist:
+                code = None
+            variable_value = EAVariableCodedValue(variable=variable,
+                                                  society=society,
+                                                  coded_value=value,
+                                                  code=code)
+            variable_value.save()
 
 def load_lang(lang_row):
     # Extract values from dictionary
