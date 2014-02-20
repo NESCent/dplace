@@ -5,6 +5,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import *
 from rest_framework.views import Request, Response
 from rest_framework.parsers import JSONParser
+from itertools import chain
 
 # Resource routes
 class EAVariableDescriptionViewSet(viewsets.ReadOnlyModelViewSet):
@@ -105,7 +106,7 @@ def find_societies(request):
     ea_variable_societies = Society.objects.filter(eavariablecodedvalue__in=coded_value_ids)
 
     # Combine the querysets
-    societies = language_societies | ea_variable_societies
+    societies = list(chain(language_societies, ea_variable_societies))
     return Response(SocietySerializer(societies).data)
 
 
