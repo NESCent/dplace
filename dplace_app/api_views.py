@@ -74,7 +74,7 @@ class LanguageViewSet(viewsets.ReadOnlyModelViewSet):
 def find_societies(request):
     """
     View to find the societies that match an input request.  Currently expects
-    { language_class_ids: [1,2,3...] }
+    { language_class_ids: [1,2,3...], ea_variable_codes: [4,5,6...] }
     """
     language_class_ids = request.QUERY_PARAMS.getlist('language_class_ids')
     language_class_ids = [int(x) for x in language_class_ids]
@@ -91,7 +91,21 @@ def find_societies(request):
     for language_classification in language_classifications:
         iso_codes.append(language_classification.language.iso_code)
     # now get societies from ISO codes
-    societies = Society.objects.filter(iso_code__in=iso_codes)
+    language_societies = Society.objects.filter(iso_code__in=iso_codes)
+
+    # Now get the societies from EA Variables
+    ea_variable_code_ids = request.QUERY_PARAMS.getlist('ea_variable_codes')
+    ea_variable_code_ids = [int(x) for x in ea_variable_code_ids]
+    codes = EAVariableCodeDescription.objects.filter(pk__in=ea_variable_code_ids) # returns a queryset
+    coded_value_ids = []
+    # Aggregate all the coded values for each selected code
+    for code in codes:
+        coded_value_ids += code.eavariablecodedvalue_set.values_list('id', flat=True)
+    # Coded values have a FK to society.  Aggregate the societies from each value
+    ea_variable_societies = Society.objects.filter(eavariablecodedvalue__in=coded_value_ids)
+
+    # Combine the querysets
+    societies = language_societies | ea_variable_societies
     return Response(SocietySerializer(societies).data)
 
 
