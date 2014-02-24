@@ -35,3 +35,9 @@ class EATestCase(TestCase):
     def test_coded_variable(self):
         self.assertEqual(self.code1.variable,self.variable)
         self.assertEqual(self.code2.variable,self.variable)
+    def test_society_variable(self):
+        self.assertIn(self.ea_society, self.variable.coded_societies())
+        self.assertNotIn(self.binford_society, self.variable.coded_societies())
+    def test_society_code(self):
+        self.assertIn(self.ea_society, self.code1.coded_societies())
+        self.assertNotIn(self.ea_society, self.code2.coded_societies())
