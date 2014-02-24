@@ -62,7 +62,7 @@ class Environmental(models.Model):
     def __unicode__(self):
         return "%d Society: %d" % (self.id, self.society_id)
     class Meta:
-        verbose_name = "Environmental Data Set"
+        verbose_name = "Environmental"
 
 class EAVariableDescription(models.Model):
     """
@@ -74,10 +74,12 @@ class EAVariableDescription(models.Model):
     """
     number = models.IntegerField(unique=True, default=0)
     name = models.CharField(max_length=200, db_index=True, default='Unknown')
+    def coded_societies(self):
+        return Society.objects.filter(eavariablecodedvalue__in=self.values.all())
     def __unicode__(self):
         return "%d - %s" % (self.number, self.name)
     class Meta:
-        verbose_name = "Ethnographic Atlas Variable"
+        verbose_name = "EA Variable"
         ordering=("number",)
 
 class EAVariableCodeDescription(models.Model):
@@ -96,10 +98,12 @@ class EAVariableCodeDescription(models.Model):
     variable = models.ForeignKey('EAVariableDescription', related_name="codes", db_index=True)
     code = models.CharField(max_length=20, db_index=True, null=False, default='.')
     description = models.CharField(max_length=500, default='Unknown')
+    def coded_societies(self):
+        return Society.objects.filter(eavariablecodedvalue__coded_value=self.code)
     def __unicode__(self):
         return "%s - %s" % (self.code, self.description)
     class Meta:
-        verbose_name = "Ethnographic Atlas Variable Code Description"
+        verbose_name = "EA Code"
         ordering = ("variable", "code")
 
 class EAVariableCodedValue(models.Model):
@@ -129,7 +133,7 @@ class EAVariableCodedValue(models.Model):
     def __unicode__(self):
         return "%s" % self.coded_value
     class Meta:
-        verbose_name = "Ethnographic Atlas Variable Coded Value"
+        verbose_name = "EA Value"
         ordering = ("variable", "coded_value")
         index_together = [
             ['variable','society'],
