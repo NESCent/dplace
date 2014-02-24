@@ -74,6 +74,8 @@ class EAVariableDescription(models.Model):
     """
     number = models.IntegerField(unique=True, default=0)
     name = models.CharField(max_length=200, db_index=True, default='Unknown')
+    def coded_societies(self):
+        return Society.objects.filter(eavariablecodedvalue__in=self.values.all())
     def __unicode__(self):
         return "%d - %s" % (self.number, self.name)
     class Meta:
@@ -96,6 +98,8 @@ class EAVariableCodeDescription(models.Model):
     variable = models.ForeignKey('EAVariableDescription', related_name="codes", db_index=True)
     code = models.CharField(max_length=20, db_index=True, null=False, default='.')
     description = models.CharField(max_length=500, default='Unknown')
+    def coded_societies(self):
+        return Society.objects.filter(eavariablecodedvalue__coded_value=self.code)
     def __unicode__(self):
         return "%s - %s" % (self.code, self.description)
     class Meta:
