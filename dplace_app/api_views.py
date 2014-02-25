@@ -4,8 +4,6 @@ from serializers import *
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import *
 from rest_framework.views import Request, Response
-from rest_framework.parsers import JSONParser
-from itertools import chain
 
 # Resource routes
 class EAVariableDescriptionViewSet(viewsets.ReadOnlyModelViewSet):
