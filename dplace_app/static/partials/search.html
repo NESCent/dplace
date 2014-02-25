@@ -94,26 +94,35 @@
                 <a class="pull-right btn btn-primary" href="" ng-click="getSocieties()">Get Societies</a>
             </span>
         </div>
-        <div class="row">
-            <div ng-hide="societies.length">
-                <p class="text-center help-block search-help">Choose one or more language families, then click <strong>Get Societies</strong>.</p>
-            </div>
-            <table class="table" ng-show="societies.length">
-                <tr>
-                    <th>Name</th>
-                    <th>Id</th>
-                    <th>ISO Code</th>
-                    <th>Location</th>
-                </tr>
-                <tr ng-repeat="society in societies">
-                    <td><a ng-href="/society/{{ society.id }}" target="_blank">{{ society.name }}</a></td>
-                    <td>{{ society.ext_id }}</td>
-                    <td>{{ society.iso_code }}</td>
-                    <td>{{ society.location.coordinates }}</td>
-                </tr>
-            </table>
+        <tabset>
+            <tab heading="Table">
+                <div class="row">
+                    <div ng-hide="societies.length">
+                        <p class="text-center help-block search-help">Choose one or more language families, then click <strong>Get Societies</strong>.</p>
+                    </div>
+                    <table class="table" ng-show="societies.length">
+                        <tr>
+                            <th>Name</th>
+                            <th>Id</th>
+                            <th>ISO Code</th>
+                            <th>Location</th>
+                        </tr>
+                        <tr ng-repeat="society in societies">
+                            <td><a ng-href="/society/{{ society.id }}" target="_blank">{{ society.name }}</a></td>
+                            <td>{{ society.ext_id }}</td>
+                            <td>{{ society.iso_code }}</td>
+                            <td>{{ society.location.coordinates }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </tab>
+            <tab heading="Map">
+                <ng-include src="'/static/partials/map.html'"></ng-include>
+            </tab>
+        </tabset>
 
-        </div>
+
+
     </div>
 
 </div>
