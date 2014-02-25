@@ -1,4 +1,4 @@
-angular.module('dplace', ['ngRoute', 'dplaceServices']) // Should look at ui-router instead
+angular.module('dplace', ['ngRoute', 'dplaceServices', 'ui.bootstrap']) // Should look at ui-router
     .config(dplaceRouter);
 
 function dplaceRouter($routeProvider) {
