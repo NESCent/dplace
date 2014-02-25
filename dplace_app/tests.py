@@ -2,6 +2,9 @@ from django.db.utils import IntegrityError
 from django.test import TestCase
 from dplace_app.models import *
 from django.contrib.gis.geos import Polygon, Point
+from rest_framework import status
+from rest_framework.test import APIRequestFactory, APITestCase
+from django.core.urlresolvers import reverse
 
 class ISOCodeTestCase(TestCase):
     '''
@@ -41,3 +44,117 @@ class EATestCase(TestCase):
     def test_society_code(self):
         self.assertIn(self.ea_society, self.code1.coded_societies())
         self.assertNotIn(self.ea_society, self.code2.coded_societies())
+
+class ISOCodeAPITestCase(APITestCase):
+    '''
+    Tests rest-framework API.  Verifies a single ISO code created can be fetched with
+    HTTP 200
+    '''
+    def setUp(self):
+        self.code = ISOCode.objects.create(iso_code='abc',location=Point(5.0,5.0))
+    def test_isocode_api(self):
+        url = reverse('isocode-list')
+        response = self.client.get(url,format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        response_dict = response.data
+        self.assertEqual(response_dict['count'],1)
+        self.assertEqual(response_dict['results'][0]['iso_code'],self.code.iso_code)
+
+class FindSocietiesTestCase(APITestCase):
+    '''
+    Tests the find societies API
+    '''
+    def setUp(self):
+        # make two societies
+        iso_code1 = ISOCode.objects.create(iso_code='abc',location=Point(1.0,1.0))
+        iso_code2 = ISOCode.objects.create(iso_code='def',location=Point(2.0,2.0))
+        iso_code3 = ISOCode.objects.create(iso_code='ghi',location=Point(3.0,3.0))
+        self.society1 = Society.objects.create(ext_id='society1',name='Society1',location=Point(1.0,1.0),source='EA',iso_code=iso_code1)
+        self.society2 = Society.objects.create(ext_id='society2',name='Society2',location=Point(2.0,2.0),source='EA',iso_code=iso_code2)
+        # Society 3 has the same language characteristics as society 1 but different EA Vars
+        self.society3 = Society.objects.create(ext_id='society3',name='Society3',location=Point(3.0,3.0),source='EA',iso_code=iso_code3)
+
+        # make a language class tree
+        self.root_language_class = LanguageClass.objects.create(name='root',level=1,parent=None)
+        self.parent_language_class_1 = LanguageClass.objects.create(name='parent1',level=2,parent=self.root_language_class)
+        self.child_language_class_1a = LanguageClass.objects.create(name='child1',level=3,parent=self.parent_language_class_1)
+        self.child_language_class_1b = LanguageClass.objects.create(name='child1',level=3,parent=self.parent_language_class_1)
+        self.parent_language_class_2 = LanguageClass.objects.create(name='parent2',level=2,parent=self.root_language_class)
+        self.child_language_class_2 = LanguageClass.objects.create(name='child2',level=3,parent=self.parent_language_class_2)
+
+        # Make languages linked to the societies
+        language1 = Language.objects.create(name='language1',iso_code=iso_code1,society=self.society1)
+        language2 = Language.objects.create(name='language2',iso_code=iso_code2,society=self.society2)
+        language3 = Language.objects.create(name='language3',iso_code=iso_code3,society=self.society3)
+
+        # make language classifications to link a language to its class tree
+        lc1 = LanguageClassification.objects.create(language=language1,
+                                                    name='lc1',
+                                                    class_family=self.root_language_class,
+                                                    class_subfamily=self.parent_language_class_1,
+                                                    class_subsubfamily=self.child_language_class_1a)
+        lc2 = LanguageClassification.objects.create(language=language2,
+                                                    name='lc2',
+                                                    class_family=self.root_language_class,
+                                                    class_subfamily=self.parent_language_class_2,
+                                                    class_subsubfamily=self.child_language_class_2)
+        lc3 = LanguageClassification.objects.create(language=language3,
+                                                    name='lc3',
+                                                    class_family=self.root_language_class,
+                                                    class_subfamily=self.parent_language_class_1,
+                                                    class_subsubfamily=self.child_language_class_1b)
+        # Make an EA Variable, code, and value
+        variable = EAVariableDescription.objects.create(number=1,name='Variable 1')
+        self.code1 = EAVariableCodeDescription.objects.create(variable=variable, code='1', description='Code 1')
+        self.code2 = EAVariableCodeDescription.objects.create(variable=variable, code='2', description='Code 2')
+        self.code3 = EAVariableCodeDescription.objects.create(variable=variable, code='3', description='Code 3')
+        value1 = EAVariableCodedValue.objects.create(variable=variable,society=self.society1,coded_value='1',code=self.code1)
+        value2 = EAVariableCodedValue.objects.create(variable=variable,society=self.society2,coded_value='2',code=self.code2)
+        self.url = reverse('find_societies')
+    def test_find_societies_by_root_language(self):
+        language_class_ids = [self.root_language_class.pk]
+        data = {'language_class_ids': language_class_ids}
+        response = self.client.get(self.url,data,format='json')
+        self.assertIn(self.society1.id,[x['id'] for x in response.data])
+        self.assertIn(self.society2.id,[x['id'] for x in response.data])
+        self.assertIn(self.society3.id,[x['id'] for x in response.data])
+    def test_find_societies_by_parent_language(self):
+        # 1 and 3 but not 2
+        language_class_ids = [self.parent_language_class_1.pk]
+        data = {'language_class_ids': language_class_ids}
+        response = self.client.get(self.url,data,format='json')
+        self.assertIn(self.society1.id,[x['id'] for x in response.data])
+        self.assertNotIn(self.society2.id,[x['id'] for x in response.data])
+        self.assertIn(self.society3.id,[x['id'] for x in response.data])
+    def test_find_societies_by_parent_and_child_language(self):
+        # 1 and 2 but not 3
+        language_class_ids = [self.child_language_class_1a.pk, self.child_language_class_2.pk]
+        data = {'language_class_ids': language_class_ids}
+        response = self.client.get(self.url,data,format='json')
+        self.assertIn(self.society1.id,[x['id'] for x in response.data])
+        self.assertIn(self.society2.id,[x['id'] for x in response.data])
+        self.assertNotIn(self.society3.id,[x['id'] for x in response.data])
+    def test_find_society_by_eavar(self):
+        data = {'ea_variable_codes': [self.code1.pk]}
+        response = self.client.get(self.url,data,format='json')
+        self.assertIn(self.society1.id,[x['id'] for x in response.data])
+        self.assertNotIn(self.society2.id,[x['id'] for x in response.data])
+    def test_find_societies_by_eavar(self):
+        data = {'ea_variable_codes': [self.code1.pk, self.code2.pk]}
+        response = self.client.get(self.url,data,format='json')
+        self.assertIn(self.society1.id,[x['id'] for x in response.data])
+        self.assertIn(self.society2.id,[x['id'] for x in response.data])
+    def test_find_no_societies(self):
+        data = {'ea_variable_codes': [self.code3.pk]}
+        response = self.client.get(self.url,data,format='json')
+        self.assertEqual(len(response.data),0)
+    def test_find_society_by_language_and_eavar(self):
+        # 1 and 3 share a parent language class
+        # 2 does not share a parent language
+        # this should return only 1 and not 2 or 3
+        data = {'ea_variable_codes': [self.code1.pk, self.code2.pk],
+                'language_class_ids': [self.parent_language_class_1.pk]}
+        response = self.client.get(self.url,data,format='json')
+        self.assertIn(self.society1.id,[x['id'] for x in response.data])
+        self.assertNotIn(self.society2.id,[x['id'] for x in response.data])
+        self.assertNotIn(self.society3.id,[x['id'] for x in response.data])
