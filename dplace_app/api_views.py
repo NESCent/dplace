@@ -116,6 +116,6 @@ def find_societies(request):
             else:
                 societies = societies & results[k]
 
-    return Response(SocietySerializer(societies).data)
+    return Response(SocietySerializer(societies,many=True).data)
 
 
