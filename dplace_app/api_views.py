@@ -107,11 +107,11 @@ def find_societies(request):
         # Coded values have a FK to society.  Aggregate the societies from each value
         results['ea_variable_societies'] = Society.objects.filter(eavariablecodedvalue__in=coded_value_ids)
 
-    societies = None
+    societies = []
     # Intersect the querysets
     for k in results.keys():
         if results[k] is not None:
-            if societies is None:
+            if len(societies) == 0:
                 societies = results[k]
             else:
                 societies = societies & results[k]
