@@ -13,6 +13,9 @@ function MapCtrl($scope) {
     $scope.icon = new OpenLayers.Icon('http://www.openlayers.org/dev/img/marker.png', size, offset);
     $scope.addMarkers = function() {
         $scope.markers.clearMarkers();
+        if(!$scope.societies) {
+            return;
+        }
         $scope.societies.forEach(function(society) {
             var coordinates = society.location.coordinates;
             // Add a marker for each point
@@ -32,4 +35,8 @@ function MapCtrl($scope) {
             $scope.markers.addMarker(marker);
         });
     };
+    // Update markers when societies change
+    $scope.$watchCollection('societies', function(oldvalue, newvalue) {
+        $scope.addMarkers();
+    });
 }
