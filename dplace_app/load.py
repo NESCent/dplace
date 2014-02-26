@@ -35,8 +35,8 @@ def load_isocode(iso_dict):
     code = iso_dict['ISO']
     found_codes = ISOCode.objects.filter(iso_code=code)
     if len(found_codes) == 0:
-        latlon = Point(float(iso_dict['LMP_LAT']),float(iso_dict['LMP_LON']))
-        isocode = ISOCode(iso_code=code,location=latlon)
+        lonlat = Point(float(iso_dict['LMP_LON']),float(iso_dict['LMP_LAT']))
+        isocode = ISOCode(iso_code=code,location=lonlat)
         isocode.save()
 
 # These are all floats
@@ -85,8 +85,8 @@ def load_environmental(env_dict):
     # This limits the environmental data to one record per society record
     found_environmentals = Environmental.objects.filter(society=society)
     if len(found_environmentals) == 0:
-        reported_latlon =  Point(float(env_dict['Reported_Lat']),float(env_dict['Reported_Lon']))
-        actual_latlon = Point(float(env_dict['latitude']), float(env_dict['longitude']))
+        reported_latlon =  Point(float(env_dict['Reported_Lon']),float(env_dict['Reported_Lat']))
+        actual_latlon = Point(float(env_dict['longitude']), float(env_dict['latitude']))
         iso_code = iso_from_code(env_dict['iso'])
 
         environmental = Environmental(society=society,
@@ -106,7 +106,7 @@ def load_society(society_dict):
     found_societies = Society.objects.filter(ext_id=ext_id,source=source)
     if len(found_societies) == 0:
         name = society_dict['society_name']
-        location = Point(float(society_dict['lat']),float(society_dict['long']))
+        location = Point(float(society_dict['long']),float(society_dict['lat']))
         iso_code = iso_from_code(society_dict['iso'])
         society = Society(ext_id=ext_id,
                           name=name,
