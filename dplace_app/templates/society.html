@@ -2,7 +2,11 @@
 {% load bootstrap3 %}
 {% block content %}
 <div class="container">
-    <h1>Society: {{ society.name }}</h1>
+    {% if language %}
+        <h1>Language {{ language.name }} from {{ society.name }}</h1>
+    {% else %}
+        <h1>Society: {{ society.name }}</h1>
+    {% endif %}
     <h2>Environmental Data</h2>
     {% for environmental in environmentals %}
     <table class="table table-bordered table-condensed table-striped">

@@ -21,9 +21,10 @@ router.register(r'languages', api_views.LanguageViewSet)
 # Additionally, we include login URLs for the browseable API.
 
 urlpatterns = patterns('dplace_app.views',
-	url(r'^$', RedirectView.as_view(url='search_geo/'), name='home'),
-	url(r'^search_geo/$', 'search_geo', name='search_geo'),
-	url(r'^society/(?P<society_id>\d+)/$', 'view_society', name='view_society'),
+    url(r'^$', RedirectView.as_view(url='search_geo/'), name='home'), 
+    url(r'^search_geo/$', 'search_geo', name='search_geo'),
+    url(r'^society/(?P<society_id>\d+)/$', 'view_society', name='view_society'),
+    url(r'^language/(?P<language_id>\d+)/$', 'view_language', name='view_language'),
     url(r'^angular/$', 'angular', name='angular'),
 	# API
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
