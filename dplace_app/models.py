@@ -26,8 +26,23 @@ class Society(models.Model):
     location = models.PointField('Location')
     source = models.CharField(max_length=16,choices=SOCIETY_SOURCES)
     iso_code = models.ForeignKey('ISOCode', null=True, related_name="societies")
+    
+    def get_ethnographic_atlas_data(self):
+        """Returns the Ethnographic Atlas data for the given society"""
+        ea_values = []
+        qset = self.eavariablecodedvalue_set.select_related('code').select_related('variable')
+        for ea_value in qset.order_by('variable__number').all():
+            ea_values.append({
+                'number': ea_value.variable.number,
+                'name': ea_value.variable.name,
+                'code': ea_value.coded_value,
+                'description': ea_value.get_description(),
+            })
+        return ea_values
+
     def __unicode__(self):
         return "%s - %s (%s)" % (self.ext_id, self.name, self.source)
+    
     class Meta:
         verbose_name_plural = "Societies"
 
