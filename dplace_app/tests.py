@@ -171,3 +171,6 @@ class FindSocietiesTestCase(APITestCase):
         self.assertIn(self.society1.id,[x['id'] for x in response.data])
         self.assertNotIn(self.society2.id,[x['id'] for x in response.data])
         self.assertNotIn(self.society3.id,[x['id'] for x in response.data])
+    def test_empty_response(self):
+        response = self.client.get(self.url,{},format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
