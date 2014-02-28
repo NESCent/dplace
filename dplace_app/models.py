@@ -112,14 +112,24 @@ class EAVariableCodeDescription(models.Model):
     """
     variable = models.ForeignKey('EAVariableDescription', related_name="codes", db_index=True)
     code = models.CharField(max_length=20, db_index=True, null=False, default='.')
+    code_number = models.IntegerField(null=True, db_index=True)
     description = models.CharField(max_length=500, default='Unknown')
+    def save(self, *args, **kwargs):
+        self.read_code_number()
+        super(EAVariableCodeDescription, self).save(*args, **kwargs)
+    def read_code_number(self):
+        try:
+            self.code_number = int(self.code)
+        except ValueError:
+            pass
+
     def coded_societies(self):
         return Society.objects.filter(eavariablecodedvalue__coded_value=self.code)
     def __unicode__(self):
         return "%s - %s" % (self.code, self.description)
     class Meta:
         verbose_name = "EA Code"
-        ordering = ("variable", "code")
+        ordering = ("variable", "code_number", "code")
 
 class EAVariableCodedValue(models.Model):
     """
