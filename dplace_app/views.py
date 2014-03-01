@@ -1,6 +1,7 @@
 from __builtin__ import dict
+from django.http import Http404
 from django.shortcuts import render, get_object_or_404
-from dplace_app.models import Society
+from dplace_app.models import Society, Language
 from forms import GeoForm
 from models import ISOCode
 # Create your views here.
@@ -30,16 +31,19 @@ def search_geo(request):
 def view_society(request, society_id):
     society = get_object_or_404(Society, pk=society_id)
     environmentals = society.environmentals.all()
-    ea_values = []
-    # get ethnographic atlas data
-    for ea_value in society.eavariablecodedvalue_set.select_related('code').select_related('variable').order_by('variable__number').all():
-        ea_values.append({
-        'number': ea_value.variable.number,
-        'name': ea_value.variable.name,
-        'code': ea_value.coded_value,
-        'description': ea_value.get_description(),
-        })
+    ea_values = society.get_ethnographic_atlas_data()
     return render(request,'society.html', {'society': society,
+                                           'environmentals': environmentals,
+                                           'ea_values': ea_values})
+
+def view_language(request, language_id):
+    language = get_object_or_404(Language, pk=language_id)
+    if language.society is None:
+        raise Http404
+    environmentals = language.society.environmentals.all()
+    ea_values = language.society.get_ethnographic_atlas_data()
+    return render(request,'society.html', {'language': language,
+                                           'society': language.society,
                                            'environmentals': environmentals,
                                            'ea_values': ea_values})
 

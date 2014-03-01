@@ -27,6 +27,7 @@ class EATestCase(TestCase):
         self.ea_society = Society.objects.create(ext_id='easoc',name='EA Society',location=Point(0.0,0.0),source='EA',iso_code=self.iso_code)
         self.binford_society = Society.objects.create(ext_id='binfordsoc',name='Binford Society',location=Point(0.0,0.0),source='Binford',iso_code=self.iso_code)
         self.variable = EAVariableDescription.objects.create(number=1,name='Variable 1')
+        self.code10 = EAVariableCodeDescription.objects.create(variable=self.variable, code='10', description='Code 10')
         self.code1 = EAVariableCodeDescription.objects.create(variable=self.variable, code='1', description='Code 1')
         self.code2 = EAVariableCodeDescription.objects.create(variable=self.variable, code='2', description='Code 2')
         self.value = EAVariableCodedValue.objects.create(variable=self.variable,society=self.ea_society,coded_value='1',code=self.code1)
@@ -44,6 +45,18 @@ class EATestCase(TestCase):
     def test_society_code(self):
         self.assertIn(self.ea_society, self.code1.coded_societies())
         self.assertNotIn(self.ea_society, self.code2.coded_societies())
+    def test_code_order(self):
+        '''
+        Make sure 2 comes before 10
+        '''
+        index_of_2 = index_of_10 = index = 0
+        for code in self.variable.codes.all():
+            if code == self.code2:
+                index_of_2 = index
+            elif code == self.code10:
+                index_of_10 = index
+            index += 1
+        self.assertLess(index_of_2, index_of_10)
 
 class ISOCodeAPITestCase(APITestCase):
     '''
@@ -158,3 +171,6 @@ class FindSocietiesTestCase(APITestCase):
         self.assertIn(self.society1.id,[x['id'] for x in response.data])
         self.assertNotIn(self.society2.id,[x['id'] for x in response.data])
         self.assertNotIn(self.society3.id,[x['id'] for x in response.data])
+    def test_empty_response(self):
+        response = self.client.get(self.url,{},format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)

@@ -26,8 +26,23 @@ class Society(models.Model):
     location = models.PointField('Location')
     source = models.CharField(max_length=16,choices=SOCIETY_SOURCES)
     iso_code = models.ForeignKey('ISOCode', null=True, related_name="societies")
+    
+    def get_ethnographic_atlas_data(self):
+        """Returns the Ethnographic Atlas data for the given society"""
+        ea_values = []
+        qset = self.eavariablecodedvalue_set.select_related('code').select_related('variable')
+        for ea_value in qset.order_by('variable__number').all():
+            ea_values.append({
+                'number': ea_value.variable.number,
+                'name': ea_value.variable.name,
+                'code': ea_value.coded_value,
+                'description': ea_value.get_description(),
+            })
+        return ea_values
+
     def __unicode__(self):
         return "%s - %s (%s)" % (self.ext_id, self.name, self.source)
+    
     class Meta:
         verbose_name_plural = "Societies"
 
@@ -97,14 +112,24 @@ class EAVariableCodeDescription(models.Model):
     """
     variable = models.ForeignKey('EAVariableDescription', related_name="codes", db_index=True)
     code = models.CharField(max_length=20, db_index=True, null=False, default='.')
+    code_number = models.IntegerField(null=True, db_index=True)
     description = models.CharField(max_length=500, default='Unknown')
+    def save(self, *args, **kwargs):
+        self.read_code_number()
+        super(EAVariableCodeDescription, self).save(*args, **kwargs)
+    def read_code_number(self):
+        try:
+            self.code_number = int(self.code)
+        except ValueError:
+            pass
+
     def coded_societies(self):
         return Society.objects.filter(eavariablecodedvalue__coded_value=self.code)
     def __unicode__(self):
         return "%s - %s" % (self.code, self.description)
     class Meta:
         verbose_name = "EA Code"
-        ordering = ("variable", "code")
+        ordering = ("variable", "code_number", "code")
 
 class EAVariableCodedValue(models.Model):
     """
