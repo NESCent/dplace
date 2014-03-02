@@ -14,19 +14,17 @@
             </div>
             <div class="panel-body scrollable">
                     <div ng-repeat="family in families | filter:family_filter">
-                        <span ng-click="toggleShowChildren(family)">
-                            <small><i class="glyphicon" ng-class="{'glyphicon-chevron-down': family.isShowingChildren, 'glyphicon-chevron-right': !family.isShowingChildren}"></i></small>
+                        <span ng-click="toggleShowChildren(family)" ng-class="{'triangle-down' : family.isShowingChildren, 'triangle-right' : !family.isShowingChildren }">
                             {{ family.name }}
                         </span>
                         <input class="pull-right" type="checkbox" ng-model="family.isSelected" ng-change="updateFamilySelected(family)"/>
                         <div ng-show="family.isShowingChildren" class="indent1">
                                 <div ng-repeat="subfamily in family.children">
-                                    <span ng-click="toggleShowChildren(subfamily)">
-                                        <small><i class="glyphicon" ng-class="{'glyphicon-chevron-down': subfamily.isShowingChildren, 'glyphicon-chevron-right': !subfamily.isShowingChildren}"></i></small>
+                                    <span ng-click="toggleShowChildren(subfamily)" ng-class="{'triangle-down' : subfamily.isShowingChildren, 'triangle-right' : !subfamily.isShowingChildren }">
                                         {{ subfamily.name }}
                                     </span>
                                     <input class="pull-right" type="checkbox" ng-model="subfamily.isSelected" ng-change="updateFamilySelected(subfamily, family)"/>
-                                <div ng-show="subfamily.isShowingChildren" class="indent4">
+                                <div ng-show="subfamily.isShowingChildren" class="indent3">
                                     <div ng-repeat="subsubfamily in subfamily.children">
                                         {{ subsubfamily.name }}&nbsp;
                                         <input class="pull-right" type="checkbox" ng-model="subsubfamily.isSelected" ng-change="updateFamilySelected(subsubfamily, subfamily, family)"/>
