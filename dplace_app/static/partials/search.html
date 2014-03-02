@@ -42,11 +42,11 @@
             <div class="panel-body scrollable">
                 <div ng-repeat="eaVariable in eaVariables | filter:eaFilter">
                     <span ng-click="toggleShowEACodes(eaVariable)">
-                        <span class="small pull-left"><i class="glyphicon" ng-class="{'glyphicon-chevron-down': eaVariable.isShowingCodes, 'glyphicon-chevron-right': !eaVariable.isShowingCodes}"></i></span>
+                        <span class="small pull-left"><i class="glyphicon" ng-class="{'triangle-down': eaVariable.isShowingCodes, 'triangle-right': !eaVariable.isShowingCodes}"></i></span>
                         <span class="ea-number pull-left">{{ eaVariable.number }}:</span>
                         <span class="ea-description">{{ eaVariable.name }}</span>
                     </span>
-                    <div ng-show="eaVariable.isShowingCodes" class="indent2">
+                    <div ng-show="eaVariable.isShowingCodes" class="indent3">
                         <div ng-repeat="code in eaVariable.codes">
                             <span class="ea-number pull-left">{{ code.code }}:</span>
                             <span class="ea-description">{{ code.description }}</span>
