@@ -6,6 +6,10 @@
     text-indent: 2rem;
 }
 
+.indent3 {
+    text-indent: 3rem;
+}
+
 .indent4 {
     text-indent: 4rem;
 }
@@ -33,4 +37,12 @@ label.light {
 .ea-description {
     text-align: left;
     padding-left: 1rem;
+}
+
+.triangle-right:before {
+    content: "\25B6";
+}
+
+.triangle-down:before {
+    content: "\25BC";
 }
