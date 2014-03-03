@@ -121,7 +121,14 @@ def load_ea_var(var_dict):
     Variables are loaded form ea_variable_names.csv for simplicity,
     but there is more detailed information in ea_codes.csv
     """
-    number = int(var_dict['Variable number'])
+    try:
+        number = int(var_dict['Variable number'])
+    except ValueError:
+        return
+    exclude = var_dict['Exclude from D-PLACE?']
+    if exclude == '1':
+        return
+
     found_vars = EAVariableDescription.objects.filter(number=number)
     if len(found_vars) == 0:
         name = var_dict['Variable'].strip()
