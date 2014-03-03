@@ -37,10 +37,6 @@ class LanguageClassSerializer(serializers.ModelSerializer):
     class Meta:
         model = LanguageClass
 
-class LanguageFamilySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = LanguageFamily
-
 class LanguageClassificationSerializer(serializers.ModelSerializer):
     class Meta:
         model = LanguageClassification

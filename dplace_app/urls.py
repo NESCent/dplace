@@ -13,7 +13,6 @@ router.register(r'societies', api_views.SocietyViewSet)
 router.register(r'environmentals', api_views.EnvironmentalViewSet)
 router.register(r'isocodes', api_views.ISOCodeViewSet)
 router.register(r'language_classes', api_views.LanguageClassViewSet)
-router.register(r'language_families', api_views.LanguageFamilyViewSet)
 router.register(r'language_classifications', api_views.LanguageClassificationViewSet)
 router.register(r'languages', api_views.LanguageViewSet)
 
