@@ -255,9 +255,8 @@ def load_lang(lang_row):
     # Extract values from dictionary
     code = lang_row['ISO 693-3 code']
     language_name = lang_row['Language name']
-    family_name = lang_row['FAMILY-CORRECTED']
-    classification_name = lang_row['Classification']
-    class_names = [lang_row['Class1'], lang_row['Class2'], lang_row['Class3']]
+    ethnologue_classification = lang_row['Ethnologue Classification (unrevised)']
+    family_names = [lang_row['FAMILY-REVISED'], lang_row['Class2'], lang_row['Class3']]
 
     # ISO Code
     isocode = iso_from_code(code) # Does not create new ISO Codes
@@ -274,40 +273,39 @@ def load_lang(lang_row):
                             iso_code=isocode
                             )
         language.save()
-    # Family
-    try:
-        family = LanguageFamily.objects.get(name=family_name)
-    except ObjectDoesNotExist:
-        family = LanguageFamily(name=family_name)
-        family.save()
-
     # Classes
     classes = []
     for i in range(3):
         level = i + 1
+        name = family_names[i].strip()
+        if len(name) == 0:
+            # empty cell
+            continue
         try:
-            classes.append(LanguageClass.objects.get(level=level,name=class_names[i]))
+            classes.append(LanguageClass.objects.get(level=level,name=name))
         except ObjectDoesNotExist:
             if len(classes) > 0:
                 parent = classes[-1]
             else:
                 parent = None
-            lang_class = LanguageClass(level=level, name=class_names[i], parent=parent)
+            lang_class = LanguageClass(level=level, name=name, parent=parent)
             lang_class.save()
             classes.append(lang_class)
 
     # Finally, create the LanguageClassification
     classification_scheme = 'R' # Ethnologue17-Revised
     try:
-        classification = LanguageClassification.objects.get(name=classification_name)
+        classification = LanguageClassification.objects.get(ethnologue_classification=ethnologue_classification)
     except ObjectDoesNotExist:
+        class_family = classes[0]
+        class_subfamily = classes[1] if len(classes) > 1 else None
+        class_subsubfamily = classes[2] if len(classes) > 2 else None
         classification = LanguageClassification(scheme=classification_scheme,
                                                 language=language,
-                                                name=classification_name,
-                                                family=family,
-                                                class_family=classes[0],
-                                                class_subfamily=classes[1],
-                                                class_subsubfamily=classes[2],
+                                                ethnologue_classification=ethnologue_classification,
+                                                class_family=class_family,
+                                                class_subfamily=class_subfamily,
+                                                class_subsubfamily=class_subsubfamily,
                                                 )
         classification.save()
 
