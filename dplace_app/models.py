@@ -114,6 +114,7 @@ class EAVariableCodeDescription(models.Model):
     code = models.CharField(max_length=20, db_index=True, null=False, default='.')
     code_number = models.IntegerField(null=True, db_index=True)
     description = models.CharField(max_length=500, default='Unknown')
+    n = models.IntegerField(null=True, default=0)
     def save(self, *args, **kwargs):
         self.read_code_number()
         super(EAVariableCodeDescription, self).save(*args, **kwargs)
