@@ -239,7 +239,6 @@ def load_ea_val(val_row):
             try:
                 variable = EAVariableDescription.objects.get(number=number)
             except ObjectDoesNotExist:
-                print "Attempting to load EA values for variable %d but did not find an existing EAVariableDescription object" % number
                 continue
             try:
                 # Check for Code description if it exists.
