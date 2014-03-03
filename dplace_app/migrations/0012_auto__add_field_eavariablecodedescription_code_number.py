@@ -12,10 +12,6 @@ class Migration(SchemaMigration):
         db.add_column(u'dplace_app_eavariablecodedescription', 'code_number',
                       self.gf('django.db.models.fields.IntegerField')(null=True, db_index=True),
                       keep_default=False)
-        for code in EAVariableCodeDescription.objects.all():
-            # Populate the new field
-            code.save()
-
 
     def backwards(self, orm):
         # Deleting field 'EAVariableCodeDescription.code_number'
