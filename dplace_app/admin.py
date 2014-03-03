@@ -11,6 +11,5 @@ admin.site.register(EAVariableCodeDescription)
 admin.site.register(EAVariableCodedValue)
 
 admin.site.register(LanguageClass)
-admin.site.register(LanguageFamily)
 admin.site.register(LanguageClassification)
 admin.site.register(Language)

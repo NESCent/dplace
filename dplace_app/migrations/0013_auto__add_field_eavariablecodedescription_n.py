@@ -3,19 +3,20 @@ from south.utils import datetime_utils as datetime
 from south.db import db
 from south.v2 import SchemaMigration
 from django.db import models
-from dplace_app.models import EAVariableCodeDescription
+
 
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding field 'EAVariableCodeDescription.code_number'
-        db.add_column(u'dplace_app_eavariablecodedescription', 'code_number',
-                      self.gf('django.db.models.fields.IntegerField')(null=True, db_index=True),
+        # Adding field 'EAVariableCodeDescription.n'
+        db.add_column(u'dplace_app_eavariablecodedescription', 'n',
+                      self.gf('django.db.models.fields.IntegerField')(default=0, null=True),
                       keep_default=False)
 
+
     def backwards(self, orm):
-        # Deleting field 'EAVariableCodeDescription.code_number'
-        db.delete_column(u'dplace_app_eavariablecodedescription', 'code_number')
+        # Deleting field 'EAVariableCodeDescription.n'
+        db.delete_column(u'dplace_app_eavariablecodedescription', 'n')
 
 
     models = {
@@ -25,6 +26,7 @@ class Migration(SchemaMigration):
             'code_number': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'db_index': 'True'}),
             'description': ('django.db.models.fields.CharField', [], {'default': "'Unknown'", 'max_length': '500'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'n': ('django.db.models.fields.IntegerField', [], {'default': '0', 'null': 'True'}),
             'variable': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'codes'", 'to': u"orm['dplace_app.EAVariableDescription']"})
         },
         u'dplace_app.eavariablecodedvalue': {

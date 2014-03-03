@@ -3,19 +3,50 @@ from south.utils import datetime_utils as datetime
 from south.db import db
 from south.v2 import SchemaMigration
 from django.db import models
-from dplace_app.models import EAVariableCodeDescription
+
 
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding field 'EAVariableCodeDescription.code_number'
-        db.add_column(u'dplace_app_eavariablecodedescription', 'code_number',
-                      self.gf('django.db.models.fields.IntegerField')(null=True, db_index=True),
+        # Deleting model 'LanguageFamily'
+        db.delete_table(u'dplace_app_languagefamily')
+
+        # Deleting field 'LanguageClassification.family'
+        db.delete_column(u'dplace_app_languageclassification', 'family_id')
+
+        # Deleting field 'LanguageClassification.name'
+        db.delete_column(u'dplace_app_languageclassification', 'name')
+
+        # Adding field 'LanguageClassification.ethnologue_classification'
+        db.add_column(u'dplace_app_languageclassification', 'ethnologue_classification',
+                      self.gf('django.db.models.fields.CharField')(default='', unique=True, max_length=250, db_index=True),
                       keep_default=False)
 
+
     def backwards(self, orm):
-        # Deleting field 'EAVariableCodeDescription.code_number'
-        db.delete_column(u'dplace_app_eavariablecodedescription', 'code_number')
+        # Adding model 'LanguageFamily'
+        db.create_table(u'dplace_app_languagefamily', (
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('name', self.gf('django.db.models.fields.CharField')(max_length=30, unique=True, db_index=True)),
+        ))
+        db.send_create_signal(u'dplace_app', ['LanguageFamily'])
+
+        # Adding field 'LanguageClassification.family'
+        db.add_column(u'dplace_app_languageclassification', 'family',
+                      self.gf('django.db.models.fields.related.ForeignKey')(related_name='languages', null=True, to=orm['dplace_app.LanguageFamily']),
+                      keep_default=False)
+
+
+        # User chose to not deal with backwards NULL issues for 'LanguageClassification.name'
+        raise RuntimeError("Cannot reverse this migration. 'LanguageClassification.name' and its values cannot be restored.")
+        
+        # The following code is provided here to aid in writing a correct migration        # Adding field 'LanguageClassification.name'
+        db.add_column(u'dplace_app_languageclassification', 'name',
+                      self.gf('django.db.models.fields.CharField')(max_length=250, unique=True, db_index=True),
+                      keep_default=False)
+
+        # Deleting field 'LanguageClassification.ethnologue_classification'
+        db.delete_column(u'dplace_app_languageclassification', 'ethnologue_classification')
 
 
     models = {
@@ -25,6 +56,7 @@ class Migration(SchemaMigration):
             'code_number': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'db_index': 'True'}),
             'description': ('django.db.models.fields.CharField', [], {'default': "'Unknown'", 'max_length': '500'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'n': ('django.db.models.fields.IntegerField', [], {'default': '0', 'null': 'True'}),
             'variable': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'codes'", 'to': u"orm['dplace_app.EAVariableDescription']"})
         },
         u'dplace_app.eavariablecodedvalue': {
@@ -92,16 +124,10 @@ class Migration(SchemaMigration):
             'class_family': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'languages1'", 'null': 'True', 'to': u"orm['dplace_app.LanguageClass']"}),
             'class_subfamily': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'languages2'", 'null': 'True', 'to': u"orm['dplace_app.LanguageClass']"}),
             'class_subsubfamily': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'languages3'", 'null': 'True', 'to': u"orm['dplace_app.LanguageClass']"}),
-            'family': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'languages'", 'null': 'True', 'to': u"orm['dplace_app.LanguageFamily']"}),
+            'ethnologue_classification': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '250', 'db_index': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'language': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['dplace_app.Language']", 'null': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '250', 'db_index': 'True'}),
             'scheme': ('django.db.models.fields.CharField', [], {'default': "'E'", 'max_length': '1'})
-        },
-        u'dplace_app.languagefamily': {
-            'Meta': {'object_name': 'LanguageFamily'},
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '30', 'db_index': 'True'})
         },
         u'dplace_app.society': {
             'Meta': {'object_name': 'Society'},

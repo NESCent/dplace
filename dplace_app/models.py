@@ -114,6 +114,7 @@ class EAVariableCodeDescription(models.Model):
     code = models.CharField(max_length=20, db_index=True, null=False, default='.')
     code_number = models.IntegerField(null=True, db_index=True)
     description = models.CharField(max_length=500, default='Unknown')
+    n = models.IntegerField(null=True, default=0)
     def save(self, *args, **kwargs):
         self.read_code_number()
         super(EAVariableCodeDescription, self).save(*args, **kwargs)
@@ -185,14 +186,6 @@ class LanguageClass(models.Model):
         verbose_name = "Language Class"
         ordering= ('level', 'name')
 
-class LanguageFamily(models.Model):
-    name = models.CharField(max_length=30, db_index=True, unique=True)
-    def __unicode__(self):
-        return "Family: %s" % self.name
-    class Meta:
-        verbose_name = "Language Family"
-        verbose_name_plural = "Language Families"
-
 CLASSIFICATION_SCHEMES = (
     ('E', 'Ethnologue17',),
     ('R', 'Ethnologue17-Revised',),
@@ -203,11 +196,9 @@ CLASSIFICATION_SCHEMES = (
 class LanguageClassification(models.Model):
     scheme = models.CharField(max_length=1, choices=CLASSIFICATION_SCHEMES, default='E');
     language = models.ForeignKey('Language', null=True)
-    # From 'Classification' column
-    name = models.CharField(max_length=250, db_index=True, unique=True)
-    # From 'FAMILY-CORRECTED' column
-    family = models.ForeignKey('LanguageFamily', related_name="languages", null=True)
-    # From 'Class1', 'Class2', 'Class3'
+    # From 'Ethnologue Classification (unrevised)' column
+    ethnologue_classification = models.CharField(max_length=250, db_index=True, unique=True)
+    # From 'FAMILY-REVISED', 'Class2', 'Class3'
     class_family = models.ForeignKey('LanguageClass', limit_choices_to={'level': 1}, related_name="languages1", null=True)
     class_subfamily = models.ForeignKey('LanguageClass', limit_choices_to={'level': 2}, related_name="languages2", null=True)
     class_subsubfamily = models.ForeignKey('LanguageClass', limit_choices_to={'level': 3}, related_name="languages3", null=True)
