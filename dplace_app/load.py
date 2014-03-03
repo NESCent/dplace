@@ -137,11 +137,12 @@ def load_ea_var(var_dict):
         variable.save()
 
 SORT_COLUMN				= 0
-VARIABLE_NUMBER_COLUMN 	= 1
-VARIABLE_NAME_COLUMN 	= 2
-N_COLUMN 				= 3
-CODE_COLUMN 			= 4
-DESCRIPTION_COLUMN 		= 5
+VARIABLE_VNUMBER_COLUMN = 1
+VARIABLE_NUMBER_COLUMN 	= 2
+VARIABLE_NAME_COLUMN 	= 3
+N_COLUMN 				= 4
+CODE_COLUMN 			= 5
+DESCRIPTION_COLUMN 		= 6
 
 # e.g. N	CODE	DESCRIPTION
 def row_is_headers(row):
@@ -184,29 +185,41 @@ def row_is_skip(row):
 
 def load_ea_codes(csvfile=None):
     number = None
+    variable = None
     csv_reader = csv.reader(csvfile)
     for row in csv_reader:
         if row_is_skip(row):
             pass
         elif row_is_data(row):
-            # FIXME: Code 92 is special
-            if number == 92:
+            if variable is None:
+                # Variable may have been excluded from D-PLACE, ignore this data row
                 continue
             code = row[CODE_COLUMN].strip()
+            n = row[N_COLUMN].strip()
+            try:
+                n = int(n)
+            except ValueError:
+                n = 0
             found_descriptions = EAVariableCodeDescription.objects.filter(variable=variable,code=code)
             if len(found_descriptions) == 0:
                 # This won't help for things that specify a range or include the word or
                 description = row[DESCRIPTION_COLUMN].strip()
                 code_description = EAVariableCodeDescription(variable=variable,
                                                              code=code,
-                                                             description=description)
+                                                             description=description,
+                                                             n=n)
                 code_description.save()
         elif row_is_headers(row):
             pass
         elif row_is_def(row):
             # get the variable number
             number = int(row[VARIABLE_NUMBER_COLUMN])
-            variable = EAVariableDescription.objects.get(number=number)
+            try:
+                # Some variables in the EA have been excluded from D-PLACE, so there
+                # will be no EAVariableDescription object for them
+                variable = EAVariableDescription.objects.get(number=number)
+            except ObjectDoesNotExist:
+                variable = None
         else:
             print "did not get anything from this row %s" % (','.join(row)).strip()
 
