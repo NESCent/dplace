@@ -224,7 +224,7 @@ def load_ea_codes(csvfile=None):
             print "did not get anything from this row %s" % (','.join(row)).strip()
 
 def load_ea_val(val_row):
-    ext_id = val_row['EA_id'].strip()
+    ext_id = val_row['ID'].strip()
     # find the existing society
     try:
         society = Society.objects.get(ext_id=ext_id)
