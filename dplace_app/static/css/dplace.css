@@ -50,3 +50,7 @@ label.light {
 .triangle-right, .triangle-down {
     cursor: pointer; cursor: hand;
 }
+
+.nav, .pagination, .carousel, .panel-title a {
+    cursor: pointer; cursor: hand;
+}
