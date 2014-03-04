@@ -10,6 +10,16 @@ def run(mode=None):
         clear_ea()
     elif mode == 'societies':
         clear_societies()
+    elif mode == 'iso':
+        clear_isocodes()
+    elif mode == 'env':
+        clear_environmentals()
+    elif mode == 'all':
+        clear_langs()
+        clear_ea()
+        clear_environmentals()
+        clear_societies()
+        clear_isocodes()
 
 def clear_langs():
     LanguageClassification.objects.all().delete()
@@ -23,6 +33,12 @@ def clear_ea():
 
 def clear_societies():
     Society.objects.all().delete()
+
+def clear_environmentals():
+    Environmental.objects.all().delete()
+
+def clear_isocodes():
+    ISOCode.objects.all().delete()
 
 if __name__ == '__main__':
     run(sys.argv[1])
