@@ -14,14 +14,8 @@ class Migration(SchemaMigration):
         # Deleting field 'LanguageClassification.family'
         db.delete_column(u'dplace_app_languageclassification', 'family_id')
 
-        # Deleting field 'LanguageClassification.name'
-        db.delete_column(u'dplace_app_languageclassification', 'name')
-
-        # Adding field 'LanguageClassification.ethnologue_classification'
-        db.add_column(u'dplace_app_languageclassification', 'ethnologue_classification',
-                      self.gf('django.db.models.fields.CharField')(default='', unique=True, max_length=250, db_index=True),
-                      keep_default=False)
-
+        # Rename name to ethngologue_classification
+        db.rename_column(u'dplace_app_languageclassification', 'name', 'ethnologue_classification')
 
     def backwards(self, orm):
         # Adding model 'LanguageFamily'
@@ -36,17 +30,8 @@ class Migration(SchemaMigration):
                       self.gf('django.db.models.fields.related.ForeignKey')(related_name='languages', null=True, to=orm['dplace_app.LanguageFamily']),
                       keep_default=False)
 
-
-        # User chose to not deal with backwards NULL issues for 'LanguageClassification.name'
-        raise RuntimeError("Cannot reverse this migration. 'LanguageClassification.name' and its values cannot be restored.")
-        
-        # The following code is provided here to aid in writing a correct migration        # Adding field 'LanguageClassification.name'
-        db.add_column(u'dplace_app_languageclassification', 'name',
-                      self.gf('django.db.models.fields.CharField')(max_length=250, unique=True, db_index=True),
-                      keep_default=False)
-
-        # Deleting field 'LanguageClassification.ethnologue_classification'
-        db.delete_column(u'dplace_app_languageclassification', 'ethnologue_classification')
+        # Rename ethnologue_classification to name
+        db.rename_column(u'dplace_app_languageclassification', 'ethnologue_classification', 'name')
 
 
     models = {
