@@ -50,11 +50,6 @@ class LanguageClassViewSet(viewsets.ReadOnlyModelViewSet):
             queryset = queryset.filter(level=1)
         return queryset
 
-class LanguageFamilyViewSet(viewsets.ReadOnlyModelViewSet):
-    serializer_class = LanguageFamilySerializer
-    filter_fields = ('name',)
-    queryset = LanguageFamily.objects.all()
-
 # Need an API to get classifications / languages for a class
 
 class LanguageClassificationViewSet(viewsets.ReadOnlyModelViewSet):

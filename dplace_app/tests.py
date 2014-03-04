@@ -102,17 +102,17 @@ class FindSocietiesTestCase(APITestCase):
 
         # make language classifications to link a language to its class tree
         lc1 = LanguageClassification.objects.create(language=language1,
-                                                    name='lc1',
+                                                    ethnologue_classification='lc1',
                                                     class_family=self.root_language_class,
                                                     class_subfamily=self.parent_language_class_1,
                                                     class_subsubfamily=self.child_language_class_1a)
         lc2 = LanguageClassification.objects.create(language=language2,
-                                                    name='lc2',
+                                                    ethnologue_classification='lc2',
                                                     class_family=self.root_language_class,
                                                     class_subfamily=self.parent_language_class_2,
                                                     class_subsubfamily=self.child_language_class_2)
         lc3 = LanguageClassification.objects.create(language=language3,
-                                                    name='lc3',
+                                                    ethnologue_classification='lc3',
                                                     class_family=self.root_language_class,
                                                     class_subfamily=self.parent_language_class_1,
                                                     class_subsubfamily=self.child_language_class_1b)

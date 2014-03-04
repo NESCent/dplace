@@ -14,7 +14,6 @@ def run(mode=None):
 def clear_langs():
     LanguageClassification.objects.all().delete()
     LanguageClass.objects.all().delete()
-    LanguageFamily.objects.all().delete()
     Language.objects.all().delete()
 
 def clear_ea():

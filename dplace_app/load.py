@@ -121,7 +121,14 @@ def load_ea_var(var_dict):
     Variables are loaded form ea_variable_names.csv for simplicity,
     but there is more detailed information in ea_codes.csv
     """
-    number = int(var_dict['Variable number'])
+    try:
+        number = int(var_dict['Variable number'])
+    except ValueError:
+        return
+    exclude = var_dict['Exclude from D-PLACE?']
+    if exclude == '1':
+        return
+
     found_vars = EAVariableDescription.objects.filter(number=number)
     if len(found_vars) == 0:
         name = var_dict['Variable'].strip()
@@ -130,11 +137,12 @@ def load_ea_var(var_dict):
         variable.save()
 
 SORT_COLUMN				= 0
-VARIABLE_NUMBER_COLUMN 	= 1
-VARIABLE_NAME_COLUMN 	= 2
-N_COLUMN 				= 3
-CODE_COLUMN 			= 4
-DESCRIPTION_COLUMN 		= 5
+VARIABLE_VNUMBER_COLUMN = 1
+VARIABLE_NUMBER_COLUMN 	= 2
+VARIABLE_NAME_COLUMN 	= 3
+N_COLUMN 				= 4
+CODE_COLUMN 			= 5
+DESCRIPTION_COLUMN 		= 6
 
 # e.g. N	CODE	DESCRIPTION
 def row_is_headers(row):
@@ -177,34 +185,46 @@ def row_is_skip(row):
 
 def load_ea_codes(csvfile=None):
     number = None
+    variable = None
     csv_reader = csv.reader(csvfile)
     for row in csv_reader:
         if row_is_skip(row):
             pass
         elif row_is_data(row):
-            # FIXME: Code 92 is special
-            if number == 92:
+            if variable is None:
+                # Variable may have been excluded from D-PLACE, ignore this data row
                 continue
             code = row[CODE_COLUMN].strip()
+            n = row[N_COLUMN].strip()
+            try:
+                n = int(n)
+            except ValueError:
+                n = 0
             found_descriptions = EAVariableCodeDescription.objects.filter(variable=variable,code=code)
             if len(found_descriptions) == 0:
                 # This won't help for things that specify a range or include the word or
                 description = row[DESCRIPTION_COLUMN].strip()
                 code_description = EAVariableCodeDescription(variable=variable,
                                                              code=code,
-                                                             description=description)
+                                                             description=description,
+                                                             n=n)
                 code_description.save()
         elif row_is_headers(row):
             pass
         elif row_is_def(row):
             # get the variable number
             number = int(row[VARIABLE_NUMBER_COLUMN])
-            variable = EAVariableDescription.objects.get(number=number)
+            try:
+                # Some variables in the EA have been excluded from D-PLACE, so there
+                # will be no EAVariableDescription object for them
+                variable = EAVariableDescription.objects.get(number=number)
+            except ObjectDoesNotExist:
+                variable = None
         else:
             print "did not get anything from this row %s" % (','.join(row)).strip()
 
 def load_ea_val(val_row):
-    ext_id = val_row['EA_id'].strip()
+    ext_id = val_row['ID'].strip()
     # find the existing society
     try:
         society = Society.objects.get(ext_id=ext_id)
@@ -219,7 +239,6 @@ def load_ea_val(val_row):
             try:
                 variable = EAVariableDescription.objects.get(number=number)
             except ObjectDoesNotExist:
-                print "Attempting to load EA values for variable %d but did not find an existing EAVariableDescription object" % number
                 continue
             try:
                 # Check for Code description if it exists.
@@ -236,9 +255,8 @@ def load_lang(lang_row):
     # Extract values from dictionary
     code = lang_row['ISO 693-3 code']
     language_name = lang_row['Language name']
-    family_name = lang_row['FAMILY-CORRECTED']
-    classification_name = lang_row['Classification']
-    class_names = [lang_row['Class1'], lang_row['Class2'], lang_row['Class3']]
+    ethnologue_classification = lang_row['Ethnologue Classification (unrevised)']
+    family_names = [lang_row['FAMILY-REVISED'], lang_row['Class2'], lang_row['Class3']]
 
     # ISO Code
     isocode = iso_from_code(code) # Does not create new ISO Codes
@@ -255,40 +273,39 @@ def load_lang(lang_row):
                             iso_code=isocode
                             )
         language.save()
-    # Family
-    try:
-        family = LanguageFamily.objects.get(name=family_name)
-    except ObjectDoesNotExist:
-        family = LanguageFamily(name=family_name)
-        family.save()
-
     # Classes
     classes = []
     for i in range(3):
         level = i + 1
+        name = family_names[i].strip()
+        if len(name) == 0:
+            # empty cell
+            continue
         try:
-            classes.append(LanguageClass.objects.get(level=level,name=class_names[i]))
+            classes.append(LanguageClass.objects.get(level=level,name=name))
         except ObjectDoesNotExist:
             if len(classes) > 0:
                 parent = classes[-1]
             else:
                 parent = None
-            lang_class = LanguageClass(level=level, name=class_names[i], parent=parent)
+            lang_class = LanguageClass(level=level, name=name, parent=parent)
             lang_class.save()
             classes.append(lang_class)
 
     # Finally, create the LanguageClassification
     classification_scheme = 'R' # Ethnologue17-Revised
     try:
-        classification = LanguageClassification.objects.get(name=classification_name)
+        classification = LanguageClassification.objects.get(ethnologue_classification=ethnologue_classification)
     except ObjectDoesNotExist:
+        class_family = classes[0]
+        class_subfamily = classes[1] if len(classes) > 1 else None
+        class_subsubfamily = classes[2] if len(classes) > 2 else None
         classification = LanguageClassification(scheme=classification_scheme,
                                                 language=language,
-                                                name=classification_name,
-                                                family=family,
-                                                class_family=classes[0],
-                                                class_subfamily=classes[1],
-                                                class_subsubfamily=classes[2],
+                                                ethnologue_classification=ethnologue_classification,
+                                                class_family=class_family,
+                                                class_subfamily=class_subfamily,
+                                                class_subsubfamily=class_subsubfamily,
                                                 )
         classification.save()
 
