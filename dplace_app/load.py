@@ -33,15 +33,20 @@ def run(file_name=None, mode=None):
         print '\n'.join(MISSING_CODES)
 
 
-def load_isocode(iso_dict):
+# get a value from a dictionary, searching the possible keys
+def get_value(dict,possible_keys):
+    for key in possible_keys:
+        if key in dict.keys():
+            return dict[key]
+    return None
+
+def get_isocode(dict):
     # ISO Code may appear in 'ISO' column (17th Ed Missing ISO codes)
     # or the 'ISO 693-3 code' column (17th Ed - ISO 693-3 - current)
-    if 'ISO' in iso_dict.keys():
-        code = iso_dict['ISO']
-    elif 'ISO 693-3 code' in iso_dict.keys():
-        code = iso_dict['ISO 693-3 code']
-    else:
-        code = None
+    return get_value(dict,('ISO','ISO 693-3 code'))
+
+def load_isocode(iso_dict):
+    code = get_isocode(iso_dict)
     if code is None:
         print "ISO Code not found in row, skipping"
         return
@@ -276,11 +281,17 @@ def load_ea_val(val_row):
 
 def load_lang(lang_row):
     # Extract values from dictionary
-    code = lang_row['ISO 693-3 code']
-    language_name = lang_row['Language name']
-    ethnologue_classification = lang_row['Ethnologue Classification (unrevised)']
-    family_names = [lang_row['FAMILY-REVISED'], lang_row['Class2'], lang_row['Class3']]
-
+    code = get_isocode(lang_row)
+    if code is None:
+        print "ISO Code not found in row, skipping"
+        return
+    language_name = get_value(lang_row,('Language name','NAM'))
+    ethnologue_classification = get_value(lang_row,('Ethnologue Classification (unrevised)','Ethnologue classification (if applicable)'))
+    family_names = [
+        get_value(lang_row,('FAMILY-REVISED','FAMILY')),
+        lang_row['Class2'],
+        lang_row['Class3']
+    ]
     # ISO Code
     isocode = iso_from_code(code) # Does not create new ISO Codes
     if isocode is None:
