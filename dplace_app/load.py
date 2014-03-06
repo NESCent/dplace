@@ -9,11 +9,13 @@ MISSING_CODES = []
 def run(file_name=None, mode=None):
     # read the csv file
     with open(file_name, 'rb') as csvfile:
-        if mode in ['iso', 'soc', 'env', 'ea_vars', 'ea_vals', 'langs']:
+        if mode in ['iso', 'soc', 'env', 'ea_vars', 'ea_vals', 'langs', 'iso_lat_long']:
             csv_reader = csv.DictReader(csvfile)
             for dict_row in csv_reader:
                 if mode == 'iso':
                     load_isocode(dict_row)
+                elif mode == 'iso_lat_long':
+                    load_iso_lat_long(dict_row)
                 elif mode == 'soc':
                     load_society(dict_row)
                 elif mode == 'env':
@@ -32,12 +34,33 @@ def run(file_name=None, mode=None):
 
 
 def load_isocode(iso_dict):
+    # ISO Code may appear in 'ISO' column (17th Ed Missing ISO codes)
+    # or the 'ISO 693-3 code' column (17th Ed - ISO 693-3 - current)
+    if 'ISO' in iso_dict.keys():
+        code = iso_dict['ISO']
+    elif 'ISO 693-3 code' in iso_dict.keys():
+        code = iso_dict['ISO 693-3 code']
+    else:
+        code = None
+    if code is None:
+        print "ISO Code not found in row, skipping"
+        return
+    if len(code) > 3:
+        print "ISO Code '%s' too long, skipping" % code
+        return
+    ISOCode.objects.get_or_create(iso_code=code)
+
+def load_iso_lat_long(iso_dict):
     code = iso_dict['ISO']
-    found_codes = ISOCode.objects.filter(iso_code=code)
-    if len(found_codes) == 0:
-        lonlat = Point(float(iso_dict['LMP_LON']),float(iso_dict['LMP_LAT']))
-        isocode = ISOCode(iso_code=code,location=lonlat)
-        isocode.save()
+    found_code = None
+    try:
+        found_code = ISOCode.objects.get(iso_code=code)
+    except ObjectDoesNotExist:
+        print "Tried to attach Lat/Long to ISO Code %s but code not found" % code
+        return
+    location = Point(float(iso_dict['LMP_LON']),float(iso_dict['LMP_LAT']))
+    found_code.location = location
+    found_code.save()
 
 # These are all floats
 ENVIRONMENTAL_MAP = {
