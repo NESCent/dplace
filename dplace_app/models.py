@@ -1,11 +1,13 @@
 from django.contrib.gis.db import models
 
-# from 'iso lat long.xlsx'.
-# I think this maps language codes to geographic points.  unclear what LMP means in LMP_LAT/LMP_LON
-# Some points don't map to a 4326 point
+# Originally from 'iso lat long.xlsx'.  This spreadsheet contains ISO Codes and their
+# Locations.  Only iso codes from the 16th edition ethnologue were present.
+# Other datasets references ISO Codes that were not present in 16th ed, so now
+# this is loaded from the ethnologue, and locations are annotated later if known
+
 class ISOCode(models.Model):
     iso_code = models.CharField('ISO Code', db_index=True, max_length=3)
-    location = models.PointField()
+    location = models.PointField(null=True) # only have locations for ISO codes in 16th ed ethnologue
     # For GeoDjango, must override the manager
     objects = models.GeoManager()
     def __unicode__(self):
