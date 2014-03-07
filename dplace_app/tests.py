@@ -26,7 +26,7 @@ class EATestCase(TestCase):
         self.iso_code = ISOCode.objects.create(iso_code='abc',location=Point(5.0,5.0))
         self.ea_society = Society.objects.create(ext_id='easoc',name='EA Society',location=Point(0.0,0.0),source='EA',iso_code=self.iso_code)
         self.binford_society = Society.objects.create(ext_id='binfordsoc',name='Binford Society',location=Point(0.0,0.0),source='Binford',iso_code=self.iso_code)
-        self.variable = EAVariableDescription.objects.create(number=1,name='Variable 1')
+        self.variable = VariableDescription.objects.create(number=1,name='Variable 1')
         self.code10 = EAVariableCodeDescription.objects.create(variable=self.variable, code='10', description='Code 10')
         self.code1 = EAVariableCodeDescription.objects.create(variable=self.variable, code='1', description='Code 1')
         self.code2 = EAVariableCodeDescription.objects.create(variable=self.variable, code='2', description='Code 2')
@@ -117,7 +117,7 @@ class FindSocietiesTestCase(APITestCase):
                                                     class_subfamily=self.parent_language_class_1,
                                                     class_subsubfamily=self.child_language_class_1b)
         # Make an EA Variable, code, and value
-        variable = EAVariableDescription.objects.create(number=1,name='Variable 1')
+        variable = VariableDescription.objects.create(number=1,name='Variable 1')
         self.code1 = EAVariableCodeDescription.objects.create(variable=variable, code='1', description='Code 1')
         self.code2 = EAVariableCodeDescription.objects.create(variable=variable, code='2', description='Code 2')
         self.code3 = EAVariableCodeDescription.objects.create(variable=variable, code='3', description='Code 3')

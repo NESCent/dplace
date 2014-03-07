@@ -81,7 +81,7 @@ class Environmental(models.Model):
     class Meta:
         verbose_name = "Environmental"
 
-class EAVariableDescription(models.Model):
+class VariableDescription(models.Model):
     """
     Variables in the Ethnographic Atlas have a number and are accompanied
     by a description, e.g.
@@ -112,7 +112,7 @@ class EAVariableCodeDescription(models.Model):
     This model is not used by every value in the EA.
 
     """
-    variable = models.ForeignKey('EAVariableDescription', related_name="codes", db_index=True)
+    variable = models.ForeignKey('VariableDescription', related_name="codes", db_index=True)
     code = models.CharField(max_length=20, db_index=True, null=False, default='.')
     code_number = models.IntegerField(null=True, db_index=True)
     description = models.CharField(max_length=500, default='Unknown')
@@ -149,7 +149,7 @@ class EAVariableCodedValue(models.Model):
     This model is not used by every code
 
     """
-    variable = models.ForeignKey('EAVariableDescription', related_name="values")
+    variable = models.ForeignKey('VariableDescription', related_name="values")
     society = models.ForeignKey('Society', limit_choices_to={'source__in': [x[0] for x in SOCIETY_SOURCES]}, null=True)
     coded_value = models.CharField(max_length=20, db_index=True, null=False, default='.')
     code = models.ForeignKey('EAVariableCodeDescription', db_index=True, null=True)

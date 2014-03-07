@@ -157,10 +157,10 @@ def load_ea_var(var_dict):
     if exclude == '1':
         return
 
-    found_vars = EAVariableDescription.objects.filter(number=number)
+    found_vars = VariableDescription.objects.filter(number=number)
     if len(found_vars) == 0:
         name = var_dict['Variable'].strip()
-        variable = EAVariableDescription(number=number,
+        variable = VariableDescription(number=number,
                                          name=name)
         variable.save()
 
@@ -244,8 +244,8 @@ def load_ea_codes(csvfile=None):
             number = int(row[VARIABLE_NUMBER_COLUMN])
             try:
                 # Some variables in the EA have been excluded from D-PLACE, so there
-                # will be no EAVariableDescription object for them
-                variable = EAVariableDescription.objects.get(number=number)
+                # will be no VariableDescription object for them
+                variable = VariableDescription.objects.get(number=number)
             except ObjectDoesNotExist:
                 variable = None
         else:
@@ -265,7 +265,7 @@ def load_ea_val(val_row):
             number = int(key[1:])
             value = val_row[key].strip()
             try:
-                variable = EAVariableDescription.objects.get(number=number)
+                variable = VariableDescription.objects.get(number=number)
             except ObjectDoesNotExist:
                 continue
             try:

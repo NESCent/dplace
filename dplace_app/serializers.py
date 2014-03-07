@@ -10,7 +10,7 @@ class EAVariableCodeDescriptionSerializer(serializers.ModelSerializer):
 
 class EAVariableDescriptionSerializer(serializers.ModelSerializer):
     class Meta:
-        model = EAVariableDescription
+        model = VariableDescription
         fields = ('id', 'number', 'name')
 
 class EAVariableCodedValueSerializer(serializers.ModelSerializer):

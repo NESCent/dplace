@@ -9,7 +9,7 @@ from rest_framework.views import Request, Response
 class EAVariableDescriptionViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = EAVariableDescriptionSerializer
     filter_fields = ('number', 'name',)
-    queryset = EAVariableDescription.objects.all()
+    queryset = VariableDescription.objects.all()
 
 class EAVariableCodeDescriptionViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = EAVariableCodeDescriptionSerializer
