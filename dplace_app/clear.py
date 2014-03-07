@@ -27,9 +27,9 @@ def clear_langs():
     Language.objects.all().delete()
 
 def clear_ea():
-    EAVariableCodedValue.objects.all().delete()
-    EAVariableCodeDescription.objects.all().delete()
-    EAVariableDescription.objects.all().delete()
+    VariableCodedValue.objects.all().delete()
+    VariableCodeDescription.objects.all().delete()
+    VariableDescription.objects.all().delete()
 
 def clear_societies():
     Society.objects.all().delete()

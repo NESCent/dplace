@@ -4,41 +4,31 @@ from south.db import db
 from south.v2 import SchemaMigration
 from django.db import models
 
+
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding field 'EAVariableCodeDescription.code_number'
-        db.add_column(u'dplace_app_eavariablecodedescription', 'code_number',
-                      self.gf('django.db.models.fields.IntegerField')(null=True, db_index=True),
-                      keep_default=False)
+        # Rename model 'EAVariableCodeDescription' to 'VariableCodeDescription'
+        db.rename_table(u'dplace_app_eavariablecodedescription', u'dplace_app_variablecodedescription')
+
+        # Changing field 'EAVariableCodedValue.code'
+        db.alter_column(u'dplace_app_eavariablecodedvalue', 'code_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['dplace_app.VariableCodeDescription'], null=True))
 
     def backwards(self, orm):
-        # Deleting field 'EAVariableCodeDescription.code_number'
-        db.delete_column(u'dplace_app_eavariablecodedescription', 'code_number')
+        # Rename model 'EAVariableCodeDescription' to 'VariableCodeDescription'
+        db.rename_table(u'dplace_app_variablecodedescription', u'dplace_app_eavariablecodedescription')
 
+        # Changing field 'EAVariableCodedValue.code'
+        db.alter_column(u'dplace_app_eavariablecodedvalue', 'code_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['dplace_app.EAVariableCodeDescription'], null=True))
 
     models = {
-        u'dplace_app.eavariablecodedescription': {
-            'Meta': {'ordering': "('variable', 'code_number', 'code')", 'object_name': 'EAVariableCodeDescription'},
-            'code': ('django.db.models.fields.CharField', [], {'default': "'.'", 'max_length': '20', 'db_index': 'True'}),
-            'code_number': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'db_index': 'True'}),
-            'description': ('django.db.models.fields.CharField', [], {'default': "'Unknown'", 'max_length': '500'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'variable': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'codes'", 'to': u"orm['dplace_app.EAVariableDescription']"})
-        },
         u'dplace_app.eavariablecodedvalue': {
             'Meta': {'ordering': "('variable', 'coded_value')", 'object_name': 'EAVariableCodedValue', 'index_together': "[['variable', 'society'], ['variable', 'coded_value'], ['variable', 'code'], ['society', 'coded_value'], ['society', 'code']]"},
-            'code': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['dplace_app.EAVariableCodeDescription']", 'null': 'True'}),
+            'code': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['dplace_app.VariableCodeDescription']", 'null': 'True'}),
             'coded_value': ('django.db.models.fields.CharField', [], {'default': "'.'", 'max_length': '20', 'db_index': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'society': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['dplace_app.Society']", 'null': 'True'}),
-            'variable': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'values'", 'to': u"orm['dplace_app.EAVariableDescription']"})
-        },
-        u'dplace_app.eavariabledescription': {
-            'Meta': {'ordering': "('number',)", 'object_name': 'EAVariableDescription'},
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'default': "'Unknown'", 'max_length': '200', 'db_index': 'True'}),
-            'number': ('django.db.models.fields.IntegerField', [], {'default': '0', 'unique': 'True'})
+            'variable': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'values'", 'to': u"orm['dplace_app.VariableDescription']"})
         },
         u'dplace_app.environmental': {
             'Meta': {'object_name': 'Environmental'},
@@ -70,7 +60,7 @@ class Migration(SchemaMigration):
             'Meta': {'object_name': 'ISOCode'},
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'iso_code': ('django.db.models.fields.CharField', [], {'max_length': '3', 'db_index': 'True'}),
-            'location': ('django.contrib.gis.db.models.fields.PointField', [], {})
+            'location': ('django.contrib.gis.db.models.fields.PointField', [], {'null': 'True'})
         },
         u'dplace_app.language': {
             'Meta': {'object_name': 'Language'},
@@ -91,16 +81,10 @@ class Migration(SchemaMigration):
             'class_family': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'languages1'", 'null': 'True', 'to': u"orm['dplace_app.LanguageClass']"}),
             'class_subfamily': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'languages2'", 'null': 'True', 'to': u"orm['dplace_app.LanguageClass']"}),
             'class_subsubfamily': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'languages3'", 'null': 'True', 'to': u"orm['dplace_app.LanguageClass']"}),
-            'family': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'languages'", 'null': 'True', 'to': u"orm['dplace_app.LanguageFamily']"}),
+            'ethnologue_classification': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '250', 'db_index': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'language': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['dplace_app.Language']", 'null': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '250', 'db_index': 'True'}),
             'scheme': ('django.db.models.fields.CharField', [], {'default': "'E'", 'max_length': '1'})
-        },
-        u'dplace_app.languagefamily': {
-            'Meta': {'object_name': 'LanguageFamily'},
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '30', 'db_index': 'True'})
         },
         u'dplace_app.society': {
             'Meta': {'object_name': 'Society'},
@@ -110,6 +94,21 @@ class Migration(SchemaMigration):
             'location': ('django.contrib.gis.db.models.fields.PointField', [], {}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '200', 'db_index': 'True'}),
             'source': ('django.db.models.fields.CharField', [], {'max_length': '16'})
+        },
+        u'dplace_app.variablecodedescription': {
+            'Meta': {'ordering': "('variable', 'code_number', 'code')", 'object_name': 'VariableCodeDescription'},
+            'code': ('django.db.models.fields.CharField', [], {'default': "'.'", 'max_length': '20', 'db_index': 'True'}),
+            'code_number': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'db_index': 'True'}),
+            'description': ('django.db.models.fields.CharField', [], {'default': "'Unknown'", 'max_length': '500'}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'n': ('django.db.models.fields.IntegerField', [], {'default': '0', 'null': 'True'}),
+            'variable': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'codes'", 'to': u"orm['dplace_app.VariableDescription']"})
+        },
+        u'dplace_app.variabledescription': {
+            'Meta': {'ordering': "('number',)", 'object_name': 'VariableDescription'},
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'name': ('django.db.models.fields.CharField', [], {'default': "'Unknown'", 'max_length': '200', 'db_index': 'True'}),
+            'number': ('django.db.models.fields.IntegerField', [], {'default': '0', 'unique': 'True'})
         }
     }
 

@@ -5,18 +5,18 @@ from rest_framework import serializers
 
 class EAVariableCodeDescriptionSerializer(serializers.ModelSerializer):
     class Meta:
-        model = EAVariableCodeDescription
+        model = VariableCodeDescription
         fields = ('id', 'code', 'description', 'variable')
 
 class EAVariableDescriptionSerializer(serializers.ModelSerializer):
     class Meta:
-        model = EAVariableDescription
-        fields = ('id', 'number', 'name')
+        model = VariableDescription
+        fields = ('id', 'label', 'name')
 
 class EAVariableCodedValueSerializer(serializers.ModelSerializer):
     code_description = EAVariableCodeDescriptionSerializer(source='code')
     class Meta:
-        model = EAVariableCodedValue
+        model = VariableCodedValue
         fields = ('id', 'variable', 'society', 'coded_value', 'code_description')
 
 class ISOCodeSerializer(gis_serializers.GeoModelSerializer):

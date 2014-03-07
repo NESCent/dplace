@@ -12,7 +12,7 @@ angular.module('dplaceServices', ['ngResource'])
                 }
             });
     })
-    .factory('EAVariable', function ($resource) {
+    .factory('Variable', function ($resource) {
         return $resource(
             '/api/v1/variables/:id',
             {page_size: 1000}, {
@@ -25,7 +25,7 @@ angular.module('dplaceServices', ['ngResource'])
                 }
             });
     })
-    .factory('EACodeDescription', function ($resource) {
+    .factory('CodeDescription', function ($resource) {
         return $resource(
             '/api/v1/codes/:id',
             {page_size: 1000}, {

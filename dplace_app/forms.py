@@ -1,9 +1,9 @@
 from django.contrib.gis import forms
 from django.forms.models import ModelChoiceField, ModelForm
-from dplace_app.models import EAVariableDescription, Environmental
+from dplace_app.models import VariableDescription, Environmental
 
 class EASearchForm(forms.Form):
-	variable = ModelChoiceField(queryset=EAVariableDescription.objects.all())
+	variable = ModelChoiceField(queryset=VariableDescription.objects.all())
 	q = forms.CharField(max_length=20)
 
 class EnvironmentalForm(ModelForm):

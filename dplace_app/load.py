@@ -144,6 +144,9 @@ def load_society(society_dict):
                           )
         society.save()
 
+def eavar_number_to_label(number):
+    return "EA{0:0>3}".format(number)
+
 def load_ea_var(var_dict):
     """
     Variables are loaded form ea_variable_names.csv for simplicity,
@@ -157,12 +160,9 @@ def load_ea_var(var_dict):
     if exclude == '1':
         return
 
-    found_vars = EAVariableDescription.objects.filter(number=number)
-    if len(found_vars) == 0:
-        name = var_dict['Variable'].strip()
-        variable = EAVariableDescription(number=number,
-                                         name=name)
-        variable.save()
+    label = eavar_number_to_label(number)
+    name = var_dict['Variable'].strip()
+    VariableDescription.objects.get_or_create(label=label,name=name)
 
 SORT_COLUMN				= 0
 VARIABLE_VNUMBER_COLUMN = 1
@@ -228,11 +228,11 @@ def load_ea_codes(csvfile=None):
                 n = int(n)
             except ValueError:
                 n = 0
-            found_descriptions = EAVariableCodeDescription.objects.filter(variable=variable,code=code)
+            found_descriptions = VariableCodeDescription.objects.filter(variable=variable,code=code)
             if len(found_descriptions) == 0:
                 # This won't help for things that specify a range or include the word or
                 description = row[DESCRIPTION_COLUMN].strip()
-                code_description = EAVariableCodeDescription(variable=variable,
+                code_description = VariableCodeDescription(variable=variable,
                                                              code=code,
                                                              description=description,
                                                              n=n)
@@ -244,8 +244,9 @@ def load_ea_codes(csvfile=None):
             number = int(row[VARIABLE_NUMBER_COLUMN])
             try:
                 # Some variables in the EA have been excluded from D-PLACE, so there
-                # will be no EAVariableDescription object for them
-                variable = EAVariableDescription.objects.get(number=number)
+                # will be no VariableDescription object for them
+                label = eavar_number_to_label(number)
+                variable = VariableDescription.objects.get(label=label)
             except ObjectDoesNotExist:
                 variable = None
         else:
@@ -263,17 +264,18 @@ def load_ea_val(val_row):
     for key in val_row.keys():
         if key.find('v') == 0:
             number = int(key[1:])
+            label = eavar_number_to_label(number)
             value = val_row[key].strip()
             try:
-                variable = EAVariableDescription.objects.get(number=number)
+                variable = VariableDescription.objects.get(label=label)
             except ObjectDoesNotExist:
                 continue
             try:
                 # Check for Code description if it exists.
-                code = EAVariableCodeDescription.objects.get(variable=variable,code=value)
+                code = VariableCodeDescription.objects.get(variable=variable,code=value)
             except ObjectDoesNotExist:
                 code = None
-            variable_value = EAVariableCodedValue(variable=variable,
+            variable_value = VariableCodedValue(variable=variable,
                                                   society=society,
                                                   coded_value=value,
                                                   code=code)
