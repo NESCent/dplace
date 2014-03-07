@@ -2,6 +2,7 @@ import csv
 import sys
 from django.contrib.gis.geos import Point
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.utils import IntegrityError
 from dplace_app.models import *
 
 MISSING_CODES = []
@@ -9,15 +10,15 @@ MISSING_CODES = []
 def run(file_name=None, mode=None):
     # read the csv file
     with open(file_name, 'rb') as csvfile:
-        if mode in ['iso', 'soc', 'env', 'ea_vars', 'ea_vals', 'langs', 'iso_lat_long']:
+        if mode in ['iso', 'ea_soc', 'env', 'ea_vars', 'ea_vals', 'langs', 'iso_lat_long']:
             csv_reader = csv.DictReader(csvfile)
             for dict_row in csv_reader:
                 if mode == 'iso':
                     load_isocode(dict_row)
                 elif mode == 'iso_lat_long':
                     load_iso_lat_long(dict_row)
-                elif mode == 'soc':
-                    load_society(dict_row)
+                elif mode == 'ea_soc':
+                    load_ea_society(dict_row)
                 elif mode == 'env':
                     load_environmental(dict_row)
                 elif mode == 'ea_vars':
@@ -31,6 +32,9 @@ def run(file_name=None, mode=None):
     if len(MISSING_CODES) > 0:
         print "Missing ISO Codes:"
         print '\n'.join(MISSING_CODES)
+    if mode == 'ea_vals':
+        # after loading values, populate society-level data from variable values
+        postprocess_ea_societies()
 
 
 # get a value from a dictionary, searching the possible keys
@@ -128,20 +132,56 @@ def load_environmental(env_dict):
                     setattr(environmental, v, float(env_dict[k]))
         environmental.save()
 
-def load_society(society_dict):
-    ext_id = society_dict['id']
-    source = society_dict['source']
+def load_ea_society(society_dict):
+    ext_id = society_dict['ID']
+    source = 'EA'
     found_societies = Society.objects.filter(ext_id=ext_id,source=source)
     if len(found_societies) == 0:
-        name = society_dict['society_name']
-        location = Point(float(society_dict['long']),float(society_dict['lat']))
-        iso_code = iso_from_code(society_dict['iso'])
+        name = society_dict['Society_name_EA']
+        iso_code = iso_from_code(society_dict['ISO693_3'])
+        # Get the language
+        language_name = society_dict['LangNam']
+        try:
+            language = Language.objects.get(name=language_name,iso_code=iso_code)
+        except ObjectDoesNotExist:
+            language = None
+            print "Warning: Creating society record for %s but no language found with name %s" % (ext_id, language_name)
         society = Society(ext_id=ext_id,
                           name=name,
-                          location=location,
                           source=source,
                           iso_code=iso_code,
+                          language=language
                           )
+        society.save()
+
+def postprocess_ea_societies():
+    '''
+    Some of the EA Variable values represent data that is needed at the society level, e.g.
+    source and location
+    '''
+    try:
+        lon_var = VariableDescription.objects.get(name='Longitude')
+        lat_var = VariableDescription.objects.get(name='Latitude')
+        focal_year_var = VariableDescription.objects.get(name='Date: Year with Century')
+    except ObjectDoesNotExist:
+        print "Unable to find vars for Lon/Lat/Year.  Have you loaded the ea_vars?"
+    for society in Society.objects.filter(source='EA'):
+        # Get location
+        try:
+            lon_val = society.variablecodedvalue_set.get(variable=lon_var)
+            lat_val = society.variablecodedvalue_set.get(variable=lat_var)
+        except ObjectDoesNotExist:
+            print "Unable to get lon/lat for society %s, skipping postprocessing" % society
+            continue
+        try:
+            location = Point(
+                float(lon_val.coded_value),
+                float(lat_val.coded_value)
+            )
+            society.location = location
+        except ValueError:
+            print "Unable to create Point from (%s,%s) for society %s" % (lon_val.coded_value, lat_val.coded_value, society)
+            # TODO: Get source, incl focal year
         society.save()
 
 def eavar_number_to_label(number):
@@ -275,11 +315,14 @@ def load_ea_val(val_row):
                 code = VariableCodeDescription.objects.get(variable=variable,code=value)
             except ObjectDoesNotExist:
                 code = None
-            variable_value = VariableCodedValue(variable=variable,
-                                                  society=society,
-                                                  coded_value=value,
-                                                  code=code)
-            variable_value.save()
+            try:
+                variable_value = VariableCodedValue(variable=variable,
+                                                    society=society,
+                                                    coded_value=value,
+                                                    code=code)
+                variable_value.save()
+            except IntegrityError:
+                print "Unable to store value %s for var %s in society %s, already exists" % (value, variable, society)
 
 def load_lang(lang_row):
     # Extract values from dictionary
