@@ -6,19 +6,19 @@ from rest_framework.permissions import *
 from rest_framework.views import Request, Response
 
 # Resource routes
-class EAVariableDescriptionViewSet(viewsets.ReadOnlyModelViewSet):
-    serializer_class = EAVariableDescriptionSerializer
+class VariableDescriptionViewSet(viewsets.ReadOnlyModelViewSet):
+    serializer_class = VariableDescriptionSerializer
     filter_fields = ('label', 'name',)
     queryset = VariableDescription.objects.all()
 
-class EAVariableCodeDescriptionViewSet(viewsets.ReadOnlyModelViewSet):
-    serializer_class = EAVariableCodeDescriptionSerializer
+class VariableCodeDescriptionViewSet(viewsets.ReadOnlyModelViewSet):
+    serializer_class = VariableCodeDescriptionSerializer
     filter_fields = ('variable', 'code', 'description',)
     queryset = VariableCodeDescription.objects.all()
 
 # Can filter by code, code__variable, or society
-class EAVariableCodedValueViewSet(viewsets.ReadOnlyModelViewSet):
-    serializer_class = EAVariableCodedValueSerializer
+class VariableCodedValueViewSet(viewsets.ReadOnlyModelViewSet):
+    serializer_class = VariableCodedValueSerializer
     filter_fields = ('variable','coded_value','code','society','code',)
     # Avoid additional database trips by select_related for foreign keys
     queryset = VariableCodedValue.objects.select_related('variable').select_related('code').all()
@@ -68,9 +68,9 @@ class LanguageViewSet(viewsets.ReadOnlyModelViewSet):
 def find_societies(request):
     """
     View to find the societies that match an input request.  Currently expects
-    { language_class_ids: [1,2,3...], ea_variable_codes: [4,5,6...] }
+    { language_class_ids: [1,2,3...], variable_codes: [4,5,6...] }
     """
-    results = {'language_societies': None, 'ea_variable_societies': None}
+    results = {'language_societies': None, 'variable_societies': None}
 
     language_class_ids = request.QUERY_PARAMS.getlist('language_class_ids')
     if len(language_class_ids) > 0:
@@ -90,17 +90,17 @@ def find_societies(request):
         # now get societies from ISO codes
         results['language_societies'] = Society.objects.filter(iso_code__in=iso_codes)
 
-    ea_variable_code_ids = request.QUERY_PARAMS.getlist('ea_variable_codes')
-    if len(ea_variable_code_ids) > 0:
-        # Now get the societies from EA Variables
-        ea_variable_code_ids = [int(x) for x in ea_variable_code_ids]
-        codes = VariableCodeDescription.objects.filter(pk__in=ea_variable_code_ids) # returns a queryset
+    variable_code_ids = request.QUERY_PARAMS.getlist('variable_codes')
+    if len(variable_code_ids) > 0:
+        # Now get the societies from variables
+        variable_code_ids = [int(x) for x in variable_code_ids]
+        codes = VariableCodeDescription.objects.filter(pk__in=variable_code_ids) # returns a queryset
         coded_value_ids = []
         # Aggregate all the coded values for each selected code
         for code in codes:
             coded_value_ids += code.variablecodedvalue_set.values_list('id', flat=True)
         # Coded values have a FK to society.  Aggregate the societies from each value
-        results['ea_variable_societies'] = Society.objects.filter(variablecodedvalue__in=coded_value_ids)
+        results['variable_societies'] = Society.objects.filter(variablecodedvalue__in=coded_value_ids)
 
     societies = []
     # Intersect the querysets
