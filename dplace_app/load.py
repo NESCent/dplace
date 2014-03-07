@@ -144,6 +144,9 @@ def load_society(society_dict):
                           )
         society.save()
 
+def eavar_number_to_label(number):
+    return "EA{0:0>3}".format(number)
+
 def load_ea_var(var_dict):
     """
     Variables are loaded form ea_variable_names.csv for simplicity,
@@ -157,12 +160,9 @@ def load_ea_var(var_dict):
     if exclude == '1':
         return
 
-    found_vars = VariableDescription.objects.filter(number=number)
-    if len(found_vars) == 0:
-        name = var_dict['Variable'].strip()
-        variable = VariableDescription(number=number,
-                                         name=name)
-        variable.save()
+    label = eavar_number_to_label(number)
+    name = var_dict['Variable'].strip()
+    VariableDescription.objects.get_or_create(label=label,name=name)
 
 SORT_COLUMN				= 0
 VARIABLE_VNUMBER_COLUMN = 1
@@ -245,7 +245,8 @@ def load_ea_codes(csvfile=None):
             try:
                 # Some variables in the EA have been excluded from D-PLACE, so there
                 # will be no VariableDescription object for them
-                variable = VariableDescription.objects.get(number=number)
+                label = eavar_number_to_label(number)
+                variable = VariableDescription.objects.get(label=label)
             except ObjectDoesNotExist:
                 variable = None
         else:
@@ -263,9 +264,10 @@ def load_ea_val(val_row):
     for key in val_row.keys():
         if key.find('v') == 0:
             number = int(key[1:])
+            label = eavar_number_to_label(number)
             value = val_row[key].strip()
             try:
-                variable = VariableDescription.objects.get(number=number)
+                variable = VariableDescription.objects.get(label=label)
             except ObjectDoesNotExist:
                 continue
             try:
