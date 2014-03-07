@@ -5,7 +5,7 @@ from rest_framework import serializers
 
 class EAVariableCodeDescriptionSerializer(serializers.ModelSerializer):
     class Meta:
-        model = EAVariableCodeDescription
+        model = VariableCodeDescription
         fields = ('id', 'code', 'description', 'variable')
 
 class EAVariableDescriptionSerializer(serializers.ModelSerializer):

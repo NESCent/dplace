@@ -228,11 +228,11 @@ def load_ea_codes(csvfile=None):
                 n = int(n)
             except ValueError:
                 n = 0
-            found_descriptions = EAVariableCodeDescription.objects.filter(variable=variable,code=code)
+            found_descriptions = VariableCodeDescription.objects.filter(variable=variable,code=code)
             if len(found_descriptions) == 0:
                 # This won't help for things that specify a range or include the word or
                 description = row[DESCRIPTION_COLUMN].strip()
-                code_description = EAVariableCodeDescription(variable=variable,
+                code_description = VariableCodeDescription(variable=variable,
                                                              code=code,
                                                              description=description,
                                                              n=n)
@@ -270,7 +270,7 @@ def load_ea_val(val_row):
                 continue
             try:
                 # Check for Code description if it exists.
-                code = EAVariableCodeDescription.objects.get(variable=variable,code=value)
+                code = VariableCodeDescription.objects.get(variable=variable,code=value)
             except ObjectDoesNotExist:
                 code = None
             variable_value = EAVariableCodedValue(variable=variable,

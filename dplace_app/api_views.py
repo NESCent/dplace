@@ -14,7 +14,7 @@ class EAVariableDescriptionViewSet(viewsets.ReadOnlyModelViewSet):
 class EAVariableCodeDescriptionViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = EAVariableCodeDescriptionSerializer
     filter_fields = ('variable', 'code', 'description',)
-    queryset = EAVariableCodeDescription.objects.all()
+    queryset = VariableCodeDescription.objects.all()
 
 # Can filter by code, code__variable, or society
 class EAVariableCodedValueViewSet(viewsets.ReadOnlyModelViewSet):
@@ -94,7 +94,7 @@ def find_societies(request):
     if len(ea_variable_code_ids) > 0:
         # Now get the societies from EA Variables
         ea_variable_code_ids = [int(x) for x in ea_variable_code_ids]
-        codes = EAVariableCodeDescription.objects.filter(pk__in=ea_variable_code_ids) # returns a queryset
+        codes = VariableCodeDescription.objects.filter(pk__in=ea_variable_code_ids) # returns a queryset
         coded_value_ids = []
         # Aggregate all the coded values for each selected code
         for code in codes:

@@ -7,7 +7,7 @@ admin.site.register(Environmental, admin.GeoModelAdmin)
 admin.site.register(ISOCode, admin.GeoModelAdmin)
 
 admin.site.register(VariableDescription)
-admin.site.register(EAVariableCodeDescription)
+admin.site.register(VariableCodeDescription)
 admin.site.register(EAVariableCodedValue)
 
 admin.site.register(LanguageClass)

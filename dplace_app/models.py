@@ -99,7 +99,7 @@ class VariableDescription(models.Model):
         verbose_name = "Variable"
         ordering=("number",)
 
-class EAVariableCodeDescription(models.Model):
+class VariableCodeDescription(models.Model):
     """
     Most of the variables in the Ethnographic Atlas are coded with
     discrete values that map to a text description, e.g.
@@ -119,7 +119,7 @@ class EAVariableCodeDescription(models.Model):
     n = models.IntegerField(null=True, default=0)
     def save(self, *args, **kwargs):
         self.read_code_number()
-        super(EAVariableCodeDescription, self).save(*args, **kwargs)
+        super(VariableCodeDescription, self).save(*args, **kwargs)
     def read_code_number(self):
         try:
             self.code_number = int(self.code)
@@ -131,7 +131,7 @@ class EAVariableCodeDescription(models.Model):
     def __unicode__(self):
         return "%s - %s" % (self.code, self.description)
     class Meta:
-        verbose_name = "EA Code"
+        verbose_name = "Code"
         ordering = ("variable", "code_number", "code")
 
 class EAVariableCodedValue(models.Model):
@@ -152,7 +152,7 @@ class EAVariableCodedValue(models.Model):
     variable = models.ForeignKey('VariableDescription', related_name="values")
     society = models.ForeignKey('Society', limit_choices_to={'source__in': [x[0] for x in SOCIETY_SOURCES]}, null=True)
     coded_value = models.CharField(max_length=20, db_index=True, null=False, default='.')
-    code = models.ForeignKey('EAVariableCodeDescription', db_index=True, null=True)
+    code = models.ForeignKey('VariableCodeDescription', db_index=True, null=True)
     def get_description(self):
         if self.code is not None:
             return self.code.description
