@@ -205,7 +205,7 @@ class LanguageClassification(models.Model):
     class_subfamily = models.ForeignKey('LanguageClass', limit_choices_to={'level': 2}, related_name="languages2", null=True)
     class_subsubfamily = models.ForeignKey('LanguageClass', limit_choices_to={'level': 3}, related_name="languages3", null=True)
     def __unicode__(self):
-        return "Classification: %s" % self.name
+        return "Classification: %s for language %s" % (self.ethnologue_classification, self.language)
     class Meta:
         index_together = [
             ['class_family', 'class_subfamily', 'class_subsubfamily']
