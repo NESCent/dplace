@@ -35,7 +35,7 @@ class EATestCase(TestCase):
         self.assertEqual(Society.objects.get(ext_id='easoc').iso_code, self.iso_code)
     def test_society_coded_value(self):
         society = Society.objects.get(ext_id='easoc')
-        self.assertIn(self.value,society.eavariablecodedvalue_set.all())
+        self.assertIn(self.value,society.variablecodedvalue_set.all())
     def test_coded_variable(self):
         self.assertEqual(self.code1.variable,self.variable)
         self.assertEqual(self.code2.variable,self.variable)
@@ -147,12 +147,12 @@ class FindSocietiesTestCase(APITestCase):
         self.assertIn(self.society1.id,[x['id'] for x in response.data])
         self.assertIn(self.society2.id,[x['id'] for x in response.data])
         self.assertNotIn(self.society3.id,[x['id'] for x in response.data])
-    def test_find_society_by_eavar(self):
+    def test_find_society_by_var(self):
         data = {'ea_variable_codes': [self.code1.pk]}
         response = self.client.get(self.url,data,format='json')
         self.assertIn(self.society1.id,[x['id'] for x in response.data])
         self.assertNotIn(self.society2.id,[x['id'] for x in response.data])
-    def test_find_societies_by_eavar(self):
+    def test_find_societies_by_var(self):
         data = {'ea_variable_codes': [self.code1.pk, self.code2.pk]}
         response = self.client.get(self.url,data,format='json')
         self.assertIn(self.society1.id,[x['id'] for x in response.data])
@@ -161,7 +161,7 @@ class FindSocietiesTestCase(APITestCase):
         data = {'ea_variable_codes': [self.code3.pk]}
         response = self.client.get(self.url,data,format='json')
         self.assertEqual(len(response.data),0)
-    def test_find_society_by_language_and_eavar(self):
+    def test_find_society_by_language_and_var(self):
         # 1 and 3 share a parent language class
         # 2 does not share a parent language
         # this should return only 1 and not 2 or 3

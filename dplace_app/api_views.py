@@ -98,9 +98,9 @@ def find_societies(request):
         coded_value_ids = []
         # Aggregate all the coded values for each selected code
         for code in codes:
-            coded_value_ids += code.eavariablecodedvalue_set.values_list('id', flat=True)
+            coded_value_ids += code.variablecodedvalue_set.values_list('id', flat=True)
         # Coded values have a FK to society.  Aggregate the societies from each value
-        results['ea_variable_societies'] = Society.objects.filter(eavariablecodedvalue__in=coded_value_ids)
+        results['ea_variable_societies'] = Society.objects.filter(variablecodedvalue__in=coded_value_ids)
 
     societies = []
     # Intersect the querysets
