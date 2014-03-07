@@ -29,18 +29,18 @@ class Society(models.Model):
     source = models.CharField(max_length=16,choices=SOCIETY_SOURCES)
     iso_code = models.ForeignKey('ISOCode', null=True, related_name="societies")
     
-    def get_ethnographic_atlas_data(self):
+    def get_cultural_trait_data(self):
         """Returns the Ethnographic Atlas data for the given society"""
-        ea_values = []
+        values = []
         qset = self.variablecodedvalue_set.select_related('code').select_related('variable')
-        for ea_value in qset.order_by('variable__number').all():
-            ea_values.append({
-                'number': ea_value.variable.number,
-                'name': ea_value.variable.name,
-                'code': ea_value.coded_value,
-                'description': ea_value.get_description(),
+        for value in qset.order_by('variable__label').all():
+            values.append({
+                'label': value.variable.label,
+                'name': value.variable.name,
+                'code': value.coded_value,
+                'description': value.get_description(),
             })
-        return ea_values
+        return values
 
     def __unicode__(self):
         return "%s - %s (%s)" % (self.ext_id, self.name, self.source)

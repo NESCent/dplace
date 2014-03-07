@@ -88,24 +88,24 @@
         </tr>
     </table>
     {% endfor %}
-    <h2>Ethnographic Atlas Data</h2>
+    <h2>Cultural Trait Data</h2>
     <table class="table table-condensed table-striped table-bordered">
     <tr>
         <th colspan="2">Variable</th>
         <th colspan="2">Value</th>
     </tr>
     <tr>
-        <th>#</th>
+        <th>Label</th>
         <th>Name</th>
         <th>Code</th>
         <th>Description</th>
     </tr>
-    {% for ea in ea_values %}
+    {% for cultural_trait in cultural_traits %}
         <tr>
-        <td>{{ ea.number }}</td>
-        <td>{{ ea.name }}</td>
-        <td>{{ ea.code }}</td>
-        <td>{{ ea.description }}</td>
+        <td>{{ cultural_trait.label }}</td>
+        <td>{{ cultural_trait.name }}</td>
+        <td>{{ cultural_trait.code }}</td>
+        <td>{{ cultural_trait.description }}</td>
         </tr>
 
     {% endfor %}

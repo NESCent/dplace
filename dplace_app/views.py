@@ -31,10 +31,10 @@ def search_geo(request):
 def view_society(request, society_id):
     society = get_object_or_404(Society, pk=society_id)
     environmentals = society.environmentals.all()
-    ea_values = society.get_ethnographic_atlas_data()
+    cultural_traits = society.get_cultural_trait_data()
     return render(request,'society.html', {'society': society,
                                            'environmentals': environmentals,
-                                           'ea_values': ea_values})
+                                           'cultural_traits': cultural_traits})
 
 def view_language(request, language_id):
     language = get_object_or_404(Language, pk=language_id)
