@@ -23,9 +23,9 @@
 {% block content %}
 {% verbatim %}
     <!-- angular stuff here -->
-    <div class="container" ng-controller="AppCtrl">
+    <div ng-controller="AppCtrl">
         <ng-include src="'/static/partials/navbar.html'"></ng-include>
-		<div ng-view></div>
+		<div class="container" ng-view></div>
 	</div>
 {% endverbatim %}
 {% endblock %}

@@ -1,1 +1,41 @@
-<p>{{ message }}</p>
+<div class="basic-search col-md-6">
+    <div class="basic-search-buttons btn-group">
+        <button type="button" class="btn btn-lg btn-primary" ng-model="searchButtons" ng-click="buttonChanged('geographic')" btn-radio="'geographic'">Geographic</button>
+        <button type="button" class="btn btn-lg btn-primary" ng-model="searchButtons" ng-click="buttonChanged('cultural')" btn-radio="'cultural'">Cultural Traits</button>
+        <button type="button" class="btn btn-lg btn-primary" ng-model="searchButtons" ng-click="buttonChanged('environmental')" btn-radio="'environmental'">Environmental</button>
+        <button type="button" class="btn btn-lg btn-primary" ng-model="searchButtons" ng-click="buttonChanged('language')" btn-radio="'language'">Language</button>
+    </div>
+    <div class="row basic-search-forms">
+        <div ng-show="searchButtons == 'geographic'">
+            <h4>Search by Geographic Region</h4>
+            <input
+                type="text"
+                ng-model="geographic_region"
+                typeahead="region for region in regions | filter:$viewValue | limitTo: 8"
+                class="form-control">
+            <!-- map -->
+        </div>
+        <div ng-show="searchButtons == 'cultural'">
+            <h4>Search by Cultural Trait</h4>
+            <form class="form-inline" role="form">
+                <div class="form-group">
+                <select
+                    ng-model="cultural_trait_variable"
+                    ng-options="variable.name for variable in variables"
+                    class="form-control"></select>
+                </div>
+                <div class="form-group">
+                <select class="form-control">
+                    <option>Trait thing</option>
+                </select>
+                    </div>
+            </form>
+        </div>
+        <div ng-show="searchButtons == 'environmental'">
+            Search by Environmental Data
+        </div>
+        <div ng-show="searchButtons == 'language'">
+            Search by Language Family / Phylogeny
+        </div>
+    </div>
+</div>
