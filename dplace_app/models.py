@@ -174,6 +174,9 @@ class VariableCodedValue(models.Model):
             ['society','coded_value'],
             ['society','code'],
         ]
+        unique_together = (
+            ('variable','society','coded_value'),
+        )
 
 class Source(models.Model):
     """
