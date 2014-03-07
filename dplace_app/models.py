@@ -96,7 +96,7 @@ class VariableDescription(models.Model):
     def __unicode__(self):
         return "%d - %s" % (self.number, self.name)
     class Meta:
-        verbose_name = "EA Variable"
+        verbose_name = "Variable"
         ordering=("number",)
 
 class EAVariableCodeDescription(models.Model):
