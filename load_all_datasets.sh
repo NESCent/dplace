@@ -34,7 +34,7 @@ echo "Loading Languages from Ethnologue"
 python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/Revised_Ethnologue_families-Feb_10_2014-17th_Ed-ISO693-3-current.csv" langs
 python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/Revised_Ethnologue_families-Feb_10_2014-17th_Ed_Missing_ISO_codes.csv" langs
 echo "Loading EA Societies"
-python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/Lat_Long_data_EA_Binford_Societies_Oct8_2013-3.csv" soc
+python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/ea_langs+isocodes.csv" ea_soc
 echo "Loading Environmental Data"
 python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/EnvironmentalDataset.15Oct2013.csv" "env"
 echo "Loading EA Variables"

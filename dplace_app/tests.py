@@ -82,10 +82,15 @@ class FindSocietiesTestCase(APITestCase):
         iso_code1 = ISOCode.objects.create(iso_code='abc',location=Point(1.0,1.0))
         iso_code2 = ISOCode.objects.create(iso_code='def',location=Point(2.0,2.0))
         iso_code3 = ISOCode.objects.create(iso_code='ghi',location=Point(3.0,3.0))
-        self.society1 = Society.objects.create(ext_id='society1',name='Society1',location=Point(1.0,1.0),source='EA',iso_code=iso_code1)
-        self.society2 = Society.objects.create(ext_id='society2',name='Society2',location=Point(2.0,2.0),source='EA',iso_code=iso_code2)
+        # Make languages
+        language1 = Language.objects.create(name='language1',iso_code=iso_code1)
+        language2 = Language.objects.create(name='language2',iso_code=iso_code2)
+        language3 = Language.objects.create(name='language3',iso_code=iso_code3)
+
+        self.society1 = Society.objects.create(ext_id='society1',name='Society1',location=Point(1.0,1.0),source='EA',iso_code=iso_code1,language=language1)
+        self.society2 = Society.objects.create(ext_id='society2',name='Society2',location=Point(2.0,2.0),source='EA',iso_code=iso_code2,language=language2)
         # Society 3 has the same language characteristics as society 1 but different EA Vars
-        self.society3 = Society.objects.create(ext_id='society3',name='Society3',location=Point(3.0,3.0),source='EA',iso_code=iso_code3)
+        self.society3 = Society.objects.create(ext_id='society3',name='Society3',location=Point(3.0,3.0),source='EA',iso_code=iso_code3,language=language3)
 
         # make a language class tree
         self.root_language_class = LanguageClass.objects.create(name='root',level=1,parent=None)
@@ -94,11 +99,6 @@ class FindSocietiesTestCase(APITestCase):
         self.child_language_class_1b = LanguageClass.objects.create(name='child1',level=3,parent=self.parent_language_class_1)
         self.parent_language_class_2 = LanguageClass.objects.create(name='parent2',level=2,parent=self.root_language_class)
         self.child_language_class_2 = LanguageClass.objects.create(name='child2',level=3,parent=self.parent_language_class_2)
-
-        # Make languages linked to the societies
-        language1 = Language.objects.create(name='language1',iso_code=iso_code1,society=self.society1)
-        language2 = Language.objects.create(name='language2',iso_code=iso_code2,society=self.society2)
-        language3 = Language.objects.create(name='language3',iso_code=iso_code3,society=self.society3)
 
         # make language classifications to link a language to its class tree
         lc1 = LanguageClassification.objects.create(language=language1,
@@ -148,24 +148,24 @@ class FindSocietiesTestCase(APITestCase):
         self.assertIn(self.society2.id,[x['id'] for x in response.data])
         self.assertNotIn(self.society3.id,[x['id'] for x in response.data])
     def test_find_society_by_var(self):
-        data = {'ea_variable_codes': [self.code1.pk]}
+        data = {'variable_codes': [self.code1.pk]}
         response = self.client.get(self.url,data,format='json')
         self.assertIn(self.society1.id,[x['id'] for x in response.data])
         self.assertNotIn(self.society2.id,[x['id'] for x in response.data])
     def test_find_societies_by_var(self):
-        data = {'ea_variable_codes': [self.code1.pk, self.code2.pk]}
+        data = {'variable_codes': [self.code1.pk, self.code2.pk]}
         response = self.client.get(self.url,data,format='json')
         self.assertIn(self.society1.id,[x['id'] for x in response.data])
         self.assertIn(self.society2.id,[x['id'] for x in response.data])
     def test_find_no_societies(self):
-        data = {'ea_variable_codes': [self.code3.pk]}
+        data = {'variable_codes': [self.code3.pk]}
         response = self.client.get(self.url,data,format='json')
         self.assertEqual(len(response.data),0)
     def test_find_society_by_language_and_var(self):
         # 1 and 3 share a parent language class
         # 2 does not share a parent language
         # this should return only 1 and not 2 or 3
-        data = {'ea_variable_codes': [self.code1.pk, self.code2.pk],
+        data = {'variable_codes': [self.code1.pk, self.code2.pk],
                 'language_class_ids': [self.parent_language_class_1.pk]}
         response = self.client.get(self.url,data,format='json')
         self.assertIn(self.society1.id,[x['id'] for x in response.data])

@@ -66,9 +66,8 @@ function SearchCtrl($scope, $routeParams, LanguageClass, Variable, CodeDescripti
         }
     };
 
-    // EA Methods
-
-    $scope.toggleShowEACodes = function(variable) {
+    // Cultural Trait Methods
+    $scope.toggleShowCodes = function(variable) {
         variable.isShowingCodes = !variable.isShowingCodes;
         if(variable.isShowingCodes && variable.codes == undefined) {
             // load EA Variable codes
@@ -124,7 +123,7 @@ function SearchCtrl($scope, $routeParams, LanguageClass, Variable, CodeDescripti
         });
     };
 
-    $scope.updateEaCodeSelections = function() {
+    $scope.updateCodeSelections = function() {
         $scope.variableSelections = [];
         $scope.variables.forEach(function(variable) {
             if(variable.codes) {
@@ -138,13 +137,13 @@ function SearchCtrl($scope, $routeParams, LanguageClass, Variable, CodeDescripti
     $scope.getSocieties = function() {
         // refresh the languageSelections array
         $scope.updateFamilySelections();
-        $scope.updateEaCodeSelections();
+        $scope.updateCodeSelections();
         var mapFunction = function (selection) { return selection.id };
         var language_ids = $scope.languageSelections.map(mapFunction);
         var code_ids = $scope.variableSelections.map(mapFunction);
         $scope.societies = FindSocieties.find({
             language_class_ids: language_ids,
-            ea_variable_codes: code_ids
+            variable_codes: code_ids
         });
     };
 }
