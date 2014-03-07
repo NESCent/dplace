@@ -1,13 +1,13 @@
-function SearchCtrl($scope, $routeParams, LanguageClass, EAVariable, EACodeDescription, FindSocieties) {
+function SearchCtrl($scope, $routeParams, LanguageClass, Variable, CodeDescription, FindSocieties) {
     $scope.languageSelections = [];
-    $scope.eaVariableSelections = [];
+    $scope.variableSelections = [];
 
     $scope.families = LanguageClass.query({level: 1});
-    $scope.eaVariables = EAVariable.query();
+    $scope.variables = Variable.query();
 
     $scope.clearAll = function() {
         $scope.clearLanguageSelections();
-        $scope.clearEaVariableSelections();
+        $scope.clearVariableSelections();
     };
 
     $scope.clearLanguageSelections = function() {
@@ -18,15 +18,15 @@ function SearchCtrl($scope, $routeParams, LanguageClass, EAVariable, EACodeDescr
         $scope.languageSelections = [];
     };
 
-    $scope.clearEaVariableSelections = function () {
-        $scope.eaVariables.forEach(function (eaVariable) {
-            if(eaVariable.codes) {
-                eaVariable.codes.forEach(function (code) {
+    $scope.clearVariableSelections = function () {
+        $scope.variables.forEach(function (variable) {
+            if(variable.codes) {
+                variable.codes.forEach(function (code) {
                     code.isSelected = false;
                 });
             }
         });
-        $scope.eaVariableSelections = [];
+        $scope.variableSelections = [];
     }
     // Families can be collapsed and can be selected
     // Changing collapse should load subfamilies if not present, and check them by default
@@ -68,19 +68,19 @@ function SearchCtrl($scope, $routeParams, LanguageClass, EAVariable, EACodeDescr
 
     // EA Methods
 
-    $scope.toggleShowEACodes = function(eaVariable) {
-        eaVariable.isShowingCodes = !eaVariable.isShowingCodes;
-        if(eaVariable.isShowingCodes && eaVariable.codes == undefined) {
+    $scope.toggleShowEACodes = function(variable) {
+        variable.isShowingCodes = !variable.isShowingCodes;
+        if(variable.isShowingCodes && variable.codes == undefined) {
             // load EA Variable codes
-            eaVariable.codes =  EACodeDescription.query({variable: eaVariable.id});
+            variable.codes =  CodeDescription.query({variable: variable.id});
         }
     };
 
     $scope.updateCodeSelected = function(code) {
         if(code.isSelected) {
-            $scope.eaVariableSelections.push(code);
+            $scope.variableSelections.push(code);
         } else {
-            $scope.eaVariableSelections.splice($scope.eaVariableSelections.indexOf(code));
+            $scope.variableSelections.splice($scope.variableSelections.indexOf(code));
         }
     }
 
@@ -125,11 +125,11 @@ function SearchCtrl($scope, $routeParams, LanguageClass, EAVariable, EACodeDescr
     };
 
     $scope.updateEaCodeSelections = function() {
-        $scope.eaVariableSelections = [];
-        $scope.eaVariables.forEach(function(eaVariable) {
-            if(eaVariable.codes) {
-                eaVariable.codes.forEach(function(code) {
-                    $scope.updateSelection(code, $scope.eaVariableSelections);
+        $scope.variableSelections = [];
+        $scope.variables.forEach(function(variable) {
+            if(variable.codes) {
+                variable.codes.forEach(function(code) {
+                    $scope.updateSelection(code, $scope.variableSelections);
                 });
             }
         });
@@ -141,7 +141,7 @@ function SearchCtrl($scope, $routeParams, LanguageClass, EAVariable, EACodeDescr
         $scope.updateEaCodeSelections();
         var mapFunction = function (selection) { return selection.id };
         var language_ids = $scope.languageSelections.map(mapFunction);
-        var code_ids = $scope.eaVariableSelections.map(mapFunction);
+        var code_ids = $scope.variableSelections.map(mapFunction);
         $scope.societies = FindSocieties.find({
             language_class_ids: language_ids,
             ea_variable_codes: code_ids

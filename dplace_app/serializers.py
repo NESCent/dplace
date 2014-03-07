@@ -11,7 +11,7 @@ class EAVariableCodeDescriptionSerializer(serializers.ModelSerializer):
 class EAVariableDescriptionSerializer(serializers.ModelSerializer):
     class Meta:
         model = VariableDescription
-        fields = ('id', 'number', 'name')
+        fields = ('id', 'label', 'name')
 
 class EAVariableCodedValueSerializer(serializers.ModelSerializer):
     code_description = EAVariableCodeDescriptionSerializer(source='code')

@@ -8,7 +8,7 @@ from rest_framework.views import Request, Response
 # Resource routes
 class EAVariableDescriptionViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = EAVariableDescriptionSerializer
-    filter_fields = ('number', 'name',)
+    filter_fields = ('label', 'name',)
     queryset = VariableDescription.objects.all()
 
 class EAVariableCodeDescriptionViewSet(viewsets.ReadOnlyModelViewSet):
