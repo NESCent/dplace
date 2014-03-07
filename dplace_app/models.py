@@ -97,7 +97,7 @@ class VariableDescription(models.Model):
     def coded_societies(self):
         return Society.objects.filter(variablecodedvalue__in=self.values.all())
     def __unicode__(self):
-        return "%d - %s" % (self.number, self.name)
+        return "%s - %s" % (self.label, self.name)
     class Meta:
         verbose_name = "Variable"
         ordering=("label",)
