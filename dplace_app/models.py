@@ -171,6 +171,20 @@ class VariableCodedValue(models.Model):
             ['society','code'],
         ]
 
+class Source(models.Model):
+    """
+    Source information for various items in the cultural traits data sets
+    """
+    year = models.CharField(max_length=10) # text, because might be '1996', '1999-2001', or 'ND'
+    author = models.CharField(max_length=50)
+    reference = models.CharField(max_length=500)
+    focal_year = models.CharField(max_length=10,null=True)
+    subcase = models.CharField(max_length=32,null=True)
+    class Meta:
+        unique_together = (
+            ('year','author')
+        )
+
 CLASS_LEVELS = (
     (1, 'Family'),
     (2, 'Subfamily'),
