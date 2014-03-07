@@ -25,7 +25,7 @@ SOCIETY_SOURCES = (
 class Society(models.Model):
     ext_id = models.CharField('External ID', unique=True, max_length=10)
     name = models.CharField('Name', db_index=True, max_length=200)
-    location = models.PointField('Location')
+    location = models.PointField('Location',null=True)
     source = models.CharField(max_length=16,choices=SOCIETY_SOURCES)
     iso_code = models.ForeignKey('ISOCode', null=True, related_name="societies")
     
