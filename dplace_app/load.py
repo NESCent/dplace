@@ -9,15 +9,15 @@ MISSING_CODES = []
 def run(file_name=None, mode=None):
     # read the csv file
     with open(file_name, 'rb') as csvfile:
-        if mode in ['iso', 'soc', 'env', 'ea_vars', 'ea_vals', 'langs', 'iso_lat_long']:
+        if mode in ['iso', 'ea_soc', 'env', 'ea_vars', 'ea_vals', 'langs', 'iso_lat_long']:
             csv_reader = csv.DictReader(csvfile)
             for dict_row in csv_reader:
                 if mode == 'iso':
                     load_isocode(dict_row)
                 elif mode == 'iso_lat_long':
                     load_iso_lat_long(dict_row)
-                elif mode == 'soc':
-                    load_society(dict_row)
+                elif mode == 'ea_soc':
+                    load_ea_society(dict_row)
                 elif mode == 'env':
                     load_environmental(dict_row)
                 elif mode == 'ea_vars':
@@ -128,19 +128,25 @@ def load_environmental(env_dict):
                     setattr(environmental, v, float(env_dict[k]))
         environmental.save()
 
-def load_society(society_dict):
-    ext_id = society_dict['id']
-    source = society_dict['source']
+def load_ea_society(society_dict):
+    ext_id = society_dict['ID']
+    source = 'EA'
     found_societies = Society.objects.filter(ext_id=ext_id,source=source)
     if len(found_societies) == 0:
-        name = society_dict['society_name']
-        location = Point(float(society_dict['long']),float(society_dict['lat']))
-        iso_code = iso_from_code(society_dict['iso'])
+        name = society_dict['Society_name_EA']
+        iso_code = iso_from_code(society_dict['ISO693_3'])
+        # Get the language
+        language_name = society_dict['LangNam']
+        try:
+            language = Language.objects.get(name=language_name,iso_code=iso_code)
+        except ObjectDoesNotExist:
+            language = None
+            print "Warning: Creating society record for %s but no language found with name %s" % (ext_id, language_name)
         society = Society(ext_id=ext_id,
                           name=name,
-                          location=location,
                           source=source,
                           iso_code=iso_code,
+                          language=language
                           )
         society.save()
 
