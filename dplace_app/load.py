@@ -9,11 +9,13 @@ MISSING_CODES = []
 def run(file_name=None, mode=None):
     # read the csv file
     with open(file_name, 'rb') as csvfile:
-        if mode in ['iso', 'soc', 'env', 'ea_vars', 'ea_vals', 'langs']:
+        if mode in ['iso', 'soc', 'env', 'ea_vars', 'ea_vals', 'langs', 'iso_lat_long']:
             csv_reader = csv.DictReader(csvfile)
             for dict_row in csv_reader:
                 if mode == 'iso':
                     load_isocode(dict_row)
+                elif mode == 'iso_lat_long':
+                    load_iso_lat_long(dict_row)
                 elif mode == 'soc':
                     load_society(dict_row)
                 elif mode == 'env':
@@ -31,13 +33,39 @@ def run(file_name=None, mode=None):
         print '\n'.join(MISSING_CODES)
 
 
+# get a value from a dictionary, searching the possible keys
+def get_value(dict,possible_keys):
+    for key in possible_keys:
+        if key in dict.keys():
+            return dict[key]
+    return None
+
+def get_isocode(dict):
+    # ISO Code may appear in 'ISO' column (17th Ed Missing ISO codes)
+    # or the 'ISO 693-3 code' column (17th Ed - ISO 693-3 - current)
+    return get_value(dict,('ISO','ISO 693-3 code'))
+
 def load_isocode(iso_dict):
+    code = get_isocode(iso_dict)
+    if code is None:
+        print "ISO Code not found in row, skipping"
+        return
+    if len(code) > 3:
+        print "ISO Code '%s' too long, skipping" % code
+        return
+    ISOCode.objects.get_or_create(iso_code=code)
+
+def load_iso_lat_long(iso_dict):
     code = iso_dict['ISO']
-    found_codes = ISOCode.objects.filter(iso_code=code)
-    if len(found_codes) == 0:
-        lonlat = Point(float(iso_dict['LMP_LON']),float(iso_dict['LMP_LAT']))
-        isocode = ISOCode(iso_code=code,location=lonlat)
-        isocode.save()
+    found_code = None
+    try:
+        found_code = ISOCode.objects.get(iso_code=code)
+    except ObjectDoesNotExist:
+        print "Tried to attach Lat/Long to ISO Code %s but code not found" % code
+        return
+    location = Point(float(iso_dict['LMP_LON']),float(iso_dict['LMP_LAT']))
+    found_code.location = location
+    found_code.save()
 
 # These are all floats
 ENVIRONMENTAL_MAP = {
@@ -116,6 +144,9 @@ def load_society(society_dict):
                           )
         society.save()
 
+def eavar_number_to_label(number):
+    return "EA{0:0>3}".format(number)
+
 def load_ea_var(var_dict):
     """
     Variables are loaded form ea_variable_names.csv for simplicity,
@@ -129,12 +160,9 @@ def load_ea_var(var_dict):
     if exclude == '1':
         return
 
-    found_vars = EAVariableDescription.objects.filter(number=number)
-    if len(found_vars) == 0:
-        name = var_dict['Variable'].strip()
-        variable = EAVariableDescription(number=number,
-                                         name=name)
-        variable.save()
+    label = eavar_number_to_label(number)
+    name = var_dict['Variable'].strip()
+    VariableDescription.objects.get_or_create(label=label,name=name)
 
 SORT_COLUMN				= 0
 VARIABLE_VNUMBER_COLUMN = 1
@@ -200,11 +228,11 @@ def load_ea_codes(csvfile=None):
                 n = int(n)
             except ValueError:
                 n = 0
-            found_descriptions = EAVariableCodeDescription.objects.filter(variable=variable,code=code)
+            found_descriptions = VariableCodeDescription.objects.filter(variable=variable,code=code)
             if len(found_descriptions) == 0:
                 # This won't help for things that specify a range or include the word or
                 description = row[DESCRIPTION_COLUMN].strip()
-                code_description = EAVariableCodeDescription(variable=variable,
+                code_description = VariableCodeDescription(variable=variable,
                                                              code=code,
                                                              description=description,
                                                              n=n)
@@ -216,8 +244,9 @@ def load_ea_codes(csvfile=None):
             number = int(row[VARIABLE_NUMBER_COLUMN])
             try:
                 # Some variables in the EA have been excluded from D-PLACE, so there
-                # will be no EAVariableDescription object for them
-                variable = EAVariableDescription.objects.get(number=number)
+                # will be no VariableDescription object for them
+                label = eavar_number_to_label(number)
+                variable = VariableDescription.objects.get(label=label)
             except ObjectDoesNotExist:
                 variable = None
         else:
@@ -235,17 +264,18 @@ def load_ea_val(val_row):
     for key in val_row.keys():
         if key.find('v') == 0:
             number = int(key[1:])
+            label = eavar_number_to_label(number)
             value = val_row[key].strip()
             try:
-                variable = EAVariableDescription.objects.get(number=number)
+                variable = VariableDescription.objects.get(label=label)
             except ObjectDoesNotExist:
                 continue
             try:
                 # Check for Code description if it exists.
-                code = EAVariableCodeDescription.objects.get(variable=variable,code=value)
+                code = VariableCodeDescription.objects.get(variable=variable,code=value)
             except ObjectDoesNotExist:
                 code = None
-            variable_value = EAVariableCodedValue(variable=variable,
+            variable_value = VariableCodedValue(variable=variable,
                                                   society=society,
                                                   coded_value=value,
                                                   code=code)
@@ -253,11 +283,17 @@ def load_ea_val(val_row):
 
 def load_lang(lang_row):
     # Extract values from dictionary
-    code = lang_row['ISO 693-3 code']
-    language_name = lang_row['Language name']
-    ethnologue_classification = lang_row['Ethnologue Classification (unrevised)']
-    family_names = [lang_row['FAMILY-REVISED'], lang_row['Class2'], lang_row['Class3']]
-
+    code = get_isocode(lang_row)
+    if code is None:
+        print "ISO Code not found in row, skipping"
+        return
+    language_name = get_value(lang_row,('Language name','NAM'))
+    ethnologue_classification = get_value(lang_row,('Ethnologue Classification (unrevised)','Ethnologue classification (if applicable)'))
+    family_names = [
+        get_value(lang_row,('FAMILY-REVISED','FAMILY')),
+        lang_row['Class2'],
+        lang_row['Class3']
+    ]
     # ISO Code
     isocode = iso_from_code(code) # Does not create new ISO Codes
     if isocode is None:

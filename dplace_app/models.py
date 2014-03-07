@@ -1,11 +1,13 @@
 from django.contrib.gis.db import models
 
-# from 'iso lat long.xlsx'.
-# I think this maps language codes to geographic points.  unclear what LMP means in LMP_LAT/LMP_LON
-# Some points don't map to a 4326 point
+# Originally from 'iso lat long.xlsx'.  This spreadsheet contains ISO Codes and their
+# Locations.  Only iso codes from the 16th edition ethnologue were present.
+# Other datasets references ISO Codes that were not present in 16th ed, so now
+# this is loaded from the ethnologue, and locations are annotated later if known
+
 class ISOCode(models.Model):
     iso_code = models.CharField('ISO Code', db_index=True, max_length=3)
-    location = models.PointField()
+    location = models.PointField(null=True) # only have locations for ISO codes in 16th ed ethnologue
     # For GeoDjango, must override the manager
     objects = models.GeoManager()
     def __unicode__(self):
@@ -27,18 +29,18 @@ class Society(models.Model):
     source = models.CharField(max_length=16,choices=SOCIETY_SOURCES)
     iso_code = models.ForeignKey('ISOCode', null=True, related_name="societies")
     
-    def get_ethnographic_atlas_data(self):
+    def get_cultural_trait_data(self):
         """Returns the Ethnographic Atlas data for the given society"""
-        ea_values = []
-        qset = self.eavariablecodedvalue_set.select_related('code').select_related('variable')
-        for ea_value in qset.order_by('variable__number').all():
-            ea_values.append({
-                'number': ea_value.variable.number,
-                'name': ea_value.variable.name,
-                'code': ea_value.coded_value,
-                'description': ea_value.get_description(),
+        values = []
+        qset = self.variablecodedvalue_set.select_related('code').select_related('variable')
+        for value in qset.order_by('variable__label').all():
+            values.append({
+                'label': value.variable.label,
+                'name': value.variable.name,
+                'code': value.coded_value,
+                'description': value.get_description(),
             })
-        return ea_values
+        return values
 
     def __unicode__(self):
         return "%s - %s (%s)" % (self.ext_id, self.name, self.source)
@@ -79,25 +81,27 @@ class Environmental(models.Model):
     class Meta:
         verbose_name = "Environmental"
 
-class EAVariableDescription(models.Model):
+class VariableDescription(models.Model):
     """
     Variables in the Ethnographic Atlas have a number and are accompanied
     by a description, e.g.
 
         NUMBER: 6, DESCRIPTION: Mode of Marriage (Primary)
 
+    This number is converted to a label: EA006
     """
-    number = models.IntegerField(unique=True, default=0)
+    label = models.CharField(max_length=10, db_index=True)
     name = models.CharField(max_length=200, db_index=True, default='Unknown')
+    source = models.ForeignKey('Source',null=True)
     def coded_societies(self):
-        return Society.objects.filter(eavariablecodedvalue__in=self.values.all())
+        return Society.objects.filter(variablecodedvalue__in=self.values.all())
     def __unicode__(self):
         return "%d - %s" % (self.number, self.name)
     class Meta:
-        verbose_name = "EA Variable"
-        ordering=("number",)
+        verbose_name = "Variable"
+        ordering=("label",)
 
-class EAVariableCodeDescription(models.Model):
+class VariableCodeDescription(models.Model):
     """
     Most of the variables in the Ethnographic Atlas are coded with
     discrete values that map to a text description, e.g.
@@ -110,14 +114,14 @@ class EAVariableCodeDescription(models.Model):
     This model is not used by every value in the EA.
 
     """
-    variable = models.ForeignKey('EAVariableDescription', related_name="codes", db_index=True)
+    variable = models.ForeignKey('VariableDescription', related_name="codes", db_index=True)
     code = models.CharField(max_length=20, db_index=True, null=False, default='.')
     code_number = models.IntegerField(null=True, db_index=True)
     description = models.CharField(max_length=500, default='Unknown')
     n = models.IntegerField(null=True, default=0)
     def save(self, *args, **kwargs):
         self.read_code_number()
-        super(EAVariableCodeDescription, self).save(*args, **kwargs)
+        super(VariableCodeDescription, self).save(*args, **kwargs)
     def read_code_number(self):
         try:
             self.code_number = int(self.code)
@@ -125,14 +129,14 @@ class EAVariableCodeDescription(models.Model):
             pass
 
     def coded_societies(self):
-        return Society.objects.filter(eavariablecodedvalue__coded_value=self.code)
+        return Society.objects.filter(variablecodedvalue__coded_value=self.code)
     def __unicode__(self):
         return "%s - %s" % (self.code, self.description)
     class Meta:
-        verbose_name = "EA Code"
+        verbose_name = "Code"
         ordering = ("variable", "code_number", "code")
 
-class EAVariableCodedValue(models.Model):
+class VariableCodedValue(models.Model):
     """
     The values coded in the EA are typically discrete codes
     that map to a description.  Some are not and
@@ -147,10 +151,11 @@ class EAVariableCodedValue(models.Model):
     This model is not used by every code
 
     """
-    variable = models.ForeignKey('EAVariableDescription', related_name="values")
+    variable = models.ForeignKey('VariableDescription', related_name="values")
     society = models.ForeignKey('Society', limit_choices_to={'source__in': [x[0] for x in SOCIETY_SOURCES]}, null=True)
     coded_value = models.CharField(max_length=20, db_index=True, null=False, default='.')
-    code = models.ForeignKey('EAVariableCodeDescription', db_index=True, null=True)
+    code = models.ForeignKey('VariableCodeDescription', db_index=True, null=True)
+    source = models.ForeignKey('Source', null=True)
     def get_description(self):
         if self.code is not None:
             return self.code.description
@@ -159,7 +164,7 @@ class EAVariableCodedValue(models.Model):
     def __unicode__(self):
         return "%s" % self.coded_value
     class Meta:
-        verbose_name = "EA Value"
+        verbose_name = "Value"
         ordering = ("variable", "coded_value")
         index_together = [
             ['variable','society'],
@@ -168,6 +173,20 @@ class EAVariableCodedValue(models.Model):
             ['society','coded_value'],
             ['society','code'],
         ]
+
+class Source(models.Model):
+    """
+    Source information for various items in the cultural traits data sets
+    """
+    year = models.CharField(max_length=10) # text, because might be '1996', '1999-2001', or 'ND'
+    author = models.CharField(max_length=50)
+    reference = models.CharField(max_length=500)
+    focal_year = models.CharField(max_length=10,null=True)
+    subcase = models.CharField(max_length=32,null=True)
+    class Meta:
+        unique_together = (
+            ('year','author')
+        )
 
 CLASS_LEVELS = (
     (1, 'Family'),
@@ -203,7 +222,7 @@ class LanguageClassification(models.Model):
     class_subfamily = models.ForeignKey('LanguageClass', limit_choices_to={'level': 2}, related_name="languages2", null=True)
     class_subsubfamily = models.ForeignKey('LanguageClass', limit_choices_to={'level': 3}, related_name="languages3", null=True)
     def __unicode__(self):
-        return "Classification: %s" % self.name
+        return "Classification: %s for language %s" % (self.ethnologue_classification, self.language)
     class Meta:
         index_together = [
             ['class_family', 'class_subfamily', 'class_subsubfamily']

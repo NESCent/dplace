@@ -6,9 +6,9 @@ admin.site.register(Society)
 admin.site.register(Environmental, admin.GeoModelAdmin)
 admin.site.register(ISOCode, admin.GeoModelAdmin)
 
-admin.site.register(EAVariableDescription)
-admin.site.register(EAVariableCodeDescription)
-admin.site.register(EAVariableCodedValue)
+admin.site.register(VariableDescription)
+admin.site.register(VariableCodeDescription)
+admin.site.register(VariableCodedValue)
 
 admin.site.register(LanguageClass)
 admin.site.register(LanguageClassification)

@@ -26,16 +26,16 @@ class EATestCase(TestCase):
         self.iso_code = ISOCode.objects.create(iso_code='abc',location=Point(5.0,5.0))
         self.ea_society = Society.objects.create(ext_id='easoc',name='EA Society',location=Point(0.0,0.0),source='EA',iso_code=self.iso_code)
         self.binford_society = Society.objects.create(ext_id='binfordsoc',name='Binford Society',location=Point(0.0,0.0),source='Binford',iso_code=self.iso_code)
-        self.variable = EAVariableDescription.objects.create(number=1,name='Variable 1')
-        self.code10 = EAVariableCodeDescription.objects.create(variable=self.variable, code='10', description='Code 10')
-        self.code1 = EAVariableCodeDescription.objects.create(variable=self.variable, code='1', description='Code 1')
-        self.code2 = EAVariableCodeDescription.objects.create(variable=self.variable, code='2', description='Code 2')
-        self.value = EAVariableCodedValue.objects.create(variable=self.variable,society=self.ea_society,coded_value='1',code=self.code1)
+        self.variable = VariableDescription.objects.create(label='EA001',name='Variable 1')
+        self.code10 = VariableCodeDescription.objects.create(variable=self.variable, code='10', description='Code 10')
+        self.code1 = VariableCodeDescription.objects.create(variable=self.variable, code='1', description='Code 1')
+        self.code2 = VariableCodeDescription.objects.create(variable=self.variable, code='2', description='Code 2')
+        self.value = VariableCodedValue.objects.create(variable=self.variable,society=self.ea_society,coded_value='1',code=self.code1)
     def test_isocode(self):
         self.assertEqual(Society.objects.get(ext_id='easoc').iso_code, self.iso_code)
     def test_society_coded_value(self):
         society = Society.objects.get(ext_id='easoc')
-        self.assertIn(self.value,society.eavariablecodedvalue_set.all())
+        self.assertIn(self.value,society.variablecodedvalue_set.all())
     def test_coded_variable(self):
         self.assertEqual(self.code1.variable,self.variable)
         self.assertEqual(self.code2.variable,self.variable)
@@ -117,12 +117,12 @@ class FindSocietiesTestCase(APITestCase):
                                                     class_subfamily=self.parent_language_class_1,
                                                     class_subsubfamily=self.child_language_class_1b)
         # Make an EA Variable, code, and value
-        variable = EAVariableDescription.objects.create(number=1,name='Variable 1')
-        self.code1 = EAVariableCodeDescription.objects.create(variable=variable, code='1', description='Code 1')
-        self.code2 = EAVariableCodeDescription.objects.create(variable=variable, code='2', description='Code 2')
-        self.code3 = EAVariableCodeDescription.objects.create(variable=variable, code='3', description='Code 3')
-        value1 = EAVariableCodedValue.objects.create(variable=variable,society=self.society1,coded_value='1',code=self.code1)
-        value2 = EAVariableCodedValue.objects.create(variable=variable,society=self.society2,coded_value='2',code=self.code2)
+        variable = VariableDescription.objects.create(label='EA001',name='Variable 1')
+        self.code1 = VariableCodeDescription.objects.create(variable=variable, code='1', description='Code 1')
+        self.code2 = VariableCodeDescription.objects.create(variable=variable, code='2', description='Code 2')
+        self.code3 = VariableCodeDescription.objects.create(variable=variable, code='3', description='Code 3')
+        value1 = VariableCodedValue.objects.create(variable=variable,society=self.society1,coded_value='1',code=self.code1)
+        value2 = VariableCodedValue.objects.create(variable=variable,society=self.society2,coded_value='2',code=self.code2)
         self.url = reverse('find_societies')
     def test_find_societies_by_root_language(self):
         language_class_ids = [self.root_language_class.pk]
@@ -147,12 +147,12 @@ class FindSocietiesTestCase(APITestCase):
         self.assertIn(self.society1.id,[x['id'] for x in response.data])
         self.assertIn(self.society2.id,[x['id'] for x in response.data])
         self.assertNotIn(self.society3.id,[x['id'] for x in response.data])
-    def test_find_society_by_eavar(self):
+    def test_find_society_by_var(self):
         data = {'ea_variable_codes': [self.code1.pk]}
         response = self.client.get(self.url,data,format='json')
         self.assertIn(self.society1.id,[x['id'] for x in response.data])
         self.assertNotIn(self.society2.id,[x['id'] for x in response.data])
-    def test_find_societies_by_eavar(self):
+    def test_find_societies_by_var(self):
         data = {'ea_variable_codes': [self.code1.pk, self.code2.pk]}
         response = self.client.get(self.url,data,format='json')
         self.assertIn(self.society1.id,[x['id'] for x in response.data])
@@ -161,7 +161,7 @@ class FindSocietiesTestCase(APITestCase):
         data = {'ea_variable_codes': [self.code3.pk]}
         response = self.client.get(self.url,data,format='json')
         self.assertEqual(len(response.data),0)
-    def test_find_society_by_language_and_eavar(self):
+    def test_find_society_by_language_and_var(self):
         # 1 and 3 share a parent language class
         # 2 does not share a parent language
         # this should return only 1 and not 2 or 3

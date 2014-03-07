@@ -8,20 +8,20 @@ from rest_framework.views import Request, Response
 # Resource routes
 class EAVariableDescriptionViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = EAVariableDescriptionSerializer
-    filter_fields = ('number', 'name',)
-    queryset = EAVariableDescription.objects.all()
+    filter_fields = ('label', 'name',)
+    queryset = VariableDescription.objects.all()
 
 class EAVariableCodeDescriptionViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = EAVariableCodeDescriptionSerializer
     filter_fields = ('variable', 'code', 'description',)
-    queryset = EAVariableCodeDescription.objects.all()
+    queryset = VariableCodeDescription.objects.all()
 
 # Can filter by code, code__variable, or society
 class EAVariableCodedValueViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = EAVariableCodedValueSerializer
     filter_fields = ('variable','coded_value','code','society','code',)
     # Avoid additional database trips by select_related for foreign keys
-    queryset = EAVariableCodedValue.objects.select_related('variable').select_related('code').all()
+    queryset = VariableCodedValue.objects.select_related('variable').select_related('code').all()
 
 class SocietyViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = SocietySerializer
@@ -94,13 +94,13 @@ def find_societies(request):
     if len(ea_variable_code_ids) > 0:
         # Now get the societies from EA Variables
         ea_variable_code_ids = [int(x) for x in ea_variable_code_ids]
-        codes = EAVariableCodeDescription.objects.filter(pk__in=ea_variable_code_ids) # returns a queryset
+        codes = VariableCodeDescription.objects.filter(pk__in=ea_variable_code_ids) # returns a queryset
         coded_value_ids = []
         # Aggregate all the coded values for each selected code
         for code in codes:
-            coded_value_ids += code.eavariablecodedvalue_set.values_list('id', flat=True)
+            coded_value_ids += code.variablecodedvalue_set.values_list('id', flat=True)
         # Coded values have a FK to society.  Aggregate the societies from each value
-        results['ea_variable_societies'] = Society.objects.filter(eavariablecodedvalue__in=coded_value_ids)
+        results['ea_variable_societies'] = Society.objects.filter(variablecodedvalue__in=coded_value_ids)
 
     societies = []
     # Intersect the querysets

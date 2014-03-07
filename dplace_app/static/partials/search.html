@@ -40,14 +40,14 @@
                 <input ng-model="eaFilter" class="form-control" placeholder="Filter Ethnographic Atlas Variables" />
             </div>
             <div class="panel-body scrollable">
-                <div ng-repeat="eaVariable in eaVariables | filter:eaFilter">
-                    <span ng-click="toggleShowEACodes(eaVariable)" ng-class="{'triangle-down': eaVariable.isShowingCodes, 'triangle-right': !eaVariable.isShowingCodes}">
-                        <span class="ea-number">{{ eaVariable.number }}:</span>
-                        <span class="ea-description">{{ eaVariable.name }}</span>
+                <div ng-repeat="variable in variables | filter:eaFilter">
+                    <span ng-click="toggleShowEACodes(variable)" ng-class="{'triangle-down': variable.isShowingCodes, 'triangle-right': !variable.isShowingCodes}">
+                        <span class="ea-label">{{ variable.label }}:</span>
+                        <span class="ea-description">{{ variable.name }}</span>
                     </span>
-                    <div ng-show="eaVariable.isShowingCodes" class="indent3">
-                        <div ng-repeat="code in eaVariable.codes">
-                            <span class="ea-number pull-left">{{ code.code }}:</span>
+                    <div ng-show="variable.isShowingCodes" class="indent3">
+                        <div ng-repeat="code in variable.codes">
+                            <span class="ea-label pull-left">{{ code.code }}:</span>
                             <span class="ea-description">{{ code.description }}</span>
                             <input class="pull-right" type="checkbox" ng-model="code.isSelected" ng-change="updateCodeSelected(code)"/>
                         </div>
