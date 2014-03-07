@@ -1,4 +1,5 @@
 function SearchCtrl($scope, $routeParams, LanguageClass, Variable, CodeDescription, FindSocieties) {
+    $scope.setActive('search');
     $scope.languageSelections = [];
     $scope.variableSelections = [];
 

@@ -9,6 +9,7 @@
     <!-- Angular Controllers -->
     <script type="text/javascript" src="/static/js/controllers/app.js"></script>
     <script type="text/javascript" src="/static/js/controllers/search.js"></script>
+    <script type="text/javascript" src="/static/js/controllers/home.js"></script>
     <script type="text/javascript" src="/static/js/controllers/map.js"></script>
     <!-- Angular Services -->
     <script type="text/javascript" src="/static/js/services.js"></script>
@@ -23,6 +24,7 @@
 {% verbatim %}
     <!-- angular stuff here -->
     <div class="container" ng-controller="AppCtrl">
+        <ng-include src="'/static/partials/navbar.html'"></ng-include>
 		<div ng-view></div>
 	</div>
 {% endverbatim %}
