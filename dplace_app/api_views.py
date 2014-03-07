@@ -21,7 +21,7 @@ class EAVariableCodedValueViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = EAVariableCodedValueSerializer
     filter_fields = ('variable','coded_value','code','society','code',)
     # Avoid additional database trips by select_related for foreign keys
-    queryset = EAVariableCodedValue.objects.select_related('variable').select_related('code').all()
+    queryset = VariableCodedValue.objects.select_related('variable').select_related('code').all()
 
 class SocietyViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = SocietySerializer

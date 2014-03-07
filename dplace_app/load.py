@@ -273,7 +273,7 @@ def load_ea_val(val_row):
                 code = VariableCodeDescription.objects.get(variable=variable,code=value)
             except ObjectDoesNotExist:
                 code = None
-            variable_value = EAVariableCodedValue(variable=variable,
+            variable_value = VariableCodedValue(variable=variable,
                                                   society=society,
                                                   coded_value=value,
                                                   code=code)

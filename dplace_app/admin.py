@@ -8,7 +8,7 @@ admin.site.register(ISOCode, admin.GeoModelAdmin)
 
 admin.site.register(VariableDescription)
 admin.site.register(VariableCodeDescription)
-admin.site.register(EAVariableCodedValue)
+admin.site.register(VariableCodedValue)
 
 admin.site.register(LanguageClass)
 admin.site.register(LanguageClassification)

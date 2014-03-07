@@ -30,7 +30,7 @@ class EATestCase(TestCase):
         self.code10 = VariableCodeDescription.objects.create(variable=self.variable, code='10', description='Code 10')
         self.code1 = VariableCodeDescription.objects.create(variable=self.variable, code='1', description='Code 1')
         self.code2 = VariableCodeDescription.objects.create(variable=self.variable, code='2', description='Code 2')
-        self.value = EAVariableCodedValue.objects.create(variable=self.variable,society=self.ea_society,coded_value='1',code=self.code1)
+        self.value = VariableCodedValue.objects.create(variable=self.variable,society=self.ea_society,coded_value='1',code=self.code1)
     def test_isocode(self):
         self.assertEqual(Society.objects.get(ext_id='easoc').iso_code, self.iso_code)
     def test_society_coded_value(self):
@@ -121,8 +121,8 @@ class FindSocietiesTestCase(APITestCase):
         self.code1 = VariableCodeDescription.objects.create(variable=variable, code='1', description='Code 1')
         self.code2 = VariableCodeDescription.objects.create(variable=variable, code='2', description='Code 2')
         self.code3 = VariableCodeDescription.objects.create(variable=variable, code='3', description='Code 3')
-        value1 = EAVariableCodedValue.objects.create(variable=variable,society=self.society1,coded_value='1',code=self.code1)
-        value2 = EAVariableCodedValue.objects.create(variable=variable,society=self.society2,coded_value='2',code=self.code2)
+        value1 = VariableCodedValue.objects.create(variable=variable,society=self.society1,coded_value='1',code=self.code1)
+        value2 = VariableCodedValue.objects.create(variable=variable,society=self.society2,coded_value='2',code=self.code2)
         self.url = reverse('find_societies')
     def test_find_societies_by_root_language(self):
         language_class_ids = [self.root_language_class.pk]

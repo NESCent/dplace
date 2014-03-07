@@ -32,7 +32,7 @@ class Society(models.Model):
     def get_ethnographic_atlas_data(self):
         """Returns the Ethnographic Atlas data for the given society"""
         ea_values = []
-        qset = self.eavariablecodedvalue_set.select_related('code').select_related('variable')
+        qset = self.variablecodedvalue_set.select_related('code').select_related('variable')
         for ea_value in qset.order_by('variable__number').all():
             ea_values.append({
                 'number': ea_value.variable.number,
@@ -92,7 +92,7 @@ class VariableDescription(models.Model):
     number = models.IntegerField(unique=True, default=0)
     name = models.CharField(max_length=200, db_index=True, default='Unknown')
     def coded_societies(self):
-        return Society.objects.filter(eavariablecodedvalue__in=self.values.all())
+        return Society.objects.filter(variablecodedvalue__in=self.values.all())
     def __unicode__(self):
         return "%d - %s" % (self.number, self.name)
     class Meta:
@@ -127,14 +127,14 @@ class VariableCodeDescription(models.Model):
             pass
 
     def coded_societies(self):
-        return Society.objects.filter(eavariablecodedvalue__coded_value=self.code)
+        return Society.objects.filter(variablecodedvalue__coded_value=self.code)
     def __unicode__(self):
         return "%s - %s" % (self.code, self.description)
     class Meta:
         verbose_name = "Code"
         ordering = ("variable", "code_number", "code")
 
-class EAVariableCodedValue(models.Model):
+class VariableCodedValue(models.Model):
     """
     The values coded in the EA are typically discrete codes
     that map to a description.  Some are not and
@@ -161,7 +161,7 @@ class EAVariableCodedValue(models.Model):
     def __unicode__(self):
         return "%s" % self.coded_value
     class Meta:
-        verbose_name = "EA Value"
+        verbose_name = "Value"
         ordering = ("variable", "coded_value")
         index_together = [
             ['variable','society'],

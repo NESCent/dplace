@@ -16,7 +16,7 @@ class EAVariableDescriptionSerializer(serializers.ModelSerializer):
 class EAVariableCodedValueSerializer(serializers.ModelSerializer):
     code_description = EAVariableCodeDescriptionSerializer(source='code')
     class Meta:
-        model = EAVariableCodedValue
+        model = VariableCodedValue
         fields = ('id', 'variable', 'society', 'coded_value', 'code_description')
 
 class ISOCodeSerializer(gis_serializers.GeoModelSerializer):
