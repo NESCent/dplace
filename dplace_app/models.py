@@ -28,7 +28,8 @@ class Society(models.Model):
     location = models.PointField('Location',null=True)
     source = models.CharField(max_length=16,choices=SOCIETY_SOURCES)
     iso_code = models.ForeignKey('ISOCode', null=True, related_name="societies")
-    
+    language = models.ForeignKey('Language', null=True, related_name="societies")
+
     def get_cultural_trait_data(self):
         """Returns the Ethnographic Atlas data for the given society"""
         values = []
@@ -231,12 +232,6 @@ class LanguageClassification(models.Model):
 class Language(models.Model):
     name = models.CharField(max_length=50, db_index=True)
     iso_code = models.ForeignKey('ISOCode', related_name="languages", unique=True)
-    # a language might belong to a given society.
-    # would be good to ask "which language does society A use" and
-    # "which socieity is language A spoken in"
-    # Note: This *might* need to be M2M with one language linking to multiple
-    # societies and vice-versa, but I suspect this won't be common?
-    society = models.ForeignKey('Society', related_name="languages", null=True)
     def __unicode__(self):
         return "Language: %s, ISO Code %s" % (self.name, self.iso_code.iso_code)
     class Meta:
