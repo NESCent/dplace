@@ -88,16 +88,18 @@ class VariableDescription(models.Model):
 
         NUMBER: 6, DESCRIPTION: Mode of Marriage (Primary)
 
+    This number is converted to a label: EA006
     """
-    number = models.IntegerField(unique=True, default=0)
+    label = models.CharField(max_length=10, db_index=True)
     name = models.CharField(max_length=200, db_index=True, default='Unknown')
+    source = models.ForeignKey('Source',null=True)
     def coded_societies(self):
         return Society.objects.filter(variablecodedvalue__in=self.values.all())
     def __unicode__(self):
         return "%d - %s" % (self.number, self.name)
     class Meta:
         verbose_name = "Variable"
-        ordering=("number",)
+        ordering=("label",)
 
 class VariableCodeDescription(models.Model):
     """
@@ -153,6 +155,7 @@ class VariableCodedValue(models.Model):
     society = models.ForeignKey('Society', limit_choices_to={'source__in': [x[0] for x in SOCIETY_SOURCES]}, null=True)
     coded_value = models.CharField(max_length=20, db_index=True, null=False, default='.')
     code = models.ForeignKey('VariableCodeDescription', db_index=True, null=True)
+    source = models.ForeignKey('Source', null=True)
     def get_description(self):
         if self.code is not None:
             return self.code.description
