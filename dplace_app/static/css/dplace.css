@@ -29,12 +29,12 @@ label.light {
     font-size: 1.5rem;
 }
 
-.ea-label {
+.variable-label {
     width: 2rem;
     text-align: right;
 }
 
-.ea-description {
+.variable-description {
     text-align: left;
     padding-left: 1rem;
 }
