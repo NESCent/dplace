@@ -1,12 +1,14 @@
 <div class="basic-search col-md-6">
     <div class="basic-search-buttons btn-group">
-        <button type="button" class="btn btn-lg btn-primary" ng-model="searchButtons" ng-click="buttonChanged('geographic')" btn-radio="'geographic'">Geographic</button>
-        <button type="button" class="btn btn-lg btn-primary" ng-model="searchButtons" ng-click="buttonChanged('cultural')" btn-radio="'cultural'">Cultural Traits</button>
-        <button type="button" class="btn btn-lg btn-primary" ng-model="searchButtons" ng-click="buttonChanged('environmental')" btn-radio="'environmental'">Environmental</button>
-        <button type="button" class="btn btn-lg btn-primary" ng-model="searchButtons" ng-click="buttonChanged('language')" btn-radio="'language'">Language</button>
+        <button ng-repeat="button in buttons"
+                type="button" class="btn btn-lg btn-default"
+                ng-model="selectedButton"
+                ng-click="buttonChanged(button.value)"
+                btn-radio="button.value"
+                >{{ button.name }}</button>
     </div>
     <div class="row basic-search-forms">
-        <div ng-show="searchButtons == 'geographic'">
+        <div ng-show="selectedButton == 'geographic'">
             <h4>Search by Geographic Region</h4>
             <input
                 type="text"
@@ -15,27 +17,41 @@
                 class="form-control">
             <!-- map -->
         </div>
-        <div ng-show="searchButtons == 'cultural'">
+        <div ng-show="selectedButton == 'cultural'">
             <h4>Search by Cultural Trait</h4>
-            <form class="form-inline" role="form">
-                <div class="form-group">
-                <select
-                    ng-model="cultural_trait_variable"
-                    ng-options="variable.name for variable in variables"
-                    class="form-control"></select>
-                </div>
-                <div class="form-group">
-                <select class="form-control">
-                    <option>Trait thing</option>
-                </select>
+            <form class="form-inline" role="form" ng-repeat="trait in traits">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <div class="form-group col-md-10">
+                            <select
+                                    ng-model="trait.selectedVariableId"
+                                    class="form-control"
+                                    ng-change="traitChanged(trait)">
+                                <option ng-repeat="variable in trait.variables"
+                                        value="{{ variable.id }}">
+                                    {{ variable.name }}
+                                </option>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-2">
+                            <button class="btn btn-default form-control">Clear</button>
+                        </div>
                     </div>
+                    <div class="panel-body">
+                        <div ng-repeat="code in trait.codes">
+                            <span class="variable-label pull-left">{{ code.code }}:</span>
+                            <span class="variable-description">{{ code.description }}</span>
+                            <input class="pull-right" type="checkbox" ng-model="code.isSelected"/>
+                        </div>
+                    </div>
+                </div>
             </form>
         </div>
-        <div ng-show="searchButtons == 'environmental'">
-            Search by Environmental Data
+        <div ng-show="selectedButton == 'environmental'">
+            <h4>Search by Environmental Data</h4>
         </div>
-        <div ng-show="searchButtons == 'language'">
-            Search by Language Family / Phylogeny
+        <div ng-show="selectedButton == 'language'">
+            <h4>Search by Language Family / Phylogeny</h4>
         </div>
     </div>
 </div>
