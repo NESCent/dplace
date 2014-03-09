@@ -10,32 +10,35 @@
     <div class="row basic-search-forms">
         <div ng-show="selectedButton == 'geographic'">
             <h4>Search by Geographic Region</h4>
-            <input
-                type="text"
-                ng-model="geographic_region"
-                typeahead="region for region in regions | filter:$viewValue | limitTo: 8"
-                class="form-control">
+            <form class="form-inline" role="form"></form>
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <input type="text"
+                           ng-model="geographic_region"
+                           typeahead="region for region in regions | filter:$viewValue | limitTo: 8"
+                           class="form-control"
+                           placeholder="Enter a geographic region">
+                    </div>
+                </div>
             <!-- map -->
+                <div>
+                    <button class="btn btn-primary form-control">Search</button>
+                </div>
+
         </div>
         <div ng-show="selectedButton == 'cultural'">
             <h4>Search by Cultural Trait</h4>
-            <form class="form-inline" role="form" ng-repeat="trait in traits">
-                <div class="panel panel-default">
+            <form class="form-inline" role="form">
+                <div class="panel panel-default" ng-repeat="trait in traits">
                     <div class="panel-heading">
-                        <div class="form-group col-md-10">
                             <select
-                                    ng-model="trait.selectedVariableId"
+                                    ng-model="trait.selectedVariable"
                                     class="form-control"
-                                    ng-change="traitChanged(trait)">
-                                <option ng-repeat="variable in trait.variables"
-                                        value="{{ variable.id }}">
-                                    {{ variable.name }}
-                                </option>
+                                    ng-change="traitChanged(trait)"
+                                    ng-options="variable.name for variable in trait.variables"
+                                    >
+                                <option value="">Please select a trait</option>
                             </select>
-                        </div>
-                        <div class="form-group col-md-2">
-                            <button class="btn btn-default form-control">Clear</button>
-                        </div>
                     </div>
                     <div class="panel-body">
                         <div ng-repeat="code in trait.codes">
@@ -45,10 +48,17 @@
                         </div>
                     </div>
                 </div>
+                <div>
+                    <button class="btn btn-primary form-control">Search</button>
+                </div>
             </form>
         </div>
         <div ng-show="selectedButton == 'environmental'">
             <h4>Search by Environmental Data</h4>
+            <!-- rainfall -- >
+            <
+            <!-- greater, less, in the range -->
+
         </div>
         <div ng-show="selectedButton == 'language'">
             <h4>Search by Language Family / Phylogeny</h4>

@@ -15,7 +15,7 @@ function HomeCtrl($scope, Variable, CodeDescription) {
         } else if(selectedButton == 'cultural') {
             $scope.activateCultural();
         } else if(selectedButton == 'environmental') {
-
+            $scope.activateEnvironmental();
         } else if(selectedButton == 'langauge') {
 
         }
@@ -31,8 +31,32 @@ function HomeCtrl($scope, Variable, CodeDescription) {
         $scope.traits = [{variables: Variable.query()}];
     };
     $scope.traitChanged = function(trait) {
-        trait.selectedCode = undefined;
-        trait.codes = CodeDescription.query({variable: trait.selectedVariableId });
-    }
+        trait.selectedCode = null;
+        trait.codes = CodeDescription.query({variable: trait.selectedVariable.id });
+    };
 
+    // Environmental Data
+    $scope.activateEnvironmental = function() {
+        // This should be moved to a web service
+        $scope.environmentalVariables = [
+          { key: 'annual_mean_temperature', name: 'Annual Mean Temperature'},
+          { key: 'annual_temperature_variance', name: 'Annual Temperature Variance'},
+          { key: 'temperature_constancy', name: 'Temperature Constancy'},
+          { key: 'temperature_contingency', name: 'Temperature Contingency'},
+          { key: 'temperature_predictability', name: 'Temperature Predictability'},
+          { key: 'annual_mean_precipitation', name: 'Annual Mean Precipitation'},
+          { key: 'annual_precipitation_variance', name: 'Annual Precipitation Variance'},
+          { key: 'precipitation_constancy', name: 'Precipitation Constancy'},
+          { key: 'precipitation_contingency', name: 'Precipitation Contingency'},
+          { key: 'precipitation_predictability', name: 'Precipitation Predictability'},
+          { key: 'mean_growing_season_duration', name: 'Mean Growing Season Duration'},
+          { key: 'net_primary_productivity', name: 'Net Primary Productivity'},
+          { key: 'bird_diversity', name: 'Bird Diversity'},
+          { key: 'mammal_diversity', name: 'Mammal Diversity'},
+          { key: 'amphibian_diversity', name: 'Amphibian Diversity'},
+          { key: 'plant_diversity', name: 'Plant Diversity'},
+          { key: 'elevation', name: 'Elevation'},
+          { key: 'slope', name: 'Slope'}
+        ];
+    };
 }
