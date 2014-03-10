@@ -39,13 +39,13 @@ function HomeCtrl($scope, Variable, CodeDescription) {
     $scope.activateEnvironmental = function() {
         // This should be moved to a web service
         $scope.environmentalVariables = [
-          { key: 'annual_mean_temperature', name: 'Annual Mean Temperature'},
-          { key: 'annual_temperature_variance', name: 'Annual Temperature Variance'},
+          { key: 'annual_mean_temperature', name: 'Annual Mean Temperature', units:'℃'},
+          { key: 'annual_temperature_variance', name: 'Annual Temperature Variance', units:'℃'},
           { key: 'temperature_constancy', name: 'Temperature Constancy'},
           { key: 'temperature_contingency', name: 'Temperature Contingency'},
           { key: 'temperature_predictability', name: 'Temperature Predictability'},
-          { key: 'annual_mean_precipitation', name: 'Annual Mean Precipitation'},
-          { key: 'annual_precipitation_variance', name: 'Annual Precipitation Variance'},
+          { key: 'annual_mean_precipitation', name: 'Annual Mean Precipitation', units:'mm'},
+          { key: 'annual_precipitation_variance', name: 'Annual Precipitation Variance',},
           { key: 'precipitation_constancy', name: 'Precipitation Constancy'},
           { key: 'precipitation_contingency', name: 'Precipitation Contingency'},
           { key: 'precipitation_predictability', name: 'Precipitation Predictability'},
@@ -58,5 +58,14 @@ function HomeCtrl($scope, Variable, CodeDescription) {
           { key: 'elevation', name: 'Elevation'},
           { key: 'slope', name: 'Slope'}
         ];
+        $scope.environmentalFilters = [
+            { key: 'inrange', name: 'between' },
+            { key: 'lt', name: 'less than'},
+            { key: 'gt', name: 'greater than'},
+            { key: 'outrange', name: 'outside'},
+        ];
+        $scope.environmental = {
+            selectedFilter: $scope.environmentalFilters[0]
+        };
     };
 }
