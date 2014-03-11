@@ -105,7 +105,7 @@ class VariableDescription(models.Model):
         ordering=("label",)
 
 class VariableCategory(models.Model):
-    name = models.CharField(max_length=30, db_index=True)
+    name = models.CharField(max_length=30, db_index=True, unique=True)
     def __unicode__(self):
         return self.name
     class Meta:
