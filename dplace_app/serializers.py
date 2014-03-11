@@ -13,6 +13,26 @@ class VariableDescriptionSerializer(serializers.ModelSerializer):
         model = VariableDescription
         fields = ('id', 'label', 'name')
 
+class VariableCategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = VariableCategory
+        fields = ('id', 'name',)
+
+class VariableDescriptionDetailSerializer(serializers.ModelSerializer):
+    index_categories = VariableCategorySerializer(many=True)
+    niche_categories = VariableCategorySerializer(many=True)
+    class Meta:
+        model = VariableDescription
+        fields = ('id', 'label', 'name', 'index_categories', 'niche_categories',)
+
+class VariableCategoryDetailSerializer(serializers.ModelSerializer):
+    # Use a Primary key related field or just get the variable
+    index_variables = VariableDescriptionSerializer(many=True)
+    niche_variables = VariableDescriptionSerializer(many=True)
+    class Meta:
+        model = VariableCategory
+        fields = ('id', 'name', 'index_variables','niche_variables')
+
 class VariableCodedValueSerializer(serializers.ModelSerializer):
     code_description = VariableCodeDescriptionSerializer(source='code')
     class Meta:

@@ -7,6 +7,7 @@ from dplace_app import api_views
 
 router = routers.DefaultRouter()
 router.register(r'variables', api_views.VariableDescriptionViewSet)
+router.register(r'categories', api_views.VariableCategoryViewSet)
 router.register(r'codes', api_views.VariableCodeDescriptionViewSet)
 router.register(r'values', api_views.VariableCodedValueViewSet)
 router.register(r'societies', api_views.SocietyViewSet)
