@@ -38,7 +38,7 @@ python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/ea_langs+isocodes.c
 echo "Loading Environmental Data"
 python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/EnvironmentalDataset.15Oct2013.csv" "env"
 echo "Loading EA Variables"
-python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/ea_variable_names.csv" ea_vars
+python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/ea_variable_names+categories.csv" ea_vars
 echo "Loading EA Variable Codes"
 python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/ea_codes.csv" ea_codes
 echo "Loading EA Variable Values"
