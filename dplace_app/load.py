@@ -202,7 +202,22 @@ def load_ea_var(var_dict):
 
     label = eavar_number_to_label(number)
     name = var_dict['Variable'].strip()
-    VariableDescription.objects.get_or_create(label=label,name=name)
+    variable, created = VariableDescription.objects.get_or_create(label=label,name=name)
+
+    index_categories = [clean_category(x) for x in var_dict['INDEXCATEGORY'].split(',')]
+    # Currently max 1 niche category
+    niche_categories = [clean_category(x) for x in var_dict['NICHECATEGORY'].split(',')]
+
+    # when creating categories, ignore '?'
+    for category_name in index_categories:
+        index_category, created = VariableCategory.objects.get_or_create(name=category_name)
+        variable.index_categories.add(index_category)
+    for category_name in niche_categories:
+        niche_category, created = VariableCategory.objects.get_or_create(name=category_name)
+        variable.niche_categories.add(niche_category)
+
+def clean_category(category):
+    return category.strip().capitalize()
 
 SORT_COLUMN				= 0
 VARIABLE_VNUMBER_COLUMN = 1
