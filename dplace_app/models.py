@@ -94,6 +94,8 @@ class VariableDescription(models.Model):
     label = models.CharField(max_length=10, db_index=True)
     name = models.CharField(max_length=200, db_index=True, default='Unknown')
     source = models.ForeignKey('Source',null=True)
+    index_categories = models.ManyToManyField('VariableCategory', related_name='index_variables')
+    niche_categories = models.ManyToManyField('VariableCategory', related_name='niche_variables')
     def coded_societies(self):
         return Society.objects.filter(variablecodedvalue__in=self.values.all())
     def __unicode__(self):
@@ -101,6 +103,14 @@ class VariableDescription(models.Model):
     class Meta:
         verbose_name = "Variable"
         ordering=("label",)
+
+class VariableCategory(models.Model):
+    name = models.CharField(max_length=30, db_index=True)
+    def __unicode__(self):
+        return self.name
+    class Meta:
+        verbose_name = "Category"
+        verbose_name_plural = "Categories"
 
 class VariableCodeDescription(models.Model):
     """
