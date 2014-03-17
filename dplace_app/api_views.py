@@ -10,6 +10,22 @@ class VariableDescriptionViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = VariableDescriptionSerializer
     filter_fields = ('label', 'name',)
     queryset = VariableDescription.objects.all()
+    # Override retrieve to use the detail serializer, which includes categories
+    def retrieve(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        serializer = VariableDescriptionDetailSerializer(self.object)
+        return Response(serializer.data)
+
+class VariableCategoryViewSet(viewsets.ReadOnlyModelViewSet):
+    serializer_class = VariableCategorySerializer
+    filter_fields = ('name',)
+    queryset = VariableCategory.objects.all()
+    # Override retrieve to use the detail serializer, which includes variables
+    def retrieve(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        serializer = VariableCategoryDetailSerializer(self.object)
+        return Response(serializer.data)
+
 
 class VariableCodeDescriptionViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = VariableCodeDescriptionSerializer
