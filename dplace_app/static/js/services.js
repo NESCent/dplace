@@ -25,6 +25,19 @@ angular.module('dplaceServices', ['ngResource'])
                 }
             });
     })
+    .factory('VariableCategory', function ($resource) {
+        return $resource(
+            '/api/v1/categories/:id',
+            {page_size: 1000}, {
+                query: {
+                    method: 'GET',
+                    isArray: true,
+                    transformResponse: function(data, headers) {
+                        return JSON.parse(data).results;
+                    }
+                }
+            });
+    })
     .factory('CodeDescription', function ($resource) {
         return $resource(
             '/api/v1/codes/:id',
