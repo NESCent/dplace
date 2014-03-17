@@ -1,4 +1,4 @@
-function HomeCtrl($scope, Variable, CodeDescription) {
+function HomeCtrl($scope, Variable, VariableCategory, CodeDescription) {
     $scope.setActive('home');
     $scope.selectedButton= '';
     $scope.buttons = [
@@ -28,8 +28,19 @@ function HomeCtrl($scope, Variable, CodeDescription) {
 
     // Cultural Traits
     $scope.activateCultural = function() {
-        $scope.traits = [{variables: Variable.query()}];
+        $scope.traits = [{
+            categories: VariableCategory.query(),
+            variables: [],
+            selectedCategory: null,
+            selectedVariable: null
+        }];
     };
+
+    $scope.categoryChanged = function(trait) {
+        trait.indexVariables = Variable.query({index_categories: trait.selectedCategory.id});
+        trait.nicheVariables = Variable.query({niche_categories: trait.selectedCategory.id});
+    }
+
     $scope.traitChanged = function(trait) {
         trait.selectedCode = null;
         trait.codes = CodeDescription.query({variable: trait.selectedVariable.id });

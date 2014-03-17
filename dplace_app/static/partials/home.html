@@ -34,6 +34,14 @@
                 <div class="panel panel-default" ng-repeat="trait in traits">
                     <div class="panel-heading">
                             <select
+                                    ng-model="trait.selectedCategory"
+                                    class="form-control"
+                                    ng-change="categoryChanged(trait)"
+                                    ng-options="variable.name for variable in trait.variables"
+                                    >
+                                <option value="">Please select a trait</option>
+                            </select>
+                            <select
                                     ng-model="trait.selectedVariable"
                                     class="form-control"
                                     ng-change="traitChanged(trait)"
@@ -41,6 +49,7 @@
                                     >
                                 <option value="">Please select a trait</option>
                             </select>
+
                     </div>
                     <div class="panel-body">
                         <div ng-repeat="code in trait.codes">
