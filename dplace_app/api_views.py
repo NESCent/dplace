@@ -8,7 +8,7 @@ from rest_framework.views import Request, Response
 # Resource routes
 class VariableDescriptionViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = VariableDescriptionSerializer
-    filter_fields = ('label', 'name',)
+    filter_fields = ('label', 'name', 'index_categories', 'niche_categories',)
     queryset = VariableDescription.objects.all()
     # Override retrieve to use the detail serializer, which includes categories
     def retrieve(self, request, *args, **kwargs):
@@ -18,7 +18,7 @@ class VariableDescriptionViewSet(viewsets.ReadOnlyModelViewSet):
 
 class VariableCategoryViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = VariableCategorySerializer
-    filter_fields = ('name',)
+    filter_fields = ('name', 'index_variables', 'niche_variables',)
     queryset = VariableCategory.objects.all()
     # Override retrieve to use the detail serializer, which includes variables
     def retrieve(self, request, *args, **kwargs):
