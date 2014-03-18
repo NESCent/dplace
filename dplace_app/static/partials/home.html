@@ -35,23 +35,25 @@
                     <div class="panel-heading">
                         <div class="row">
                             <div class="form-group col-xs-6">
+                                <label class="control-label">Category</label>
                                 <select
                                         ng-model="trait.selectedCategory"
                                         class="form-control"
                                         ng-change="categoryChanged(trait)"
                                         ng-options="category.name for category in trait.categories"
                                         >
-                                    <option value="">Please select a Category</option>
+                                    <option value="">---</option>
                                 </select>
                             </div>
                             <div class="form-group col-xs-6">
+                                <label class="control-label">Variable</label>
                                 <select
                                         ng-model="trait.selectedVariable"
                                         class="form-control"
                                         ng-change="traitChanged(trait)"
                                         ng-options="variable.name for variable in trait.indexVariables"
                                         >
-                                    <option value="">Please select a trait</option>
+                                    <option value="">---</option>
                                 </select>
                             </div>
                         </div>
