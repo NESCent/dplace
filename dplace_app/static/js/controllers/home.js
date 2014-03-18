@@ -39,6 +39,7 @@ function HomeCtrl($scope, Variable, VariableCategory, CodeDescription) {
     $scope.categoryChanged = function(trait) {
         trait.indexVariables = Variable.query({index_categories: trait.selectedCategory.id});
         trait.nicheVariables = Variable.query({niche_categories: trait.selectedCategory.id});
+        trait.codes = [];
     }
 
     $scope.traitChanged = function(trait) {
