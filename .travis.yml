@@ -5,5 +5,9 @@ python:
 install:
   - pip install -r requirements.txt
   - cp dplace/settings.travis dplace/settings.py
+before_script:
+  - psql -c 'create database travis_postgis;' -U postgres
+  - psql -c 'CREATE EXTENSION postgis;' -U postgres -d travis_postgis
+  - psql -c 'CREATE EXTENSION postgis_topology;' -U postgres -d travis_postgis
 # command to run tests
 script: "python manage.py test"
