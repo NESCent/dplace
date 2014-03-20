@@ -11,6 +11,10 @@ function dplaceRouter($routeProvider) {
             templateUrl: '/static/partials/home.html',
             controller: 'HomeCtrl'
         })
+        .when('/societies', {
+            templateUrl: '/static/partials/societies.html',
+            controller: 'SocietiesCtrl'
+        })
         .otherwise({
 	        redirectTo: '/home'
 	});

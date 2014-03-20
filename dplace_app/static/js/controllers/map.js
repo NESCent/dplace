@@ -6,21 +6,21 @@ function MapCtrl($scope) {
     map.zoomToMaxExtent();
     var markers = new OpenLayers.Layer.Markers("SocietyMarkers");
     map.addLayer(markers);
-    $scope.map = map;
-    $scope.markers = markers;
+    $scope.results.map = map;
+    $scope.results.mapMarkers = markers;
     var size = new OpenLayers.Size(21,25);
     var offset = new OpenLayers.Pixel(-(size.w/2), -size.h);
-    $scope.icon = new OpenLayers.Icon('http://www.openlayers.org/dev/img/marker.png', size, offset);
+    $scope.results.icon = new OpenLayers.Icon('http://www.openlayers.org/dev/img/marker.png', size, offset);
     $scope.addMarkers = function() {
-        $scope.markers.clearMarkers();
-        if(!$scope.societies) {
+        $scope.results.mapMarkers.clearMarkers();
+        if(!$scope.results.societies) {
             return;
         }
-        $scope.societies.forEach(function(society) {
+        $scope.results.societies.forEach(function(society) {
             var coordinates = society.location.coordinates;
             // Add a marker for each point
             var lonlat = OpenLayers.LonLat.fromArray(coordinates);
-            var marker = new OpenLayers.Marker(lonlat, $scope.icon.clone());
+            var marker = new OpenLayers.Marker(lonlat, $scope.results.icon.clone());
             marker.events.register('mouseover', marker, function(evt) {
                 var popup = new OpenLayers.Popup.FramedCloud(society.name,
                     marker.lonlat,          // lonlat
@@ -29,14 +29,14 @@ function MapCtrl($scope) {
                     marker.icon,            // anchor
                     false                   // closebox
                 );
-                $scope.map.addPopup(popup);
+                $scope.results.map.addPopup(popup);
                 marker.events.register('mouseout', marker, function(evt) { popup.hide(); } )
             });
-            $scope.markers.addMarker(marker);
+            $scope.results.mapMarkers.addMarker(marker);
         });
     };
     // Update markers when societies change
-    $scope.$watchCollection('societies', function(oldvalue, newvalue) {
+    $scope.$watchCollection('results.societies', function(oldvalue, newvalue) {
         $scope.addMarkers();
     });
 }

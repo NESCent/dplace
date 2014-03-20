@@ -14,7 +14,9 @@
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
       <ul class="nav navbar-nav">
         <li ng-class="homeActive"><a ng-href href="#/home">Home</a></li>
+        <li ng-class="societiesActive"><a ng-href href="#/societies">Societies <span ng-show="results.societies.length">({{ results.societies.length }})</span></a></li>
         <li ng-class="searchActive"><a ng-href href="#/search">Dev Prototype</a></li>
+
       </ul>
     </div><!-- /.navbar-collapse -->
   </div><!-- /.container-fluid -->

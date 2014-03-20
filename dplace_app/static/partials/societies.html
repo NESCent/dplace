@@ -1,0 +1,33 @@
+<div class="container results">
+    <div class="row">
+        <span>
+            <p class="pull-left lead">Societies <span ng-show="results.societies.length">({{ results.societies.length }})</span></p>
+        </span>
+    </div>
+    <tabset>
+        <tab heading="Table">
+            <div class="row">
+                <div ng-hide="results.societies.length">
+                    <p class="text-center help-block search-help"></p>
+                </div>
+                <table class="table" ng-show="results.societies.length">
+                    <tr>
+                        <th>Name</th>
+                        <th>Id</th>
+                        <th>ISO Code</th>
+                        <th>Location</th>
+                    </tr>
+                    <tr ng-repeat="society in results.societies">
+                        <td><a ng-href="/society/{{ society.id }}" target="_blank">{{ society.name }}</a></td>
+                        <td>{{ society.ext_id }}</td>
+                        <td>{{ society.iso_code }}</td>
+                        <td>{{ society.location.coordinates }}</td>
+                    </tr>
+                </table>
+            </div>
+        </tab>
+        <tab heading="Map">
+            <ng-include src="'/static/partials/map.html'"></ng-include>
+        </tab>
+    </tabset>
+</div>
