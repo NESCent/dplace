@@ -1,154 +1,22 @@
-<div class="basic-search container">
-    <div class="row text-center">
-        <div class="btn-group">
-            <button ng-repeat="button in buttons"
-                    type="button" class="btn btn-lg btn-default"
-                    ng-model="selectedButton"
-                    ng-click="buttonChanged(button.value)"
-                    btn-radio="button.value"
-                    >{{ button.name }}</button>
+<div class="">
+    <div class="container">
+        <p class="lead">Search for societies by selecting a mode:</p>
+        <div class="row text-center">
+            <div class="btn-group">
+                <button ng-repeat="button in buttons"
+                        type="button" class="btn btn-lg btn-default btn-dplace-search"
+                        ng-model="selectedButton"
+                        ng-click="buttonChanged(button.value)"
+                        btn-radio="button.value"
+                        >{{ button.name }}</button>
+            </div>
         </div>
     </div>
+</div>
+<div class="container">
     <div class="row basic-search-forms">
-        <div ng-show="selectedButton == 'geographic'">
-            <h4>Search by Geographic Region</h4>
-            <form class="form-inline" role="form"></form>
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <input type="text"
-                           ng-model="geographic_region"
-                           typeahead="region for region in regions | filter:$viewValue | limitTo: 8"
-                           class="form-control"
-                           placeholder="Enter a geographic region">
-                    </div>
-                </div>
-            <!-- map -->
-                <div>
-                    <button class="btn btn-primary form-control">Search</button>
-                </div>
-
-        </div>
-        <div ng-show="selectedButton == 'cultural'">
-            <h4>Search by Cultural Trait</h4>
-            <form class="form-inline" role="form">
-                <div class="panel panel-default" ng-repeat="trait in traits">
-                    <div class="panel-heading">
-                        <div class="row">
-                            <div class="form-group col-xs-6">
-                                <select
-                                        ng-model="trait.selectedCategory"
-                                        class="form-control"
-                                        ng-change="categoryChanged(trait)"
-                                        ng-options="category.name for category in trait.categories"
-                                        >
-                                    <option value="">---</option>
-                                </select>
-                            </div>
-                            <div class="form-group col-xs-6">
-                                <select
-                                        ng-model="trait.selectedVariable"
-                                        class="form-control"
-                                        ng-change="traitChanged(trait)"
-                                        ng-options="variable.name for variable in trait.indexVariables"
-                                        >
-                                    <option value="">---</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="panel-body">
-                        <div ng-repeat="code in trait.codes">
-                            <span class="variable-label pull-left">{{ code.code }}:</span>
-                            <span class="variable-description">{{ code.description }}</span>
-                            <input class="pull-right" type="checkbox" ng-model="code.isSelected"/>
-                        </div>
-                    </div>
-                </div>
-                <div>
-                    <button class="btn btn-primary form-control">Search</button>
-                </div>
-            </form>
-        </div>
-        <div ng-show="selectedButton == 'environmental'">
-            <h4>Search by Environmental Data</h4>
-            <form class="form-inline" role="form">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <div class="row">
-                            <div class="form-group col-xs-4">
-                                <select
-                                        ng-model="environmental.selectedVariable"
-                                        class="form-control"
-                                        ng-change="environmentalChanged()"
-                                        ng-options="environmental.name for environmental in environmentalVariables"
-                                        >
-                                    <option value="">Select an environmental variable</option>
-                                </select>
-                            </div>
-                            <div ng-show="environmental.selectedVariable">
-                                <div class="form-group col-xs-2">
-                                    <div class="dropdown">
-                                        <button class="btn btn-default dropdown-toggle form-control">{{ environmental.selectedFilter.name }} <span class="caret"></span></button>
-                                        <ul class="dropdown-menu">
-                                            <li ng-repeat="environmentalFilter in environmentalFilters"><a ng-click="environmental.selectedFilter = environmentalFilter">{{ environmentalFilter.name }}</a></li>
-                                        </ul>
-                                    </div>
-                                </div>
-                                <div class="fields-inrange" ng-show="environmental.selectedFilter.key == 'inrange'">
-                                    <div class="form-group col-xs-3">
-                                        <div class="input-group">
-                                            <input class="form-control input-xs" ng-model="environmental.lowerVal" />
-                                            <span class="input-group-addon">{{ environmental.selectedVariable.units }}</span>
-                                        </div>
-                                    </div>
-                                    <div class="form-group col-xs-3">
-                                        <div class="input-group">
-                                            <input class="form-control" ng-model="environmental.upperVal" />
-                                            <span class="input-group-addon">{{ environmental.selectedVariable.units }}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="fields-inrange" ng-show="environmental.selectedFilter.key == 'outrange'">
-                                    <div class="form-group col-xs-3">
-                                        <div class="input-group">
-                                            <input class="form-control input-xs" ng-model="environmental.lowerVal" />
-                                            <span class="input-group-addon">{{ environmental.selectedVariable.units }}</span>
-                                        </div>
-                                    </div>
-                                    <div class="form-group col-xs-3">
-                                        <div class="input-group">
-                                            <input class="form-control" ng-model="environmental.upperVal" />
-                                            <span class="input-group-addon">{{ environmental.selectedVariable.units }}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="fields-inrange" ng-show="environmental.selectedFilter.key == 'lt'">
-                                    <div class="form-group col-xs-6">
-                                        <div class="input-group">
-                                            <input class="form-control input-xs" ng-model="environmental.lowerVal" />
-                                            <span class="input-group-addon">{{ environmental.selectedVariable.units }}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="fields-inrange" ng-show="environmental.selectedFilter.key == 'gt'">
-                                    <div class="form-group col-xs-6">
-                                        <div class="input-group">
-                                            <input class="form-control" ng-model="environmental.upperVal" />
-                                            <span class="input-group-addon">{{ environmental.selectedVariable.units }}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div>
-                    <button class="btn btn-primary form-control">Search</button>
-                </div>
-            </form>
-        </div>
-        <div ng-show="selectedButton == 'language'">
-            <h4>Search by Language Family / Phylogeny</h4>
+        <div ng-show="selectedButton">
+            <ng-include src="'/static/partials/search/' +  selectedButton + '.html'"></ng-include>
         </div>
     </div>
 </div>

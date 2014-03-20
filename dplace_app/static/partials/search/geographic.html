@@ -1,0 +1,16 @@
+<h4>Search by Geographic Region</h4>
+<form class="form-inline" role="form"></form>
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <input type="text"
+               ng-model="geographic_region"
+               typeahead="region for region in regions | filter:$viewValue | limitTo: 8"
+               class="form-control"
+               placeholder="Enter a geographic region">
+        </div>
+    </div>
+<!-- map -->
+    <div>
+        <button class="btn btn-primary form-control">Search</button>
+    </div>
+

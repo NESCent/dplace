@@ -1,0 +1,76 @@
+<h4>Search by Environmental Data</h4>
+<form class="form-inline" role="form">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <div class="row">
+                <div class="form-group col-xs-4">
+                    <select
+                            ng-model="environmental.selectedVariable"
+                            class="form-control"
+                            ng-change="environmentalChanged()"
+                            ng-options="environmental.name for environmental in environmentalVariables"
+                            >
+                        <option value="">Select an environmental variable</option>
+                    </select>
+                </div>
+                <div ng-show="environmental.selectedVariable">
+                    <div class="form-group col-xs-2">
+                        <div class="dropdown">
+                            <button class="btn btn-default dropdown-toggle form-control">{{ environmental.selectedFilter.name }} <span class="caret"></span></button>
+                            <ul class="dropdown-menu">
+                                <li ng-repeat="environmentalFilter in environmentalFilters"><a ng-click="environmental.selectedFilter = environmentalFilter">{{ environmentalFilter.name }}</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="fields-inrange" ng-show="environmental.selectedFilter.key == 'inrange'">
+                        <div class="form-group col-xs-3">
+                            <div class="input-group">
+                                <input class="form-control input-xs" ng-model="environmental.lowerVal" />
+                                <span class="input-group-addon">{{ environmental.selectedVariable.units }}</span>
+                            </div>
+                        </div>
+                        <div class="form-group col-xs-3">
+                            <div class="input-group">
+                                <input class="form-control" ng-model="environmental.upperVal" />
+                                <span class="input-group-addon">{{ environmental.selectedVariable.units }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="fields-inrange" ng-show="environmental.selectedFilter.key == 'outrange'">
+                        <div class="form-group col-xs-3">
+                            <div class="input-group">
+                                <input class="form-control input-xs" ng-model="environmental.lowerVal" />
+                                <span class="input-group-addon">{{ environmental.selectedVariable.units }}</span>
+                            </div>
+                        </div>
+                        <div class="form-group col-xs-3">
+                            <div class="input-group">
+                                <input class="form-control" ng-model="environmental.upperVal" />
+                                <span class="input-group-addon">{{ environmental.selectedVariable.units }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="fields-inrange" ng-show="environmental.selectedFilter.key == 'lt'">
+                        <div class="form-group col-xs-6">
+                            <div class="input-group">
+                                <input class="form-control input-xs" ng-model="environmental.lowerVal" />
+                                <span class="input-group-addon">{{ environmental.selectedVariable.units }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="fields-inrange" ng-show="environmental.selectedFilter.key == 'gt'">
+                        <div class="form-group col-xs-6">
+                            <div class="input-group">
+                                <input class="form-control" ng-model="environmental.upperVal" />
+                                <span class="input-group-addon">{{ environmental.selectedVariable.units }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div>
+        <button class="btn btn-primary form-control">Search</button>
+    </div>
+</form>
