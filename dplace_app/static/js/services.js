@@ -51,6 +51,19 @@ angular.module('dplaceServices', ['ngResource'])
                 }
             });
     })
+    .factory('EnvironmentalVariable', function ($resource) {
+        return $resource(
+            '/api/v1/environmental_variables/:id',
+            {page_size: 1000}, {
+                query: {
+                    method: 'GET',
+                    isArray: true,
+                    transformResponse: function(data, headers) {
+                        return JSON.parse(data).results;
+                    }
+                }
+            });
+    })
     .factory('FindSocieties', function($resource) {
         return $resource(
             '/api/v1/find_societies',
