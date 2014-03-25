@@ -53,6 +53,7 @@ class Society(models.Model):
 UNIT_CHOICES = (
     ('mm','mm'),
     ('℃','℃'),
+    ('mo','mo'),
     ('',''),
 )
 
