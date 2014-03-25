@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from django.contrib.gis.db import models
 
 # Originally from 'iso lat long.xlsx'.  This spreadsheet contains ISO Codes and their
@@ -49,31 +50,35 @@ class Society(models.Model):
     class Meta:
         verbose_name_plural = "Societies"
 
+UNIT_CHOICES = (
+    ('mm','mm'),
+    ('℃','℃'),
+    ('',''),
+)
+
+class EnvironmentalVariable(models.Model):
+    name = models.CharField(max_length=50, unique=True)
+    units = models.CharField(max_length=10, choices=UNIT_CHOICES)
+
+class EnvironmentalValue(models.Model):
+    variable = models.ForeignKey('EnvironmentalVariable', related_name="values")
+    value = models.FloatField(db_index=True)
+    environmental = models.ForeignKey('Environmental', related_name="values")
+    class Meta:
+        unique_together = (
+            ('variable','environmental')
+        )
+        index_together = [
+            ['variable','value']
+        ]
+
 class Environmental(models.Model):
     # may be EA or Binford or ... something
     society = models.ForeignKey('Society', null=True, related_name="environmentals")
     reported_location = models.PointField()
     actual_location = models.PointField()
     iso_code = models.ForeignKey('ISOCode', null=True, related_name="environmentals")
-    # Environmental data
-    annual_mean_temperature = models.FloatField(null=True)
-    annual_temperature_variance = models.FloatField(null=True)
-    temperature_constancy = models.FloatField(null=True)
-    temperature_contingency = models.FloatField(null=True)
-    temperature_predictability = models.FloatField(null=True)
-    annual_mean_precipitation = models.FloatField(null=True)
-    annual_precipitation_variance = models.FloatField(null=True)
-    precipitation_constancy = models.FloatField(null=True)
-    precipitation_contingency = models.FloatField(null=True)
-    precipitation_predictability = models.FloatField(null=True)
-    mean_growing_season_duration = models.FloatField(null=True)
-    net_primary_productivity = models.FloatField(null=True)
-    bird_diversity = models.FloatField(null=True)
-    mammal_diversity = models.FloatField(null=True)
-    amphibian_diversity = models.FloatField(null=True)
-    plant_diversity = models.FloatField(null=True)
-    elevation = models.FloatField(null=True)
-    slope = models.FloatField(null=True)
+
     # For GeoDjango, must override the manager
     objects = models.GeoManager()
 
