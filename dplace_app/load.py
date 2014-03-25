@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import csv
 import sys
 from django.contrib.gis.geos import Point
@@ -10,7 +11,7 @@ MISSING_CODES = []
 def run(file_name=None, mode=None):
     # read the csv file
     with open(file_name, 'rb') as csvfile:
-        if mode in ['iso', 'ea_soc', 'env', 'ea_vars', 'ea_vals', 'langs', 'iso_lat_long']:
+        if mode in ['iso', 'ea_soc', 'env_vals', 'ea_vars', 'ea_vals', 'langs', 'iso_lat_long']:
             csv_reader = csv.DictReader(csvfile)
             for dict_row in csv_reader:
                 if mode == 'iso':
@@ -19,7 +20,7 @@ def run(file_name=None, mode=None):
                     load_iso_lat_long(dict_row)
                 elif mode == 'ea_soc':
                     load_ea_society(dict_row)
-                elif mode == 'env':
+                elif mode == 'env_vals':
                     load_environmental(dict_row)
                 elif mode == 'ea_vars':
                     load_ea_var(dict_row)
@@ -35,6 +36,8 @@ def run(file_name=None, mode=None):
     if mode == 'ea_vals':
         # after loading values, populate society-level data from variable values
         postprocess_ea_societies()
+    elif mode == 'env_vars':
+        create_environmental_variables()
 
 
 # get a value from a dictionary, searching the possible keys
@@ -71,26 +74,89 @@ def load_iso_lat_long(iso_dict):
     found_code.location = location
     found_code.save()
 
-# These are all floats
 ENVIRONMENTAL_MAP = {
-    'AnnualMeanTemperature': 'annual_mean_temperature',
-    'AnnualTemperatureVariance': 'annual_temperature_variance',
-    'TemperatureConstancy': 'temperature_constancy',
-    'TemperatureContingency': 'temperature_contingency',
-    'TemperaturePredictability': 'temperature_predictability',
-    'AnnualMeanPrecipitation': 'annual_mean_precipitation',
-    'AnnualPrecipitationVariance': 'annual_precipitation_variance',
-    'PrecipitationConstancy': 'precipitation_constancy',
-    'PrecipitationContingency': 'precipitation_contingency',
-    'PrecipitationPredictability': 'precipitation_predictability',
-    'MeanGrowingSeason_duration': 'mean_growing_season_duration',
-    'NetPrimaryProductivity': 'net_primary_productivity',
-    'BirdDiversity': 'bird_diversity',
-    'MammalDiversity': 'mammal_diversity',
-    'AmphibianDiversity': 'amphibian_diversity',
-    'PlantDiversity': 'plant_diversity',
-    'Elevation': 'elevation',
-    'Slope': 'slope',
+    'AnnualMeanTemperature': {
+        'name': 'Annual Mean Temperature',
+        'units': '℃',
+    },
+    'AnnualTemperatureVariance': {
+        'name': 'Annual Temperature Variance',
+        'units': '℃',
+    },
+    'TemperatureConstancy': {
+        'name': 'Temperature Constancy',
+        'units': '',
+    },
+    'TemperatureContingency': {
+        'name': 'Temperature Contingency',
+        'units': '',
+    },
+    'TemperaturePredictability': {
+        'name': 'Temperature Predictability',
+        'units': '',
+    },
+    'AnnualMeanPrecipitation': {
+        'name': 'Annual Mean Precipitation',
+        'units': 'mm',
+    },
+    'AnnualPrecipitationVariance': {
+        'name': 'Annual Precipitation Variance',
+        'units': '',
+    },
+    'PrecipitationConstancy': {
+        'name': 'Precipitation Constancy',
+        'units': '',
+    },
+    'PrecipitationContingency': {
+        'name': 'Precipitation Contingency',
+        'units': '',
+    },
+    'PrecipitationPredictability': {
+        'name': 'Precipitation Predictability',
+        'units': '',
+    },
+    'BirdRichness': {
+        'name': 'Bird Richness',
+        'units': '',
+    },
+    'MammalRichness': {
+        'name': 'Mammal Richness',
+        'units': '',
+    },
+    'AmphibianRichness': {
+        'name': 'Amphibian Richness',
+        'units': '',
+    },
+    'VascularPlantsRichness': {
+        'name': 'Vascular Plants Richness',
+        'units': '',
+    },
+    # TODO: EcoRegion! (text)
+    'Elevation': {
+        'name': 'Elevation',
+        'units': '',
+    },
+    'Slope': {
+        'name': 'Slope',
+        'units': '',
+    },
+    # TODO: Coastal (Bool)
+    'NetPrimaryProduction': {
+        'name': 'Net Primary Production',
+        'units': '',
+    },
+    'DurationOfGrowingSeason': {
+        'name': 'Duration of Growing Season',
+        'units': 'mo',
+    },
+    'MeanGrowingSeason.NPP': {
+        'name': 'Mean Growing Season NPP',
+        'units': '',
+    },
+    'InterYearVariance.GrowingSeason.NPP': {
+        'name': 'Inter-Year Variance Growing Season NPP',
+        'units': '',
+    },
 }
 
 def iso_from_code(code):
@@ -101,9 +167,14 @@ def iso_from_code(code):
     except ObjectDoesNotExist:
         return None
 
+def create_environmental_variables():
+    for k in ENVIRONMENTAL_MAP:
+        var_dict = ENVIRONMENTAL_MAP[k]
+        EnvironmentalVariable.objects.get_or_create(name=var_dict['name'],units=var_dict['units'])
+
 def load_environmental(env_dict):
-    ext_id = env_dict['id']
-    source = env_dict['source']
+    ext_id = env_dict['ID']
+    source = env_dict['Source']
 
     # hack for B109 vs. 109
     if source == 'Binford' and ext_id.find('B') == -1:
@@ -117,20 +188,27 @@ def load_environmental(env_dict):
     # This limits the environmental data to one record per society record
     found_environmentals = Environmental.objects.filter(society=society)
     if len(found_environmentals) == 0:
-        reported_latlon =  Point(float(env_dict['Reported_Lon']),float(env_dict['Reported_Lat']))
+        reported_latlon =  Point(float(env_dict['Orig.longitude']),float(env_dict['Orig.latitude']))
         actual_latlon = Point(float(env_dict['longitude']), float(env_dict['latitude']))
         iso_code = iso_from_code(env_dict['iso'])
 
+        # Create the base Environmental
         environmental = Environmental(society=society,
                                       reported_location=reported_latlon,
                                       actual_location=actual_latlon,
                                       iso_code=iso_code)
-        for k in ENVIRONMENTAL_MAP:
-            v = ENVIRONMENTAL_MAP[k]
-            if env_dict[k]:
-                if env_dict[k] != 'NA':
-                    setattr(environmental, v, float(env_dict[k]))
         environmental.save()
+        for k in ENVIRONMENTAL_MAP: # keys are the columns in the CSV file
+            var_dict = ENVIRONMENTAL_MAP[k]
+            try:
+                # Get the variable
+                variable = EnvironmentalVariable.objects.get(name=var_dict['name'])
+            except ObjectDoesNotExist:
+                print "Warning: Did not find an EnvironmentalVariable with name %s" % var_dict['name']
+                continue
+            if env_dict[k] and env_dict[k] != 'NA':
+                value = float(env_dict[k])
+                EnvironmentalValue.objects.get_or_create(variable=variable,value=value,environmental=environmental)
 
 def load_ea_society(society_dict):
     ext_id = society_dict['ID']
