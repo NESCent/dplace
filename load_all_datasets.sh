@@ -36,7 +36,8 @@ python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/Revised_Ethnologue_
 echo "Loading EA Societies"
 python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/ea_langs+isocodes.csv" ea_soc
 echo "Loading Environmental Data"
-python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/EnvironmentalDataset.15Oct2013.csv" "env"
+python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/EcologicalData.DBASE.07Mar14.csv" "env_vars"
+python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/EcologicalData.DBASE.07Mar14.csv" "env_vals"
 echo "Loading EA Variables"
 python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/ea_variable_names+categories.csv" ea_vars
 echo "Loading EA Variable Codes"

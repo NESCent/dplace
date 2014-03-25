@@ -48,6 +48,16 @@ class ISOCodeViewSet(viewsets.ReadOnlyModelViewSet):
     filter_fields = ('iso_code',)
     queryset = ISOCode.objects.all()
 
+class EnvironmentalVariableViewSet(viewsets.ReadOnlyModelViewSet):
+    serializer_class = EnvironmentalVariableSerializer
+    filter_fields = ('name', 'units',)
+    queryset = EnvironmentalVariable.objects.all()
+
+class EnvironmentalValueViewSet(viewsets.ReadOnlyModelViewSet):
+    serializer_class = EnvironmentalValueSerializer
+    filter_fields = ('variable','environmental',)
+    queryset = EnvironmentalValue.objects.all()
+
 class EnvironmentalViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = EnvironmentalSerializer
     filter_fields = ('society', 'iso_code',)
@@ -129,4 +139,5 @@ def find_societies(request):
 
     return Response(SocietySerializer(societies,many=True).data)
 
+# Need an API to query on environmental values with operators (gt, lt, between)
 

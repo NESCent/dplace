@@ -35,7 +35,9 @@ def clear_societies():
     Society.objects.all().delete()
 
 def clear_environmentals():
+    EnvironmentalValue.objects.all().delete()
     Environmental.objects.all().delete()
+    EnvironmentalVariable.objects.all().delete()
 
 def clear_isocodes():
     ISOCode.objects.all().delete()
