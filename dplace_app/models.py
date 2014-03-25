@@ -60,11 +60,16 @@ UNIT_CHOICES = (
 class EnvironmentalVariable(models.Model):
     name = models.CharField(max_length=50, unique=True)
     units = models.CharField(max_length=10, choices=UNIT_CHOICES)
+    def __unicode__(self):
+        return "%s (%s)" % (self.name, self.units)
+
 
 class EnvironmentalValue(models.Model):
     variable = models.ForeignKey('EnvironmentalVariable', related_name="values")
     value = models.FloatField(db_index=True)
     environmental = models.ForeignKey('Environmental', related_name="values")
+    def __unicode__(self):
+        return "%f" % self.value
     class Meta:
         unique_together = (
             ('variable','environmental')
