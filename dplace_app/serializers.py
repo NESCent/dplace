@@ -49,6 +49,14 @@ class SocietySerializer(gis_serializers.GeoModelSerializer):
         model = Society
         fields = ('id', 'ext_id', 'name', 'location', 'iso_code', 'source')
 
+class EnvironmentalVariableSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EnvironmentalVariable
+
+class EnvironmentalValueSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EnvironmentalValue
+
 class EnvironmentalSerializer(gis_serializers.GeoModelSerializer):
     class Meta:
         model = Environmental
