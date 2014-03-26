@@ -89,18 +89,21 @@ class LanguageViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Language.objects.all()
 
 # search/filter APIs
-@api_view(['GET'])
+@api_view(['POST'])
 @permission_classes((IsAuthenticatedOrReadOnly,))
 def find_societies(request):
     """
     View to find the societies that match an input request.  Currently expects
     { language_class_ids: [1,2,3...], variable_codes: [4,5,6...] }
     """
-    results = {'language_societies': None, 'variable_societies': None}
+    results = {
+        'language_societies': None,
+        'variable_societies': None,
+        'environmental_societies': None
+    }
 
-    language_class_ids = request.QUERY_PARAMS.getlist('language_class_ids')
-    if len(language_class_ids) > 0:
-        language_class_ids = [int(x) for x in language_class_ids]
+    if 'language_class_ids' in request.DATA:
+        language_class_ids = [int(x) for x in request.DATA['language_class_ids']]
         # Loop over the language class IDs to get classes
         language_classes = LanguageClass.objects.filter(pk__in=language_class_ids)
         # Classifications are related to classes
@@ -116,10 +119,9 @@ def find_societies(request):
         # now get societies from ISO codes
         results['language_societies'] = Society.objects.filter(iso_code__in=iso_codes)
 
-    variable_code_ids = request.QUERY_PARAMS.getlist('variable_codes')
-    if len(variable_code_ids) > 0:
+    if 'variable_codes' in request.DATA:
         # Now get the societies from variables
-        variable_code_ids = [int(x) for x in variable_code_ids]
+        variable_code_ids = [int(x) for x in request.DATA['variable_codes']]
         codes = VariableCodeDescription.objects.filter(pk__in=variable_code_ids) # returns a queryset
         coded_value_ids = []
         # Aggregate all the coded values for each selected code

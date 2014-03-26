@@ -1,4 +1,8 @@
 angular.module('dplaceServices', ['ngResource'])
+    .config(function($httpProvider) {
+        $httpProvider.defaults.xsrfCookieName = 'csrftoken';
+        $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
+    })
     .factory('LanguageClass', function ($resource) {
         return $resource(
             '/api/v1/language_classes/:id',
@@ -69,7 +73,7 @@ angular.module('dplaceServices', ['ngResource'])
             '/api/v1/find_societies',
             {},{
                 find: {
-                    method: 'GET',
+                    method: 'POST',
                     isArray: true
                 }
             }
