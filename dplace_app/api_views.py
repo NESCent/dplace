@@ -94,7 +94,8 @@ class LanguageViewSet(viewsets.ReadOnlyModelViewSet):
 def find_societies(request):
     """
     View to find the societies that match an input request.  Currently expects
-    { language_class_ids: [1,2,3...], variable_codes: [4,5,6...] }
+    { language_class_ids: [1,2,3...], variable_codes: [4,5,6...],
+    environmental_filters: [{id: 1, operator: 'gt', params: [0.0]}, {id:3, operator 'inrange', params: [10.0,20.0] }] }
     """
     results = {
         'language_societies': None,
@@ -130,6 +131,9 @@ def find_societies(request):
         # Coded values have a FK to society.  Aggregate the societies from each value
         results['variable_societies'] = Society.objects.filter(variablecodedvalue__in=coded_value_ids)
 
+    if 'environmental_filters' in request.DATA:
+        environmental_filters = request.DATA['environmental_filters']
+        print environmental_filters
     societies = []
     # Intersect the querysets
     for k in results.keys():
