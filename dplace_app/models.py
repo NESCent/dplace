@@ -68,6 +68,8 @@ class EnvironmentalValue(models.Model):
     variable = models.ForeignKey('EnvironmentalVariable', related_name="values")
     value = models.FloatField(db_index=True)
     environmental = models.ForeignKey('Environmental', related_name="values")
+    def society(self):
+        return self.environmental.society
     def __unicode__(self):
         return "%f" % self.value
     class Meta:
