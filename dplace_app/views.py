@@ -1,7 +1,6 @@
 from __builtin__ import dict
 from django.http import Http404
 from django.shortcuts import render, get_object_or_404
-from django.views.decorators.csrf import ensure_csrf_cookie
 from dplace_app.models import Society, Language
 from forms import GeoForm
 from models import ISOCode
@@ -48,6 +47,5 @@ def view_language(request, language_id):
                                            'environmentals': environmentals,
                                            'ea_values': ea_values})
 
-@ensure_csrf_cookie
 def angular(request):
     return render(request, 'angular.html', dict())
