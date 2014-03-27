@@ -134,6 +134,20 @@ def find_societies(request):
     if 'environmental_filters' in request.DATA:
         environmental_filters = request.DATA['environmental_filters']
         print environmental_filters
+        for filter in environmental_filters:
+            values = EnvironmentalValue.objects.filter(variable=filter['id'])
+            operator = filter['operator']
+            if operator == 'inrange':
+                values = values.filter(value__gt=filter['params'][0]).filter(value__lt=filter['params'][1])
+            elif operator == 'outrange':
+                values = values.filter(value__gt=filter['params'][1]).filter(value__lt=filter['params'][0])
+            elif operator == 'gt':
+                values = values.filter(value__gt=filter['params'][0])
+            elif operator == 'lt':
+                values = values.filter(value__lt=filter['params'][0])
+            # get the societies from the values
+            raise NotImplemented('Not yet implemented')
+            Society.objects.filter()
     societies = []
     # Intersect the querysets
     for k in results.keys():
