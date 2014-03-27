@@ -90,7 +90,7 @@ class LanguageViewSet(viewsets.ReadOnlyModelViewSet):
 
 # search/filter APIs
 @api_view(['POST'])
-@permission_classes((IsAuthenticatedOrReadOnly,))
+@permission_classes((AllowAny,))
 def find_societies(request):
     """
     View to find the societies that match an input request.  Currently expects
