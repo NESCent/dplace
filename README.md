@@ -1,5 +1,6 @@
 D-PLACE
 =============
+[![Build Status](https://travis-ci.org/NESCent/dplace.svg?branch=master)](https://travis-ci.org/NESCent/dplace)
 
 This repository contains a [GeoDjango](http://geodjango.org) application for the NESCent working group [Explaining cultural diversity: A new evolutionary synthesis](http://evolutionary-synthesis.wikispaces.com) (wiki login required)
 
