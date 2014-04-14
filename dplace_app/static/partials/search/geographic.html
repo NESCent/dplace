@@ -12,6 +12,8 @@
         </div>
     <!-- map -->
         <div>
-            <button class="btn btn-primary form-control">Search</button>
+            <button class="btn btn-primary form-control"
+                    ng-disabled="searchButton.disabled"
+                    ng-click="doSearch()">{{ searchButton.text }}</button>
         </div>
 </div>

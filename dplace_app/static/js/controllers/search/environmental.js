@@ -25,8 +25,10 @@ function EnvironmentalCtrl($scope, EnvironmentalVariable, FindSocieties) {
 
     $scope.doSearch = function() {
         var filters = $scope.getSelectedFilters();
-        $scope.results.societies = FindSocieties.find({ environmental_filters: filters});
-        // TODO: Activate the societies link
+        $scope.disableSearchButton()
+        $scope.results.societies = FindSocieties.find({ environmental_filters: filters}, function() {
+            $scope.enableSearchButton();
+        });
     };
 
 }

@@ -28,8 +28,10 @@ function CulturalCtrl($scope, Variable, VariableCategory, CodeDescription, FindS
     // Search for societies matching this
     $scope.doSearch = function() {
         var code_ids = $scope.getSelectedTraitCodes()
-        $scope.results.societies = FindSocieties.find({ variable_codes: code_ids });
-        // TODO: Activate the societies link
+        $scope.disableSearchButton()
+        $scope.results.societies = FindSocieties.find({ variable_codes: code_ids }, function() {
+            $scope.enableSearchButton();
+        });
     };
 
 }
