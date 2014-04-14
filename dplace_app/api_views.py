@@ -133,7 +133,7 @@ def find_societies(request):
 
     if 'environmental_filters' in request.DATA:
         environmental_filters = request.DATA['environmental_filters']
-        print environmental_filters
+        # There can be multiple filters, so we must aggregate the results.
         for filter in environmental_filters:
             values = EnvironmentalValue.objects.filter(variable=filter['id'])
             operator = filter['operator']
@@ -146,8 +146,13 @@ def find_societies(request):
             elif operator == 'lt':
                 values = values.filter(value__lt=filter['params'][0])
             # get the societies from the values
-            raise NotImplemented('Not yet implemented')
-            Society.objects.filter()
+            if values.count() > 0:
+                environmental_society_ids = [value.society().id for value in values]
+                environmental_society_qs = Society.objects.filter(pk__in=environmental_society_ids)
+                if results['environmental_societies'] is None:
+                    results['environmental_societies'] = environmental_society_qs
+                else:
+                    results['environmental_societies'] &= environmental_society_qs
     societies = []
     # Intersect the querysets
     for k in results.keys():
@@ -155,7 +160,7 @@ def find_societies(request):
             if len(societies) == 0:
                 societies = results[k]
             else:
-                societies = societies & results[k]
+                societies &= results[k]
 
     return Response(SocietySerializer(societies,many=True).data)
 

@@ -123,6 +123,25 @@ class FindSocietiesTestCase(APITestCase):
         self.code3 = VariableCodeDescription.objects.create(variable=variable, code='3', description='Code 3')
         value1 = VariableCodedValue.objects.create(variable=variable,society=self.society1,coded_value='1',code=self.code1)
         value2 = VariableCodedValue.objects.create(variable=variable,society=self.society2,coded_value='2',code=self.code2)
+        # Setup environmentals
+        self.environmental1 = Environmental.objects.create(society=self.society1,
+                                                           reported_location=Point(0,0),
+                                                           actual_location=Point(0,0),
+                                                           iso_code=iso_code1)
+        self.environmental2 = Environmental.objects.create(society=self.society2,
+                                                           reported_location=Point(1,1),
+                                                           actual_location=Point(1,1),
+                                                           iso_code=iso_code2)
+
+        self.environmental_variable1 = EnvironmentalVariable.objects.create(name='precipitation',
+                                                                            units='mm')
+        self.environmental_value1 = EnvironmentalValue.objects.create(variable=self.environmental_variable1,
+                                                                      value=1.0,
+                                                                      environmental=self.environmental1)
+        self.environmental_value2 = EnvironmentalValue.objects.create(variable=self.environmental_variable1,
+                                                                      value=2.0,
+                                                                      environmental=self.environmental2)
+
         self.url = reverse('find_societies')
     def test_find_societies_by_root_language(self):
         language_class_ids = [self.root_language_class.pk]
@@ -174,3 +193,27 @@ class FindSocietiesTestCase(APITestCase):
     def test_empty_response(self):
         response = self.client.post(self.url,{},format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+    def test_find_by_environmental_filter_gt(self):
+        data = {'environmental_filters': [{'id': str(self.environmental_variable1.pk),
+                                           'operator': 'gt', 'params': ['1.5']}]}
+        response = self.client.post(self.url,data,format='json')
+        self.assertNotIn(self.society1.id,[x['id'] for x in response.data])
+        self.assertIn(self.society2.id,[x['id'] for x in response.data])
+    def test_find_by_environmental_filter_lt(self):
+        data = {'environmental_filters': [{'id': str(self.environmental_variable1.pk),
+                                           'operator': 'lt', 'params': ['1.5']}]}
+        response = self.client.post(self.url,data,format='json')
+        self.assertIn(self.society1.id,[x['id'] for x in response.data])
+        self.assertNotIn(self.society2.id,[x['id'] for x in response.data])
+    def test_find_by_environmental_filter_inrange(self):
+        data = {'environmental_filters': [{'id': str(self.environmental_variable1.pk),
+                                           'operator': 'inrange', 'params': ['0.0','1.5']}]}
+        response = self.client.post(self.url,data,format='json')
+        self.assertIn(self.society1.id,[x['id'] for x in response.data])
+        self.assertNotIn(self.society2.id,[x['id'] for x in response.data])
+    def test_find_by_environmental_filter_outrange(self):
+        data = {'environmental_filters': [{'id': str(self.environmental_variable1.pk),
+                                           'operator': 'outrange', 'params': ['0.0','3.0']}]}
+        response = self.client.post(self.url,data,format='json')
+        self.assertNotIn(self.society1.id,[x['id'] for x in response.data])
+        self.assertNotIn(self.society2.id,[x['id'] for x in response.data])
