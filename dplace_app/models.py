@@ -62,6 +62,8 @@ class EnvironmentalVariable(models.Model):
     units = models.CharField(max_length=10, choices=UNIT_CHOICES)
     def __unicode__(self):
         return "%s (%s)" % (self.name, self.units)
+    class Meta:
+        ordering=("name",)
 
 
 class EnvironmentalValue(models.Model):
@@ -73,6 +75,7 @@ class EnvironmentalValue(models.Model):
     def __unicode__(self):
         return "%f" % self.value
     class Meta:
+        ordering=("variable",)
         unique_together = (
             ('variable','environmental')
         )
