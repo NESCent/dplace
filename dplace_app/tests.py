@@ -127,7 +127,7 @@ class FindSocietiesTestCase(APITestCase):
     def test_find_societies_by_root_language(self):
         language_class_ids = [self.root_language_class.pk]
         data = {'language_class_ids': language_class_ids}
-        response = self.client.get(self.url,data,format='json')
+        response = self.client.post(self.url,data,format='json')
         self.assertIn(self.society1.id,[x['id'] for x in response.data])
         self.assertIn(self.society2.id,[x['id'] for x in response.data])
         self.assertIn(self.society3.id,[x['id'] for x in response.data])
@@ -135,7 +135,7 @@ class FindSocietiesTestCase(APITestCase):
         # 1 and 3 but not 2
         language_class_ids = [self.parent_language_class_1.pk]
         data = {'language_class_ids': language_class_ids}
-        response = self.client.get(self.url,data,format='json')
+        response = self.client.post(self.url,data,format='json')
         self.assertIn(self.society1.id,[x['id'] for x in response.data])
         self.assertNotIn(self.society2.id,[x['id'] for x in response.data])
         self.assertIn(self.society3.id,[x['id'] for x in response.data])
@@ -143,23 +143,23 @@ class FindSocietiesTestCase(APITestCase):
         # 1 and 2 but not 3
         language_class_ids = [self.child_language_class_1a.pk, self.child_language_class_2.pk]
         data = {'language_class_ids': language_class_ids}
-        response = self.client.get(self.url,data,format='json')
+        response = self.client.post(self.url,data,format='json')
         self.assertIn(self.society1.id,[x['id'] for x in response.data])
         self.assertIn(self.society2.id,[x['id'] for x in response.data])
         self.assertNotIn(self.society3.id,[x['id'] for x in response.data])
     def test_find_society_by_var(self):
         data = {'variable_codes': [self.code1.pk]}
-        response = self.client.get(self.url,data,format='json')
+        response = self.client.post(self.url,data,format='json')
         self.assertIn(self.society1.id,[x['id'] for x in response.data])
         self.assertNotIn(self.society2.id,[x['id'] for x in response.data])
     def test_find_societies_by_var(self):
         data = {'variable_codes': [self.code1.pk, self.code2.pk]}
-        response = self.client.get(self.url,data,format='json')
+        response = self.client.post(self.url,data,format='json')
         self.assertIn(self.society1.id,[x['id'] for x in response.data])
         self.assertIn(self.society2.id,[x['id'] for x in response.data])
     def test_find_no_societies(self):
         data = {'variable_codes': [self.code3.pk]}
-        response = self.client.get(self.url,data,format='json')
+        response = self.client.post(self.url,data,format='json')
         self.assertEqual(len(response.data),0)
     def test_find_society_by_language_and_var(self):
         # 1 and 3 share a parent language class
@@ -167,10 +167,10 @@ class FindSocietiesTestCase(APITestCase):
         # this should return only 1 and not 2 or 3
         data = {'variable_codes': [self.code1.pk, self.code2.pk],
                 'language_class_ids': [self.parent_language_class_1.pk]}
-        response = self.client.get(self.url,data,format='json')
+        response = self.client.post(self.url,data,format='json')
         self.assertIn(self.society1.id,[x['id'] for x in response.data])
         self.assertNotIn(self.society2.id,[x['id'] for x in response.data])
         self.assertNotIn(self.society3.id,[x['id'] for x in response.data])
     def test_empty_response(self):
-        response = self.client.get(self.url,{},format='json')
+        response = self.client.post(self.url,{},format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
