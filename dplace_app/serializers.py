@@ -78,6 +78,9 @@ class SocietySerializer(gis_serializers.GeoModelSerializer):
         model = Society
         fields = ('id', 'ext_id', 'name', 'location', 'iso_code', 'source')
 
+SEARCH_LANGUAGE = 'l'
+SEARCH_ENVIRONMENTAL = 'e'
+SEARCH_VARIABLES = 'v'
 
 class SocietyResult(object):
     '''
@@ -94,12 +97,22 @@ class SocietyResult(object):
         self.environmental_values.add(environmental_value)
     def add_language_classification(self,language_classification):
         self.language_classifications.add(language_classification)
+    def includes_criteria(self,criteria=[], SEARCH_VARIABLES=None):
+        result = True
+        if SEARCH_VARIABLES in criteria and len(self.variable_coded_values) == 0:
+            result = False
+        if SEARCH_ENVIRONMENTAL in criteria and len(self.environmental_values) == 0:
+            result = False
+        if SEARCH_LANGUAGE in criteria and len(self.language_classifications) == 0:
+            result = False
+        return result
 
 class SocietyResultMap(object):
     '''
     Provides a mapping of Societies to SocietyResult objects
     Used in building the search response
     '''
+
     def __init__(self):
         # Use a dictionary to map society_id -> SocietyResult
         self.society_results = dict()
@@ -113,8 +126,8 @@ class SocietyResultMap(object):
         self.get_society_result(society).add_environmental_value(environmental_value)
     def add_language_classification(self,society,language_classification):
         self.get_society_result(society).add_language_classification(language_classification)
-    def get_society_results(self):
-        return self.society_results.values()
+    def get_society_results(self,criteria):
+        return [x for x in self.society_results.values() if x.includes_criteria(criteria)]
 
 class SocietyResultSerializer(serializers.Serializer):
     '''

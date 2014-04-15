@@ -98,8 +98,12 @@ def find_societies(request):
     environmental_filters: [{id: 1, operator: 'gt', params: [0.0]}, {id:3, operator 'inrange', params: [10.0,20.0] }] }
     """
     result_map = SocietyResultMap()
+    # Criteria keeps track of what types of data were searched on, so that we can
+    # AND them together
+    criteria = []
 
     if 'language_class_ids' in request.DATA:
+        criteria.append(SEARCH_LANGUAGE)
         language_class_ids = [int(x) for x in request.DATA['language_class_ids']]
         # Loop over the language class IDs to get classes
         language_classes = LanguageClass.objects.filter(pk__in=language_class_ids)
@@ -117,6 +121,7 @@ def find_societies(request):
                 result_map.add_language_classification(society, lc)
 
     if 'variable_codes' in request.DATA:
+        criteria.append(SEARCH_VARIABLES)
         # Now get the societies from variables
         variable_code_ids = [int(x) for x in request.DATA['variable_codes']]
         codes = VariableCodeDescription.objects.filter(pk__in=variable_code_ids) # returns a queryset
@@ -130,6 +135,7 @@ def find_societies(request):
             result_map.add_variable_coded_value(value.society,value)
 
     if 'environmental_filters' in request.DATA:
+        criteria.append(SEARCH_ENVIRONMENTAL)
         environmental_filters = request.DATA['environmental_filters']
         # There can be multiple filters, so we must aggregate the results.
         for filter in environmental_filters:
@@ -146,6 +152,7 @@ def find_societies(request):
             # get the societies from the values
             for value in values:
                 result_map.add_environmental_value(value.society(),value)
-    society_results = result_map.get_society_results()
+
+    society_results = result_map.get_society_results(criteria)
     return Response(SocietyResultSerializer(society_results,many=True).data)
 
