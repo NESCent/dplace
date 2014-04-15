@@ -148,39 +148,39 @@ class FindSocietiesTestCase(APITestCase):
         language_class_ids = [self.root_language_class.pk]
         data = {'language_class_ids': language_class_ids}
         response = self.client.post(self.url,data,format='json')
-        self.assertIn(self.society1.id,[x['society']['id'] for x in response.data])
-        self.assertIn(self.society2.id,[x['society']['id'] for x in response.data])
-        self.assertIn(self.society3.id,[x['society']['id'] for x in response.data])
+        self.assertIn(self.society1.id,[x['society']['id'] for x in response.data['results']])
+        self.assertIn(self.society2.id,[x['society']['id'] for x in response.data['results']])
+        self.assertIn(self.society3.id,[x['society']['id'] for x in response.data['results']])
     def test_find_societies_by_parent_language(self):
         # 1 and 3 but not 2
         language_class_ids = [self.parent_language_class_1.pk]
         data = {'language_class_ids': language_class_ids}
         response = self.client.post(self.url,data,format='json')
-        self.assertIn(self.society1.id,[x['society']['id'] for x in response.data])
-        self.assertNotIn(self.society2.id,[x['society']['id'] for x in response.data])
-        self.assertIn(self.society3.id,[x['society']['id'] for x in response.data])
+        self.assertIn(self.society1.id,[x['society']['id'] for x in response.data['results']])
+        self.assertNotIn(self.society2.id,[x['society']['id'] for x in response.data['results']])
+        self.assertIn(self.society3.id,[x['society']['id'] for x in response.data['results']])
     def test_find_societies_by_parent_and_child_language(self):
         # 1 and 2 but not 3
         language_class_ids = [self.child_language_class_1a.pk, self.child_language_class_2.pk]
         data = {'language_class_ids': language_class_ids}
         response = self.client.post(self.url,data,format='json')
-        self.assertIn(self.society1.id,[x['society']['id'] for x in response.data])
-        self.assertIn(self.society2.id,[x['society']['id'] for x in response.data])
-        self.assertNotIn(self.society3.id,[x['society']['id'] for x in response.data])
+        self.assertIn(self.society1.id,[x['society']['id'] for x in response.data['results']])
+        self.assertIn(self.society2.id,[x['society']['id'] for x in response.data['results']])
+        self.assertNotIn(self.society3.id,[x['society']['id'] for x in response.data['results']])
     def test_find_society_by_var(self):
         data = {'variable_codes': [self.code1.pk]}
         response = self.client.post(self.url,data,format='json')
-        self.assertIn(self.society1.id,[x['society']['id'] for x in response.data])
-        self.assertNotIn(self.society2.id,[x['society']['id'] for x in response.data])
+        self.assertIn(self.society1.id,[x['society']['id'] for x in response.data['results']])
+        self.assertNotIn(self.society2.id,[x['society']['id'] for x in response.data['results']])
     def test_find_societies_by_var(self):
         data = {'variable_codes': [self.code1.pk, self.code2.pk]}
         response = self.client.post(self.url,data,format='json')
-        self.assertIn(self.society1.id,[x['society']['id'] for x in response.data])
-        self.assertIn(self.society2.id,[x['society']['id'] for x in response.data])
+        self.assertIn(self.society1.id,[x['society']['id'] for x in response.data['results']])
+        self.assertIn(self.society2.id,[x['society']['id'] for x in response.data['results']])
     def test_find_no_societies(self):
         data = {'variable_codes': [self.code3.pk]}
         response = self.client.post(self.url,data,format='json')
-        self.assertEqual(len(response.data),0)
+        self.assertEqual(len(response.data['results']),0)
     def test_find_society_by_language_and_var(self):
         # 1 and 3 share a parent language class
         # 2 does not share a parent language
@@ -190,9 +190,9 @@ class FindSocietiesTestCase(APITestCase):
         data = {'variable_codes': [self.code1.pk, self.code2.pk],
                 'language_class_ids': [self.parent_language_class_1.pk]}
         response = self.client.post(self.url,data,format='json')
-        self.assertIn(self.society1.id,[x['society']['id'] for x in response.data])
-        self.assertNotIn(self.society2.id,[x['society']['id'] for x in response.data])
-        self.assertNotIn(self.society3.id,[x['society']['id'] for x in response.data])
+        self.assertIn(self.society1.id,[x['society']['id'] for x in response.data['results']])
+        self.assertNotIn(self.society2.id,[x['society']['id'] for x in response.data['results']])
+        self.assertNotIn(self.society3.id,[x['society']['id'] for x in response.data['results']])
     def test_empty_response(self):
         response = self.client.post(self.url,{},format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -200,23 +200,23 @@ class FindSocietiesTestCase(APITestCase):
         data = {'environmental_filters': [{'id': str(self.environmental_variable1.pk),
                                            'operator': 'gt', 'params': ['1.5']}]}
         response = self.client.post(self.url,data,format='json')
-        self.assertNotIn(self.society1.id,[x['society']['id'] for x in response.data])
-        self.assertIn(self.society2.id,[x['society']['id'] for x in response.data])
+        self.assertNotIn(self.society1.id,[x['society']['id'] for x in response.data['results']])
+        self.assertIn(self.society2.id,[x['society']['id'] for x in response.data['results']])
     def test_find_by_environmental_filter_lt(self):
         data = {'environmental_filters': [{'id': str(self.environmental_variable1.pk),
                                            'operator': 'lt', 'params': ['1.5']}]}
         response = self.client.post(self.url,data,format='json')
-        self.assertIn(self.society1.id,[x['society']['id'] for x in response.data])
-        self.assertNotIn(self.society2.id,[x['society']['id'] for x in response.data])
+        self.assertIn(self.society1.id,[x['society']['id'] for x in response.data['results']])
+        self.assertNotIn(self.society2.id,[x['society']['id'] for x in response.data['results']])
     def test_find_by_environmental_filter_inrange(self):
         data = {'environmental_filters': [{'id': str(self.environmental_variable1.pk),
                                            'operator': 'inrange', 'params': ['0.0','1.5']}]}
         response = self.client.post(self.url,data,format='json')
-        self.assertIn(self.society1.id,[x['society']['id'] for x in response.data])
-        self.assertNotIn(self.society2.id,[x['society']['id'] for x in response.data])
+        self.assertIn(self.society1.id,[x['society']['id'] for x in response.data['results']])
+        self.assertNotIn(self.society2.id,[x['society']['id'] for x in response.data['results']])
     def test_find_by_environmental_filter_outrange(self):
         data = {'environmental_filters': [{'id': str(self.environmental_variable1.pk),
                                            'operator': 'outrange', 'params': ['0.0','3.0']}]}
         response = self.client.post(self.url,data,format='json')
-        self.assertNotIn(self.society1.id,[x['society']['id'] for x in response.data])
-        self.assertNotIn(self.society2.id,[x['society']['id'] for x in response.data])
+        self.assertNotIn(self.society1.id,[x['society']['id'] for x in response.data['results']])
+        self.assertNotIn(self.society2.id,[x['society']['id'] for x in response.data['results']])

@@ -99,7 +99,7 @@ def find_societies(request):
 
     Returns serialized collection of SocietyResult objects
     """
-    result_map = SocietyResultMap()
+    result_set = SocietyResultSet()
     # Criteria keeps track of what types of data were searched on, so that we can
     # AND them together
     criteria = []
@@ -108,19 +108,16 @@ def find_societies(request):
         criteria.append(SEARCH_LANGUAGE)
         language_class_ids = [int(x) for x in request.DATA['language_class_ids']]
         # Loop over the language class IDs to get classes
-        language_classes = LanguageClass.objects.filter(pk__in=language_class_ids)
-        # Classifications are related to classes
-        language_classifications = []
+        language_classes = LanguageClass.objects.filter(pk__in=language_class_ids).select_related(
+            'languages1','languages2','languages3'
+        ).select_related(
+            'languages1__language__societies','languages2__language__societies','languages3__language__societies'
+        )
         for language_class in language_classes:
-            language_classifications += language_class.languages1.all()
-            language_classifications += language_class.languages2.all()
-            language_classifications += language_class.languages3.all()
-        # Now get languages from classifications
-        # Language classifications is not a queryset, so this could use optimization
-        for lc in language_classifications:
-            societies = Society.objects.filter(language__languageclassification=lc)
-            for society in societies:
-                result_map.add_language_classification(society, lc)
+            for each in [language_class.languages1, language_class.languages2, language_class.languages3]:
+                for language_classification in each.all():
+                    for society in language_classification.language.societies.all():
+                        result_set.add_language(society, language_class, language_classification)
 
     if 'variable_codes' in request.DATA:
         criteria.append(SEARCH_VARIABLES)
@@ -133,9 +130,9 @@ def find_societies(request):
             coded_value_ids += code.variablecodedvalue_set.values_list('id', flat=True)
         # Coded values have a FK to society.  Aggregate the societies from each value
         values = VariableCodedValue.objects.filter(id__in=coded_value_ids)
-        values = values.select_related('society')
+        values = values.select_related('society','variable')
         for value in values:
-            result_map.add_variable_coded_value(value.society,value)
+            result_set.add_cultural(value.society,value.variable,value)
 
     if 'environmental_filters' in request.DATA:
         criteria.append(SEARCH_ENVIRONMENTAL)
@@ -152,11 +149,12 @@ def find_societies(request):
                 values = values.filter(value__gt=filter['params'][0])
             elif operator == 'lt':
                 values = values.filter(value__lt=filter['params'][0])
-            values = values.select_related('environmental__society')
+            values = values.select_related('variable','environmental__society')
             # get the societies from the values
             for value in values:
-                result_map.add_environmental_value(value.society(),value)
+                result_set.add_environmental(value.society(), value.variable, value)
 
-    society_results = result_map.get_society_results(criteria)
-    return Response(SocietyResultSerializer(society_results,many=True).data)
+    # Filter the results to those that matched all criteria
+    result_set.finalize(criteria)
+    return Response(SocietyResultSetSerializer(result_set).data)
 

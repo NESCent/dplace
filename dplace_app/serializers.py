@@ -107,7 +107,7 @@ class SocietyResult(object):
             result = False
         return result
 
-class SocietyResultMap(object):
+class SocietyResultSet(object):
     '''
     Provides a mapping of Societies to SocietyResult objects
     Used in building the search response
@@ -115,25 +115,53 @@ class SocietyResultMap(object):
 
     def __init__(self):
         # Use a dictionary to map society_id -> SocietyResult
-        self.society_results = dict()
-    def get_society_result(self,society):
-        if society.id not in self.society_results.keys():
-            self.society_results[society.id] = SocietyResult(society)
-        return self.society_results[society.id]
-    def add_variable_coded_value(self,society,variable_coded_value):
-        self.get_society_result(society).add_variable_coded_value(variable_coded_value)
-    def add_environmental_value(self,society,environmental_value):
-        self.get_society_result(society).add_environmental_value(environmental_value)
-    def add_language_classification(self,society,language_classification):
-        self.get_society_result(society).add_language_classification(language_classification)
-    def get_society_results(self,criteria):
-        return [x for x in self.society_results.values() if x.includes_criteria(criteria)]
+        self._society_results = dict()
+        self.results = None # not valid until finalize() is called
+        # These are the column headers in the search results
+        self.variable_descriptions = set()
+        self.environmental_variables = set()
+        self.language_classes = set()
+
+    def _get_society_result(self,society):
+        if society.id not in self._society_results.keys():
+            self._society_results[society.id] = SocietyResult(society)
+        return self._society_results[society.id]
+
+    def add_cultural(self,society,variable_description,variable_coded_value):
+        self.variable_descriptions.add(variable_description)
+        self._get_society_result(society).add_variable_coded_value(variable_coded_value)
+
+    def add_environmental(self,society,environmental_variable,environmental_value):
+        self.environmental_variables.add(environmental_variable)
+        self._get_society_result(society).add_environmental_value(environmental_value)
+
+    def add_language(self,society,language_class,language_classification):
+        self.language_classes.add(language_class)
+        self._get_society_result(society).add_language_classification(language_classification)
+
+    def finalize(self,criteria):
+        self.results = [x for x in self._society_results.values() if x.includes_criteria(criteria)]
+
 
 class SocietyResultSerializer(serializers.Serializer):
     '''
-    Serializer, uses the SocietyResult object
+    Serializer for the SocietyResult object
     '''
     society = SocietySerializer()
     variable_coded_values = VariableCodedValueSerializer(many=True)
     environmental_values = EnvironmentalValueSerializer(many=True)
     language_classifications = LanguageClassificationSerializer(many=True)
+
+class SocietyResultSetSerializer(serializers.Serializer):
+    '''
+    Serialize a set of society results and the search criteria
+    '''
+    # Results contains a society and variable values that matched
+    results = SocietyResultSerializer(many=True)
+    # These contain the search parameters
+    # variable descriptions -> variable codes
+    variable_descriptions = VariableDescriptionSerializer(many=True)
+    # environmental variables -> environmental values
+    environmental_variables = EnvironmentalVariableSerializer(many=True)
+    # language classes -> language classifications
+    language_classes = LanguageClassSerializer(many=True)
