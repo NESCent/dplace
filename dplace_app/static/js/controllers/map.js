@@ -16,7 +16,8 @@ function MapCtrl($scope) {
         if(!$scope.results.societies) {
             return;
         }
-        $scope.results.societies.forEach(function(society) {
+        $scope.results.societies.forEach(function(societyResult) {
+            var society = societyResult.society;
             var coordinates = society.location.coordinates;
             // Add a marker for each point
             var lonlat = OpenLayers.LonLat.fromArray(coordinates);
