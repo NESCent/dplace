@@ -73,8 +73,7 @@ angular.module('dplaceServices', ['ngResource'])
             '/api/v1/find_societies',
             {},{
                 find: {
-                    method: 'POST',
-                    isArray: true
+                    method: 'POST'
                 }
             }
         )

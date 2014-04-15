@@ -26,7 +26,7 @@ function EnvironmentalCtrl($scope, EnvironmentalVariable, FindSocieties) {
     $scope.doSearch = function() {
         var filters = $scope.getSelectedFilters();
         $scope.disableSearchButton()
-        $scope.results.societies = FindSocieties.find({ environmental_filters: filters}, function() {
+        $scope.model.searchResults = FindSocieties.find({ environmental_filters: filters}, function() {
             $scope.enableSearchButton();
         });
     };

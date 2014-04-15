@@ -1,3 +1,9 @@
+/*
+This is old and poorly named. This was the original AngularUI search prototype and made
+some bad assumptions about languages
+ */
+
+
 function SearchCtrl($scope, $routeParams, LanguageClass, Variable, CodeDescription, FindSocieties) {
     $scope.setActive('search');
     $scope.languageSelections = [];
