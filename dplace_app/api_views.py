@@ -116,7 +116,7 @@ def find_societies(request):
             language_classifications += language_class.languages2.all()
             language_classifications += language_class.languages3.all()
         # Now get languages from classifications
-        Society.objects.filter(language__languageclassification__in=language_classifications)
+        # Language classifications is not a queryset, so this could use optimization
         for lc in language_classifications:
             societies = Society.objects.filter(language__languageclassification=lc)
             for society in societies:
@@ -133,6 +133,7 @@ def find_societies(request):
             coded_value_ids += code.variablecodedvalue_set.values_list('id', flat=True)
         # Coded values have a FK to society.  Aggregate the societies from each value
         values = VariableCodedValue.objects.filter(id__in=coded_value_ids)
+        values = values.select_related('society')
         for value in values:
             result_map.add_variable_coded_value(value.society,value)
 
@@ -151,6 +152,7 @@ def find_societies(request):
                 values = values.filter(value__gt=filter['params'][0])
             elif operator == 'lt':
                 values = values.filter(value__lt=filter['params'][0])
+            values = values.select_related('environmental__society')
             # get the societies from the values
             for value in values:
                 result_map.add_environmental_value(value.society(),value)
