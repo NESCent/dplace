@@ -24,9 +24,9 @@
                         <td>{{ society_result.society.iso_code }}</td>
                         <td>{{ society_result.society.location.coordinates }}</td>
                         <td>
-                            {{ society_result.variable_coded_values }}
-                            {{ society_result.environmental_values }}
-                            {{ society_result.language_classifications }}
+                            {{ society_result.variable_coded_values | formatVariableCodeValues }}
+                            {{ society_result.environmental_values | formatEnvironmentalValues }}
+                            {{ society_result.language_classifications | formatLanguageClassifications }}
                         </td>
                     </tr>
                 </table>
