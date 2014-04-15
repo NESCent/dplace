@@ -16,12 +16,18 @@
                         <th>Id</th>
                         <th>ISO Code</th>
                         <th>Location</th>
+                        <th>Data</th>
                     </tr>
-                    <tr ng-repeat="society in results.societies">
-                        <td><a ng-href="/society/{{ society.id }}" target="_blank">{{ society.name }}</a></td>
-                        <td>{{ society.ext_id }}</td>
-                        <td>{{ society.iso_code }}</td>
-                        <td>{{ society.location.coordinates }}</td>
+                    <tr ng-repeat="society_result in results.societies">
+                        <td><a ng-href="/society/{{ society_result.society.id }}" target="_blank">{{ society_result.society.name }}</a></td>
+                        <td>{{ society_result.society.ext_id }}</td>
+                        <td>{{ society_result.society.iso_code }}</td>
+                        <td>{{ society_result.society.location.coordinates }}</td>
+                        <td>
+                            {{ society_result.variable_coded_values }}
+                            {{ society_result.environmental_values }}
+                            {{ society_result.language_classifications }}
+                        </td>
                     </tr>
                 </table>
             </div>

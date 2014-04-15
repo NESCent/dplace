@@ -96,6 +96,8 @@ def find_societies(request):
     View to find the societies that match an input request.  Currently expects
     { language_class_ids: [1,2,3...], variable_codes: [4,5,6...],
     environmental_filters: [{id: 1, operator: 'gt', params: [0.0]}, {id:3, operator 'inrange', params: [10.0,20.0] }] }
+
+    Returns serialized collection of SocietyResult objects
     """
     result_map = SocietyResultMap()
     # Criteria keeps track of what types of data were searched on, so that we can
