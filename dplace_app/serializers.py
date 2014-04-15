@@ -97,7 +97,7 @@ class SocietyResult(object):
         self.environmental_values.add(environmental_value)
     def add_language_classification(self,language_classification):
         self.language_classifications.add(language_classification)
-    def includes_criteria(self,criteria=[], SEARCH_VARIABLES=None):
+    def includes_criteria(self,criteria=[]):
         result = True
         if SEARCH_VARIABLES in criteria and len(self.variable_coded_values) == 0:
             result = False

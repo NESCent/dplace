@@ -186,6 +186,7 @@ class FindSocietiesTestCase(APITestCase):
         # 2 does not share a parent language
         # this should return only 1 and not 2 or 3
         # This tests that results should be intersection (AND), not union (OR)
+        # Society 3 is not coded for any variables, so it should not appear in the list.
         data = {'variable_codes': [self.code1.pk, self.code2.pk],
                 'language_class_ids': [self.parent_language_class_1.pk]}
         response = self.client.post(self.url,data,format='json')
