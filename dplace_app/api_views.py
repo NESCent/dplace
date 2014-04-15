@@ -97,11 +97,7 @@ def find_societies(request):
     { language_class_ids: [1,2,3...], variable_codes: [4,5,6...],
     environmental_filters: [{id: 1, operator: 'gt', params: [0.0]}, {id:3, operator 'inrange', params: [10.0,20.0] }] }
     """
-    results = {
-        'language_societies': None,
-        'variable_societies': None,
-        'environmental_societies': None
-    }
+    result_map = SocietyResultMap()
 
     if 'language_class_ids' in request.DATA:
         language_class_ids = [int(x) for x in request.DATA['language_class_ids']]
@@ -114,11 +110,11 @@ def find_societies(request):
             language_classifications += language_class.languages2.all()
             language_classifications += language_class.languages3.all()
         # Now get languages from classifications
-        iso_codes = []
-        for language_classification in language_classifications:
-            iso_codes.append(language_classification.language.iso_code)
-        # now get societies from ISO codes
-        results['language_societies'] = Society.objects.filter(iso_code__in=iso_codes)
+        Society.objects.filter(language__languageclassification__in=language_classifications)
+        for lc in language_classifications:
+            societies = Society.objects.filter(language__languageclassification=lc)
+            for society in societies:
+                result_map.add_language_classification(society, lc)
 
     if 'variable_codes' in request.DATA:
         # Now get the societies from variables
@@ -129,7 +125,9 @@ def find_societies(request):
         for code in codes:
             coded_value_ids += code.variablecodedvalue_set.values_list('id', flat=True)
         # Coded values have a FK to society.  Aggregate the societies from each value
-        results['variable_societies'] = Society.objects.filter(variablecodedvalue__in=coded_value_ids)
+        values = VariableCodedValue.objects.filter(id__in=coded_value_ids)
+        for value in values:
+            result_map.add_variable_coded_value(value.society,value)
 
     if 'environmental_filters' in request.DATA:
         environmental_filters = request.DATA['environmental_filters']
@@ -146,23 +144,8 @@ def find_societies(request):
             elif operator == 'lt':
                 values = values.filter(value__lt=filter['params'][0])
             # get the societies from the values
-            if values.count() > 0:
-                environmental_society_ids = [value.society().id for value in values]
-                environmental_society_qs = Society.objects.filter(pk__in=environmental_society_ids)
-                if results['environmental_societies'] is None:
-                    results['environmental_societies'] = environmental_society_qs
-                else:
-                    results['environmental_societies'] &= environmental_society_qs
-    societies = []
-    # Intersect the querysets
-    for k in results.keys():
-        if results[k] is not None:
-            if len(societies) == 0:
-                societies = results[k]
-            else:
-                societies &= results[k]
-
-    return Response(SocietySerializer(societies,many=True).data)
-
-# Need an API to query on environmental values with operators (gt, lt, between)
+            for value in values:
+                result_map.add_environmental_value(value.society(),value)
+    society_results = result_map.get_society_results()
+    return Response(SocietyResultSerializer(society_results,many=True).data)
 
