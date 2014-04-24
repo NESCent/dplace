@@ -35,6 +35,8 @@ def run(file_name=None, mode=None):
                     load_lang(dict_row)
                 elif mode == 'bf_soc':
                     load_bf_society(dict_row)
+                elif mode =='bf_vars':
+                    load_bf_var(dict_row)
         elif mode == 'ea_codes':
             load_ea_codes(csvfile)
     if len(MISSING_CODES) > 0:
@@ -274,7 +276,7 @@ def eavar_number_to_label(number):
 
 def load_ea_var(var_dict):
     """
-    Variables are loaded form ea_variable_names.csv for simplicity,
+    Variables are loaded form ea_variable_names+categories.csv for simplicity,
     but there is more detailed information in ea_codes.csv
     """
     try:
@@ -512,6 +514,29 @@ def load_bf_society(society_dict):
                           language=language
                           )
         society.save()
+
+def load_bf_var(var_dict):
+    """
+    Variables are loaded form binford_variable_names+categories.csv for simplicity,
+    but there is more detailed information in bf_codebook.csv
+    """
+    label = var_dict['Field name'].strip()
+    name = var_dict['Variable name'].strip()
+    description = var_dict['Detailed description'].strip()
+
+    variable, created = VariableDescription.objects.get_or_create(label=label,name=name)
+
+    index_categories = [clean_category(x) for x in var_dict['INDEXCATEGORY'].split(',')]
+    # Currently max 1 niche category
+    niche_categories = [clean_category(x) for x in var_dict['NICHECATEGORY'].split(',')]
+
+    # when creating categories, ignore '?'
+    for category_name in index_categories:
+        index_category, created = VariableCategory.objects.get_or_create(name=category_name)
+        variable.index_categories.add(index_category)
+    for category_name in niche_categories:
+        niche_category, created = VariableCategory.objects.get_or_create(name=category_name)
+        variable.niche_categories.add(niche_category)
 
 if __name__ == '__main__':
     run(sys.argv[1], sys.argv[2])
