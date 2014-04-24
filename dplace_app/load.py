@@ -608,6 +608,10 @@ def load_bf_codes(csvfile=None):
         codes = read_binford_code_rows(csv_reader)
         variable = VariableDescription.objects.get(label=variable_def['field'])
         for code in codes:
+            # Special cases
+            if code['code'].startswith('class:'):
+                print "Code %s starts with 'class:', skipping" % code['code']
+                continue
             code_description = VariableCodeDescription.objects.get_or_create(variable=variable,
                                                                              code=code['code'],
                                                                              description=code['description'])
