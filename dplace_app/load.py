@@ -48,6 +48,8 @@ def run(file_name=None, mode=None):
     if mode == 'ea_vals':
         # after loading values, populate society-level data from variable values
         postprocess_ea_societies()
+    elif mode == 'bf_vals':
+        postprocess_binford_societies()
     elif mode == 'env_vars':
         create_environmental_variables()
 

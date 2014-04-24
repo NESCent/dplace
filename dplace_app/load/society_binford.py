@@ -3,6 +3,7 @@
 
 import csv
 import re
+from django.contrib.gis.geos import Point
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.utils import IntegrityError, DataError
 from dplace_app.models import *
@@ -166,3 +167,32 @@ def load_bf_val(val_row):
             except DataError:
                 print "data error saving '%s'" % value
 
+
+def postprocess_binford_societies():
+    '''
+    Some of the EA Variable values represent data that is needed at the society level, e.g.
+    source and location
+    '''
+    try:
+        lon_var = VariableDescription.objects.get(label='revised.longitude')
+        lat_var = VariableDescription.objects.get(label='revised.latitude')
+    except ObjectDoesNotExist:
+        print "Unable to find vars for Lon/Lat.  Have you loaded the bf_vars?"
+    for society in Society.objects.filter(source='Binford'):
+        # Get location
+        try:
+            lon_val = society.variablecodedvalue_set.get(variable=lon_var)
+            lat_val = society.variablecodedvalue_set.get(variable=lat_var)
+        except ObjectDoesNotExist:
+            print "Unable to get lon/lat for society %s, skipping postprocessing" % society
+            continue
+        try:
+            location = Point(
+                float(lon_val.coded_value),
+                float(lat_val.coded_value)
+            )
+            society.location = location
+        except ValueError:
+            print "Unable to create Point from (%s,%s) for society %s" % (lon_val.coded_value, lat_val.coded_value, society)
+            # TODO: Get source, incl focal year
+        society.save()
