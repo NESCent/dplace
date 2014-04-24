@@ -3,10 +3,6 @@ angular.module('dplace', ['ngRoute', 'dplaceServices', 'ui.bootstrap', 'dplaceFi
 
 function dplaceRouter($routeProvider) {
     $routeProvider
-        .when('/search', {
-            templateUrl: '/static/partials/search.html',
-            controller: 'SearchCtrl'
-        })
         .when('/home', {
             templateUrl: '/static/partials/home.html',
             controller: 'HomeCtrl'

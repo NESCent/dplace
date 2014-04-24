@@ -13,7 +13,6 @@
                 <table class="table" ng-show="model.searchResults.results.length">
                     <tr>
                         <th>Name</th>
-                        <th>Id</th>
                         <th>ISO Code</th>
                         <th>Location</th>
                         <th ng-repeat="variable in model.searchResults.variable_descriptions">{{ variable.name }}</th>
@@ -22,7 +21,6 @@
                     </tr>
                     <tr ng-repeat="society_result in model.searchResults.results">
                         <td><a ng-href="/society/{{ society_result.society.id }}" target="_blank">{{ society_result.society.name }}</a></td>
-                        <td>{{ society_result.society.ext_id }}</td>
                         <td>{{ society_result.society.iso_code }}</td>
                         <td>{{ society_result.society.location.coordinates }}</td>
                         <td ng-repeat="variable in model.searchResults.variable_descriptions">
