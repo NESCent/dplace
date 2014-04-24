@@ -8,10 +8,15 @@ from dplace_app.models import *
 
 MISSING_CODES = []
 
+LOAD_BY_ROW=('iso', 'env_vals',
+             'langs', 'iso_lat_long',
+             'ea_soc', 'ea_vars', 'ea_vals',
+             'bf_soc', 'bf_vars', 'bf_vals')
+
 def run(file_name=None, mode=None):
     # read the csv file
     with open(file_name, 'rb') as csvfile:
-        if mode in ['iso', 'ea_soc', 'env_vals', 'ea_vars', 'ea_vals', 'langs', 'iso_lat_long']:
+        if mode in LOAD_BY_ROW:
             csv_reader = csv.DictReader(csvfile)
             for dict_row in csv_reader:
                 if mode == 'iso':
@@ -28,6 +33,8 @@ def run(file_name=None, mode=None):
                     load_ea_val(dict_row)
                 elif mode == 'langs':
                     load_lang(dict_row)
+                elif mode == 'bf_soc':
+                    load_bf_society(dict_row)
         elif mode == 'ea_codes':
             load_ea_codes(csvfile)
     if len(MISSING_CODES) > 0:
@@ -483,6 +490,28 @@ def load_lang(lang_row):
 
 def add_missing_isocode(isocode):
     MISSING_CODES.append(isocode)
+
+def load_bf_society(society_dict):
+    ext_id = society_dict['ID']
+    source = 'Binford'
+    found_societies = Society.objects.filter(ext_id=ext_id,source=source)
+    if len(found_societies) == 0:
+        name = society_dict['STANDARD SOCIETY NAME Binford']
+        iso_code = iso_from_code(society_dict['ISO693_3'])
+        # Get the language
+        language_name = society_dict['LangNam']
+        try:
+            language = Language.objects.get(name=language_name,iso_code=iso_code)
+        except ObjectDoesNotExist:
+            language = None
+            print "Warning: Creating society record for %s but no language found with name %s" % (ext_id, language_name)
+        society = Society(ext_id=ext_id,
+                          name=name,
+                          source=source,
+                          iso_code=iso_code,
+                          language=language
+                          )
+        society.save()
 
 if __name__ == '__main__':
     run(sys.argv[1], sys.argv[2])
