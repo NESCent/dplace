@@ -213,4 +213,4 @@ def load_ea_val(val_row):
                                                     code=code)
                 variable_value.save()
             except IntegrityError:
-                print "Unable to store value %s for var %s in society %s, already exists" % (value, variable, society)
+                print "Unable to store value '%s' for var %s in society %s, already exists" % (value, variable.label, society)
