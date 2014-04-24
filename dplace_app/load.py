@@ -34,8 +34,10 @@ def run(file_name=None, mode=None):
                     load_lang(dict_row)
                 elif mode == 'bf_soc':
                     load_bf_society(dict_row)
-                elif mode =='bf_vars':
+                elif mode == 'bf_vars':
                     load_bf_var(dict_row)
+                elif mode == 'bf_vals':
+                    load_bf_val(dict_row)
         elif mode == 'ea_codes':
             load_ea_codes(csvfile)
         elif mode == 'bf_codes':

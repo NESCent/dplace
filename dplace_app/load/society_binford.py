@@ -4,6 +4,7 @@
 import csv
 import re
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.utils import IntegrityError, DataError
 from dplace_app.models import *
 from environmental import iso_from_code
 from society_ea import clean_category
@@ -131,3 +132,37 @@ def load_bf_codes(csvfile=None):
                                                                              description=code['description'])
         # Set up for next pass
         variable_def = read_binford_variable_def(csv_reader)
+
+def load_bf_val(val_row):
+    ext_id = val_row['ID'].strip()
+    # find the existing society
+    try:
+        society = Society.objects.get(ext_id=ext_id)
+    except ObjectDoesNotExist:
+        print "Attempting to load Binford values for %s but did not find an existing Society object" % ext_id
+        return
+    # Variable values are in columns after 'ID' and 'Name'
+    for key in val_row.keys():
+        if key not in ('ID', 'Name'):
+            label = key
+            value = val_row[key].strip()
+            try:
+                variable = VariableDescription.objects.get(label=label)
+            except ObjectDoesNotExist:
+                continue
+            try:
+                # Check for Code description if it exists.
+                code = VariableCodeDescription.objects.get(variable=variable,code=value)
+            except ObjectDoesNotExist:
+                code = None
+            try:
+                variable_value = VariableCodedValue(variable=variable,
+                                                    society=society,
+                                                    coded_value=value,
+                                                    code=code)
+                variable_value.save()
+            except IntegrityError:
+                print "Unable to store value '%s' for var %s in society %s, already exists" % (value, variable.label, society)
+            except DataError:
+                print "data error saving '%s'" % value
+
