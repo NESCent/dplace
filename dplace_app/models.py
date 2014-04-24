@@ -107,7 +107,7 @@ class VariableDescription(models.Model):
 
     This number is converted to a label: EA006
     """
-    label = models.CharField(max_length=10, db_index=True)
+    label = models.CharField(max_length=25, db_index=True)
     name = models.CharField(max_length=200, db_index=True, default='Unknown')
     source = models.ForeignKey('Source',null=True)
     index_categories = models.ManyToManyField('VariableCategory', related_name='index_variables')
