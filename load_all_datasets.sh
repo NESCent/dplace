@@ -60,3 +60,4 @@ echo "Loading Binford Variable Codes"
 python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/binford_variable_codebook.csv" bf_codes
 
 echo "Loading Binford Variable Values"
+python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/binford_vals.csv" bf_vals
