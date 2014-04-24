@@ -1,5 +1,5 @@
-function HomeCtrl($scope) {
-    $scope.setActive('home');
+function SearchCtrl($scope) {
+    $scope.setActive('search');
     $scope.selectedButton = {};
     $scope.buttons = [
         {value:'geographic', name:'Geographic'},
