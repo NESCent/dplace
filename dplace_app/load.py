@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import csv
 import sys
+import re
 from django.contrib.gis.geos import Point
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.utils import IntegrityError
@@ -39,6 +40,8 @@ def run(file_name=None, mode=None):
                     load_bf_var(dict_row)
         elif mode == 'ea_codes':
             load_ea_codes(csvfile)
+        elif mode == 'bf_codes':
+            load_bf_codes(csvfile)
     if len(MISSING_CODES) > 0:
         print "Missing ISO Codes:"
         print '\n'.join(MISSING_CODES)
@@ -537,6 +540,79 @@ def load_bf_var(var_dict):
     for category_name in niche_categories:
         niche_category, created = VariableCategory.objects.get_or_create(name=category_name)
         variable.niche_categories.add(niche_category)
+
+VARIABLE_DEF_EXPRESSION = 'B[0-9]{3}_.*'
+BF_CODE_COLUMN_VARIABLE_DEF = 0
+BF_CODE_COLUMN_VARIABLE_NAME = 6
+BF_CODE_COLUMN_VARIABLE_DESC = 8
+
+def read_binford_variable_def(csv_reader):
+    '''
+    Advances the CSV reader row-by-row until finding a row that starts with
+    VARIABLE_DEF_EXPRESSION
+    '''
+    row, matched = None, None
+    while matched is None:
+        try:
+            row = csv_reader.next()
+        except StopIteration:
+            return None
+        matched = re.match(VARIABLE_DEF_EXPRESSION, row[BF_CODE_COLUMN_VARIABLE_DEF])
+    variable_def = dict()
+    variable_def['field'] = row[BF_CODE_COLUMN_VARIABLE_DEF]
+    variable_def['name'] = row[BF_CODE_COLUMN_VARIABLE_NAME]
+    variable_def['desc'] = row[BF_CODE_COLUMN_VARIABLE_DESC]
+    return variable_def
+
+def read_binford_header_row(csv_reader):
+    '''
+    Advances the CSV reader row-by-row until finding a row with CODE,DESCRIPTION,NOTES
+    '''
+    row, matched = None, False
+    while not matched:
+        try:
+            row = csv_reader.next()
+        except StopIteration:
+            return None
+        matched = row[0].strip() == 'CODE'
+    return row
+
+def read_binford_code_rows(csv_reader):
+    '''
+    Advances the CSV reader row-by-row, collecting CODE / DESCRIPTION / NOTES / PAGE rows
+    until a blank row is found
+    '''
+    codes, done = [], False
+    while not done:
+        try:
+            row = csv_reader.next()
+        except StopIteration:
+            done = True
+            break
+        if len(row[0].strip()) == 0:
+            done = True
+        else:
+            codes.append({'code': row[0].strip(),
+                         'description': row[1].strip(),
+                         'notes': row[2].strip(),
+                         'page': row[3].strip()
+            })
+    return codes
+
+def load_bf_codes(csvfile=None):
+    csv_reader = csv.reader(csvfile)
+    # parse the file, looking for variable def, then header, then codes
+    variable_def = read_binford_variable_def(csv_reader)
+    while variable_def is not None:
+        read_binford_header_row(csv_reader)
+        codes = read_binford_code_rows(csv_reader)
+        variable = VariableDescription.objects.get(label=variable_def['field'])
+        for code in codes:
+            code_description = VariableCodeDescription.objects.get_or_create(variable=variable,
+                                                                             code=code['code'],
+                                                                             description=code['description'])
+        # Set up for next pass
+        variable_def = read_binford_variable_def(csv_reader)
 
 if __name__ == '__main__':
     run(sys.argv[1], sys.argv[2])
