@@ -526,9 +526,9 @@ def load_bf_var(var_dict):
 
     variable, created = VariableDescription.objects.get_or_create(label=label,name=name)
 
-    index_categories = [clean_category(x) for x in var_dict['INDEXCATEGORY'].split(',')]
+    index_categories = [clean_category(x) for x in var_dict['IndexCategory'].split(',')]
     # Currently max 1 niche category
-    niche_categories = [clean_category(x) for x in var_dict['NICHECATEGORY'].split(',')]
+    niche_categories = [clean_category(x) for x in var_dict['NicheCategory'].split(',')]
 
     # when creating categories, ignore '?'
     for category_name in index_categories:
