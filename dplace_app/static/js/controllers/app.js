@@ -1,4 +1,4 @@
-function AppCtrl($scope) {
+function AppCtrl($scope, $location) {
     $scope.model = {'searchResults': {}};
     $scope.searchButton = {'disabled': false, 'text': 'Search'};
     // Root controller for app
@@ -6,5 +6,8 @@ function AppCtrl($scope) {
         $scope.searchActive = '';
         $scope.societiesActive = '';
         $scope[tabName + 'Active'] = 'active'
+    }
+    $scope.switchToResults = function() {
+        $location.path('/societies');
     }
 }

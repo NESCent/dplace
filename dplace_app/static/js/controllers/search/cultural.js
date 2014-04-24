@@ -31,6 +31,7 @@ function CulturalCtrl($scope, Variable, VariableCategory, CodeDescription, FindS
         $scope.disableSearchButton()
         $scope.model.searchResults = FindSocieties.find({ variable_codes: code_ids }, function() {
             $scope.enableSearchButton();
+            $scope.switchToResults();
         });
     };
 
