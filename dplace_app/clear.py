@@ -16,7 +16,7 @@ def run(mode=None):
         clear_environmentals()
     elif mode == 'all':
         clear_langs()
-        clear_ea()
+        clear_cultural()
         clear_environmentals()
         clear_societies()
         clear_isocodes()
@@ -30,6 +30,7 @@ def clear_cultural():
     VariableCodedValue.objects.all().delete()
     VariableCodeDescription.objects.all().delete()
     VariableDescription.objects.all().delete()
+    VariableCategory.objects.all().delete()
 
 def clear_societies():
     Society.objects.all().delete()
