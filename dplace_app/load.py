@@ -612,6 +612,8 @@ def load_bf_codes(csvfile=None):
             if code['code'].startswith('class:'):
                 print "Code %s starts with 'class:', skipping" % code['code']
                 continue
+            if code['code'].startswith('Value'):
+                print "Code %s starts with 'Value', skipping" %code['code']
             code_description = VariableCodeDescription.objects.get_or_create(variable=variable,
                                                                              code=code['code'],
                                                                              description=code['description'])
