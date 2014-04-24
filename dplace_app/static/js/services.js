@@ -1,4 +1,8 @@
 angular.module('dplaceServices', ['ngResource'])
+    .config(function($httpProvider) {
+        $httpProvider.defaults.xsrfCookieName = 'csrftoken';
+        $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
+    })
     .factory('LanguageClass', function ($resource) {
         return $resource(
             '/api/v1/language_classes/:id',
@@ -25,9 +29,35 @@ angular.module('dplaceServices', ['ngResource'])
                 }
             });
     })
+    .factory('VariableCategory', function ($resource) {
+        return $resource(
+            '/api/v1/categories/:id',
+            {page_size: 1000}, {
+                query: {
+                    method: 'GET',
+                    isArray: true,
+                    transformResponse: function(data, headers) {
+                        return JSON.parse(data).results;
+                    }
+                }
+            });
+    })
     .factory('CodeDescription', function ($resource) {
         return $resource(
             '/api/v1/codes/:id',
+            {page_size: 1000}, {
+                query: {
+                    method: 'GET',
+                    isArray: true,
+                    transformResponse: function(data, headers) {
+                        return JSON.parse(data).results;
+                    }
+                }
+            });
+    })
+    .factory('EnvironmentalVariable', function ($resource) {
+        return $resource(
+            '/api/v1/environmental_variables/:id',
             {page_size: 1000}, {
                 query: {
                     method: 'GET',
@@ -43,8 +73,7 @@ angular.module('dplaceServices', ['ngResource'])
             '/api/v1/find_societies',
             {},{
                 find: {
-                    method: 'GET',
-                    isArray: true
+                    method: 'POST'
                 }
             }
         )

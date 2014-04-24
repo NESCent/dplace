@@ -6,21 +6,22 @@ function MapCtrl($scope) {
     map.zoomToMaxExtent();
     var markers = new OpenLayers.Layer.Markers("SocietyMarkers");
     map.addLayer(markers);
-    $scope.map = map;
-    $scope.markers = markers;
+    $scope.model.map = map;
+    $scope.model.mapMarkers = markers;
     var size = new OpenLayers.Size(21,25);
     var offset = new OpenLayers.Pixel(-(size.w/2), -size.h);
-    $scope.icon = new OpenLayers.Icon('http://www.openlayers.org/dev/img/marker.png', size, offset);
+    $scope.model.icon = new OpenLayers.Icon('http://www.openlayers.org/dev/img/marker.png', size, offset);
     $scope.addMarkers = function() {
-        $scope.markers.clearMarkers();
-        if(!$scope.societies) {
+        $scope.model.mapMarkers.clearMarkers();
+        if(!$scope.model.searchResults.results) {
             return;
         }
-        $scope.societies.forEach(function(society) {
+        $scope.model.searchResults.results.forEach(function(societyResult) {
+            var society = societyResult.society;
             var coordinates = society.location.coordinates;
             // Add a marker for each point
             var lonlat = OpenLayers.LonLat.fromArray(coordinates);
-            var marker = new OpenLayers.Marker(lonlat, $scope.icon.clone());
+            var marker = new OpenLayers.Marker(lonlat, $scope.model.icon.clone());
             marker.events.register('mouseover', marker, function(evt) {
                 var popup = new OpenLayers.Popup.FramedCloud(society.name,
                     marker.lonlat,          // lonlat
@@ -29,14 +30,14 @@ function MapCtrl($scope) {
                     marker.icon,            // anchor
                     false                   // closebox
                 );
-                $scope.map.addPopup(popup);
+                $scope.model.map.addPopup(popup);
                 marker.events.register('mouseout', marker, function(evt) { popup.hide(); } )
             });
-            $scope.markers.addMarker(marker);
+            $scope.model.mapMarkers.addMarker(marker);
         });
     };
     // Update markers when societies change
-    $scope.$watchCollection('societies', function(oldvalue, newvalue) {
+    $scope.$watchCollection('model.searchResults.results', function(oldvalue, newvalue) {
         $scope.addMarkers();
     });
 }

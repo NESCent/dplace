@@ -14,78 +14,12 @@
             <th>Variable</th>
             <th>Value</th>
         </tr>
-        <tr>
-            <td>Annual Mean Temperature</td>
-            <td>{{ environmental.annual_mean_temperature }}</td>
-        </tr>
-        <tr>
-            <td>Annual Temperature Variance</td>
-            <td>{{ environmental.annual_temperature_variance }}</td>
-        </tr>
-        <tr>
-            <td>Temperature Constancy</td>
-            <td>{{ environmental.temperature_constancy }}</td>
-        </tr>
-        <tr>
-            <td>Temperature Contingency</td>
-            <td>{{ environmental.temperature_contingency }}</td>
-        </tr>
-        <tr>
-            <td>Temperature Predictability</td>
-            <td>{{ environmental.temperature_predictability }}</td>
-        </tr>
-        <tr>
-            <td>Annual Mean Precipitation</td>
-            <td>{{ environmental.annual_mean_precipitation }}</td>
-        </tr>
-        <tr>
-            <td>Annual Precipitation Variance</td>
-            <td>{{ environmental.annual_precipitation_variance}}</td>
-        </tr>
-        <tr>
-            <td>Precipitation Constancy</td>
-            <td>{{ environmental.precipitation_constancy }}</td>
-        </tr>
-        <tr>
-            <td>Precipitation Contingency</td>
-            <td>{{ environmental.precipitation_contingency }}</td>
-        </tr>
-        <tr>
-            <td>Precipitation Predictability</td>
-            <td>{{ environmental.precipitation_predictability}}</td>
-        </tr>
-        <tr>
-            <td>Mean Growing Season Duration</td>
-            <td>{{ environmental.mean_growing_season_duration}}</td>
-        </tr>
-        <tr>
-            <td>Net Primary Productivity</td>
-            <td>{{ environmental.net_primary_productivity}}</td>
-        </tr>
-        <tr>
-            <td>Bird Diversity</td>
-            <td>{{ environmental.bird_diversity}}</td>
-        </tr>
-        <tr>
-            <td>Mammal Diversity</td>
-            <td>{{ environmental.mammal_diversity}}</td>
-        </tr>
-        <tr>
-            <td>Amphibian Diversity</td>
-            <td>{{ environmental.amphibian_diversity }}</td>
-        </tr>
-        <tr>
-            <td>Plant Diversity</td>
-            <td>{{ environmental.plant_diversity }}</td>
-        </tr>
-        <tr>
-            <td>Elevation</td>
-            <td>{{ environmental.elevation }}</td>
-        </tr>
-        <tr>
-            <td>Slope</td>
-            <td>{{ environmental.slope }}</td>
-        </tr>
+        {% for value in environmental.values.all %}
+            <tr>
+                <td>{{ value.variable.name }}</td>
+                <td>{{ value.value }}</td>
+            </tr>
+        {% endfor %}
     </table>
     {% endfor %}
     <h2>Cultural Trait Data</h2>

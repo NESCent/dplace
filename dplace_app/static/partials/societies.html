@@ -1,0 +1,43 @@
+<div class="container results">
+    <div class="row">
+        <span>
+            <p class="pull-left lead">Societies <span ng-show="model.searchResults.results.length">({{ model.searchResults.results.length }})</span></p>
+        </span>
+    </div>
+    <tabset>
+        <tab heading="Table">
+            <div class="row">
+                <div ng-hide="model.searchResults.results.length">
+                    <p class="text-center help-block search-help"></p>
+                </div>
+                <table class="table" ng-show="model.searchResults.results.length">
+                    <tr>
+                        <th>Name</th>
+                        <th>ISO Code</th>
+                        <th>Location</th>
+                        <th ng-repeat="variable in model.searchResults.variable_descriptions">{{ variable.name }}</th>
+                        <th ng-repeat="environmental in model.searchResults.environmental_variables">{{ environmental.name }}</th>
+                        <th ng-repeat="language_class in model.searchResults.language_classes">{{ language_class.name }}</th>
+                    </tr>
+                    <tr ng-repeat="society_result in model.searchResults.results">
+                        <td><a ng-href="/society/{{ society_result.society.id }}" target="_blank">{{ society_result.society.name }}</a></td>
+                        <td>{{ society_result.society.iso_code }}</td>
+                        <td>{{ society_result.society.location.coordinates }}</td>
+                        <td ng-repeat="variable in model.searchResults.variable_descriptions">
+                            {{ society_result.variable_coded_values | formatVariableCodeValues }}
+                        </td>
+                        <td ng-repeat="environmental in model.searchResults.environmental_variables">
+                            {{ society_result.environmental_values | formatEnvironmentalValues }}
+                        </td>
+                        <td ng-repeat="language_class in model.searchResults.language_classes">
+                            {{ society_result.language_classifications | formatLanguageClassifications }}
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </tab>
+        <tab heading="Map">
+            <ng-include src="'/static/partials/map.html'"></ng-include>
+        </tab>
+    </tabset>
+</div>

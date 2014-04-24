@@ -1,28 +1,38 @@
 {% extends 'base.html' %}
 {% block extra_head %}
     <!-- AngularJS -->
-    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.12/angular.min.js"></script>
-    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.12/angular-resource.min.js"></script>
-    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.12/angular-route.min.js"></script>
+    <script type="text/javascript" src="/static/js/lib/angular.min.js"></script>
+    <script type="text/javascript" src="/static/js/lib/angular-resource.min.js"></script>
+    <script type="text/javascript" src="/static/js/lib/angular-route.min.js"></script>
     <!-- Angular app script -->
     <script type="text/javascript" src="/static/js/app.js"></script>
     <!-- Angular Controllers -->
     <script type="text/javascript" src="/static/js/controllers/app.js"></script>
     <script type="text/javascript" src="/static/js/controllers/search.js"></script>
+    <script type="text/javascript" src="/static/js/controllers/home.js"></script>
     <script type="text/javascript" src="/static/js/controllers/map.js"></script>
+    <script type="text/javascript" src="/static/js/controllers/societies.js"></script>
+    <script type="text/javascript" src="/static/js/controllers/search/cultural.js"></script>
+    <script type="text/javascript" src="/static/js/controllers/search/geographic.js"></script>
+    <script type="text/javascript" src="/static/js/controllers/search/environmental.js"></script>
+    <script type="text/javascript" src="/static/js/controllers/search/language.js"></script>
+
     <!-- Angular Services -->
     <script type="text/javascript" src="/static/js/services.js"></script>
+    <!-- Angular Filters -->
+    <script type="text/javascript" src="/static/js/filters.js"></script>
     <!-- Angular UI Bootstrap -->
-    <script type="text/javascript" src="http://angular-ui.github.io/bootstrap/ui-bootstrap-tpls-0.10.0.min.js"></script>
+    <script type="text/javascript" src="/static/js/lib/ui-bootstrap-tpls-0.10.0.min.js"></script>
     <!-- OpenLayers JS -->
-    <script src="http://www.openlayers.org/api/OpenLayers.js"></script>
+    <script src="/static/js/lib/OpenLayers.js"></script>
 
 {% endblock %}
 {% load bootstrap3 %}
 {% block content %}
 {% verbatim %}
     <!-- angular stuff here -->
-    <div class="container" ng-controller="AppCtrl">
+    <div ng-controller="AppCtrl">
+        <ng-include src="'/static/partials/navbar.html'"></ng-include>
 		<div ng-view></div>
 	</div>
 {% endverbatim %}

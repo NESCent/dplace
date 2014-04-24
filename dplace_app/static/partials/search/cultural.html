@@ -1,0 +1,45 @@
+<div ng-controller="CulturalCtrl">
+    <h4>Search by Cultural Trait</h4>
+    <form class="form-inline" role="form">
+        <div class="panel panel-default" ng-repeat="trait in traits">
+            <div class="panel-heading">
+                <div class="row">
+                    <div class="form-group col-xs-6">
+                        <select
+                                ng-model="trait.selectedCategory"
+                                class="form-control"
+                                style="width:100%"
+                                ng-change="categoryChanged(trait)"
+                                ng-options="category.name for category in trait.categories"
+                                >
+                            <option value="">Select a Category</option>
+                        </select>
+                    </div>
+                    <div class="form-group col-xs-6">
+                        <select
+                                ng-model="trait.selectedVariable"
+                                class="form-control"
+                                style="width:100%"
+                                ng-change="traitChanged(trait)"
+                                ng-options="variable.name for variable in trait.indexVariables"
+                                >
+                            <option value="">Select a Variable</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-body">
+                <div ng-repeat="code in trait.codes">
+                    <span class="variable-label pull-left">{{ code.code }}:</span>
+                    <span class="variable-description">{{ code.description }}</span>
+                    <input class="pull-right" type="checkbox" ng-model="code.isSelected"/>
+                </div>
+            </div>
+        </div>
+        <div>
+            <button class="btn btn-primary form-control"
+                    ng-disabled="searchButton.disabled"
+                    ng-click="doSearch()">{{ searchButton.text }}</button>
+        </div>
+    </form>
+</div>

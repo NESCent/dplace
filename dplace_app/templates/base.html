@@ -7,7 +7,8 @@
     <title>D-PLACE</title>
     <meta name="description" content="">
     <meta name="author" content="Dan Leehr">
-    {% bootstrap_css %}
+    <!-- {% bootstrap_css %} -->
+    <link href="/static/css/lib/bootstrap.min.css" media="screen" rel="stylesheet">
     <style type="text/css">
         body {
             padding-top: 60px;
@@ -18,8 +19,9 @@
     <!--[if lt IE 9]>
     <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
-    <script src="//code.jquery.com/jquery.js"></script>
-    {% bootstrap_javascript %}
+    <script src="/static/js/lib/jquery.js"></script>
+    <!-- {% bootstrap_javascript %} -->
+    <script src="/static/js/lib/bootstrap.min.js"></script>
     {% block extra_head %}{% endblock %}
 </head>
 

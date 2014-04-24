@@ -8,7 +8,7 @@ from rest_framework.views import Request, Response
 # Resource routes
 class VariableDescriptionViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = VariableDescriptionSerializer
-    filter_fields = ('label', 'name',)
+    filter_fields = ('label', 'name', 'index_categories', 'niche_categories',)
     queryset = VariableDescription.objects.all()
     # Override retrieve to use the detail serializer, which includes categories
     def retrieve(self, request, *args, **kwargs):
@@ -18,7 +18,7 @@ class VariableDescriptionViewSet(viewsets.ReadOnlyModelViewSet):
 
 class VariableCategoryViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = VariableCategorySerializer
-    filter_fields = ('name',)
+    filter_fields = ('name', 'index_variables', 'niche_variables',)
     queryset = VariableCategory.objects.all()
     # Override retrieve to use the detail serializer, which includes variables
     def retrieve(self, request, *args, **kwargs):
@@ -89,55 +89,72 @@ class LanguageViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Language.objects.all()
 
 # search/filter APIs
-@api_view(['GET'])
-@permission_classes((IsAuthenticatedOrReadOnly,))
+@api_view(['POST'])
+@permission_classes((AllowAny,))
 def find_societies(request):
     """
     View to find the societies that match an input request.  Currently expects
-    { language_class_ids: [1,2,3...], variable_codes: [4,5,6...] }
+    { language_class_ids: [1,2,3...], variable_codes: [4,5,6...],
+    environmental_filters: [{id: 1, operator: 'gt', params: [0.0]}, {id:3, operator 'inrange', params: [10.0,20.0] }] }
+
+    Returns serialized collection of SocietyResult objects
     """
-    results = {'language_societies': None, 'variable_societies': None}
+    result_set = SocietyResultSet()
+    # Criteria keeps track of what types of data were searched on, so that we can
+    # AND them together
+    criteria = []
 
-    language_class_ids = request.QUERY_PARAMS.getlist('language_class_ids')
-    if len(language_class_ids) > 0:
-        language_class_ids = [int(x) for x in language_class_ids]
+    if 'language_class_ids' in request.DATA:
+        criteria.append(SEARCH_LANGUAGE)
+        language_class_ids = [int(x) for x in request.DATA['language_class_ids']]
         # Loop over the language class IDs to get classes
-        language_classes = LanguageClass.objects.filter(pk__in=language_class_ids)
-        # Classifications are related to classes
-        language_classifications = []
+        language_classes = LanguageClass.objects.filter(pk__in=language_class_ids).select_related(
+            'languages1','languages2','languages3'
+        ).select_related(
+            'languages1__language__societies','languages2__language__societies','languages3__language__societies'
+        )
         for language_class in language_classes:
-            language_classifications += language_class.languages1.all()
-            language_classifications += language_class.languages2.all()
-            language_classifications += language_class.languages3.all()
-        # Now get languages from classifications
-        iso_codes = []
-        for language_classification in language_classifications:
-            iso_codes.append(language_classification.language.iso_code)
-        # now get societies from ISO codes
-        results['language_societies'] = Society.objects.filter(iso_code__in=iso_codes)
+            for each in [language_class.languages1, language_class.languages2, language_class.languages3]:
+                for language_classification in each.all():
+                    for society in language_classification.language.societies.all():
+                        result_set.add_language(society, language_class, language_classification)
 
-    variable_code_ids = request.QUERY_PARAMS.getlist('variable_codes')
-    if len(variable_code_ids) > 0:
+    if 'variable_codes' in request.DATA:
+        criteria.append(SEARCH_VARIABLES)
         # Now get the societies from variables
-        variable_code_ids = [int(x) for x in variable_code_ids]
+        variable_code_ids = [int(x) for x in request.DATA['variable_codes']]
         codes = VariableCodeDescription.objects.filter(pk__in=variable_code_ids) # returns a queryset
         coded_value_ids = []
         # Aggregate all the coded values for each selected code
         for code in codes:
             coded_value_ids += code.variablecodedvalue_set.values_list('id', flat=True)
         # Coded values have a FK to society.  Aggregate the societies from each value
-        results['variable_societies'] = Society.objects.filter(variablecodedvalue__in=coded_value_ids)
+        values = VariableCodedValue.objects.filter(id__in=coded_value_ids)
+        values = values.select_related('society','variable')
+        for value in values:
+            result_set.add_cultural(value.society,value.variable,value)
 
-    societies = []
-    # Intersect the querysets
-    for k in results.keys():
-        if results[k] is not None:
-            if len(societies) == 0:
-                societies = results[k]
-            else:
-                societies = societies & results[k]
+    if 'environmental_filters' in request.DATA:
+        criteria.append(SEARCH_ENVIRONMENTAL)
+        environmental_filters = request.DATA['environmental_filters']
+        # There can be multiple filters, so we must aggregate the results.
+        for filter in environmental_filters:
+            values = EnvironmentalValue.objects.filter(variable=filter['id'])
+            operator = filter['operator']
+            if operator == 'inrange':
+                values = values.filter(value__gt=filter['params'][0]).filter(value__lt=filter['params'][1])
+            elif operator == 'outrange':
+                values = values.filter(value__gt=filter['params'][1]).filter(value__lt=filter['params'][0])
+            elif operator == 'gt':
+                values = values.filter(value__gt=filter['params'][0])
+            elif operator == 'lt':
+                values = values.filter(value__lt=filter['params'][0])
+            values = values.select_related('variable','environmental__society')
+            # get the societies from the values
+            for value in values:
+                result_set.add_environmental(value.society(), value.variable, value)
 
-    return Response(SocietySerializer(societies,many=True).data)
-
-# Need an API to query on environmental values with operators (gt, lt, between)
+    # Filter the results to those that matched all criteria
+    result_set.finalize(criteria)
+    return Response(SocietyResultSetSerializer(result_set).data)
 

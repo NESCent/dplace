@@ -62,15 +62,20 @@ class EnvironmentalVariable(models.Model):
     units = models.CharField(max_length=10, choices=UNIT_CHOICES)
     def __unicode__(self):
         return "%s (%s)" % (self.name, self.units)
+    class Meta:
+        ordering=("name",)
 
 
 class EnvironmentalValue(models.Model):
     variable = models.ForeignKey('EnvironmentalVariable', related_name="values")
     value = models.FloatField(db_index=True)
     environmental = models.ForeignKey('Environmental', related_name="values")
+    def society(self):
+        return self.environmental.society
     def __unicode__(self):
         return "%f" % self.value
     class Meta:
+        ordering=("variable",)
         unique_together = (
             ('variable','environmental')
         )
@@ -122,6 +127,7 @@ class VariableCategory(models.Model):
     class Meta:
         verbose_name = "Category"
         verbose_name_plural = "Categories"
+        ordering=("name",)
 
 class VariableCodeDescription(models.Model):
     """

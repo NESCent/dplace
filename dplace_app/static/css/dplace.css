@@ -54,3 +54,12 @@ label.light {
 .nav, .pagination, .carousel, .panel-title a {
     cursor: pointer; cursor: hand;
 }
+
+.basic-search {
+    float: none;
+    margin: 0 auto;
+}
+
+.basic-search-forms {
+    margin-top: 2rem;
+}
