@@ -54,5 +54,9 @@ echo "Loading EA Variable Values"
 python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/ea_vals.csv" ea_vals
 
 echo "Loading Binford Variables"
+python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/binford_variable_names+categories.csv" bf_vars
+
 echo "Loading Binford Variable Codes"
+python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/binford_variable_codebook.csv" bf_codes
+
 echo "Loading Binford Variable Values"
