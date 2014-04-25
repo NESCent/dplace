@@ -6,6 +6,7 @@ import re
 from django.contrib.gis.geos import Point
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.utils import IntegrityError, DataError
+from dplace_app.load.isocode import get_isocode
 from dplace_app.models import *
 from environmental import iso_from_code
 from society_ea import clean_category
@@ -16,7 +17,9 @@ def load_bf_society(society_dict):
     found_societies = Society.objects.filter(ext_id=ext_id,source=source)
     if len(found_societies) == 0:
         name = society_dict['STANDARD SOCIETY NAME Binford']
-        iso_code = iso_from_code(society_dict['ISO693_3'])
+        iso_code = iso_from_code(get_isocode(society_dict))
+        if iso_code is None:
+            print "Warning: Unable to find a record for ISO code %s" % get_isocode(society_dict)
         # Get the language
         language_name = society_dict['LangNam']
         try:
@@ -30,7 +33,13 @@ def load_bf_society(society_dict):
                           iso_code=iso_code,
                           language=language
                           )
-        society.save()
+        try:
+            society.save()
+        except BaseException as e:
+            print "Exception saving society: %s" % e.message
+            return None
+        return society
+    return found_societies.first()
 
 def load_bf_var(var_dict):
     """
