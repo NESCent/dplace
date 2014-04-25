@@ -6,8 +6,8 @@ MISSING_CODES = []
 def run(mode=None):
     if mode == 'langs':
         clear_langs()
-    elif mode == 'ea':
-        clear_ea()
+    elif mode == 'cultural':
+        clear_cultural()
     elif mode == 'societies':
         clear_societies()
     elif mode == 'iso':
@@ -16,7 +16,7 @@ def run(mode=None):
         clear_environmentals()
     elif mode == 'all':
         clear_langs()
-        clear_ea()
+        clear_cultural()
         clear_environmentals()
         clear_societies()
         clear_isocodes()
@@ -26,10 +26,11 @@ def clear_langs():
     LanguageClass.objects.all().delete()
     Language.objects.all().delete()
 
-def clear_ea():
+def clear_cultural():
     VariableCodedValue.objects.all().delete()
     VariableCodeDescription.objects.all().delete()
     VariableDescription.objects.all().delete()
+    VariableCategory.objects.all().delete()
 
 def clear_societies():
     Society.objects.all().delete()
