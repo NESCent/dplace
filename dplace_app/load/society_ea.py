@@ -5,6 +5,7 @@ import csv
 from django.contrib.gis.geos import Point
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.utils import IntegrityError
+from dplace_app.load.isocode import get_isocode
 from dplace_app.models import *
 from environmental import iso_from_code
 
@@ -14,7 +15,9 @@ def load_ea_society(society_dict):
     found_societies = Society.objects.filter(ext_id=ext_id,source=source)
     if len(found_societies) == 0:
         name = society_dict['Society_name_EA']
-        iso_code = iso_from_code(society_dict['ISO693_3'])
+        iso_code = iso_from_code(get_isocode(society_dict))
+        if iso_code is None:
+            print "Warning: Unable to find a record for ISO code %s" % get_isocode(society_dict)
         # Get the language
         language_name = society_dict['LangNam']
         try:
@@ -28,7 +31,14 @@ def load_ea_society(society_dict):
                           iso_code=iso_code,
                           language=language
                           )
-        society.save()
+        try:
+            society.save()
+            return society
+        except BaseException as e:
+            print "Exception saving society: %s" % e.message
+            return None
+    else:
+        return found_societies.first()
 
 def postprocess_ea_societies():
     '''
