@@ -1,3 +1,24 @@
 <div ng-controller="LanguageCtrl">
     <h4>Search by Language Family / Phylogeny</h4>
+    <form class="form-inline" role="form">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                    <input type="text"
+                       ng-model="language.filterText"
+                       class="form-control"
+                       style="width:100%"
+                       placeholder="Enter a language name to filter">
+            </div>
+            <div class="panel-body scrollable">
+                    <div ng-repeat="item in language.items | filter:language.filterText">
+                        <language-picker language="item"></language-picker>
+                    </div>
+                </div>
+        </div>
+        <div>
+            <button class="btn btn-primary form-control"
+                    ng-disabled="true"
+                    ng-click="doSearch()">{{ searchButton.text }} (not yet functional)</button>
+        </div>
+    </form>
 </div>
