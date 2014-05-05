@@ -1,17 +1,48 @@
 <div ng-controller="LanguageCtrl">
     <h4>Search by Language Family / Phylogeny</h4>
     <form class="form-inline" role="form">
-        <div class="panel panel-default">
+        <div class="panel panel-default" ng-repeat="languageFilter in language.languageFilters">
             <div class="panel-heading">
-                    <input type="text"
-                       ng-model="language.filterText"
-                       class="form-control"
-                       style="width:100%"
-                       placeholder="Enter a language name to filter">
+                <div class="row">
+                    <div class="form-group col-xs-4">
+                        <select
+                                ng-model="languageFilter.selectedFamily"
+                                class="form-control"
+                                style="width:100%"
+                                ng-change="familyChanged(languageFilter)"
+                                ng-options="family.name for family in languageFilter.families"
+                                >
+                            <option value="">Language Family</option>
+                        </select>
+                    </div>
+                    <div class="form-group col-xs-4">
+                        <select
+                                ng-model="languageFilter.selectedSubFamily"
+                                class="form-control"
+                                style="width:100%"
+                                ng-change="subFamilyChanged(languageFilter)"
+                                ng-options="subfamily.name for subfamily in languageFilter.subfamilies"
+                                >
+                            <option value="">Subfamily</option>
+                        </select>
+                    </div>
+                    <div class="form-group col-xs-4">
+                        <select
+                                ng-model="languageFilter.selectedSubSubFamily"
+                                class="form-control"
+                                style="width:100%"
+                                ng-change="subSubFamilyChanged(languageFilter)"
+                                ng-options="subsubfamily.name for subsubfamily in languageFilter.subsubfamilies"
+                                >
+                            <option value="">Subsubfamily</option>
+                        </select>
+                    </div>
+                </div>
             </div>
             <div class="panel-body scrollable">
-                    <div ng-repeat="item in language.items | filter:language.filterText">
-                        <language-picker language="item"></language-picker>
+
+                    <div ng-repeat="language in languageFilter.languages">
+                        {{ language }}
                     </div>
                 </div>
         </div>

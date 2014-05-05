@@ -5,6 +5,9 @@ function LanguageCtrl($scope) {
             { name: 'Language 1'},
             { name: 'Language 2'},
             { name: 'Language 3'}
+        ],
+        languageFilters: [
+            { families: [{name:'a'},{name:'b'}]}
         ]
     };
 }
