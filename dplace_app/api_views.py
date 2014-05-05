@@ -67,14 +67,6 @@ class LanguageClassViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = LanguageClassSerializer
     filter_fields = ('level', 'parent', 'name',)
     model = LanguageClass
-    def get_queryset(self):
-        queryset = LanguageClass.objects.all()
-        level = self.request.QUERY_PARAMS.get('level', None)
-        if level is not None:
-            queryset = queryset.filter(level=level)
-        else:
-            queryset = queryset.filter(level=1)
-        return queryset
 
 # Need an API to get classifications / languages for a class
 
