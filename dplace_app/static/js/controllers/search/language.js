@@ -1,4 +1,4 @@
-function LanguageCtrl($scope, LanguageClass, LanguageClassification) {
+function LanguageCtrl($scope, LanguageClass, LanguageClassification, FindSocieties) {
 
     /* Prototype model for UI */
     var levels = [
@@ -82,6 +82,31 @@ function LanguageCtrl($scope, LanguageClass, LanguageClassification) {
             clearItems(languageFilter, childLevel);
         }
         updateClassifications(languageFilter);
+    };
+
+    function getSelectedLanguageClassifications(languageFilter) {
+        return languageFilter.classifications.filter( function (classification) {
+            return classification.isSelected;
+        });
+    }
+
+    $scope.getLanguageQueryFilters = function() {
+        var languageQueryFilters = [];
+        $scope.language.languageFilters.forEach(function(languageFilter) {
+            var selectedClassifications = getSelectedLanguageClassifications(languageFilter);
+            var languageIds = selectedClassifications.map(function (classification) { return classification.language.id; });
+            languageQueryFilters.push({language_ids: languageIds});
+        });
+        return languageQueryFilters;
+    };
+
+    $scope.doSearch = function() {
+        var filters = $scope.getLanguageQueryFilters();
+        $scope.disableSearchButton()
+        $scope.model.searchResults = FindSocieties.find({ language_filters: filters }, function() {
+            $scope.enableSearchButton();
+            $scope.switchToResults();
+        });
     };
 
 }
