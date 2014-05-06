@@ -63,13 +63,14 @@ class LanguageClassSerializer(serializers.ModelSerializer):
     class Meta:
         model = LanguageClass
 
-class LanguageClassificationSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = LanguageClassification
-
 class LanguageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Language
+
+class LanguageClassificationSerializer(serializers.ModelSerializer):
+    language = LanguageSerializer(source='language')
+    class Meta:
+        model = LanguageClassification
 
 # Societies
 class SocietySerializer(gis_serializers.GeoModelSerializer):
