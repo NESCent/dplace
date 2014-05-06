@@ -230,6 +230,15 @@ class LanguageClass(models.Model):
     name = models.CharField(max_length=50, db_index=True)
     level = models.IntegerField(db_index=True, choices=CLASS_LEVELS)
     parent = models.ForeignKey('self', null=True, default=None)
+    language_count = models.IntegerField(default=0,null=False)
+    def update_counts(self):
+        if self.level == 1:
+            self.language_count = self.languages1.count()
+        elif self.level == 2:
+            self.language_count = self.languages2.count()
+        elif self.level == 3:
+            self.language_count = self.languages3.count()
+        self.save()
     def __unicode__(self):
         return "Language Class %s, level %d" % (self.name, self.level)
     class Meta:

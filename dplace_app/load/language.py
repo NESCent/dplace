@@ -74,3 +74,7 @@ def load_lang(lang_row):
                                                 )
         classification.save()
     return language
+
+def update_language_counts():
+    for language_class in LanguageClass.objects.all():
+        language_class.update_counts()
