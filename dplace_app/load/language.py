@@ -15,7 +15,7 @@ def load_lang(lang_row):
     code = get_isocode(lang_row)
     if code is None:
         print "ISO Code not found in row, skipping"
-        return
+        return None
     language_name = get_value(lang_row,('Language name','NAM'))
     ethnologue_classification = get_value(lang_row,('Ethnologue Classification (unrevised)','Ethnologue classification (if applicable)'))
     family_names = [
@@ -28,7 +28,7 @@ def load_lang(lang_row):
     if isocode is None:
         print "No ISO Code found in database for %s, skipping language %s" % (code, language_name)
         add_missing_isocode(code)
-        return
+        return None
 
     # Language
     try:
@@ -73,3 +73,8 @@ def load_lang(lang_row):
                                                 class_subsubfamily=class_subsubfamily,
                                                 )
         classification.save()
+    return language
+
+def update_language_counts():
+    for language_class in LanguageClass.objects.all():
+        language_class.update_counts()

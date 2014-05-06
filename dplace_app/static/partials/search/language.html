@@ -1,3 +1,34 @@
 <div ng-controller="LanguageCtrl">
-    <h4>Search by Language Family / Phylogeny</h4>
+    <h4>Search by Language Family</h4>
+    <form class="form-inline" role="form">
+        <div class="panel panel-default" ng-repeat="languageFilter in language.languageFilters">
+            <div class="panel-heading">
+                <div class="row">
+                    <div ng-repeat="levelObject in language.levels"
+                         class="form-group col-xs-4">
+                        <select
+                                ng-model="languageFilter[levelObject.level - 1].selectedItem"
+                                class="form-control"
+                                style="width:100%"
+                                ng-change="selectionChanged(languageFilter,levelObject)"
+                                ng-options="item.name + ' (' + item.language_count + ')' for item in languageFilter[levelObject.level - 1].items"
+                                >
+                            <option value="">{{ levelObject.name }}</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-body scrollable">
+                <div ng-repeat="classification in languageFilter.classifications">
+                    <span class="language-label">{{ classification.language.name }}</span>
+                    <input class="pull-right" type="checkbox" ng-model="classification.isSelected">
+                </div>
+            </div>
+        </div>
+        <div>
+            <button class="btn btn-primary form-control"
+                    ng-disabled="searchButton.disabled"
+                    ng-click="doSearch()">{{ searchButton.text }}</button>
+        </div>
+    </form>
 </div>

@@ -63,13 +63,14 @@ class LanguageClassSerializer(serializers.ModelSerializer):
     class Meta:
         model = LanguageClass
 
-class LanguageClassificationSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = LanguageClassification
-
 class LanguageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Language
+
+class LanguageClassificationSerializer(serializers.ModelSerializer):
+    language = LanguageSerializer(source='language')
+    class Meta:
+        model = LanguageClassification
 
 # Societies
 class SocietySerializer(gis_serializers.GeoModelSerializer):
@@ -90,20 +91,20 @@ class SocietyResult(object):
         self.society = society
         self.variable_coded_values = set()
         self.environmental_values = set()
-        self.language_classifications = set()
+        self.languages = set()
     def add_variable_coded_value(self,variable_coded_value):
         self.variable_coded_values.add(variable_coded_value)
     def add_environmental_value(self,environmental_value):
         self.environmental_values.add(environmental_value)
-    def add_language_classification(self,language_classification):
-        self.language_classifications.add(language_classification)
+    def add_language(self,language):
+        self.languages.add(language)
     def includes_criteria(self,criteria=[]):
         result = True
         if SEARCH_VARIABLES in criteria and len(self.variable_coded_values) == 0:
             result = False
         if SEARCH_ENVIRONMENTAL in criteria and len(self.environmental_values) == 0:
             result = False
-        if SEARCH_LANGUAGE in criteria and len(self.language_classifications) == 0:
+        if SEARCH_LANGUAGE in criteria and len(self.languages) == 0:
             result = False
         return result
 
@@ -120,7 +121,7 @@ class SocietyResultSet(object):
         # These are the column headers in the search results
         self.variable_descriptions = set()
         self.environmental_variables = set()
-        self.language_classes = set()
+        self.languages = set()
 
     def _get_society_result(self,society):
         if society.id not in self._society_results.keys():
@@ -135,9 +136,9 @@ class SocietyResultSet(object):
         self.environmental_variables.add(environmental_variable)
         self._get_society_result(society).add_environmental_value(environmental_value)
 
-    def add_language(self,society,language_class,language_classification):
-        self.language_classes.add(language_class)
-        self._get_society_result(society).add_language_classification(language_classification)
+    def add_language(self,society,language):
+        self.languages.add(language)
+        self._get_society_result(society).add_language(language)
 
     def finalize(self,criteria):
         self.results = [x for x in self._society_results.values() if x.includes_criteria(criteria)]
@@ -150,7 +151,7 @@ class SocietyResultSerializer(serializers.Serializer):
     society = SocietySerializer()
     variable_coded_values = VariableCodedValueSerializer(many=True)
     environmental_values = EnvironmentalValueSerializer(many=True)
-    language_classifications = LanguageClassificationSerializer(many=True)
+    languages = LanguageSerializer(many=True)
 
 class SocietyResultSetSerializer(serializers.Serializer):
     '''
@@ -163,5 +164,5 @@ class SocietyResultSetSerializer(serializers.Serializer):
     variable_descriptions = VariableDescriptionSerializer(many=True)
     # environmental variables -> environmental values
     environmental_variables = EnvironmentalVariableSerializer(many=True)
-    # language classes -> language classifications
-    language_classes = LanguageClassSerializer(many=True)
+    # languages
+    languages = LanguageSerializer(many=True)

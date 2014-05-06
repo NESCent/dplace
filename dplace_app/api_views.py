@@ -67,20 +67,12 @@ class LanguageClassViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = LanguageClassSerializer
     filter_fields = ('level', 'parent', 'name',)
     model = LanguageClass
-    def get_queryset(self):
-        queryset = LanguageClass.objects.all()
-        level = self.request.QUERY_PARAMS.get('level', None)
-        if level is not None:
-            queryset = queryset.filter(level=level)
-        else:
-            queryset = queryset.filter(level=1)
-        return queryset
 
 # Need an API to get classifications / languages for a class
 
 class LanguageClassificationViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = LanguageClassificationSerializer
-    filter_fields = ('scheme', 'language', 'name', 'family', 'class_family', 'class_subfamily', 'class_subsubfamily',)
+    filter_fields = ('scheme', 'language', 'class_family', 'class_subfamily', 'class_subsubfamily',)
     queryset = LanguageClassification.objects.all()
 
 class LanguageViewSet(viewsets.ReadOnlyModelViewSet):
@@ -94,7 +86,7 @@ class LanguageViewSet(viewsets.ReadOnlyModelViewSet):
 def find_societies(request):
     """
     View to find the societies that match an input request.  Currently expects
-    { language_class_ids: [1,2,3...], variable_codes: [4,5,6...],
+    { language_filters: [{language_ids: [1,2,3]}], variable_codes: [4,5,6...],
     environmental_filters: [{id: 1, operator: 'gt', params: [0.0]}, {id:3, operator 'inrange', params: [10.0,20.0] }] }
 
     Returns serialized collection of SocietyResult objects
@@ -104,20 +96,16 @@ def find_societies(request):
     # AND them together
     criteria = []
 
-    if 'language_class_ids' in request.DATA:
+    if 'language_filters' in request.DATA:
         criteria.append(SEARCH_LANGUAGE)
-        language_class_ids = [int(x) for x in request.DATA['language_class_ids']]
-        # Loop over the language class IDs to get classes
-        language_classes = LanguageClass.objects.filter(pk__in=language_class_ids).select_related(
-            'languages1','languages2','languages3'
-        ).select_related(
-            'languages1__language__societies','languages2__language__societies','languages3__language__societies'
-        )
-        for language_class in language_classes:
-            for each in [language_class.languages1, language_class.languages2, language_class.languages3]:
-                for language_classification in each.all():
-                    for society in language_classification.language.societies.all():
-                        result_set.add_language(society, language_class, language_classification)
+        language_filters = request.DATA['language_filters']
+        for filter in language_filters:
+            language_ids = [int(x) for x in filter['language_ids']]
+            languages = Language.objects.filter(pk__in=language_ids) # Returns a queryset
+            languages.select_related('societies')
+            for language in languages:
+                for society in language.societies.all():
+                    result_set.add_language(society,language)
 
     if 'variable_codes' in request.DATA:
         criteria.append(SEARCH_VARIABLES)

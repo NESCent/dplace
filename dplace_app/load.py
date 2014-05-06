@@ -52,6 +52,8 @@ def run(file_name=None, mode=None):
         postprocess_binford_societies()
     elif mode == 'env_vars':
         create_environmental_variables()
+    elif mode == 'langs':
+        update_language_counts()
 
 if __name__ == '__main__':
     if len(sys.argv) != 3:
