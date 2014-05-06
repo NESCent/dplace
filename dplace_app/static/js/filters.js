@@ -14,10 +14,10 @@ angular.module('dplaceFilters', [])
             }).join(',');
         };
     })
-    .filter('formatLanguageClassifications', function () {
+    .filter('formatLanguage', function () {
         return function(values) {
-            return values.map( function(classification) {
-                return classification.name;
+            return values.map( function(language) {
+                return language.name;
             }).join(',');
         };
     });
