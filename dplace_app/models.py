@@ -267,6 +267,7 @@ class LanguageClassification(models.Model):
         index_together = [
             ['class_family', 'class_subfamily', 'class_subsubfamily']
         ]
+        ordering=("language__name",)
 
 class Language(models.Model):
     name = models.CharField(max_length=50, db_index=True)
