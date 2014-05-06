@@ -11,7 +11,7 @@
                                 class="form-control"
                                 style="width:100%"
                                 ng-change="selectionChanged(languageFilter,levelObject)"
-                                ng-options="item.name for item in languageFilter[levelObject.level - 1].items"
+                                ng-options="item.name + ' (' + item.language_count + ')' for item in languageFilter[levelObject.level - 1].items"
                                 >
                             <option value="">{{ levelObject.name }}</option>
                         </select>
