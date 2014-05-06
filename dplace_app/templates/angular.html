@@ -23,7 +23,10 @@
     <!-- Angular UI Bootstrap -->
     <script type="text/javascript" src="/static/js/lib/ui-bootstrap-tpls-0.10.0.min.js"></script>
     <!-- OpenLayers JS -->
-    <script src="/static/js/lib/OpenLayers.js"></script>
+    <script src="/static/js/lib/OpenLayers.js">
+        OpenLayers.ImgPath = "/static/img/openlayers/";
+    </script>
+    <link href="/static/css/lib/openlayers/style.css" media="screen" rel="stylesheet">
 
 {% endblock %}
 {% load bootstrap3 %}
