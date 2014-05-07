@@ -1,5 +1,5 @@
 function CulturalCtrl($scope, Variable, VariableCategory, CodeDescription, FindSocieties) {
-    $scope.traits = [{
+    $scope.model.searchParams.traits = [{
         categories: VariableCategory.query(),
         variables: [],
         selectedCategory: null,
@@ -19,7 +19,7 @@ function CulturalCtrl($scope, Variable, VariableCategory, CodeDescription, FindS
     };
 
     $scope.getSelectedTraitCodes = function() {
-        var allCodes = Array.prototype.concat.apply([], $scope.traits.map( function(trait) { return trait.codes; }));
+        var allCodes = Array.prototype.concat.apply([], $scope.model.searchParams.traits.map( function(trait) { return trait.codes; }));
         var selectedCodes = allCodes.filter( function(c) { return c.isSelected; }).map( function(c) { return c.id; })
         console.log(selectedCodes);
         return selectedCodes;
