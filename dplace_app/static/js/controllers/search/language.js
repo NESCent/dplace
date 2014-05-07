@@ -20,7 +20,7 @@ function LanguageCtrl($scope, LanguageClass, LanguageClassification, FindSocieti
     languageFilter[0].items = LanguageClass.query({level: familyLevel});
 
     /* Iniitial setup */
-    $scope.language = {
+    $scope.model.searchParams.language = {
         levels: levels,
         languageFilters: [languageFilter]
     };
@@ -92,7 +92,7 @@ function LanguageCtrl($scope, LanguageClass, LanguageClassification, FindSocieti
 
     $scope.getLanguageQueryFilters = function() {
         var languageQueryFilters = [];
-        $scope.language.languageFilters.forEach(function(languageFilter) {
+        $scope.model.searchParams.language.languageFilters.forEach(function(languageFilter) {
             var selectedClassifications = getSelectedLanguageClassifications(languageFilter);
             var languageIds = selectedClassifications.map(function (classification) { return classification.language.id; });
             languageQueryFilters.push({language_ids: languageIds});

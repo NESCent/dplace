@@ -5,7 +5,7 @@
             <div class="btn-group">
                 <button ng-repeat="button in buttons"
                         type="button" class="btn btn-lg btn-default btn-dplace-search"
-                        ng-model="selectedButton"
+                        ng-model="model.searchParams.selectedButton"
                         ng-click="buttonChanged(button)"
                         btn-radio="button"
                         >{{ button.name }}</button>
@@ -15,8 +15,8 @@
 </div>
 <div class="container">
     <div class="row basic-search-forms">
-        <div ng-if="selectedButton.value">
-            <ng-include src="'/static/partials/search/' +  selectedButton.value + '.html'"></ng-include>
+        <div ng-if="model.searchParams.selectedButton.value">
+            <ng-include src="'/static/partials/search/' +  model.searchParams.selectedButton.value + '.html'"></ng-include>
         </div>
     </div>
 </div>

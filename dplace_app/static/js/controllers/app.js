@@ -1,5 +1,5 @@
 function AppCtrl($scope, $location) {
-    $scope.model = {'searchResults': {}};
+    $scope.model = {'searchResults': {}, 'searchParams': {}};
     $scope.searchButton = {'disabled': false, 'text': 'Search'};
     // Root controller for app
     $scope.setActive = function(tabName) {

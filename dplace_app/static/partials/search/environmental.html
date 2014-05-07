@@ -6,64 +6,66 @@
                 <div class="row">
                     <div class="form-group col-xs-4">
                         <select
-                                ng-model="environmental.selectedVariable"
+                                ng-model="model.searchParams.environmental.selectedVariable"
                                 class="form-control"
                                 ng-change="environmentalChanged()"
-                                ng-options="environmental.name for environmental in environmentalVariables"
+                                ng-options="environmental.name for environmental in model.searchParams.environmentalVariables"
                                 >
                             <option value="">Select an environmental variable</option>
                         </select>
                     </div>
-                    <div ng-show="environmental.selectedVariable">
+                    <div ng-show="model.searchParams.environmental.selectedVariable">
                         <div class="form-group col-xs-2">
                             <div class="dropdown">
-                                <button class="btn btn-default dropdown-toggle form-control">{{ environmental.selectedFilter.name }} <span class="caret"></span></button>
+                                <button class="btn btn-default dropdown-toggle form-control">{{ model.searchParams.environmental.selectedFilter.name }} <span class="caret"></span></button>
                                 <ul class="dropdown-menu">
-                                    <li ng-repeat="environmentalFilter in environmentalFilters"><a ng-click="environmental.selectedFilter = environmentalFilter">{{ environmentalFilter.name }}</a></li>
+                                    <li ng-repeat="environmentalFilter in model.searchParams.environmentalFilters">
+                                        <a ng-click="model.searchParams.environmental.selectedFilter = environmentalFilter">{{ environmentalFilter.name }}</a>
+                                    </li>
                                 </ul>
                             </div>
                         </div>
-                        <div class="fields-inrange" ng-show="environmental.selectedFilter.operator == 'inrange'">
+                        <div class="fields-inrange" ng-show="model.searchParams.environmental.selectedFilter.operator == 'inrange'">
                             <div class="form-group col-xs-3">
                                 <div class="input-group">
-                                    <input class="form-control input-xs" ng-model="environmental.vals[0]" />
-                                    <span class="input-group-addon">{{ environmental.selectedVariable.units }}</span>
+                                    <input class="form-control input-xs" ng-model="model.searchParams.environmental.vals[0]" />
+                                    <span class="input-group-addon">{{ model.searchParams.environmental.selectedVariable.units }}</span>
                                 </div>
                             </div>
                             <div class="form-group col-xs-3">
                                 <div class="input-group">
-                                    <input class="form-control" ng-model="environmental.vals[1]" />
-                                    <span class="input-group-addon">{{ environmental.selectedVariable.units }}</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="fields-inrange" ng-show="environmental.selectedFilter.operator == 'outrange'">
-                            <div class="form-group col-xs-3">
-                                <div class="input-group">
-                                    <input class="form-control input-xs" ng-model="environmental.vals[0]" />
-                                    <span class="input-group-addon">{{ environmental.selectedVariable.units }}</span>
-                                </div>
-                            </div>
-                            <div class="form-group col-xs-3">
-                                <div class="input-group">
-                                    <input class="form-control" ng-model="environmental.vals[1]" />
-                                    <span class="input-group-addon">{{ environmental.selectedVariable.units }}</span>
+                                    <input class="form-control" ng-model="model.searchParams.environmental.vals[1]" />
+                                    <span class="input-group-addon">{{ model.searchParams.environmental.selectedVariable.units }}</span>
                                 </div>
                             </div>
                         </div>
-                        <div class="fields-inrange" ng-show="environmental.selectedFilter.operator == 'lt'">
+                        <div class="fields-inrange" ng-show="model.searchParams.environmental.selectedFilter.operator == 'outrange'">
+                            <div class="form-group col-xs-3">
+                                <div class="input-group">
+                                    <input class="form-control input-xs" ng-model="model.searchParams.environmental.vals[0]" />
+                                    <span class="input-group-addon">{{ model.searchParams.environmental.selectedVariable.units }}</span>
+                                </div>
+                            </div>
+                            <div class="form-group col-xs-3">
+                                <div class="input-group">
+                                    <input class="form-control" ng-model="model.searchParams.environmental.vals[1]" />
+                                    <span class="input-group-addon">{{ model.searchParams.environmental.selectedVariable.units }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="fields-inrange" ng-show="model.searchParams.environmental.selectedFilter.operator == 'lt'">
                             <div class="form-group col-xs-6">
                                 <div class="input-group">
-                                    <input class="form-control input-xs" ng-model="environmental.vals[0]" />
-                                    <span class="input-group-addon">{{ environmental.selectedVariable.units }}</span>
+                                    <input class="form-control input-xs" ng-model="model.searchParams.environmental.vals[0]" />
+                                    <span class="input-group-addon">{{ model.searchParams.environmental.selectedVariable.units }}</span>
                                 </div>
                             </div>
                         </div>
-                        <div class="fields-inrange" ng-show="environmental.selectedFilter.operator == 'gt'">
+                        <div class="fields-inrange" ng-show="model.searchParams.environmental.selectedFilter.operator == 'gt'">
                             <div class="form-group col-xs-6">
                                 <div class="input-group">
-                                    <input class="form-control" ng-model="environmental.vals[0]" />
-                                    <span class="input-group-addon">{{ environmental.selectedVariable.units }}</span>
+                                    <input class="form-control" ng-model="model.searchParams.environmental.vals[0]" />
+                                    <span class="input-group-addon">{{ model.searchParams.environmental.selectedVariable.units }}</span>
                                 </div>
                             </div>
                         </div>
