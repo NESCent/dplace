@@ -285,3 +285,5 @@ class GeographicRegion(models.Model):
     tdwg_code = models.IntegerField()
     geom = models.MultiPolygonField(srid=4326)
     objects = models.GeoManager()
+    def __unicode__(self):
+        return "Region: %s, Continent %s" % (self.region_nam, self.continent)
