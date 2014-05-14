@@ -277,3 +277,11 @@ class Language(models.Model):
     class Meta:
         verbose_name = "Language"
 
+class GeographicRegion(models.Model):
+    level_2_re = models.FloatField()
+    count = models.FloatField()
+    region_nam = models.CharField(max_length=254)
+    continent = models.CharField(max_length=254)
+    tdwg_code = models.IntegerField()
+    geom = models.MultiPolygonField(srid=4326)
+    objects = models.GeoManager()
