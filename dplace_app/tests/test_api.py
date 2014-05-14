@@ -1,7 +1,7 @@
 __author__ = 'dan'
 
 from dplace_app.models import *
-from django.contrib.gis.geos import Polygon, Point
+from django.contrib.gis.geos import Polygon, Point, MultiPolygon
 from rest_framework import status
 from rest_framework.test import APIRequestFactory, APITestCase
 from django.core.urlresolvers import reverse
@@ -21,6 +21,24 @@ class ISOCodeAPITestCase(APITestCase):
         response_dict = response.data
         self.assertEqual(response_dict['count'],1)
         self.assertEqual(response_dict['results'][0]['iso_code'],self.code.iso_code)
+
+class GeographicRegionAPITestCase(APITestCase):
+    def setUp(self):
+        poly = MultiPolygon(Polygon( ((4.0, 4.0), (6.0, 4.0), (6.0, 6.0), (4.0, 6.0), (4.0,4.0))))
+        self.geographic_region = GeographicRegion.objects.create(
+            level_2_re=0,
+            count=1,
+            region_nam='Region1',
+            continent='Continent1',
+            tdwg_code=0,
+            geom=poly)
+    def test_geo_api(self):
+        url = reverse('geographicregion-list')
+        response = self.client.get(url,format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        response_dict = response.data
+        self.assertEqual(response_dict['count'],1)
+        self.assertEqual(response_dict['results'][0]['region_nam'],self.geographic_region.region_nam)
 
 class FindSocietiesTestCase(APITestCase):
     '''

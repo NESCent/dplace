@@ -146,3 +146,7 @@ def find_societies(request):
     result_set.finalize(criteria)
     return Response(SocietyResultSetSerializer(result_set).data)
 
+class GeographicRegionViewSet(viewsets.ReadOnlyModelViewSet):
+    serializer_class = GeographicRegionSerializer
+    filter_fields = ('region_nam','continent',)
+    model = GeographicRegion
