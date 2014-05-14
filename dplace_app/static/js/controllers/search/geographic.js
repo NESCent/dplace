@@ -1,4 +1,3 @@
-function GeographicCtrl($scope) {
-    //TODO: Replace with actual web service data
-    $scope.model.searchParams.regions = ['America','Albania','Zimbabwe','North America'];
+function GeographicCtrl($scope, GeographicRegion) {
+    $scope.model.searchParams.regions = GeographicRegion.query();
 }
