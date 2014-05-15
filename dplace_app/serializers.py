@@ -83,7 +83,7 @@ class SocietySerializer(gis_serializers.GeoModelSerializer):
 class GeographicRegionSerializer(gis_serializers.GeoModelSerializer):
     class Meta:
         model = GeographicRegion
-        fields = ('level_2_re','count','region_nam','continent','tdwg_code')
+        fields = ('id','level_2_re','count','region_nam','continent','tdwg_code')
 
 SEARCH_LANGUAGE = 'l'
 SEARCH_ENVIRONMENTAL = 'e'

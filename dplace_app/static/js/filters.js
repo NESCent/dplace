@@ -20,4 +20,11 @@ angular.module('dplaceFilters', [])
                 return language.name;
             }).join(',');
         };
+    })
+    .filter('formatGeographicRegion', function () {
+        return function(values) {
+            return values.map( function(region) {
+                return region.region_nam;
+            }).join(',');
+        };
     });
