@@ -18,6 +18,7 @@
                         <th ng-repeat="variable in model.searchResults.variable_descriptions">{{ variable.name }}</th>
                         <th ng-repeat="environmental in model.searchResults.environmental_variables">{{ environmental.name }}</th>
                         <th ng-show="model.searchResults.languages">Language</th>
+                        <th ng-show="model.searchResults.geographic_regions">Geographic Region</th>
                     </tr>
                     <tr ng-repeat="society_result in model.searchResults.results">
                         <td><a ng-href="/society/{{ society_result.society.id }}" target="_blank">{{ society_result.society.name }}</a></td>
@@ -31,6 +32,9 @@
                         </td>
                         <td ng-show="model.searchResults.languages">
                             {{ society_result.languages | formatLanguage}}
+                        </td>
+                        <td ng-show="model.searchResults.geographic_regions">
+                            {{ society_result.geographic_regions | formatGeographicRegion}}
                         </td>
                     </tr>
                 </table>

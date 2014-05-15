@@ -5,8 +5,8 @@ from django_filters import CharFilter
 from models import GeographicRegion
 
 class GeographicRegionFilter(GeoFilterSet):
-    region_nam = CharFilter(name='region_nam', lookup_type='istartswith')
-    continent = CharFilter(name='continent', lookup_type='istartswith')
+    region_nam = CharFilter(name='region_nam', lookup_type='icontains')
+    continent = CharFilter(name='continent', lookup_type='icontains')
     contains_geom = GeometryFilter(name='geom', lookup_type='contains')
 
     class Meta:

@@ -109,6 +109,30 @@ class FindSocietiesTestCase(APITestCase):
         self.environmental_value2 = EnvironmentalValue.objects.create(variable=self.environmental_variable1,
                                                                       value=2.0,
                                                                       environmental=self.environmental2)
+        # Geographic regions that contain societies
+        poly2  = MultiPolygon(
+            Polygon( ((1.5, 1.5), (1.5, 2.5), (2.5, 2.5), (2.5, 1.5), (1.5, 1.5)) ),
+        )
+        self.geographic_region2 = GeographicRegion.objects.create(
+            level_2_re=2,
+            count=1,
+            region_nam='Region2',
+            continent='Continent2',
+            tdwg_code=2,
+            geom=poly2
+        )
+        poly13 = MultiPolygon(
+            Polygon( ((0.5, 0.5), (0.5, 1.5), (1.5, 1.5), (1.5, 0.5), (0.5, 0.5)) ),
+            Polygon( ((2.5, 2.5), (2.5, 3.5), (3.5, 3.5), (3.5, 2.5), (2.5, 2.5)) ),
+        )
+        self.geographic_region13 = GeographicRegion.objects.create(
+            level_2_re=3,
+            count=2,
+            region_nam='Region13',
+            continent='Continent13',
+            tdwg_code=3,
+            geom=poly13
+        )
 
         self.url = reverse('find_societies')
     def assertSocietyInResponse(self,society,response):
@@ -179,4 +203,22 @@ class FindSocietiesTestCase(APITestCase):
                                            'operator': 'outrange', 'params': ['0.0','3.0']}]}
         response = self.client.post(self.url,data,format='json')
         self.assertSocietyNotInResponse(self.society1,response)
+        self.assertSocietyNotInResponse(self.society2,response)
+    def test_find_by_geographic_region(self):
+        '''
+        This uses a region that contains a single polygon around society 2
+        '''
+        data = {'geographic_regions': [str(self.geographic_region2.pk)]}
+        response = self.client.post(self.url,data,format='json')
+        self.assertSocietyInResponse(self.society2,response)
+        self.assertSocietyNotInResponse(self.society1,response)
+        self.assertSocietyNotInResponse(self.society3,response)
+    def test_find_by_geographic_region_mpoly(self):
+        '''
+        This uses a region that contains two polygons that should overlap societies 1 and 3
+        '''
+        data = {'geographic_regions': [str(self.geographic_region13.pk)]}
+        response = self.client.post(self.url,data,format='json')
+        self.assertSocietyInResponse(self.society1,response)
+        self.assertSocietyInResponse(self.society3,response)
         self.assertSocietyNotInResponse(self.society2,response)

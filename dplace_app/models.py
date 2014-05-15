@@ -30,6 +30,7 @@ class Society(models.Model):
     source = models.CharField(max_length=16,choices=SOCIETY_SOURCES)
     iso_code = models.ForeignKey('ISOCode', null=True, related_name="societies")
     language = models.ForeignKey('Language', null=True, related_name="societies")
+    objects = models.GeoManager()
 
     def get_cultural_trait_data(self):
         """Returns the Ethnographic Atlas data for the given society"""

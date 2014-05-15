@@ -142,7 +142,13 @@ def find_societies(request):
             # get the societies from the values
             for value in values:
                 result_set.add_environmental(value.society(), value.variable, value)
-
+    if 'geographic_regions' in request.DATA:
+        criteria.append(SEARCH_GEOGRAPHIC)
+        geographic_region_ids = [int(x) for x in request.DATA['geographic_regions']]
+        regions = GeographicRegion.objects.filter(pk__in=geographic_region_ids) # returns a queryset
+        for region in regions:
+            for society in Society.objects.filter(location__intersects=region.geom):
+                result_set.add_geographic_region(society, region)
     # Filter the results to those that matched all criteria
     result_set.finalize(criteria)
     return Response(SocietyResultSetSerializer(result_set).data)

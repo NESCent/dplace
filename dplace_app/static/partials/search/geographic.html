@@ -5,7 +5,7 @@
             <div class="panel-heading">
                     <input type="text"
                        ng-model="model.searchParams.geographic_region"
-                       typeahead="region.region_nam for region in getRegions($viewValue)"
+                       typeahead="region as region.region_nam for region in getRegions($viewValue)"
                        class="form-control"
                        style="width:100%"
                        placeholder="Enter a geographic region">
@@ -16,8 +16,8 @@
         </div>
         <div>
             <button class="btn btn-primary form-control"
-                    ng-disabled="true"
-                    ng-click="doSearch()">{{ searchButton.text }} (not yet functional)</button>
+                    ng-disabled="searchButton.disabled"
+                    ng-click="doSearch()">{{ searchButton.text }}</button>
         </div>
     </form>
 </div>
