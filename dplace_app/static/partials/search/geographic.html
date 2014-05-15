@@ -5,7 +5,7 @@
             <div class="panel-heading">
                     <input type="text"
                        ng-model="model.searchParams.geographic_region"
-                       typeahead="region.region_nam for region in model.searchParams.regions | filter:$viewValue | limitTo: 8"
+                       typeahead="region.region_nam for region in getRegions($viewValue)"
                        class="form-control"
                        style="width:100%"
                        placeholder="Enter a geographic region">
