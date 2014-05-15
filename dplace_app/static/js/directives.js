@@ -1,6 +1,7 @@
 angular.module('dplaceMapDirective', [])
     .directive('dplaceMap', function() {
         function link(scope, element, attrs) {
+            /* Temporarily Broken as OpenLayers is removed */
             element.append("<div id='mapdiv' style='width:1140px; height:480px;'></div>");
             var map = new OpenLayers.Map('mapdiv');
             var wms = new OpenLayers.Layer.WMS( "OpenLayers WMS",
