@@ -90,4 +90,17 @@ angular.module('dplaceServices', ['ngResource'])
                 }
             }
         )
+    })
+    .factory('GeographicRegion', function ($resource) {
+        return $resource(
+            '/api/v1/geographic_regions/:id',
+            {page_size: 1000}, {
+                query: {
+                    method: 'GET',
+                    isArray: true,
+                    transformResponse: function(data, headers) {
+                        return JSON.parse(data).results;
+                    }
+                }
+            });
     });

@@ -4,6 +4,7 @@ from serializers import *
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import *
 from rest_framework.views import Request, Response
+from filters import *
 
 # Resource routes
 class VariableDescriptionViewSet(viewsets.ReadOnlyModelViewSet):
@@ -146,3 +147,7 @@ def find_societies(request):
     result_set.finalize(criteria)
     return Response(SocietyResultSetSerializer(result_set).data)
 
+class GeographicRegionViewSet(viewsets.ReadOnlyModelViewSet):
+    serializer_class = GeographicRegionSerializer
+    model = GeographicRegion
+    filter_class = GeographicRegionFilter

@@ -166,3 +166,9 @@ class SocietyResultSetSerializer(serializers.Serializer):
     environmental_variables = EnvironmentalVariableSerializer(many=True)
     # languages
     languages = LanguageSerializer(many=True)
+
+# Geographic Regions
+class GeographicRegionSerializer(gis_serializers.GeoModelSerializer):
+    class Meta:
+        model = GeographicRegion
+        fields = ('level_2_re','count','region_nam','continent','tdwg_code')

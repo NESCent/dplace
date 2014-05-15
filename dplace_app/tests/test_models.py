@@ -1,7 +1,7 @@
 __author__ = 'dan'
 
 from dplace_app.models import *
-from django.contrib.gis.geos import Polygon, Point
+from django.contrib.gis.geos import Polygon, Point, MultiPolygon
 from django.test import TestCase
 
 class ISOCodeTestCase(TestCase):
@@ -15,6 +15,23 @@ class ISOCodeTestCase(TestCase):
         poly = Polygon( ((4.0, 4.0), (6.0, 4.0), (6.0, 6.0), (4.0, 6.0), (4.0,4.0)))
         self.assertIn(ISOCode.objects.get(iso_code='abc'), ISOCode.objects.filter(location__intersects=poly), "ISO Code should be in region")
         self.assertNotIn(ISOCode.objects.get(iso_code='def'), ISOCode.objects.filter(location__intersects=poly), "ISO Code should not be in region")
+
+class GeographicRegionTestCase(TestCase):
+    def setUp(self):
+        poly = MultiPolygon(Polygon( ((4.0, 4.0), (6.0, 4.0), (6.0, 6.0), (4.0, 6.0), (4.0,4.0))))
+        self.geographic_region = GeographicRegion.objects.create(
+            level_2_re=0,
+            count=1,
+            region_nam='Region1',
+            continent='Continent1',
+            tdwg_code=0,
+            geom=poly)
+        self.point_in = Point(5.0,5.0)
+        self.point_out = Point(10.0,10.0)
+    def test_point_in_region(self):
+        self.assertIn(self.geographic_region, GeographicRegion.objects.filter(geom__intersects=self.point_in), "Point should be in geo region")
+    def test_point_not_in_region(self):
+        self.assertNotIn(self.geographic_region, GeographicRegion.objects.filter(geom__intersects=self.point_out), "Point should not be in geo region")
 
 class EATestCase(TestCase):
     '''

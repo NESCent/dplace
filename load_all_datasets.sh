@@ -61,3 +61,6 @@ python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/binford_variable_co
 
 echo "Loading Binford Variable Values"
 python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/binford_vals.csv" bf_vals
+
+echo "Loading Geographic regions from shapefile"
+python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/geo/level2-shape/level2.shp" geo
