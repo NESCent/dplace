@@ -2,7 +2,27 @@ angular.module('dplaceMapDirective', [])
     .directive('dplaceMap', function() {
         function link(scope, element, attrs) {
             element.append("<div id='mapdiv' style='width:1140px; height:480px;'></div>");
-            scope.map = $('#mapdiv').vectorMap({map: 'world_mill_en'}).vectorMap('get','mapObject');
+            scope.map = $('#mapdiv').vectorMap({
+                map: 'world_mill_en',
+                backgroundColor: 'white',
+                regionStyle: {
+                  initial: {
+                    fill: '#428bca',
+                    "fill-opacity": 1,
+                    stroke: '#357ebd',
+                    "stroke-width": 0,
+                    "stroke-opacity": 1
+                  },
+                  hover: {
+                    "fill-opacity": 0.8
+                  },
+                  selected: {
+                    fill: 'yellow'
+                  },
+                  selectedHover: {
+                  }
+                }
+            }).vectorMap('get','mapObject');
             scope.addMarkers = function() {
                 scope.map.removeAllMarkers();
                 if(!scope.societies) {
