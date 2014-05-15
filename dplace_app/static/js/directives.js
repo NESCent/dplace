@@ -21,8 +21,13 @@ angular.module('dplaceMapDirective', [])
                   },
                   selectedHover: {
                   }
+                },
+                onRegionOver: function(e, code) {
+                    scope.region = code;
+                    scope.$apply();
                 }
             }).vectorMap('get','mapObject');
+
             scope.addMarkers = function() {
                 scope.map.removeAllMarkers();
                 if(!scope.societies) {
@@ -49,7 +54,8 @@ angular.module('dplaceMapDirective', [])
         return {
             restrict: 'E',
             scope: {
-                societies: '='
+                societies: '=',
+                region: '='
             },
             link: link
         };
