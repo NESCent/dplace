@@ -79,9 +79,16 @@ class SocietySerializer(gis_serializers.GeoModelSerializer):
         model = Society
         fields = ('id', 'ext_id', 'name', 'location', 'iso_code', 'source')
 
+# Geographic Regions
+class GeographicRegionSerializer(gis_serializers.GeoModelSerializer):
+    class Meta:
+        model = GeographicRegion
+        fields = ('level_2_re','count','region_nam','continent','tdwg_code')
+
 SEARCH_LANGUAGE = 'l'
 SEARCH_ENVIRONMENTAL = 'e'
 SEARCH_VARIABLES = 'v'
+SEARCH_GEOGRAPHIC = 'g'
 
 class SocietyResult(object):
     '''
@@ -92,12 +99,15 @@ class SocietyResult(object):
         self.variable_coded_values = set()
         self.environmental_values = set()
         self.languages = set()
+        self.geographic_regions = set()
     def add_variable_coded_value(self,variable_coded_value):
         self.variable_coded_values.add(variable_coded_value)
     def add_environmental_value(self,environmental_value):
         self.environmental_values.add(environmental_value)
     def add_language(self,language):
         self.languages.add(language)
+    def add_geographic_region(self,geographic_region):
+        self.geographic_regions.add(geographic_region)
     def includes_criteria(self,criteria=[]):
         result = True
         if SEARCH_VARIABLES in criteria and len(self.variable_coded_values) == 0:
@@ -105,6 +115,8 @@ class SocietyResult(object):
         if SEARCH_ENVIRONMENTAL in criteria and len(self.environmental_values) == 0:
             result = False
         if SEARCH_LANGUAGE in criteria and len(self.languages) == 0:
+            result = False
+        if SEARCH_GEOGRAPHIC in criteria and len(self.geographic_regions) == 0:
             result = False
         return result
 
@@ -122,6 +134,7 @@ class SocietyResultSet(object):
         self.variable_descriptions = set()
         self.environmental_variables = set()
         self.languages = set()
+        self.geographic_regions = set()
 
     def _get_society_result(self,society):
         if society.id not in self._society_results.keys():
@@ -140,6 +153,10 @@ class SocietyResultSet(object):
         self.languages.add(language)
         self._get_society_result(society).add_language(language)
 
+    def add_geographic_region(self,society,geographic_region):
+        self.geographic_regions.add(geographic_region)
+        self._get_society_result(society).add_geographic_region(geographic_region)
+
     def finalize(self,criteria):
         self.results = [x for x in self._society_results.values() if x.includes_criteria(criteria)]
 
@@ -152,6 +169,7 @@ class SocietyResultSerializer(serializers.Serializer):
     variable_coded_values = VariableCodedValueSerializer(many=True)
     environmental_values = EnvironmentalValueSerializer(many=True)
     languages = LanguageSerializer(many=True)
+    geographic_regions = GeographicRegionSerializer(many=True)
 
 class SocietyResultSetSerializer(serializers.Serializer):
     '''
@@ -164,11 +182,7 @@ class SocietyResultSetSerializer(serializers.Serializer):
     variable_descriptions = VariableDescriptionSerializer(many=True)
     # environmental variables -> environmental values
     environmental_variables = EnvironmentalVariableSerializer(many=True)
-    # languages
+    # languages - Does not map to a more specific value
     languages = LanguageSerializer(many=True)
-
-# Geographic Regions
-class GeographicRegionSerializer(gis_serializers.GeoModelSerializer):
-    class Meta:
-        model = GeographicRegion
-        fields = ('level_2_re','count','region_nam','continent','tdwg_code')
+    # Geographic Regions - does not map to a more specific value
+    geographic_regions = GeographicRegionSerializer(many=True)
