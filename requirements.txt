@@ -1,11 +1,11 @@
-Django==1.6
+Django==1.6.5
 django-appconf==0.6
-django-bootstrap3==3.2.1
+django-bootstrap3==4.4.1
 django-filter==0.7
-djangorestframework==2.3.8
+djangorestframework==2.3.13
 djangorestframework-gis==0.2
 numpy==1.7.1
-psycopg2==2.5.1
-six==1.4.1
+psycopg2==2.5.2
+six==1.6.1
 wsgiref==0.1.2
 South==0.8.4
