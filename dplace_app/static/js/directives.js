@@ -1,7 +1,7 @@
 angular.module('dplaceMapDirective', [])
     .directive('dplaceMap', function() {
         function link(scope, element, attrs) {
-            element.append("<div id='mapdiv' style='width:1140px; height:480px;'></div>");
+            element.append("<div id='mapdiv' style='width:1140px; height:30rem;'></div>");
             scope.map = $('#mapdiv').vectorMap({
                 map: 'world_mill_en',
                 backgroundColor: 'white',
@@ -17,15 +17,26 @@ angular.module('dplaceMapDirective', [])
                     "fill-opacity": 0.8
                   },
                   selected: {
-                    fill: 'yellow'
+                    fill: '#113'
                   },
                   selectedHover: {
                   }
                 },
                 onRegionOver: function(e, code) {
-                    scope.region = code;
-                    scope.$apply();
-                }
+                    if(attrs.region) {
+                        scope.$apply(function () {
+                            scope.region = code;
+                        });
+                    }
+                },
+                onRegionSelected: function(e, code, isSelected, selectedRegions) {
+                    if(attrs.selectedRegionIds) {
+                        scope.$apply(function() {
+                            scope.selectedRegionIds = selectedRegions;
+                        });
+                    }
+                },
+                regionsSelectable: true
             }).vectorMap('get','mapObject');
 
             scope.addMarkers = function() {
@@ -55,7 +66,8 @@ angular.module('dplaceMapDirective', [])
             restrict: 'E',
             scope: {
                 societies: '=',
-                region: '='
+                region: '=',
+                selectedRegionIds: '='
             },
             link: link
         };
