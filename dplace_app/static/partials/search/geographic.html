@@ -3,17 +3,26 @@
     <form class="form form-inline" role="form">
         <div class="panel panel-default">
             <div class="panel-heading">
-                    <input type="text"
-                       ng-model="model.searchParams.geographic_region"
-                       typeahead="region as region.region_nam for region in getRegions($viewValue)"
-                       class="form-control"
-                       style="width:100%"
-                       placeholder="Enter a geographic region">
+                <div class="row">
+                    <div class="form-group col-xs-10">
+                        <input type="text"
+                           ng-model="model.searchParams.geographic_region"
+                           typeahead="region as region.region_nam for region in getRegions($viewValue)"
+                           class="form-control"
+                           style="width:100%"
+                           placeholder="Enter a geographic region">
+                    </div>
+                    <div class="form-group col-xs-2">
+                        <button ng-click="updateMap()"
+                                class="btn btn-primary form-control">Update Map</button>
+                    </div>
+                </div>
             </div>
             <div class="panel-body scrollable">
-                <dplace-map selected-region-ids="model.searchParam.regionIds"></dplace-map>
+                <dplace-map selected-region-ids="model.searchParams.regionIds"></dplace-map>
             </div>
         </div>
+        <div>{{ model.searchParams.regionIds | json }}</div>
         <div>
             <button class="btn btn-primary form-control"
                     ng-disabled="searchButton.disabled"
