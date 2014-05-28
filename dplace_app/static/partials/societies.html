@@ -4,7 +4,6 @@
             <p class="pull-left lead">Societies <span ng-show="model.searchResults.results.length">({{ model.searchResults.results.length }})</span></p>
         </span>
     </div>
-    <div class="row"><span>Current region: {{ model.currentRegion }}</span></div>
     <tabset>
         <tab heading="Table">
             <div class="row">
@@ -42,7 +41,7 @@
             </div>
         </tab>
         <tab heading="Map" select="resizeMap()">
-            <dplace-map societies="model.searchResults.results" region="model.currentRegion"></dplace-map>
+            <dplace-map societies="model.searchResults.results"></dplace-map>
         </tab>
     </tabset>
 </div>
