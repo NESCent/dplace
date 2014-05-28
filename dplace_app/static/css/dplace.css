@@ -63,3 +63,8 @@ label.light {
 .basic-search-forms {
     margin-top: 2rem;
 }
+
+.jvectormap-zoomin, .jvectormap-zoomout {
+    width: 16px;
+    height: 16px;
+}
