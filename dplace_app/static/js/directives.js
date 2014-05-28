@@ -2,10 +2,7 @@ angular.module('dplaceMapDirective', [])
     .directive('dplaceMap', function() {
         function link(scope, element, attrs) {
             element.append("<div id='mapdiv' style='width:1140px; height:30rem;'></div>");
-            scope.localRegionIds = [];
-            scope.checkDirty = function () {
-                return !(angular.equals(scope.localRegionIds, scope.selectedRegionIds));
-            }
+            scope.updatesEnabled = true;
             scope.map = $('#mapdiv').vectorMap({
                 map: 'world_mill_en',
                 backgroundColor: 'white',
@@ -34,11 +31,9 @@ angular.module('dplaceMapDirective', [])
                     }
                 },
                 onRegionSelected: function(e, code, isSelected, selectedRegionIds) {
-                    scope.localRegionIds = angular.copy(selectedRegionIds);
-                    var dirty = scope.checkDirty();
-                    if(attrs.selectedRegionIds && dirty) {
+                    if(attrs.selectedRegionIds && scope.updatesEnabled) {
                         scope.$apply(function() {
-                            scope.selectedRegionIds = angular.copy(scope.localRegionIds);
+                            scope.selectedRegionIds = angular.copy(selectedRegionIds);
                         });
                     }
                 },
@@ -64,13 +59,10 @@ angular.module('dplaceMapDirective', [])
             });
 
             scope.$watchCollection('selectedRegionIds', function(oldvalue, newvalue) {
-                var dirty = scope.checkDirty();
-                if(dirty) {
-                    // update the local variable first
-                    scope.localRegionIds = angular.copy(scope.selectedRegionIds);
-                    // Then update the UI
-                    scope.map.setSelectedRegions(scope.localRegionIds);
-                }
+                // Then update the UI
+                scope.updatesEnabled = false;
+                scope.map.setSelectedRegions(angular.copy(newvalue));
+                scope.updatesEnabled = true;
             });
             scope.$on('mapTabActivated', function(event, args) {
                 scope.map.setSize();
