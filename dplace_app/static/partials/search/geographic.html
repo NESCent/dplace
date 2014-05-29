@@ -3,17 +3,16 @@
     <form class="form form-inline" role="form">
         <div class="panel panel-default">
             <div class="panel-heading">
-                <span ng-hide="model.searchParams.selectedRegions.length">Select Geographic regions by clicking the map</span>
-                <span ng-repeat="region in model.searchParams.selectedRegions">
-                    <span class="region">{{ region.name }}</span>
-                    <span class="glyphicon glyphicon-remove" ng-click="removeRegion(region)"></span></span>
+                <span ng-hide="model.searchParams.selectedRegions.length" class="search-help">Select Geographic regions by clicking the map</span>
+                <span class="region" ng-repeat="region in model.searchParams.selectedRegions">
+                    <span>{{ region.name }}</span>
+                    <span class="glyphicon glyphicon-remove region-remove" ng-click="removeRegion(region)"></span></span>
                 </span>
             </div>
             <div class="panel-body scrollable">
                 <dplace-map selected-regions="model.searchParams.selectedRegions"></dplace-map>
             </div>
         </div>
-        <div>{{ model.searchParams.selectedRegions | json }}</div>
         <div>
             <button class="btn btn-primary form-control"
                     ng-disabled="searchButton.disabled"
