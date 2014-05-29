@@ -2,6 +2,10 @@ angular.module('dplaceMapDirective', [])
     .directive('dplaceMap', function() {
         function link(scope, element, attrs) {
             element.append("<div id='mapdiv' style='width:1140px; height:30rem;'></div>");
+            scope.localRegions = [];
+            scope.checkDirty = function() {
+                return !(angular.equals(scope.localRegions, scope.selectedRegions));
+            };
             scope.updatesEnabled = true;
             scope.map = $('#mapdiv').vectorMap({
                 map: 'world_mill_en',
@@ -31,10 +35,19 @@ angular.module('dplaceMapDirective', [])
                     }
                 },
                 onRegionSelected: function(e, code, isSelected, selectedRegionIds) {
-                    if(attrs.selectedRegionIds && scope.updatesEnabled) {
-                        scope.$apply(function() {
-                            scope.selectedRegionIds = angular.copy(selectedRegionIds);
+                    if(scope.updatesEnabled && attrs.selectedRegions) {
+                        scope.localRegions = selectedRegionIds.map(function(regionId) {
+                            return {
+                                id: regionId,
+                                name: scope.map.getRegionName(regionId)
+                            };
                         });
+                        var dirty = scope.checkDirty();
+                        if(dirty) {
+                            scope.$apply(function() {
+                                scope.selectedRegions = angular.copy(scope.localRegions);
+                            });
+                        }
                     }
                 },
                 regionsSelectable: true
@@ -53,21 +66,30 @@ angular.module('dplaceMapDirective', [])
                 });
             };
 
-            // Update markers when societies change
-            scope.$watchCollection('societies', function(oldvalue, newvalue) {
-                scope.addMarkers();
-            });
+            if(attrs.societies) {
+                // Update markers when societies change
+                scope.$watchCollection('societies', function(oldvalue, newvalue) {
+                    scope.addMarkers();
+                });
+            }
 
-            scope.$watchCollection('selectedRegionIds', function(oldvalue, newvalue) {
-                // Then update the UI
-                // If the regions in the map are already correct, do not set them
-                if(!angular.equals(scope.map.getSelectedRegions(), scope.selectedRegionIds)) {
-                    // Prevent this update from triggering another change
-                    scope.updatesEnabled = false;
-                    scope.map.setSelectedRegions(angular.copy(scope.selectedRegionIds));
-                    scope.updatesEnabled = true;
-                }
-            });
+            if(attrs.selectedRegions) {
+                scope.$watchCollection('selectedRegions', function(oldvalue, newvalue) {
+                    var dirty = scope.checkDirty();
+                    if(dirty) {
+                        // update the local variable first
+                        scope.localRegions = angular.copy(scope.selectedRegions);
+
+                        // then update the UI
+                        scope.updatesEnabled = false;
+                        var regionIds = scope.localRegions.map(function(region){
+                            return region.id;
+                        });
+                        scope.map.setSelectedRegions(regionIds);
+                        scope.updatesEnabled = true;
+                    }
+                });
+            }
             scope.$on('mapTabActivated', function(event, args) {
                 scope.map.setSize();
             });
@@ -78,7 +100,7 @@ angular.module('dplaceMapDirective', [])
             scope: {
                 societies: '=',
                 region: '=',
-                selectedRegionIds: '='
+                selectedRegions: '='
             },
             link: link
         };
