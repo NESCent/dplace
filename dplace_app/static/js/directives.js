@@ -60,9 +60,13 @@ angular.module('dplaceMapDirective', [])
 
             scope.$watchCollection('selectedRegionIds', function(oldvalue, newvalue) {
                 // Then update the UI
-                scope.updatesEnabled = false;
-                scope.map.setSelectedRegions(angular.copy(newvalue));
-                scope.updatesEnabled = true;
+                // If the regions in the map are already correct, do not set them
+                if(!angular.equals(scope.map.getSelectedRegions(), scope.selectedRegionIds)) {
+                    // Prevent this update from triggering another change
+                    scope.updatesEnabled = false;
+                    scope.map.setSelectedRegions(angular.copy(scope.selectedRegionIds));
+                    scope.updatesEnabled = true;
+                }
             });
             scope.$on('mapTabActivated', function(event, args) {
                 scope.map.setSize();
