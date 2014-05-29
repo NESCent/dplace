@@ -3,7 +3,7 @@
     <form class="form form-inline" role="form">
         <div class="panel panel-default">
             <div class="panel-heading">
-                <span ng-hide="model.searchParams.selectedRegions">Select Geographic regions by clicking the map</span>
+                <span ng-hide="model.searchParams.selectedRegions.length">Select Geographic regions by clicking the map</span>
                 <span ng-repeat="region in model.searchParams.selectedRegions">
                     <span class="region">{{ region.name }}</span>
                     <span class="glyphicon glyphicon-remove" ng-click="removeRegion(region)"></span></span>
