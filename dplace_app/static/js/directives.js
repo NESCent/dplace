@@ -34,12 +34,12 @@ angular.module('dplaceMapDirective', [])
                         });
                     }
                 },
-                onRegionSelected: function(e, code, isSelected, selectedRegionIds) {
+                onRegionSelected: function(e, code, isSelected, selectedRegionCodes) {
                     if(scope.updatesEnabled && attrs.selectedRegions) {
-                        scope.localRegions = selectedRegionIds.map(function(regionId) {
+                        scope.localRegions = selectedRegionCodes.map(function(code) {
                             return {
-                                id: regionId,
-                                name: scope.map.getRegionName(regionId)
+                                code: code,
+                                name: scope.map.getRegionName(code)
                             };
                         });
                         var dirty = scope.checkDirty();
@@ -82,11 +82,11 @@ angular.module('dplaceMapDirective', [])
 
                         // then update the UI
                         scope.updatesEnabled = false;
-                        var regionIds = scope.localRegions.map(function(region){
-                            return region.id;
+                        var codes = scope.localRegions.map(function(region){
+                            return region.code;
                         });
                         scope.map.clearSelectedRegions();
-                        scope.map.setSelectedRegions(regionIds);
+                        scope.map.setSelectedRegions(regionCodes);
                         scope.updatesEnabled = true;
                     }
                 });
