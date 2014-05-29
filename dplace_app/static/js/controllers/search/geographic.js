@@ -6,6 +6,7 @@ function GeographicCtrl($scope, GeographicRegion, $http, limitToFilter, FindSoci
         $scope.model.searchParams.selectedRegions.splice(index, 1);
     };
 
+    // Discrepancy here. Region id is the tdwg code but the API expects the model pk id
     $scope.getSelectedGeographicRegions = function() {
         return $scope.model.searchParams.selectedRegions.map(function(region) {
             return region.id;
