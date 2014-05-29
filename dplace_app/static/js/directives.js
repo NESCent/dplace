@@ -85,6 +85,7 @@ angular.module('dplaceMapDirective', [])
                         var regionIds = scope.localRegions.map(function(region){
                             return region.id;
                         });
+                        scope.map.clearSelectedRegions();
                         scope.map.setSelectedRegions(regionIds);
                         scope.updatesEnabled = true;
                     }
