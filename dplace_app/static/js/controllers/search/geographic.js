@@ -1,21 +1,32 @@
 function GeographicCtrl($scope, GeographicRegion, $http, limitToFilter, FindSocieties) {
     $scope.model.searchParams.selectedRegions = [];
-
+    $scope.model.geographic_regions = GeographicRegion.query();
     $scope.removeRegion = function(region) {
         var index = $scope.model.searchParams.selectedRegions.indexOf(region)
         $scope.model.searchParams.selectedRegions.splice(index, 1);
     };
 
-    // Discrepancy here. Region id is the tdwg code but the API expects the model pk id
-    $scope.getSelectedGeographicRegions = function() {
-        return $scope.model.searchParams.selectedRegions.map(function(region) {
-            return region.id;
+    $scope.regionIdFromCode = function(code) {
+        var regionId;
+        $scope.model.geographic_regions.forEach(function (region) {
+            if(region.tdwg_code == code) {
+                regionId = region.id;
+            }
         });
+        return regionId;
+    }
+
+    $scope.getSelectedGeographicRegions = function() {
+        var regionsWithoutIds = $scope.model.searchParams.selectedRegions;
+        var regionIds = regionsWithoutIds.map(function(region) {
+            return $scope.regionIdFromCode(Number(region.code));
+        });
+        return regionIds;
     }
 
     $scope.doSearch = function() {
-        var geographicRegions = $scope.getSelectedGeographicRegions();
         $scope.disableSearchButton();
+        var geographicRegions = $scope.getSelectedGeographicRegions();
         $scope.model.searchResults = FindSocieties.find({ geographic_regions: geographicRegions }, function() {
             $scope.enableSearchButton();
             $scope.switchToResults();
