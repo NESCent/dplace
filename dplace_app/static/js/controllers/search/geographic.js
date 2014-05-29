@@ -2,7 +2,8 @@ function GeographicCtrl($scope, GeographicRegion, $http, limitToFilter, FindSoci
     $scope.model.searchParams.selectedRegions = [];
 
     $scope.removeRegion = function(region) {
-        $scope.model.searchParams.selectedRegions.splice($scope.model.searchParams.selectedRegions.indexOf(region));
+        var index = $scope.model.searchParams.selectedRegions.indexOf(region)
+        $scope.model.searchParams.selectedRegions.splice(index, 1);
     };
 
     $scope.getSelectedGeographicRegions = function() {
