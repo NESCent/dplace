@@ -8,7 +8,7 @@ angular.module('dplaceMapDirective', [])
             };
             scope.updatesEnabled = true;
             scope.map = $('#mapdiv').vectorMap({
-                map: 'world_mill_en',
+                map: 'tdwg-level2',
                 backgroundColor: 'white',
                 regionStyle: {
                   initial: {
