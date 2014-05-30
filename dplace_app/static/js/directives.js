@@ -94,6 +94,11 @@ angular.module('dplaceMapDirective', [])
             scope.$on('mapTabActivated', function(event, args) {
                 scope.map.setSize();
             });
+
+            scope.$on('$destroy', function() {
+                scope.map.remove();
+
+            });
         }
 
         return {
