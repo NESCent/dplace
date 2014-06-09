@@ -1,24 +1,32 @@
 function GeographicCtrl($scope, GeographicRegion, $http, limitToFilter, FindSocieties) {
-    $scope.model.searchParams.geographic_region = undefined;
-    /*
-        This uses $http instead of $resource because $http
-        returns a promise and not an initially empty array.
-     */
-    $scope.getRegions = function(regionName) {
-        return $http.get("/api/v1/geographic_regions?region_nam="+regionName).then(function(response){
-            return limitToFilter(response.data.results, 15);
-        });
+    $scope.model.searchParams.selectedRegions = [];
+    $scope.model.geographic_regions = GeographicRegion.query();
+    $scope.removeRegion = function(region) {
+        var index = $scope.model.searchParams.selectedRegions.indexOf(region)
+        $scope.model.searchParams.selectedRegions.splice(index, 1);
     };
 
+    $scope.regionIdFromCode = function(code) {
+        var regionId;
+        $scope.model.geographic_regions.forEach(function (region) {
+            if(region.tdwg_code == code) {
+                regionId = region.id;
+            }
+        });
+        return regionId;
+    }
+
     $scope.getSelectedGeographicRegions = function() {
-        var regions = [];
-        regions.push($scope.model.searchParams.geographic_region.id);
-        return regions;
+        var regionsWithoutIds = $scope.model.searchParams.selectedRegions;
+        var regionIds = regionsWithoutIds.map(function(region) {
+            return $scope.regionIdFromCode(Number(region.code));
+        });
+        return regionIds;
     }
 
     $scope.doSearch = function() {
-        var geographicRegions = $scope.getSelectedGeographicRegions();
         $scope.disableSearchButton();
+        var geographicRegions = $scope.getSelectedGeographicRegions();
         $scope.model.searchResults = FindSocieties.find({ geographic_regions: geographicRegions }, function() {
             $scope.enableSearchButton();
             $scope.switchToResults();

@@ -3,15 +3,14 @@
     <form class="form form-inline" role="form">
         <div class="panel panel-default">
             <div class="panel-heading">
-                    <input type="text"
-                       ng-model="model.searchParams.geographic_region"
-                       typeahead="region as region.region_nam for region in getRegions($viewValue)"
-                       class="form-control"
-                       style="width:100%"
-                       placeholder="Enter a geographic region">
+                <span ng-hide="model.searchParams.selectedRegions.length" class="search-help">Select Geographic regions by clicking the map</span>
+                <span class="region" ng-repeat="region in model.searchParams.selectedRegions">
+                    <span>{{ region.name }}</span>
+                    <span class="glyphicon glyphicon-remove region-remove" ng-click="removeRegion(region)"></span></span>
+                </span>
             </div>
             <div class="panel-body scrollable">
-                <div><i>Clickable map regions here</i></div>
+                <dplace-map selected-regions="model.searchParams.selectedRegions"></dplace-map>
             </div>
         </div>
         <div>

@@ -63,3 +63,20 @@ label.light {
 .basic-search-forms {
     margin-top: 2rem;
 }
+
+.jvectormap-zoomin, .jvectormap-zoomout {
+    width: 16px;
+    height: 16px;
+}
+
+.region {
+    background-color: #fff;
+    border: 1px solid #ccc;
+    padding: 5px;
+    border-radius: 5px;
+    margin-right: 5px;
+}
+
+.region-remove {
+    cursor: hand;
+}

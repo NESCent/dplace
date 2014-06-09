@@ -1,33 +1,33 @@
 {% extends 'base.html' %}
+{% load static from staticfiles %}
 {% block extra_head %}
     <!-- AngularJS -->
-    <script type="text/javascript" src="/static/js/lib/angular.min.js"></script>
-    <script type="text/javascript" src="/static/js/lib/angular-resource.min.js"></script>
-    <script type="text/javascript" src="/static/js/lib/angular-route.min.js"></script>
+    <script type="text/javascript" src="{% static "bower_components/angular/angular.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "bower_components/angular-resource/angular-resource.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "bower_components/angular-route/angular-route.min.js" %}"></script>
     <!-- Angular app script -->
-    <script type="text/javascript" src="/static/js/app.js"></script>
+    <script type="text/javascript" src="{% static "js/app.js" %}"></script>
     <!-- Angular Controllers -->
-    <script type="text/javascript" src="/static/js/controllers/app.js"></script>
-    <script type="text/javascript" src="/static/js/controllers/search.js"></script>
-    <script type="text/javascript" src="/static/js/controllers/societies.js"></script>
-    <script type="text/javascript" src="/static/js/controllers/search/cultural.js"></script>
-    <script type="text/javascript" src="/static/js/controllers/search/geographic.js"></script>
-    <script type="text/javascript" src="/static/js/controllers/search/environmental.js"></script>
-    <script type="text/javascript" src="/static/js/controllers/search/language.js"></script>
+    <script type="text/javascript" src="{% static "js/controllers/app.js" %}"></script>
+    <script type="text/javascript" src="{% static "js/controllers/search.js" %}"></script>
+    <script type="text/javascript" src="{% static "js/controllers/societies.js" %}"></script>
+    <script type="text/javascript" src="{% static "js/controllers/search/cultural.js" %}"></script>
+    <script type="text/javascript" src="{% static "js/controllers/search/geographic.js" %}"></script>
+    <script type="text/javascript" src="{% static "js/controllers/search/environmental.js" %}"></script>
+    <script type="text/javascript" src="{% static "js/controllers/search/language.js" %}"></script>
 
     <!-- Angular Services -->
-    <script type="text/javascript" src="/static/js/services.js"></script>
+    <script type="text/javascript" src="{% static "js/services.js" %}"></script>
     <!-- Angular Filters -->
-    <script type="text/javascript" src="/static/js/filters.js"></script>
+    <script type="text/javascript" src="{% static "js/filters.js" %}"></script>
     <!-- Angular Directives -->
-    <script type="text/javascript" src="/static/js/directives.js"></script>
+    <script type="text/javascript" src="{% static "js/directives.js" %}"></script>
     <!-- Angular UI Bootstrap -->
-    <script type="text/javascript" src="/static/js/lib/ui-bootstrap-tpls-0.10.0.min.js"></script>
-    <!-- OpenLayers JS -->
-    <script src="/static/js/lib/OpenLayers.js">
-        OpenLayers.ImgPath = "/static/img/lib/openlayers/";
-    </script>
-    <link href="/static/css/lib/openlayers/style.css" media="screen" rel="stylesheet">
+    <script type="text/javascript" src="{% static "bower_components/angular-ui-bootstrap-bower/ui-bootstrap-tpls.min.js" %}"></script>
+    <!-- jVectorMap -->
+    <script type="text/javascript" src="{% static "bower_components/bower-jvectormap/jquery-jvectormap-1.2.2.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "js/lib/tdwg-level2-map.js" %}"></script>
+    <link href="{% static "bower_components/bower-jvectormap/jquery-jvectormap-1.2.2.css" %}" media="screen" rel="stylesheet" />
 
 {% endblock %}
 {% load bootstrap3 %}
