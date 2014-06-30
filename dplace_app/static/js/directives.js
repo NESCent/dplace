@@ -1,5 +1,5 @@
 angular.module('dplaceMapDirective', [])
-    .directive('dplaceMap', function() {
+    .directive('dplaceMap', function(colorMapService) {
         function link(scope, element, attrs) {
             element.append("<div id='mapdiv' style='width:1140px; height:30rem;'></div>");
             scope.localRegions = [];
@@ -58,24 +58,6 @@ angular.module('dplaceMapDirective', [])
                 regionsSelectable: true
             }).vectorMap('get','mapObject');
 
-            /** Move this into a service **/
-            var getColorAtScalar = function (n, maxLength) {
-                var n = n * 240 / (maxLength);
-                return 'hsl(' + n + ',100%,50%)';
-            };
-
-            var generateColorMap = function(ids) {
-                // Return a map of ids to colors
-                var colors = {};
-                for(var i=0;i<ids.length;i++) {
-                    var color = getColorAtScalar(i, ids.length);
-                    colors[ids[i]] = color;
-                }
-                return colors;
-            };
-
-            /** end color service **/
-
             scope.addMarkers = function() {
                 scope.map.removeAllMarkers();
                 if(!scope.societies) {
@@ -95,7 +77,7 @@ angular.module('dplaceMapDirective', [])
                 });
 
                 // Map IDs to colors
-                var colorMap = generateColorMap(societyIds);
+                var colorMap = colorMapService.generateColorMap(societyIds);
                 scope.map.series.markers[0].setValues(colorMap);
             };
 
