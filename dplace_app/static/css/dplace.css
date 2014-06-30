@@ -80,3 +80,11 @@ label.light {
 .region-remove {
     cursor: hand;
 }
+
+.circle {
+    border-radius: 50%;
+    border: 1px solid darkgray;
+    display: inline-block;
+    width: 1.2rem;
+    height: 1.2rem;
+}
