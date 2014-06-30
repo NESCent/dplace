@@ -27,9 +27,7 @@ function GeographicCtrl($scope, GeographicRegion, $http, limitToFilter, FindSoci
     $scope.doSearch = function() {
         $scope.disableSearchButton();
         var geographicRegions = $scope.getSelectedGeographicRegions();
-        $scope.model.searchResults = FindSocieties.find({ geographic_regions: geographicRegions }, function() {
-            $scope.enableSearchButton();
-            $scope.switchToResults();
-        });
+        $scope.model.searchResults = FindSocieties.find({ geographic_regions: geographicRegions },
+            $scope.searchCompleted );
     };
 }

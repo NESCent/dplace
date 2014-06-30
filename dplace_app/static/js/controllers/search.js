@@ -21,4 +21,8 @@ function SearchCtrl($scope) {
         $scope.searchButton.text = 'Search';
     };
 
+    $scope.searchCompleted = function() {
+        $scope.enableSearchButton();
+        $scope.switchToResults();
+    };
 }
