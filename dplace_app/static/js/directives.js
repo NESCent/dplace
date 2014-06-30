@@ -10,6 +10,11 @@ angular.module('dplaceMapDirective', [])
             scope.map = $('#mapdiv').vectorMap({
                 map: 'tdwg-level2',
                 backgroundColor: 'white',
+                series: {
+                    markers: [{
+                        attribute: 'fill'
+                    }]
+                },
                 regionStyle: {
                   initial: {
                     fill: '#428bca',
@@ -53,17 +58,45 @@ angular.module('dplaceMapDirective', [])
                 regionsSelectable: true
             }).vectorMap('get','mapObject');
 
+            /** Move this into a service **/
+            var getColorAtScalar = function (n, maxLength) {
+                var n = n * 240 / (maxLength);
+                return 'hsl(' + n + ',100%,50%)';
+            };
+
+            var generateColorMap = function(ids) {
+                // Return a map of ids to colors
+                var colors = {};
+                for(var i=0;i<ids.length;i++) {
+                    var color = getColorAtScalar(i, ids.length);
+                    colors[ids[i]] = color;
+                }
+                return colors;
+            };
+
+            /** end color service **/
+
             scope.addMarkers = function() {
                 scope.map.removeAllMarkers();
                 if(!scope.societies) {
                     return;
                 }
+
+                // get the society IDs
+                var societyIds = scope.societies.map(function(societyResult) {
+                    return societyResult.society.id;
+                });
+
                 scope.societies.forEach(function(societyResult) {
                     var society = societyResult.society;
                     // Add a marker for each point
                     var marker = {latLng: society.location.coordinates.reverse(), name: society.name}
                     scope.map.addMarker(society.id, marker);
                 });
+
+                // Map IDs to colors
+                var colorMap = generateColorMap(societyIds);
+                scope.map.series.markers[0].setValues(colorMap);
             };
 
             if(attrs.societies) {
