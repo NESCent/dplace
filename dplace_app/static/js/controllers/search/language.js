@@ -103,10 +103,7 @@ function LanguageCtrl($scope, LanguageClass, LanguageClassification, FindSocieti
     $scope.doSearch = function() {
         var filters = $scope.getLanguageQueryFilters();
         $scope.disableSearchButton()
-        $scope.model.searchResults = FindSocieties.find({ language_filters: filters }, function() {
-            $scope.enableSearchButton();
-            $scope.switchToResults();
-        });
+        $scope.model.searchResults = FindSocieties.find({ language_filters: filters }, $scope.searchCompleted );
     };
 
 }

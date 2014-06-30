@@ -1,4 +1,4 @@
-function SearchCtrl($scope) {
+function SearchCtrl($scope, colorMapService) {
     $scope.setActive('search');
     $scope.selectedButton = {};
     $scope.buttons = [
@@ -16,9 +16,22 @@ function SearchCtrl($scope) {
         $scope.searchButton.disabled = true;
         $scope.searchButton.text = 'Working...';
     };
+
     $scope.enableSearchButton = function () {
         $scope.searchButton.disabled = false;
         $scope.searchButton.text = 'Search';
     };
 
+    $scope.assignColors = function() {
+        var colorMap = colorMapService.generateColorMap($scope.getSocietyIds());
+        $scope.getResults().forEach(function(result) {
+            result.society.style = {'background-color' : colorMap[result.society.id] };
+        });
+    };
+
+    $scope.searchCompleted = function() {
+        $scope.enableSearchButton();
+        $scope.assignColors();
+        $scope.switchToResults();
+    };
 }

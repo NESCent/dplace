@@ -29,10 +29,7 @@ function CulturalCtrl($scope, Variable, VariableCategory, CodeDescription, FindS
     $scope.doSearch = function() {
         var code_ids = $scope.getSelectedTraitCodes()
         $scope.disableSearchButton()
-        $scope.model.searchResults = FindSocieties.find({ variable_codes: code_ids }, function() {
-            $scope.enableSearchButton();
-            $scope.switchToResults();
-        });
+        $scope.model.searchResults = FindSocieties.find({ variable_codes: code_ids }, $scope.searchCompleted );
     };
 
 }

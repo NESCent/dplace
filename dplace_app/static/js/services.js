@@ -3,6 +3,7 @@ angular.module('dplaceServices', ['ngResource'])
         $httpProvider.defaults.xsrfCookieName = 'csrftoken';
         $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
     })
+    .service('colorMapService', [ColorMapService])
     .factory('LanguageClass', function ($resource) {
         return $resource(
             '/api/v1/language_classes/:id',

@@ -1,5 +1,5 @@
 angular.module('dplaceMapDirective', [])
-    .directive('dplaceMap', function() {
+    .directive('dplaceMap', function(colorMapService) {
         function link(scope, element, attrs) {
             element.append("<div id='mapdiv' style='width:1140px; height:30rem;'></div>");
             scope.localRegions = [];
@@ -10,6 +10,11 @@ angular.module('dplaceMapDirective', [])
             scope.map = $('#mapdiv').vectorMap({
                 map: 'tdwg-level2',
                 backgroundColor: 'white',
+                series: {
+                    markers: [{
+                        attribute: 'fill'
+                    }]
+                },
                 regionStyle: {
                   initial: {
                     fill: '#428bca',
@@ -58,12 +63,22 @@ angular.module('dplaceMapDirective', [])
                 if(!scope.societies) {
                     return;
                 }
+
+                // get the society IDs
+                var societyIds = scope.societies.map(function(societyResult) {
+                    return societyResult.society.id;
+                });
+
                 scope.societies.forEach(function(societyResult) {
                     var society = societyResult.society;
                     // Add a marker for each point
                     var marker = {latLng: society.location.coordinates.reverse(), name: society.name}
                     scope.map.addMarker(society.id, marker);
                 });
+
+                // Map IDs to colors
+                var colorMap = colorMapService.generateColorMap(societyIds);
+                scope.map.series.markers[0].setValues(colorMap);
             };
 
             if(attrs.societies) {
