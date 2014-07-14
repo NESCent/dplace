@@ -22,6 +22,36 @@ class ISOCodeAPITestCase(APITestCase):
         self.assertEqual(response_dict['count'],1)
         self.assertEqual(response_dict['results'][0]['iso_code'],self.code.iso_code)
 
+class VariableCodeDescriptionAPITestCase(APITestCase):
+    '''
+    tests rest-framework api for Variable Code Descriptions
+    '''
+    def setUp(self):
+        self.variable = VariableDescription.objects.create(label='EA001',name='Variable 1')
+        self.code1 = VariableCodeDescription.objects.create(variable=self.variable, code='1', description='Code 1')
+        self.code10 = VariableCodeDescription.objects.create(variable=self.variable, code='10', description='Code 10')
+        self.code2 = VariableCodeDescription.objects.create(variable=self.variable, code='2', description='Code 2')
+    def test_code_description_order(self):
+        '''
+        Make sure 2 comes before 10
+        '''
+        url = reverse('variablecodedescription-list')
+        data = {'variable': self.variable.id }
+        response = self.client.get(url,data,format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        response_dict = response.data
+        index_of_1 = index_of_2 = index_of_10 = index = 0
+        for result in response_dict['results']:
+            if result['code'] == self.code1.code:
+                index_of_1 = index
+            elif result['code'] == self.code2.code:
+                index_of_2 = index
+            elif result['code'] == self.code10.code:
+                index_of_10 = index
+            index += 1
+        self.assertLess(index_of_1, index_of_2)
+        self.assertLess(index_of_2, index_of_10)
+
 class GeographicRegionAPITestCase(APITestCase):
     def setUp(self):
         poly = MultiPolygon(Polygon( ((4.0, 4.0), (6.0, 4.0), (6.0, 6.0), (4.0, 6.0), (4.0,4.0))))
