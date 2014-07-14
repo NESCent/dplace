@@ -76,19 +76,19 @@ class FindSocietiesTestCase(APITestCase):
     Responses will be serialized SocietyResult objects
     '''
     def setUp(self):
-        # make two societies
+        # make ISO codes
         iso_code1 = ISOCode.objects.create(iso_code='abc',location=Point(1.0,1.0))
         iso_code2 = ISOCode.objects.create(iso_code='def',location=Point(2.0,2.0))
         iso_code3 = ISOCode.objects.create(iso_code='ghi',location=Point(3.0,3.0))
         # Make languages
-        self.language1 = Language.objects.create(name='language1',iso_code=iso_code1)
-        self.language2 = Language.objects.create(name='language2',iso_code=iso_code2)
-        self.language3 = Language.objects.create(name='language3',iso_code=iso_code3)
+        self.languageA1 = Language.objects.create(name='languageA1',iso_code=iso_code1)
+        self.languageC2 = Language.objects.create(name='languageC2',iso_code=iso_code2)
+        self.languageB3 = Language.objects.create(name='languageB3',iso_code=iso_code3)
 
-        self.society1 = Society.objects.create(ext_id='society1',name='Society1',location=Point(1.0,1.0),source='EA',iso_code=iso_code1,language=self.language1)
-        self.society2 = Society.objects.create(ext_id='society2',name='Society2',location=Point(2.0,2.0),source='EA',iso_code=iso_code2,language=self.language2)
+        self.society1 = Society.objects.create(ext_id='society1',name='Society1',location=Point(1.0,1.0),source='EA',iso_code=iso_code1,language=self.languageA1)
+        self.society2 = Society.objects.create(ext_id='society2',name='Society2',location=Point(2.0,2.0),source='EA',iso_code=iso_code2,language=self.languageC2)
         # Society 3 has the same language characteristics as society 1 but different EA Vars
-        self.society3 = Society.objects.create(ext_id='society3',name='Society3',location=Point(3.0,3.0),source='EA',iso_code=iso_code3,language=self.language3)
+        self.society3 = Society.objects.create(ext_id='society3',name='Society3',location=Point(3.0,3.0),source='EA',iso_code=iso_code3,language=self.languageB3)
 
         # make a language class tree
         self.root_language_class = LanguageClass.objects.create(name='root',level=1,parent=None)
@@ -99,17 +99,17 @@ class FindSocietiesTestCase(APITestCase):
         self.child_language_class_2 = LanguageClass.objects.create(name='child2',level=3,parent=self.parent_language_class_2)
 
         # make language classifications to link a language to its class tree
-        lc1 = LanguageClassification.objects.create(language=self.language1,
+        lc1 = LanguageClassification.objects.create(language=self.languageA1,
                                                     ethnologue_classification='lc1',
                                                     class_family=self.root_language_class,
                                                     class_subfamily=self.parent_language_class_1,
                                                     class_subsubfamily=self.child_language_class_1a)
-        lc2 = LanguageClassification.objects.create(language=self.language2,
+        lc2 = LanguageClassification.objects.create(language=self.languageC2,
                                                     ethnologue_classification='lc2',
                                                     class_family=self.root_language_class,
                                                     class_subfamily=self.parent_language_class_2,
                                                     class_subsubfamily=self.child_language_class_2)
-        lc3 = LanguageClassification.objects.create(language=self.language3,
+        lc3 = LanguageClassification.objects.create(language=self.languageB3,
                                                     ethnologue_classification='lc3',
                                                     class_family=self.root_language_class,
                                                     class_subfamily=self.parent_language_class_1,
@@ -173,7 +173,7 @@ class FindSocietiesTestCase(APITestCase):
         return self.assertNotIn(society.id, response_society_ids)
     def test_find_societies_by_language(self):
         # Find the societies that use language1
-        language_ids = [self.language1.id]
+        language_ids = [self.languageA1.id]
         data = {'language_filters' : [{'language_ids': language_ids }]}
         response = self.client.post(self.url,data,format='json')
         self.assertSocietyInResponse(self.society1,response)
@@ -194,12 +194,12 @@ class FindSocietiesTestCase(APITestCase):
         response = self.client.post(self.url,data,format='json')
         self.assertEqual(len(response.data['results']),0)
     def test_find_society_by_language_and_var(self):
-        # Search for societies with language1 and language 3
+        # Search for societies with language 1 and language 3
         # Coded with variable codes 1 and 2
         # this should return only 1 and not 2 or 3
         # This tests that results should be intersection (AND), not union (OR)
         # Society 3 is not coded for any variables, so it should not appear in the list.
-        language_ids = [self.language1.id, self.language3.id]
+        language_ids = [self.languageA1.id, self.languageB3.id]
         data = {'variable_codes': [self.code1.pk, self.code2.pk],
                 'language_filters' : [{'language_ids': language_ids }]}
         response = self.client.post(self.url,data,format='json')
@@ -252,3 +252,23 @@ class FindSocietiesTestCase(APITestCase):
         self.assertSocietyInResponse(self.society1,response)
         self.assertSocietyInResponse(self.society3,response)
         self.assertSocietyNotInResponse(self.society2,response)
+    def test_language_classification_order(self):
+        '''
+        verify the API returns language classifications ordered by language name
+        '''
+
+        url = reverse('languageclassification-list')
+        response = self.client.get(url,format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        response_dict = response.data
+        index_of_A = index_of_B = index_of_C = index =0
+        for result in response_dict['results']:
+            if result['language']['name'] == self.languageA1.name:
+                index_of_A = index
+            elif result['language']['name'] == self.languageC2.name:
+                index_of_C = index
+            elif result['language']['name'] == self.languageB3.name:
+                index_of_B = index
+            index += 1
+        self.assertLess(index_of_A, index_of_B)
+        self.assertLess(index_of_B, index_of_C)
