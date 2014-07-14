@@ -40,7 +40,6 @@ class VariableCodeDescriptionAPITestCase(APITestCase):
         response = self.client.get(url,data,format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         response_dict = response.data
-        print response_dict
         index_of_1 = index_of_2 = index_of_10 = index = 0
         for result in response_dict['results']:
             if result['code'] == self.code1.code:

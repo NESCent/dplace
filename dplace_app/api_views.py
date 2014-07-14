@@ -28,11 +28,10 @@ class VariableCategoryViewSet(viewsets.ReadOnlyModelViewSet):
         return Response(serializer.data)
 
 class VariableCodeDescriptionViewSet(viewsets.ReadOnlyModelViewSet):
-    # Model ordering is ignored when filter_fields enabled
+    # Model ordering is ignored when filter_fields enabled, requires FilterSet subclass
     # see https://github.com/tomchristie/django-rest-framework/issues/1432
-    # workaround did not work.
     serializer_class = VariableCodeDescriptionSerializer
-    filter_fields = ('variable', 'code', 'description',)
+    filter_class = VariableCodeDescriptionFilter
     queryset = VariableCodeDescription.objects.all()
 
 # Can filter by code, code__variable, or society
