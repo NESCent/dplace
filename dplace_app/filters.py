@@ -22,3 +22,8 @@ class LanguageClassificationFilter(django_filters.FilterSet):
     class Meta:
         model = LanguageClassification
         fields = ['scheme', 'language', 'class_family', 'class_subfamily', 'class_subsubfamily']
+
+class LanguageClassFilter(django_filters.FilterSet):
+    class Meta:
+        model = LanguageClass
+        fields = ['level', 'parent', 'name']
