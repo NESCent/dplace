@@ -272,3 +272,17 @@ class FindSocietiesTestCase(APITestCase):
             index += 1
         self.assertLess(index_of_A, index_of_B)
         self.assertLess(index_of_B, index_of_C)
+    def test_language_class_order(self):
+        '''
+        language classes should be ordered by level then name
+        '''
+        url = reverse('languageclass-list')
+        response = self.client.get(url,format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        response_dict = response.data
+        results = response_dict['results']
+        def getkey(item):
+            return item['level'], item['name'],
+        sorted_results = sorted(results, key=getkey)
+        self.assertEquals(results,sorted_results)
+
