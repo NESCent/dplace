@@ -66,15 +66,19 @@ class EnvironmentalViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Environmental.objects.all()
 
 class LanguageClassViewSet(viewsets.ReadOnlyModelViewSet):
+    # Model ordering is ignored when filter_fields enabled, requires FilterSet subclass
+    # see https://github.com/tomchristie/django-rest-framework/issues/1432
     serializer_class = LanguageClassSerializer
-    filter_fields = ('level', 'parent', 'name',)
-    model = LanguageClass
+    filter_class = LanguageClassFilter
+    queryset = LanguageClass.objects.all()
 
 # Need an API to get classifications / languages for a class
 
 class LanguageClassificationViewSet(viewsets.ReadOnlyModelViewSet):
+    # Model ordering is ignored when filter_fields enabled, requires FilterSet subclass
+    # see https://github.com/tomchristie/django-rest-framework/issues/1432
     serializer_class = LanguageClassificationSerializer
-    filter_fields = ('scheme', 'language', 'class_family', 'class_subfamily', 'class_subsubfamily',)
+    filter_class = LanguageClassificationFilter
     queryset = LanguageClassification.objects.all()
 
 class LanguageViewSet(viewsets.ReadOnlyModelViewSet):
