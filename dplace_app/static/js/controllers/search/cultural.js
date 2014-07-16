@@ -1,17 +1,20 @@
-function CulturalCtrl($scope, Variable, VariableCategory, CodeDescription, FindSocieties) {
-    $scope.model.searchParams.traits = [{
-        categories: VariableCategory.query(),
-        variables: [],
-        selectedCategory: null,
-        selectedVariable: null
-    }];
+function CulturalCtrl($scope, Variable, VariableCategory, CodeDescription) {
+    $scope.initialize = function() {
+        $scope.model.searchParams.traits = [{
+            categories: VariableCategory.query(),
+            variables: [],
+            selectedCategory: null,
+            selectedVariable: null
+        }];
+    };
+    $scope.initialize();
 
     $scope.categoryChanged = function(trait) {
         trait.indexVariables = Variable.query({index_categories: trait.selectedCategory.id});
         trait.nicheVariables = Variable.query({niche_categories: trait.selectedCategory.id});
         trait.codes = [];
         trait.selectedCode = "";
-    }
+    };
 
     $scope.traitChanged = function(trait) {
         trait.selectedCode = "";
@@ -23,13 +26,18 @@ function CulturalCtrl($scope, Variable, VariableCategory, CodeDescription, FindS
         var selectedCodes = allCodes.filter( function(c) { return c.isSelected; }).map( function(c) { return c.id; })
         console.log(selectedCodes);
         return selectedCodes;
-    }
+    };
 
     // Search for societies matching this
     $scope.doSearch = function() {
         var code_ids = $scope.getSelectedTraitCodes()
-        $scope.disableSearchButton()
-        $scope.model.searchResults = FindSocieties.find({ variable_codes: code_ids }, $scope.searchCompleted );
+        $scope.updateSearchQuery({ variable_codes: code_ids });
+        $scope.searchSocieties();
+    };
+
+    $scope.resetSearch = function() {
+        $scope.initialize();
+        $scope.resetSearchQuery();
     };
 
 }

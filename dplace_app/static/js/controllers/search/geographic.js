@@ -1,4 +1,9 @@
-function GeographicCtrl($scope, GeographicRegion, $http, limitToFilter, FindSocieties) {
+function GeographicCtrl($scope, GeographicRegion) {
+    $scope.initialize = function() {
+        $scope.model.searchParams.selectedRegions = [];
+    };
+    $scope.initialize();
+
     $scope.model.searchParams.selectedRegions = [];
     $scope.model.geographic_regions = GeographicRegion.query();
     $scope.removeRegion = function(region) {
@@ -14,7 +19,7 @@ function GeographicCtrl($scope, GeographicRegion, $http, limitToFilter, FindSoci
             }
         });
         return regionId;
-    }
+    };
 
     $scope.getSelectedGeographicRegions = function() {
         var regionsWithoutIds = $scope.model.searchParams.selectedRegions;
@@ -22,12 +27,17 @@ function GeographicCtrl($scope, GeographicRegion, $http, limitToFilter, FindSoci
             return $scope.regionIdFromCode(Number(region.code));
         });
         return regionIds;
-    }
+    };
 
     $scope.doSearch = function() {
-        $scope.disableSearchButton();
         var geographicRegions = $scope.getSelectedGeographicRegions();
-        $scope.model.searchResults = FindSocieties.find({ geographic_regions: geographicRegions },
-            $scope.searchCompleted );
+        $scope.updateSearchQuery({ geographic_regions: geographicRegions });
+        $scope.searchSocieties();
     };
+
+    $scope.resetSearch = function() {
+        $scope.initialize();
+        $scope.resetSearchQuery();
+    };
+
 }

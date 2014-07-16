@@ -1,4 +1,4 @@
-function SearchCtrl($scope, colorMapService) {
+function SearchCtrl($scope, colorMapService, FindSocieties) {
     $scope.setActive('search');
     $scope.selectedButton = {};
     $scope.buttons = [
@@ -27,6 +27,21 @@ function SearchCtrl($scope, colorMapService) {
         $scope.getResults().forEach(function(result) {
             result.society.style = {'background-color' : colorMap[result.society.id] };
         });
+    };
+
+    $scope.resetSearchQuery = function() {
+        $scope.model.searchQuery = {};
+    };
+
+    $scope.updateSearchQuery = function(searchQuery) {
+        for(var propertyName in searchQuery) {
+            $scope.model.searchQuery[propertyName] = searchQuery[propertyName];
+        }
+    };
+
+    $scope.searchSocieties = function() {
+        $scope.disableSearchButton();
+        $scope.model.searchResults = FindSocieties.find($scope.model.searchQuery,$scope.searchCompleted);
     };
 
     $scope.searchCompleted = function() {

@@ -1,4 +1,4 @@
-function LanguageCtrl($scope, LanguageClass, LanguageClassification, FindSocieties) {
+function LanguageCtrl($scope, LanguageClass, LanguageClassification) {
 
     /* Prototype model for UI */
     var levels = [
@@ -9,21 +9,25 @@ function LanguageCtrl($scope, LanguageClass, LanguageClassification, FindSocieti
 
     var maxLevel = levels[levels.length - 1].level
 
-    /* Model for binding */
-    var languageFilter = angular.copy(levels);
-    languageFilter.forEach(function (filterLevel) {
-        filterLevel.selectedItem = undefined;
-    });
 
-    /* Populate language family for first level */
-    var familyLevel = 1;
-    languageFilter[0].items = LanguageClass.query({level: familyLevel});
 
     /* Iniitial setup */
-    $scope.model.searchParams.language = {
-        levels: levels,
-        languageFilters: [languageFilter]
+    $scope.initialize = function() {
+        /* Model for binding */
+        var languageFilter = angular.copy(levels);
+        languageFilter.forEach(function (filterLevel) {
+            filterLevel.selectedItem = undefined;
+        });
+
+        /* Populate language family for first level */
+        var familyLevel = 1;
+        languageFilter[0].items = LanguageClass.query({level: familyLevel});
+        $scope.model.searchParams.language = {
+            levels: levels,
+            languageFilters: [languageFilter]
+        };
     };
+    $scope.initialize();
 
     function levelToIndex(levelObject) {
         return levelObject.level - 1;
@@ -102,8 +106,13 @@ function LanguageCtrl($scope, LanguageClass, LanguageClassification, FindSocieti
 
     $scope.doSearch = function() {
         var filters = $scope.getLanguageQueryFilters();
-        $scope.disableSearchButton()
-        $scope.model.searchResults = FindSocieties.find({ language_filters: filters }, $scope.searchCompleted );
+        $scope.updateSearchQuery({ language_filters: filters });
+        $scope.searchSocieties();
+    };
+
+    $scope.resetSearch = function() {
+        $scope.initialize();
+        $scope.resetSearchQuery();
     };
 
 }

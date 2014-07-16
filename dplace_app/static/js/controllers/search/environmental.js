@@ -1,4 +1,4 @@
-function EnvironmentalCtrl($scope, EnvironmentalVariable, FindSocieties) {
+function EnvironmentalCtrl($scope, EnvironmentalVariable) {
     $scope.model.searchParams.environmentalVariables = EnvironmentalVariable.query();
     $scope.model.searchParams.environmentalFilters = [
         { operator: 'inrange', name: 'between' },
@@ -6,11 +6,14 @@ function EnvironmentalCtrl($scope, EnvironmentalVariable, FindSocieties) {
         { operator: 'gt', name: 'greater than'},
         { operator: 'outrange', name: 'outside'},
     ];
-    $scope.model.searchParams.environmental = {
-        selectedVariable: null,
-        vals: [],
-        selectedFilter: $scope.model.searchParams.environmentalFilters[0]
+    $scope.initialize = function() {
+        $scope.model.searchParams.environmental = {
+            selectedVariable: null,
+            vals: [],
+            selectedFilter: $scope.model.searchParams.environmentalFilters[0]
+        };
     };
+    $scope.initialize();
 
     $scope.getSelectedFilters = function() {
         //environmental_vals: [{id: 1, operator: 'gt', params: [0.0]}, {id:3, operator 'inrange', params: [10.0,20.0] }
@@ -25,8 +28,13 @@ function EnvironmentalCtrl($scope, EnvironmentalVariable, FindSocieties) {
 
     $scope.doSearch = function() {
         var filters = $scope.getSelectedFilters();
-        $scope.disableSearchButton()
-        $scope.model.searchResults = FindSocieties.find({ environmental_filters: filters}, $scope.searchCompleted );
+        $scope.updateSearchQuery({ environmental_filters: filters });
+        $scope.searchSocieties();
+    };
+
+    $scope.resetSearch = function() {
+        $scope.initialize();
+        $scope.resetSearchQuery();
     };
 
 }
