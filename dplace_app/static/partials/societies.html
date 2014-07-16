@@ -43,5 +43,15 @@
         <tab heading="Map" select="resizeMap()">
             <dplace-map societies="model.searchResults.results"></dplace-map>
         </tab>
+        <tab heading="Download" select="generateDownloadLinks()">
+            <div class="row">
+                <h4>Download results as:</h4>
+                <ul>
+                    <li>
+                        <a ng-href="{{ csvDownloadLink }}" class="btn btn-info btn-dplace-download">CSV</a>
+                    </li>
+                </ul>
+            </div>
+        </tab>
     </tabset>
 </div>
