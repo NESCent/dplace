@@ -86,6 +86,11 @@ class LanguageViewSet(viewsets.ReadOnlyModelViewSet):
     filter_fields = ('name', 'iso_code', 'society',)
     queryset = Language.objects.all()
 
+class LanguageTreeViewSet(viewsets.ReadOnlyModelViewSet):
+    serializer_class = LanguageTreeSerializer
+    filter_fields = ('name',)
+    queryset = LanguageTree.objects.all()
+
 # search/filter APIs
 @api_view(['POST'])
 @permission_classes((AllowAny,))

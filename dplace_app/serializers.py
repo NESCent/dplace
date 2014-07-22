@@ -86,6 +86,12 @@ class GeographicRegionSerializer(gis_serializers.GeoModelSerializer):
         model = GeographicRegion
         fields = ('id','level_2_re','count','region_nam','continent','tdwg_code')
 
+class LanguageTreeSerializer(serializers.ModelSerializer):
+    languages = LanguageSerializer(source='languages', many=True)
+    class Meta:
+        model = LanguageTree
+        fields = ('id','languages')
+
 SEARCH_LANGUAGE = 'l'
 SEARCH_ENVIRONMENTAL = 'e'
 SEARCH_VARIABLES = 'v'
