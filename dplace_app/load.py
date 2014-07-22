@@ -7,6 +7,7 @@ from load.language import *
 from load.society_ea import *
 from load.society_binford import *
 from load.geographic import *
+from load.tree import *
 
 LOAD_BY_ROW=('iso', 'env_vals',
              'langs', 'iso_lat_long',
@@ -16,6 +17,8 @@ LOAD_BY_ROW=('iso', 'env_vals',
 def run(file_name=None, mode=None):
     if mode == 'geo':
         load_regions(file_name)
+    elif mode == 'tree':
+        load_tree(file_name)
     else:
         # read the csv file
         with open(file_name, 'rb') as csvfile:
