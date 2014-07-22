@@ -21,6 +21,17 @@ angular.module('dplaceFilters', [])
             }).join(',');
         };
     })
+    .filter('formatLanguageTrees', function () {
+        return function(values) {
+            if (angular.isArray(values)) {
+                return values.map(function (language) {
+                    return language.name;
+                }).join("\n");
+            } else {
+                return '';
+            }
+        };
+    })
     .filter('formatLanguageName', function () {
         return function(value) {
             if (value === null) {

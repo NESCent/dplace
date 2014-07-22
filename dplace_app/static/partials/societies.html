@@ -27,7 +27,7 @@
                         </td>
                         <td>{{ society_result.society.iso_code }}</td>
                         <td>{{ society_result.society.language | formatLanguageName }}</td>
-                        <td>{{ society_result.society.trees | countOrBlank }}</td>
+                        <td><a popover="{{society_result.society.trees | formatLanguageTrees }}" title="'Trees'">{{ society_result.society.trees | countOrBlank }}</a></td>
                         <td ng-repeat="variable in model.searchResults.variable_descriptions">
                             {{ society_result.variable_coded_values | formatVariableCodeValues }}
                         </td>
