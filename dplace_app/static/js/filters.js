@@ -21,6 +21,24 @@ angular.module('dplaceFilters', [])
             }).join(',');
         };
     })
+    .filter('formatLanguageName', function () {
+        return function(value) {
+            if (value === null) {
+                return '';
+            } else {
+                return value.name;
+            }
+        };
+    })
+    .filter('countOrBlank', function () {
+        return function(value) {
+            if (angular.isUndefined(value) || value.length === 0) {
+                return '';
+            } else {
+                return value.length;
+            }
+        };
+    })
     .filter('formatGeographicRegion', function () {
         return function(values) {
             return values.map( function(region) {
