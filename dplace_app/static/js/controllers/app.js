@@ -5,6 +5,7 @@ function AppCtrl($scope, $location) {
     $scope.setActive = function(tabName) {
         $scope.searchActive = '';
         $scope.societiesActive = '';
+        $scope.aboutActive = '';
         $scope[tabName + 'Active'] = 'active'
     };
     $scope.switchToResults = function() {
