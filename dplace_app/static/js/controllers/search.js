@@ -1,6 +1,16 @@
-function SearchCtrl($scope, colorMapService, FindSocieties) {
+/**
+ * Controller for the search tab. pops in sub controllers for geographic/cultural/etc
+ *
+ * @param $scope
+ * @param colorMapService
+ * @param searchModelService
+ * @param FindSocieties
+ * @constructor
+ */
+function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties) {
     $scope.setActive('search');
-    $scope.selectedButton = {};
+    $scope.searchModel = searchModelService.getModel();
+    $scope.selectedButton = $scope.searchModel.selectedButton;
     $scope.buttons = [
         {value:'geographic', name:'Geographic'},
         {value:'cultural', name:'Cultural Traits'},
@@ -12,6 +22,7 @@ function SearchCtrl($scope, colorMapService, FindSocieties) {
         $scope.selectedButton = selectedButton;
     };
 
+    // All of this needs to move into model
     $scope.disableSearchButton = function () {
         $scope.searchButton.disabled = true;
         $scope.searchButton.text = 'Working...';
@@ -24,29 +35,37 @@ function SearchCtrl($scope, colorMapService, FindSocieties) {
 
     $scope.assignColors = function() {
         var colorMap = colorMapService.generateColorMap($scope.getSocietyIds());
-        $scope.getResults().forEach(function(result) {
-            result.society.style = {'background-color' : colorMap[result.society.id] };
+        $scope.searchModel.getSocieties().forEach(function(container) {
+            container.society.style = {'background-color' : colorMap[container.society.id] };
         });
     };
 
     $scope.resetSearchQuery = function() {
-        $scope.model.searchQuery = {};
+        searchModelService.getModel().reset();
     };
 
+    // This method merges the current searchQuery object with the incoming searchQuery
     $scope.updateSearchQuery = function(searchQuery) {
         for(var propertyName in searchQuery) {
-            $scope.model.searchQuery[propertyName] = searchQuery[propertyName];
+            $scope.searchModel.query[propertyName] = searchQuery[propertyName];
         }
     };
 
-    $scope.searchSocieties = function() {
-        $scope.disableSearchButton();
-        $scope.model.searchResults = FindSocieties.find($scope.model.searchQuery,$scope.searchCompleted);
-    };
-
-    $scope.searchCompleted = function() {
+    var searchCompletedCallback = function() {
         $scope.enableSearchButton();
         $scope.assignColors();
         $scope.switchToResults();
     };
+
+    $scope.searchSocieties = function() {
+        $scope.disableSearchButton();
+        var query = $scope.searchModel.query;
+        $scope.searchModel.results = FindSocieties.find(query, searchCompletedCallback);
+    };
+
+    // resets this object state and the search query.
+    $scope.resetSearch = function() {
+        $scope.searchModel.reset();
+    };
+
 }
