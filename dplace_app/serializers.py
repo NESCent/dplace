@@ -129,7 +129,7 @@ class SocietyResultSet(object):
     def __init__(self):
         # Use a dictionary to map society_id -> SocietyResult
         self._society_results = dict()
-        self.results = None # not valid until finalize() is called
+        self.societies = None # not valid until finalize() is called
         # These are the column headers in the search results
         self.variable_descriptions = set()
         self.environmental_variables = set()
@@ -158,7 +158,7 @@ class SocietyResultSet(object):
         self._get_society_result(society).add_geographic_region(geographic_region)
 
     def finalize(self,criteria):
-        self.results = [x for x in self._society_results.values() if x.includes_criteria(criteria)]
+        self.societies = [x for x in self._society_results.values() if x.includes_criteria(criteria)]
 
 
 class SocietyResultSerializer(serializers.Serializer):
@@ -176,7 +176,7 @@ class SocietyResultSetSerializer(serializers.Serializer):
     Serialize a set of society results and the search criteria
     '''
     # Results contains a society and variable values that matched
-    results = SocietyResultSerializer(many=True)
+    societies = SocietyResultSerializer(many=True)
     # These contain the search parameters
     # variable descriptions -> variable codes
     variable_descriptions = VariableDescriptionSerializer(many=True)

@@ -166,10 +166,10 @@ class FindSocietiesTestCase(APITestCase):
 
         self.url = reverse('find_societies')
     def assertSocietyInResponse(self,society,response):
-        response_society_ids = [x['society']['id'] for x in response.data['results']]
+        response_society_ids = [x['society']['id'] for x in response.data['societies']]
         return self.assertIn(society.id, response_society_ids)
     def assertSocietyNotInResponse(self,society,response):
-        response_society_ids = [x['society']['id'] for x in response.data['results']]
+        response_society_ids = [x['society']['id'] for x in response.data['societies']]
         return self.assertNotIn(society.id, response_society_ids)
     def test_find_societies_by_language(self):
         # Find the societies that use language1
@@ -192,7 +192,7 @@ class FindSocietiesTestCase(APITestCase):
     def test_find_no_societies(self):
         data = {'variable_codes': [self.code3.pk]}
         response = self.client.post(self.url,data,format='json')
-        self.assertEqual(len(response.data['results']),0)
+        self.assertEqual(len(response.data['societies']),0)
     def test_find_society_by_language_and_var(self):
         # Search for societies with language 1 and language 3
         # Coded with variable codes 1 and 2
@@ -209,7 +209,7 @@ class FindSocietiesTestCase(APITestCase):
     def test_empty_response(self):
         response = self.client.post(self.url,{},format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data['results']),0)
+        self.assertEqual(len(response.data['societies']),0)
     def test_find_by_environmental_filter_gt(self):
         data = {'environmental_filters': [{'id': str(self.environmental_variable1.pk),
                                            'operator': 'gt', 'params': ['1.5']}]}
