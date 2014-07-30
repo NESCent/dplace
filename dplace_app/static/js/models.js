@@ -3,7 +3,7 @@
  * Created by dan on 7/30/14.
  */
 
-function SearchModel(VariableCategory, GeographicRegion, FindSocieties) {
+function SearchModel(VariableCategory, GeographicRegion, EnvironmentalVariable) {
     this.reset = function() {
         this.selectedButton = null;
         this.results = {}; // Populated after search is run
@@ -11,7 +11,8 @@ function SearchModel(VariableCategory, GeographicRegion, FindSocieties) {
         this.query = {}; // Parameters sent to the FindSocieties API
         this.results.societies = [];
         this.params.culturalTraits = new CulturalTraitModel(VariableCategory);
-        this.params.geographicRegions = new GeographicRegionModel(GeographicRegion)
+        this.params.geographicRegions = new GeographicRegionModel(GeographicRegion);
+        this.params.environmentalData = new EnvironmentalDataModel(EnvironmentalVariable);
     };
 
     // getters
@@ -21,7 +22,9 @@ function SearchModel(VariableCategory, GeographicRegion, FindSocieties) {
     this.getGeographicRegions = function() {
         return this.params.geographicRegions;
     };
-
+    this.getEnvironmentalData = function() {
+        return this.params.environmentalData;
+    };
 
     // Includes the search query
     this.getResults = function() {
@@ -47,4 +50,17 @@ function CulturalTraitModel(VariableCategory) {
 function GeographicRegionModel(GeographicRegion) {
     this.selectedRegions = [];
     this.allRegions = GeographicRegion.query();
+}
+
+function EnvironmentalDataModel(EnvironmentalVariable) {
+    this.variables = EnvironmentalVariable.query();
+    this.selectedVariable = null;
+    this.filters = [
+        { operator: 'inrange', name: 'between' },
+        { operator: 'lt', name: 'less than'},
+        { operator: 'gt', name: 'greater than'},
+        { operator: 'outrange', name: 'outside'},
+    ];
+    this.selectedFilter = this.filters[0];
+    this.vals = [];
 }

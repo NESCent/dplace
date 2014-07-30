@@ -3,8 +3,8 @@
  * search UI state across controllers
  * @constructor
  */
-function SearchModelService(VariableCategory, GeographicRegion) {
-    this.model = new SearchModel(VariableCategory, GeographicRegion);
+function SearchModelService(VariableCategory, GeographicRegion, EnvironmentalVariable) {
+    this.model = new SearchModel(VariableCategory, GeographicRegion, EnvironmentalVariable);
     this.getModel = function() {
         return this.model;
     }
