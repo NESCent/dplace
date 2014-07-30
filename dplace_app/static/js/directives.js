@@ -97,7 +97,7 @@ angular.module('dplaceMapDirective', [])
 
                         // then update the UI
                         scope.updatesEnabled = false;
-                        var codes = scope.localRegions.map(function(region){
+                        var regionCodes = scope.localRegions.map(function(region){
                             return region.code;
                         });
                         scope.map.clearSelectedRegions();
