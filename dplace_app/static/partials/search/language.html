@@ -1,10 +1,10 @@
 <div ng-controller="LanguageCtrl">
     <h4>Search by Language Family</h4>
     <form class="form-inline" role="form">
-        <div class="panel panel-default" ng-repeat="languageFilter in model.searchParams.language.languageFilters">
+        <div class="panel panel-default" ng-repeat="languageFilter in languageClassifications.languageFilters">
             <div class="panel-heading">
                 <div class="row">
-                    <div ng-repeat="levelObject in model.searchParams.language.levels"
+                    <div ng-repeat="levelObject in languageClassifications.levels"
                          class="form-group col-xs-4">
                         <select
                                 ng-model="languageFilter[levelObject.level - 1].selectedItem"

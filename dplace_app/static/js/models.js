@@ -3,7 +3,7 @@
  * Created by dan on 7/30/14.
  */
 
-function SearchModel(VariableCategory, GeographicRegion, EnvironmentalVariable) {
+function SearchModel(VariableCategory, GeographicRegion, EnvironmentalVariable, LanguageClass) {
     this.reset = function() {
         this.selectedButton = null;
         this.results = {}; // Populated after search is run
@@ -13,6 +13,7 @@ function SearchModel(VariableCategory, GeographicRegion, EnvironmentalVariable) 
         this.params.culturalTraits = new CulturalTraitModel(VariableCategory);
         this.params.geographicRegions = new GeographicRegionModel(GeographicRegion);
         this.params.environmentalData = new EnvironmentalDataModel(EnvironmentalVariable);
+        this.params.languageClassifications = new LanguageClassificationModel(LanguageClass)
     };
 
     // getters
@@ -25,6 +26,9 @@ function SearchModel(VariableCategory, GeographicRegion, EnvironmentalVariable) 
     this.getEnvironmentalData = function() {
         return this.params.environmentalData;
     };
+    this.getLanguageClassifications = function() {
+        return this.params.languageClassifications;
+    }
 
     // Includes the search query
     this.getResults = function() {
@@ -63,4 +67,24 @@ function EnvironmentalDataModel(EnvironmentalVariable) {
     ];
     this.selectedFilter = this.filters[0];
     this.vals = [];
+}
+
+function LanguageClassificationModel(LanguageClass) {
+    var levels = [
+        {level: 1, name: 'Family',          tag: 'family'},
+        {level: 2, name: 'Subfamily',       tag: 'subfamily'},
+        {level: 3, name: 'Subsubfamily',    tag: 'subsubfamily'}
+    ];
+
+    var languageFilter = angular.copy(levels);
+    languageFilter.forEach(function (filterLevel) {
+        filterLevel.selectedItem = undefined;
+    });
+
+    /* Populate language family for first level */
+    var familyLevel = 1;
+    languageFilter[0].items = LanguageClass.query({level: familyLevel});
+
+    this.levels = levels;
+    this.languageFilters = [languageFilter];
 }

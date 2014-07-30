@@ -1,33 +1,6 @@
-function LanguageCtrl($scope, LanguageClass, LanguageClassification) {
-
-    /* Prototype model for UI */
-    var levels = [
-        {level: 1, name: 'Family',          tag: 'family'},
-        {level: 2, name: 'Subfamily',       tag: 'subfamily'},
-        {level: 3, name: 'Subsubfamily',    tag: 'subsubfamily'}
-    ];
-
-    var maxLevel = levels[levels.length - 1].level
-
-
-
-    /* Iniitial setup */
-    $scope.initialize = function() {
-        /* Model for binding */
-        var languageFilter = angular.copy(levels);
-        languageFilter.forEach(function (filterLevel) {
-            filterLevel.selectedItem = undefined;
-        });
-
-        /* Populate language family for first level */
-        var familyLevel = 1;
-        languageFilter[0].items = LanguageClass.query({level: familyLevel});
-        $scope.model.searchParams.language = {
-            levels: levels,
-            languageFilters: [languageFilter]
-        };
-    };
-    $scope.initialize();
+function LanguageCtrl($scope, searchModelService, LanguageClass, LanguageClassification) {
+    $scope.languageClassifications = searchModelService.getModel().getLanguageClassifications();
+    var levels = $scope.languageClassifications.levels;
 
     function levelToIndex(levelObject) {
         return levelObject.level - 1;
@@ -38,7 +11,7 @@ function LanguageCtrl($scope, LanguageClass, LanguageClassification) {
 
     function selectedItemAtLevel(languageFilter,levelObject) {
         return languageFilter[levelToIndex(levelObject)].selectedItem;
-    };
+    }
 
     function queryParameterForLevel(levelObject) {
         return 'class_' + levelObject.tag;
@@ -62,13 +35,13 @@ function LanguageCtrl($scope, LanguageClass, LanguageClassification) {
     }
 
     function updateItems(languageFilter, parentObject, levelObject) {
-        var index = levelToIndex(levelObject)
+        var index = levelToIndex(levelObject);
         languageFilter[index].items = LanguageClass.query({parent: parentObject.id, level: levelObject.level});
         languageFilter[index].selectedItem = undefined;
     }
 
     function clearItems(languageFilter, levelObject) {
-        var index = levelToIndex(levelObject)
+        var index = levelToIndex(levelObject);
         languageFilter[index].items = [];
         languageFilter[index].selectedItem = undefined;
     }
@@ -96,7 +69,7 @@ function LanguageCtrl($scope, LanguageClass, LanguageClassification) {
 
     $scope.getLanguageQueryFilters = function() {
         var languageQueryFilters = [];
-        $scope.model.searchParams.language.languageFilters.forEach(function(languageFilter) {
+        $scope.languageClassifications.languageFilters.forEach(function(languageFilter) {
             var selectedClassifications = getSelectedLanguageClassifications(languageFilter);
             var languageIds = selectedClassifications.map(function (classification) { return classification.language.id; });
             languageQueryFilters.push({language_ids: languageIds});
@@ -108,11 +81,6 @@ function LanguageCtrl($scope, LanguageClass, LanguageClassification) {
         var filters = $scope.getLanguageQueryFilters();
         $scope.updateSearchQuery({ language_filters: filters });
         $scope.searchSocieties();
-    };
-
-    $scope.resetSearch = function() {
-        $scope.initialize();
-        $scope.resetSearchQuery();
     };
 
 }
