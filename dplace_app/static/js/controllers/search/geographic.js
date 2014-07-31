@@ -1,6 +1,10 @@
 function GeographicCtrl($scope, searchModelService) {
-    // Get a reference to the geographic regions from the model
-    $scope.geographic = searchModelService.getModel().getGeographicRegions();
+    var linkModel = function() {
+        // Get a reference to the geographic regions from the model
+        $scope.geographic = searchModelService.getModel().getGeographicRegions();
+    };
+    $scope.$on('searchModelReset', linkModel); // When model is reset, update our model
+    linkModel();
 
     $scope.removeRegion = function(region) {
         var index = $scope.geographic.selectedRegions.indexOf(region);

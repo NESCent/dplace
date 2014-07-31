@@ -1,5 +1,11 @@
 function LanguageCtrl($scope, searchModelService, LanguageClass, LanguageClassification) {
-    $scope.languageClassifications = searchModelService.getModel().getLanguageClassifications();
+    var linkModel = function() {
+        // Get a reference to the language classifications from the model
+        $scope.languageClassifications = searchModelService.getModel().getLanguageClassifications();
+    };
+    $scope.$on('searchModelReset', linkModel); // When model is reset, update our model
+    linkModel();
+
     var levels = $scope.languageClassifications.levels;
 
     function levelToIndex(levelObject) {

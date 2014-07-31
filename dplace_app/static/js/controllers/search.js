@@ -40,10 +40,6 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties) 
         });
     };
 
-    $scope.resetSearchQuery = function() {
-        searchModelService.getModel().reset();
-    };
-
     // This method merges the current searchQuery object with the incoming searchQuery
     $scope.updateSearchQuery = function(searchQuery) {
         for(var propertyName in searchQuery) {
@@ -66,6 +62,8 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties) 
     // resets this object state and the search query.
     $scope.resetSearch = function() {
         $scope.searchModel.reset();
+        // send a notification so that the individual controllers reload their state
+        $scope.$broadcast('searchModelReset');
     };
 
 }

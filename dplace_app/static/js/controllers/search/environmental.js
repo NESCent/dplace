@@ -1,5 +1,10 @@
 function EnvironmentalCtrl($scope, searchModelService) {
-    $scope.environmentalData = searchModelService.getModel().getEnvironmentalData();
+    var linkModel = function() {
+        // Get a reference to the environmental search params from the model
+        $scope.environmentalData = searchModelService.getModel().getEnvironmentalData();
+    };
+    $scope.$on('searchModelReset', linkModel); // When model is reset, update our model
+    linkModel();
 
     var getSelectedFilters = function() {
         //environmental_vals: [{id: 1, operator: 'gt', params: [0.0]}, {id:3, operator 'inrange', params: [10.0,20.0] }

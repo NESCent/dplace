@@ -1,6 +1,10 @@
 function CulturalCtrl($scope, searchModelService, Variable, CodeDescription) {
-    // Model/state lives in searchModelService
-    $scope.traits = [searchModelService.getModel().getCulturalTraits()];
+    var linkModel = function() {
+        // Model/state lives in searchModelService
+        $scope.traits = [searchModelService.getModel().getCulturalTraits()];
+    };
+    $scope.$on('searchModelReset', linkModel); // When model is reset, update our model
+    linkModel();
 
     // triggered by the view when a category is changed
     $scope.categoryChanged = function(trait) {
