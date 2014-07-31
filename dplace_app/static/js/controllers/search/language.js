@@ -83,6 +83,16 @@ function LanguageCtrl($scope, searchModelService, LanguageClass, LanguageClassif
         return languageQueryFilters;
     };
 
+    $scope.classificationSelectionChanged = function(classification) {
+        // Since the selections are stored deep in the model, this is greatly simplified by +1 / -1
+        // But if we add "select all", this will not work
+        if(classification.isSelected) {
+            $scope.languageClassifications.badgeValue++;
+        } else {
+            $scope.languageClassifications.badgeValue--;
+        }
+    };
+
     $scope.doSearch = function() {
         var filters = $scope.getLanguageQueryFilters();
         $scope.updateSearchQuery({ language_filters: filters });

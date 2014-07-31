@@ -17,6 +17,13 @@ function EnvironmentalCtrl($scope, searchModelService) {
         return filters;
     };
 
+    $scope.variableChanged = function(variable) {
+        if(variable != null) {
+            $scope.environmentalData.badgeValue = 1;
+        } else {
+            $scope.environmentalData.badgeValue = 0;
+        }
+    };
     $scope.doSearch = function() {
         var filters = getSelectedFilters();
         $scope.updateSearchQuery({ environmental_filters: filters });

@@ -28,6 +28,10 @@ function CulturalCtrl($scope, searchModelService, Variable, CodeDescription) {
         return selectedCodes;
     };
 
+    $scope.traitCodeSelectionChanged = function(trait) {
+        trait.badgeValue = trait.codes.filter(function(code) { return code.isSelected; }).length;
+    };
+
     // wired to the search button. Gets the code ids, adds cultural to the query, and invokes the search
     $scope.doSearch = function() {
         var code_ids = $scope.getSelectedTraitCodes($scope.traits);

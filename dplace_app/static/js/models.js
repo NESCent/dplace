@@ -28,7 +28,7 @@ function SearchModel(VariableCategory, GeographicRegion, EnvironmentalVariable, 
     };
     this.getLanguageClassifications = function() {
         return this.params.languageClassifications;
-    }
+    };
 
     // Includes the search query
     this.getResults = function() {
@@ -49,11 +49,13 @@ function CulturalTraitModel(VariableCategory) {
     this.categories = VariableCategory.query(); // these objects get annotated with variables
     this.selectedCategory = null;
     this.selectedVariable = null;
+    this.badgeValue = 0;
 }
 
 function GeographicRegionModel(GeographicRegion) {
     this.selectedRegions = [];
     this.allRegions = GeographicRegion.query();
+    this.badgeValue = 0;
 }
 
 function EnvironmentalDataModel(EnvironmentalVariable) {
@@ -67,6 +69,7 @@ function EnvironmentalDataModel(EnvironmentalVariable) {
     ];
     this.selectedFilter = this.filters[0];
     this.vals = [];
+    this.badgeValue = 0;
 }
 
 function LanguageClassificationModel(LanguageClass) {
@@ -87,4 +90,5 @@ function LanguageClassificationModel(LanguageClass) {
 
     this.levels = levels;
     this.languageFilters = [languageFilter];
+    this.badgeValue = 0;
 }
