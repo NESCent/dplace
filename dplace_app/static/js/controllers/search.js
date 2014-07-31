@@ -12,10 +12,18 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties) 
     $scope.searchModel = searchModelService.getModel();
     $scope.selectedButton = $scope.searchModel.selectedButton;
     $scope.buttons = [
-        {value:'geographic', name:'Geographic'},
-        {value:'cultural', name:'Cultural Traits'},
-        {value:'environmental', name:'Environmental'},
-        {value:'language', name:'Language'}
+        {value:'geographic', name:'Geographic', badgeValue:
+            function() { return $scope.searchModel.getGeographicRegions().badgeValue; }
+        },
+        {value:'cultural', name:'Cultural Traits', badgeValue:
+            function() { return $scope.searchModel.getCulturalTraits().badgeValue; }
+        },
+        {value:'environmental', name:'Environmental', badgeValue:
+            function() { return $scope.searchModel.getEnvironmentalData().badgeValue; }
+        },
+        {value:'language', name:'Language', badgeValue:
+            function() { return $scope.searchModel.getLanguageClassifications().badgeValue; }
+        }
     ];
 
     $scope.buttonChanged = function(selectedButton) {
