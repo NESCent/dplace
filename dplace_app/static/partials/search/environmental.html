@@ -9,6 +9,7 @@
                                 ng-model="environmentalData.selectedVariable"
                                 class="form-control"
                                 ng-options="environmental.name for environmental in environmentalData.variables"
+                                ng-change="variableChanged(environmentalData.selectedVariable)"
                                 >
                             <option value="">Select an environmental variable</option>
                         </select>

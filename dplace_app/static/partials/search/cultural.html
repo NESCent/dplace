@@ -32,7 +32,7 @@
                 <div ng-repeat="code in trait.codes">
                     <span class="variable-label pull-left">{{ code.code }}:</span>
                     <span class="variable-description">{{ code.description }}</span>
-                    <input class="pull-right" type="checkbox" ng-model="code.isSelected"/>
+                    <input class="pull-right" type="checkbox" ng-model="code.isSelected" ng-change="traitCodeSelectionChanged(trait)"/>
                 </div>
             </div>
         </div>
