@@ -1,20 +1,14 @@
-function EnvironmentalCtrl($scope, EnvironmentalVariable, FindSocieties) {
-    $scope.model.searchParams.environmentalVariables = EnvironmentalVariable.query();
-    $scope.model.searchParams.environmentalFilters = [
-        { operator: 'inrange', name: 'between' },
-        { operator: 'lt', name: 'less than'},
-        { operator: 'gt', name: 'greater than'},
-        { operator: 'outrange', name: 'outside'},
-    ];
-    $scope.model.searchParams.environmental = {
-        selectedVariable: null,
-        vals: [],
-        selectedFilter: $scope.model.searchParams.environmentalFilters[0]
+function EnvironmentalCtrl($scope, searchModelService) {
+    var linkModel = function() {
+        // Get a reference to the environmental search params from the model
+        $scope.environmentalData = searchModelService.getModel().getEnvironmentalData();
     };
+    $scope.$on('searchModelReset', linkModel); // When model is reset, update our model
+    linkModel();
 
-    $scope.getSelectedFilters = function() {
+    var getSelectedFilters = function() {
         //environmental_vals: [{id: 1, operator: 'gt', params: [0.0]}, {id:3, operator 'inrange', params: [10.0,20.0] }
-        var environmental = $scope.model.searchParams.environmental;
+        var environmental = $scope.environmentalData;
         var filters = [{
             id: environmental.selectedVariable.id,
             operator: environmental.selectedFilter.operator,
@@ -23,10 +17,16 @@ function EnvironmentalCtrl($scope, EnvironmentalVariable, FindSocieties) {
         return filters;
     };
 
-    $scope.doSearch = function() {
-        var filters = $scope.getSelectedFilters();
-        $scope.disableSearchButton()
-        $scope.model.searchResults = FindSocieties.find({ environmental_filters: filters}, $scope.searchCompleted );
+    $scope.variableChanged = function(variable) {
+        if(variable != null) {
+            $scope.environmentalData.badgeValue = 1;
+        } else {
+            $scope.environmentalData.badgeValue = 0;
+        }
     };
-
+    $scope.doSearch = function() {
+        var filters = getSelectedFilters();
+        $scope.updateSearchQuery({ environmental_filters: filters });
+        $scope.searchSocieties();
+    };
 }

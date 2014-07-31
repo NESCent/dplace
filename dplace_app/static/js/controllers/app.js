@@ -1,6 +1,6 @@
-function AppCtrl($scope, $location) {
-    $scope.model = {'searchResults': {}, 'searchParams': {}};
+function AppCtrl($scope, $location, searchModelService) {
     $scope.searchButton = {'disabled': false, 'text': 'Search'};
+    $scope.model = searchModelService.getModel();
     // Root controller for app
     $scope.setActive = function(tabName) {
         $scope.searchActive = '';
@@ -8,17 +8,14 @@ function AppCtrl($scope, $location) {
         $scope.aboutActive = '';
         $scope[tabName + 'Active'] = 'active'
     };
+
     $scope.switchToResults = function() {
         $location.path('/societies');
     };
 
-    $scope.getResults = function() {
-        return $scope.model.searchResults.results;
-    };
-
     $scope.getSocietyIds = function() {
-        return $scope.getResults().map(function (result) {
-            return result.society.id;
+        return $scope.model.getSocieties().map(function (container) {
+            return container.society.id;
         });
-    }
+    };
 }
