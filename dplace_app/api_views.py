@@ -176,5 +176,5 @@ def trees_from_languages(request):
         trees = LanguageTree.objects.filter(languages__pk__in=language_ids).distinct()
     else:
         trees = None
-    return Response(LanguageTreeSerializer(trees).data)
+    return Response(LanguageTreeSerializer(trees, many=True).data,)
 
