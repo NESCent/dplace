@@ -4,6 +4,7 @@ angular.module('dplaceServices', ['ngResource'])
         $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
     })
     .service('colorMapService', [ColorMapService])
+    .service('searchModelService',['VariableCategory','GeographicRegion','EnvironmentalVariable','LanguageClass',SearchModelService])
     .factory('LanguageClass', function ($resource) {
         return $resource(
             '/api/v1/language_classes/:id',

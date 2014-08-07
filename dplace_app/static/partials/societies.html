@@ -1,43 +1,43 @@
 <div class="container results">
     <div class="row">
         <span>
-            <p class="pull-left lead">Societies <span ng-show="model.searchResults.results.length">({{ model.searchResults.results.length }})</span></p>
+            <p class="pull-left lead">Societies <span ng-show="results.societies.length">({{ results.societies.length }})</span></p>
         </span>
     </div>
     <tabset>
         <tab heading="Table">
             <div class="row">
-                <div ng-hide="model.searchResults.results.length">
+                <div ng-hide="results.societies.length">
                     <p class="text-center help-block search-help"></p>
                 </div>
-                <table class="table" ng-show="model.searchResults.results.length">
+                <table class="table" ng-show="results.societies.length">
                     <tr>
                         <th>Name</th>
                         <th>ISO Code</th>
                         <th>Language</th>
                         <th>Trees</th>
-                        <th ng-repeat="variable in model.searchResults.variable_descriptions">{{ variable.name }}</th>
-                        <th ng-repeat="environmental in model.searchResults.environmental_variables">{{ environmental.name }}</th>
-                        <th ng-show="model.searchResults.languages">Language</th>
-                        <th ng-show="model.searchResults.geographic_regions">Geographic Region</th>
+                        <th ng-repeat="variable in results.variable_descriptions">{{ variable.name }}</th>
+                        <th ng-repeat="environmental in results.environmental_variables">{{ environmental.name }}</th>
+                        <th ng-show="results.languages">Language</th>
+                        <th ng-show="results.geographic_regions">Geographic Region</th>
                     </tr>
-                    <tr ng-repeat="society_result in model.searchResults.results">
+                    <tr ng-repeat="society_result in results.societies">
                         <td><span class="circle" ng-style="society_result.society.style"></span>
                             <a ng-href="/society/{{ society_result.society.id }}" target="_blank">{{ society_result.society.name }}</a>
                         </td>
                         <td>{{ society_result.society.iso_code }}</td>
                         <td>{{ society_result.society.language | formatLanguageName }}</td>
                         <td><a popover="{{society_result.society.trees | formatLanguageTrees }}" title="'Trees'">{{ society_result.society.trees | countOrBlank }}</a></td>
-                        <td ng-repeat="variable in model.searchResults.variable_descriptions">
+                        <td ng-repeat="variable in results.variable_descriptions">
                             {{ society_result.variable_coded_values | formatVariableCodeValues }}
                         </td>
-                        <td ng-repeat="environmental in model.searchResults.environmental_variables">
+                        <td ng-repeat="environmental in results.environmental_variables">
                             {{ society_result.environmental_values | formatEnvironmentalValues }}
                         </td>
-                        <td ng-show="model.searchResults.languages">
+                        <td ng-show="results.languages">
                             {{ society_result.languages | formatLanguage}}
                         </td>
-                        <td ng-show="model.searchResults.geographic_regions">
+                        <td ng-show="results.geographic_regions">
                             {{ society_result.geographic_regions | formatGeographicRegion}}
                         </td>
                     </tr>
@@ -45,7 +45,17 @@
             </div>
         </tab>
         <tab heading="Map" select="resizeMap()">
-            <dplace-map societies="model.searchResults.results"></dplace-map>
+            <dplace-map societies="results.societies"></dplace-map>
+        </tab>
+        <tab heading="Download" select="generateDownloadLinks()">
+            <div class="row">
+                <h4>Download results as:</h4>
+                <ul>
+                    <li>
+                        <a ng-href="{{ csvDownloadLink }}" class="btn btn-info btn-dplace-download">CSV</a>
+                    </li>
+                </ul>
+            </div>
         </tab>
     </tabset>
 </div>

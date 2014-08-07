@@ -1,29 +1,12 @@
-function LanguageCtrl($scope, LanguageClass, LanguageClassification, FindSocieties) {
-
-    /* Prototype model for UI */
-    var levels = [
-        {level: 1, name: 'Family',          tag: 'family'},
-        {level: 2, name: 'Subfamily',       tag: 'subfamily'},
-        {level: 3, name: 'Subsubfamily',    tag: 'subsubfamily'}
-    ];
-
-    var maxLevel = levels[levels.length - 1].level
-
-    /* Model for binding */
-    var languageFilter = angular.copy(levels);
-    languageFilter.forEach(function (filterLevel) {
-        filterLevel.selectedItem = undefined;
-    });
-
-    /* Populate language family for first level */
-    var familyLevel = 1;
-    languageFilter[0].items = LanguageClass.query({level: familyLevel});
-
-    /* Iniitial setup */
-    $scope.model.searchParams.language = {
-        levels: levels,
-        languageFilters: [languageFilter]
+function LanguageCtrl($scope, searchModelService, LanguageClass, LanguageClassification) {
+    var linkModel = function() {
+        // Get a reference to the language classifications from the model
+        $scope.languageClassifications = searchModelService.getModel().getLanguageClassifications();
     };
+    $scope.$on('searchModelReset', linkModel); // When model is reset, update our model
+    linkModel();
+
+    var levels = $scope.languageClassifications.levels;
 
     function levelToIndex(levelObject) {
         return levelObject.level - 1;
@@ -34,7 +17,7 @@ function LanguageCtrl($scope, LanguageClass, LanguageClassification, FindSocieti
 
     function selectedItemAtLevel(languageFilter,levelObject) {
         return languageFilter[levelToIndex(levelObject)].selectedItem;
-    };
+    }
 
     function queryParameterForLevel(levelObject) {
         return 'class_' + levelObject.tag;
@@ -58,13 +41,13 @@ function LanguageCtrl($scope, LanguageClass, LanguageClassification, FindSocieti
     }
 
     function updateItems(languageFilter, parentObject, levelObject) {
-        var index = levelToIndex(levelObject)
+        var index = levelToIndex(levelObject);
         languageFilter[index].items = LanguageClass.query({parent: parentObject.id, level: levelObject.level});
         languageFilter[index].selectedItem = undefined;
     }
 
     function clearItems(languageFilter, levelObject) {
-        var index = levelToIndex(levelObject)
+        var index = levelToIndex(levelObject);
         languageFilter[index].items = [];
         languageFilter[index].selectedItem = undefined;
     }
@@ -92,7 +75,7 @@ function LanguageCtrl($scope, LanguageClass, LanguageClassification, FindSocieti
 
     $scope.getLanguageQueryFilters = function() {
         var languageQueryFilters = [];
-        $scope.model.searchParams.language.languageFilters.forEach(function(languageFilter) {
+        $scope.languageClassifications.languageFilters.forEach(function(languageFilter) {
             var selectedClassifications = getSelectedLanguageClassifications(languageFilter);
             var languageIds = selectedClassifications.map(function (classification) { return classification.language.id; });
             languageQueryFilters.push({language_ids: languageIds});
@@ -100,10 +83,20 @@ function LanguageCtrl($scope, LanguageClass, LanguageClassification, FindSocieti
         return languageQueryFilters;
     };
 
+    $scope.classificationSelectionChanged = function(classification) {
+        // Since the selections are stored deep in the model, this is greatly simplified by +1 / -1
+        // But if we add "select all", this will not work
+        if(classification.isSelected) {
+            $scope.languageClassifications.badgeValue++;
+        } else {
+            $scope.languageClassifications.badgeValue--;
+        }
+    };
+
     $scope.doSearch = function() {
         var filters = $scope.getLanguageQueryFilters();
-        $scope.disableSearchButton()
-        $scope.model.searchResults = FindSocieties.find({ language_filters: filters }, $scope.searchCompleted );
+        $scope.updateSearchQuery({ language_filters: filters });
+        $scope.searchSocieties();
     };
 
 }

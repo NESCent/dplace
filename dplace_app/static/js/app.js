@@ -11,7 +11,11 @@ function dplaceRouter($routeProvider) {
             templateUrl: '/static/partials/societies.html',
             controller: 'SocietiesCtrl'
         })
+        .when('/about', {
+            templateUrl: '/static/partials/about.html',
+            controller: 'AboutCtrl'
+        })
         .otherwise({
-	        redirectTo: '/search'
+	        redirectTo: '/about'
 	});
 }

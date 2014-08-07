@@ -8,7 +8,7 @@
                         ng-model="model.searchParams.selectedButton"
                         ng-click="buttonChanged(button)"
                         btn-radio="button"
-                        >{{ button.name }}</button>
+                        >{{ button.name }} <span class="badge" ng-show="button.badgeValue()">{{ button.badgeValue() }}</span></button>
             </div>
         </div>
     </div>
