@@ -7,7 +7,7 @@
  * @param FindSocieties
  * @constructor
  */
-function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties) {
+function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties, TreesFromLanguages) {
     $scope.setActive('search');
     $scope.searchModel = searchModelService.getModel();
     $scope.selectedButton = $scope.searchModel.selectedButton;
@@ -48,6 +48,30 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties) 
         });
     };
 
+    function searchForLanguageTrees() {
+        var languageIDs = $scope.searchModel.getSocieties().filter(function (container) {
+            return container.society.language != null;
+        }).map(function (container) {
+            return container.society.language.id;
+        });
+        $scope.searchModel.languageTrees = TreesFromLanguages.find({language_ids: languageIDs}, addTreesToSocieties);
+    }
+    
+    function addTreesToSocieties() {
+        $scope.searchModel.getSocieties().forEach(function (container) {
+            var language = container.society.language;
+            if(language != null) {
+                container.society.trees = $scope.searchModel.languageTrees.filter(function (tree) {
+                    return tree.languages.some(function (item) {
+                        return angular.equals(language, item);
+                    });
+                });
+            } else {
+                container.society.trees = [];
+            }
+        });
+    }
+
     // This method merges the current searchQuery object with the incoming searchQuery
     $scope.updateSearchQuery = function(searchQuery) {
         for(var propertyName in searchQuery) {
@@ -58,6 +82,7 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties) 
     var searchCompletedCallback = function() {
         $scope.enableSearchButton();
         $scope.assignColors();
+        searchForLanguageTrees();
         $scope.switchToResults();
     };
 

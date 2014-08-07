@@ -105,4 +105,16 @@ angular.module('dplaceServices', ['ngResource'])
                     }
                 }
             });
-    });
+    })
+    .factory('TreesFromLanguages', function($resource) {
+        return $resource(
+            '/api/v1/trees_from_languages',
+            {},{
+                find: {
+                    method: 'POST',
+                    isArray: true
+                }
+            }
+        )
+    })
+    ;

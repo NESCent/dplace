@@ -288,3 +288,7 @@ class GeographicRegion(models.Model):
     objects = models.GeoManager()
     def __unicode__(self):
         return "Region: %s, Continent %s" % (self.region_nam, self.continent)
+
+class LanguageTree(models.Model):
+    name = models.CharField(max_length=50, db_index=True)
+    languages = models.ManyToManyField(to='Language')

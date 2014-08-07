@@ -86,6 +86,11 @@ class LanguageViewSet(viewsets.ReadOnlyModelViewSet):
     filter_fields = ('name', 'iso_code', 'society',)
     queryset = Language.objects.all()
 
+class LanguageTreeViewSet(viewsets.ReadOnlyModelViewSet):
+    serializer_class = LanguageTreeSerializer
+    filter_fields = ('name',)
+    queryset = LanguageTree.objects.all()
+
 # search/filter APIs
 @api_view(['POST'])
 @permission_classes((AllowAny,))
@@ -162,3 +167,14 @@ class GeographicRegionViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = GeographicRegionSerializer
     model = GeographicRegion
     filter_class = GeographicRegionFilter
+
+@api_view(['POST'])
+@permission_classes((AllowAny,))
+def trees_from_languages(request):
+    if 'language_ids' in request.DATA:
+        language_ids = [int(x) for x in request.DATA['language_ids']]
+        trees = LanguageTree.objects.filter(languages__pk__in=language_ids).distinct()
+    else:
+        trees = None
+    return Response(LanguageTreeSerializer(trees).data)
+
