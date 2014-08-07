@@ -49,25 +49,25 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties, 
     };
 
     function searchForLanguageTrees() {
-        var languageIDs = $scope.model.searchResults.results.filter(function (result) {
-            return result.society.language != null;
-        }).map(function (result) {
-            return result.society.language.id;
+        var languageIDs = $scope.searchModel.getSocieties().filter(function (container) {
+            return container.society.language != null;
+        }).map(function (container) {
+            return container.society.language.id;
         });
-        $scope.model.languageTrees = TreesFromLanguages.find({language_ids: languageIDs}, addTreesToSocieties);
+        $scope.searchModel.languageTrees = TreesFromLanguages.find({language_ids: languageIDs}, addTreesToSocieties);
     }
     
     function addTreesToSocieties() {
-        $scope.model.searchResults.results.forEach(function (result) {
-            var language = result.society.language;
-            if (language != null) {
-                result.society.trees = $scope.model.languageTrees.filter(function (tree) {
+        $scope.searchModel.getSocieties().forEach(function (container) {
+            var language = container.society.language;
+            if(language != null) {
+                container.society.trees = $scope.searchModel.languageTrees.filter(function (tree) {
                     return tree.languages.some(function (item) {
                         return angular.equals(language, item);
                     });
                 });
             } else {
-                result.society.trees = [];
+                container.society.trees = [];
             }
         });
     }
