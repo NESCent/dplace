@@ -80,16 +80,22 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties, 
     };
 
     var searchCompletedCallback = function() {
+        $scope.searchModel.errors = null;
         $scope.enableSearchButton();
         $scope.assignColors();
         searchForLanguageTrees();
         $scope.switchToResults();
     };
 
+    var errorCallback = function(httpResponse) {
+        $scope.errors = httpResponse.data;
+        $scope.enableSearchButton();
+    };
+
     $scope.searchSocieties = function() {
         $scope.disableSearchButton();
         var query = $scope.searchModel.query;
-        $scope.searchModel.results = FindSocieties.find(query, searchCompletedCallback);
+        $scope.searchModel.results = FindSocieties.find(query, searchCompletedCallback, errorCallback);
     };
 
     // resets this object state and the search query.

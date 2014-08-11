@@ -7,6 +7,7 @@ function SearchModel(VariableCategory, GeographicRegion, EnvironmentalVariable, 
     this.reset = function() {
         this.selectedButton = null;
         this.results = {}; // Populated after search is run
+        this.errors = null;
         this.params = {}; // state for individual controllers
         this.query = {}; // Parameters sent to the FindSocieties API
         this.results.societies = [];
