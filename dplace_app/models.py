@@ -215,6 +215,8 @@ class Source(models.Model):
     reference = models.CharField(max_length=500)
     focal_year = models.CharField(max_length=10,null=True)
     subcase = models.CharField(max_length=32,null=True)
+    def __unicode__(self):
+        return "%s (%s)" % (self.author, self.year)
     class Meta:
         unique_together = (
             ('year','author')
