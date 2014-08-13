@@ -19,6 +19,9 @@
                     ng-click="doSearch()">{{ searchButton.text }}</button>
             <button class="btn btn-danger form-control"
                     ng-click="resetSearch()">Reset</button>
+	    <span class="alert alert-danger" ng-show="errors">
+	      {{ errors }}
+	    </span>
         </div>
     </form>
 </div>

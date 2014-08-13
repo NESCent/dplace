@@ -1,6 +1,6 @@
 <div ng-controller="EnvironmentalCtrl">
     <h4>Search by Environmental Data</h4>
-    <form class="form-inline" role="form">
+    <form class="form-inline" role="form" name="environmentalForm">
         <div class="panel panel-default">
             <div class="panel-heading">
                 <div class="row">
@@ -26,15 +26,15 @@
                             </div>
                         </div>
                         <div class="fields-inrange" ng-show="environmentalData.selectedFilter.operator == 'inrange'">
-                            <div class="form-group col-xs-3">
+                            <div class="form-group col-xs-3" ng-class="{'has-error': environmentalForm.val0.$invalid}">
                                 <div class="input-group">
-                                    <input class="form-control input-xs" ng-model="environmentalData.vals[0]" />
+                                    <input class="form-control input-xs" ng-model="environmentalData.vals[0]" name="val0" required/>
                                     <span class="input-group-addon">{{ environmentalData.selectedVariable.units }}</span>
                                 </div>
                             </div>
                             <div class="form-group col-xs-3">
                                 <div class="input-group">
-                                    <input class="form-control" ng-model="environmentalData.vals[1]" />
+                                    <input class="form-control" ng-model="environmentalData.vals[1]" required/>
                                     <span class="input-group-addon">{{ environmentalData.selectedVariable.units }}</span>
                                 </div>
                             </div>
@@ -79,6 +79,9 @@
                     ng-click="doSearch()">{{ searchButton.text }}</button>
             <button class="btn btn-danger form-control"
                     ng-click="resetSearch()">Reset</button>
-        </div>
+	    <span class="alert alert-danger" ng-show="errors">
+	      {{ errors }}
+	    </span>
+	</div>
     </form>
 </div>
