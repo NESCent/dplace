@@ -8,11 +8,13 @@ from django.db.utils import IntegrityError
 from dplace_app.load.isocode import get_isocode
 from dplace_app.models import *
 from environmental import iso_from_code
+from sources import get_source
+# TODO: figure out how to deal with focal year.
 
 def load_ea_society(society_dict):
     ext_id = society_dict['ID']
-    source = 'EA'
-    found_societies = Society.objects.filter(ext_id=ext_id,source=source)
+    source = get_source('EA')
+    found_societies = Society.objects.filter(ext_id=ext_id, source=get_source("EA"))
     if len(found_societies) == 0:
         name = society_dict['Society_name_EA']
         iso_code = iso_from_code(get_isocode(society_dict))
@@ -51,7 +53,7 @@ def postprocess_ea_societies():
         focal_year_var = VariableDescription.objects.get(name='Date: Year with Century')
     except ObjectDoesNotExist:
         print "Unable to find vars for Lon/Lat/Year.  Have you loaded the ea_vars?"
-    for society in Society.objects.filter(source='EA'):
+    for society in Society.objects.filter(source=get_source("EA")):
         # Get location
         try:
             lon_val = society.variablecodedvalue_set.get(variable=lon_var)
@@ -67,7 +69,6 @@ def postprocess_ea_societies():
             society.location = location
         except ValueError:
             print "Unable to create Point from (%s,%s) for society %s" % (lon_val.coded_value, lat_val.coded_value, society)
-            # TODO: Get source, incl focal year
         society.save()
 
 def eavar_number_to_label(number):
@@ -88,7 +89,7 @@ def load_ea_var(var_dict):
 
     label = eavar_number_to_label(number)
     name = var_dict['Variable'].strip()
-    variable, created = VariableDescription.objects.get_or_create(label=label,name=name)
+    variable, created = VariableDescription.objects.get_or_create(label=label,name=name,source=get_source("EA"))
 
     index_categories = [clean_category(x) for x in var_dict['INDEXCATEGORY'].split(',')]
     # Currently max 1 niche category
@@ -193,33 +194,62 @@ def load_ea_codes(csvfile=None):
         else:
             print "did not get anything from this row %s" % (','.join(row)).strip()
 
+
+
+
+_EA_VAL_CACHE, _EA_VCD_CACHE = {}, {}
 def load_ea_val(val_row):
+    # So sloooow.
+    def get_variable(number):
+        label = eavar_number_to_label(number)
+        if label not in _EA_VAL_CACHE:
+            try:
+                _EA_VAL_CACHE[label] = VariableDescription.objects.get(label=label)
+            except ObjectDoesNotExist:
+                _EA_VAL_CACHE[label] = None
+        return _EA_VAL_CACHE[label]
+        
+    def get_description(variable, value):
+        key = (variable, value)
+        if key not in _EA_VCD_CACHE:
+            try:
+                # Check for Code description if it exists.
+                _EA_VCD_CACHE[key] = VariableCodeDescription.objects.get(variable=variable,code=value)
+            except ObjectDoesNotExist:
+                _EA_VCD_CACHE[key] = None
+        return _EA_VCD_CACHE[key]
+        
     ext_id = val_row['ID'].strip()
+    source = get_source("EA")
     # find the existing society
+    
+    if ext_id == "":
+        assert all([val_row[cell] == "" for cell in val_row])
+        return
+        
     try:
         society = Society.objects.get(ext_id=ext_id)
     except ObjectDoesNotExist:
         print "Attempting to load EA values for %s but did not find an existing Society object" % ext_id
         return
+   
     # get the keys that start with v
     for key in val_row.keys():
         if key.find('v') == 0:
             number = int(key[1:])
-            label = eavar_number_to_label(number)
             value = val_row[key].strip()
-            try:
-                variable = VariableDescription.objects.get(label=label)
-            except ObjectDoesNotExist:
+            variable = get_variable(number)
+            
+            if variable is None:
                 continue
-            try:
-                # Check for Code description if it exists.
-                code = VariableCodeDescription.objects.get(variable=variable,code=value)
-            except ObjectDoesNotExist:
-                code = None
+            
+            code = get_description(variable, value)
+            
             try:
                 variable_value = VariableCodedValue(variable=variable,
                                                     society=society,
                                                     coded_value=value,
+                                                    source=source,
                                                     code=code)
                 variable_value.save()
             except IntegrityError:
