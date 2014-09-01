@@ -8,13 +8,14 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-
-        # Renaming column for 'Society.source' to match new field type.
-        db.rename_column(u'dplace_app_society', 'source', 'source_id')
-        # Changing field 'Society.source'
-        db.alter_column(u'dplace_app_society', 'source_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['dplace_app.Source'], null=True))
-        # Adding index on 'Society', fields ['source']
-        db.create_index(u'dplace_app_society', ['source_id'])
+        # Deleting field 'source'
+        db.delete_column(u'dplace_app_society', 'source')
+        # Adding field 'source_id'
+        db.add_column(u'dplace_app_society', 'source',
+                      self.gf('django.db.models.fields.related.ForeignKey')(null=True, to=orm['dplace_app.Source']),
+                      keep_default=False)
+        # # Adding index on 'Society', fields ['source']
+        # db.create_index(u'dplace_app_society', ['source_id'])
 
 
     def backwards(self, orm):
