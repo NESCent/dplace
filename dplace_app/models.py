@@ -27,7 +27,7 @@ class Society(models.Model):
     ext_id = models.CharField('External ID', unique=True, max_length=10)
     name = models.CharField('Name', db_index=True, max_length=200)
     location = models.PointField('Location',null=True)
-    source = models.CharField(max_length=16,choices=SOCIETY_SOURCES)
+    source = models.ForeignKey('Source', null=True)
     iso_code = models.ForeignKey('ISOCode', null=True, related_name="societies")
     language = models.ForeignKey('Language', null=True, related_name="societies")
     objects = models.GeoManager()
@@ -110,7 +110,7 @@ class VariableDescription(models.Model):
     """
     label = models.CharField(max_length=25, db_index=True)
     name = models.CharField(max_length=200, db_index=True, default='Unknown')
-    source = models.ForeignKey('Source',null=True)
+    source = models.ForeignKey('Source', null=True)
     index_categories = models.ManyToManyField('VariableCategory', related_name='index_variables')
     niche_categories = models.ManyToManyField('VariableCategory', related_name='niche_variables')
     def coded_societies(self):
