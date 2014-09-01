@@ -10,11 +10,12 @@ from dplace_app.load.isocode import get_isocode
 from dplace_app.models import *
 from environmental import iso_from_code
 from society_ea import clean_category
+from sources import get_source
 
 def load_bf_society(society_dict):
     ext_id = society_dict['ID']
-    source = 'Binford'
-    found_societies = Society.objects.filter(ext_id=ext_id,source=source)
+    source = get_source("Binford")
+    found_societies = Society.objects.filter(ext_id=ext_id, source=source)
     if len(found_societies) == 0:
         name = society_dict['STANDARD SOCIETY NAME Binford']
         iso_code = iso_from_code(get_isocode(society_dict))
@@ -50,7 +51,7 @@ def load_bf_var(var_dict):
     name = var_dict['Variable name'].strip()
     description = var_dict['Detailed description'].strip()
 
-    variable, created = VariableDescription.objects.get_or_create(label=label,name=name)
+    variable, created = VariableDescription.objects.get_or_create(label=label,name=name,source=get_source("Binford"))
 
     index_categories = [clean_category(x) for x in var_dict['IndexCategory'].split(',')]
     # Currently max 1 niche category
@@ -136,7 +137,8 @@ def load_bf_codes(csvfile=None):
                 print "Code %s starts with 'class:', skipping" % code['code']
                 continue
             if code['code'].startswith('Value'):
-                print "Code %s starts with 'Value', skipping" %code['code']
+                print "Code %s starts with 'Value', skipping" % code['code']
+                continue
             code_description = VariableCodeDescription.objects.get_or_create(variable=variable,
                                                                              code=code['code'],
                                                                              description=code['description'])
@@ -145,6 +147,7 @@ def load_bf_codes(csvfile=None):
 
 def load_bf_val(val_row):
     ext_id = val_row['ID'].strip()
+    source = get_source("Binford")
     # find the existing society
     try:
         society = Society.objects.get(ext_id=ext_id)
@@ -187,7 +190,7 @@ def postprocess_binford_societies():
         lat_var = VariableDescription.objects.get(label='revised.latitude')
     except ObjectDoesNotExist:
         print "Unable to find vars for Lon/Lat.  Have you loaded the bf_vars?"
-    for society in Society.objects.filter(source='Binford'):
+    for society in Society.objects.filter(source=get_source("Binford")):
         # Get location
         try:
             lon_val = society.variablecodedvalue_set.get(variable=lon_var)
