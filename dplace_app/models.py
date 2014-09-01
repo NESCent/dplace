@@ -61,6 +61,7 @@ UNIT_CHOICES = (
 class EnvironmentalVariable(models.Model):
     name = models.CharField(max_length=50, unique=True)
     units = models.CharField(max_length=10, choices=UNIT_CHOICES)
+    
     def __unicode__(self):
         return "%s (%s)" % (self.name, self.units)
     class Meta:
@@ -71,6 +72,8 @@ class EnvironmentalValue(models.Model):
     variable = models.ForeignKey('EnvironmentalVariable', related_name="values")
     value = models.FloatField(db_index=True)
     environmental = models.ForeignKey('Environmental', related_name="values")
+    source = models.ForeignKey('Source', null=True)
+    
     def society(self):
         return self.environmental.society
     def __unicode__(self):
@@ -185,6 +188,7 @@ class VariableCodedValue(models.Model):
     coded_value = models.CharField(max_length=100, db_index=True, null=False, default='.')
     code = models.ForeignKey('VariableCodeDescription', db_index=True, null=True)
     source = models.ForeignKey('Source', null=True)
+    
     def get_description(self):
         if self.code is not None:
             return self.code.description
