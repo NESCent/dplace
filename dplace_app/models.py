@@ -93,6 +93,7 @@ class Environmental(models.Model):
     reported_location = models.PointField()
     actual_location = models.PointField()
     iso_code = models.ForeignKey('ISOCode', null=True, related_name="environmentals")
+    source = models.ForeignKey('Source', null=True)
 
     # For GeoDjango, must override the manager
     objects = models.GeoManager()
