@@ -91,7 +91,7 @@ ENVIRONMENTAL_MAP = {
 }
 
 def iso_from_code(code):
-    if code == 'NA':
+    if code == 'NA' or len(code) == 0:
         return None
     try:
         return ISOCode.objects.get(iso_code=code)
