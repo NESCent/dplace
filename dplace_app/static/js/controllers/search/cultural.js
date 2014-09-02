@@ -31,15 +31,13 @@ function CulturalCtrl($scope, searchModelService, Variable, CodeDescription) {
 		var allCodes = Array.prototype.concat.apply([], traits.map( function(trait) { 
 			return trait.codes; 
 		}));
-		selectedCodes = allCodes.filter( function(c) { return c.isSelected; }).map( function(c) { return c.id; });
+		selectedCodes = allCodes.filter( function(c) { return c.isSelected; }).map( function(c) { return c; });
 	   return selectedCodes;
     };
 
     $scope.traitCodeSelectionChanged = function(trait) {
         //trait.badgeValue = trait.codes.filter(function(code) { return code.isSelected; }).length;
-		
 		currentSelection = $scope.getSelectedTraitCodes();
-		 //alert(currentSelection.length);
 		currentSelection.forEach(function(code) {
 			if (selected.indexOf(code) == -1) { 
 			//if selected trait code is not already in the array of selected codes, add it to the array
@@ -47,16 +45,17 @@ function CulturalCtrl($scope, searchModelService, Variable, CodeDescription) {
 			}
 			
 		});
-		trait.badgeValue = selected.length; //update badge value
+		trait.badgeValue = selected.filter(function(code) { return code.isSelected; }).length;
 	};
 	
 	$scope.selectAllChanged = function(trait) { //this doesn't work
-		angular.forEach(trait.codes, function(code){ code.isSelected = true; });
+		trait.codes.forEach(function(code){ code.isSelected = true; });
 	};
 
     // wired to the search button. Gets the code ids, adds cultural to the query, and invokes the search
     $scope.doSearch = function() {
-       var code_ids = $scope.getSelectedTraitCodes();			
+       //var code_ids = $scope.getSelectedTraitCodes();		
+		var code_ids = selected.filter(function(code) { return code.isSelected; }).map( function(c) { return c.id });
         $scope.updateSearchQuery({ variable_codes: code_ids });
         $scope.searchSocieties();
     };
