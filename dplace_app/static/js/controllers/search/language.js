@@ -1,5 +1,6 @@
 function LanguageCtrl($scope, searchModelService, LanguageClass, LanguageClassification) {
-    var linkModel = function() {
+    var selected = []; //keeps track of selected languages
+	var linkModel = function() {
         // Get a reference to the language classifications from the model
         $scope.languageClassifications = searchModelService.getModel().getLanguageClassifications();
     };
@@ -53,7 +54,7 @@ function LanguageCtrl($scope, searchModelService, LanguageClass, LanguageClassif
     }
 
     $scope.selectionChanged = function(languageFilter, levelObject) {
-        var changedIndex = levelToIndex(levelObject);
+		var changedIndex = levelToIndex(levelObject);
         var parentObject = selectedItemAtLevel(languageFilter, levelObject);
         if(changedIndex + 1 < levels.length) {
             // Update the next level
@@ -66,6 +67,16 @@ function LanguageCtrl($scope, searchModelService, LanguageClass, LanguageClassif
         }
         updateClassifications(languageFilter);
     };
+	
+	$scope.selectAllChanged = function(languageFilter) {
+		if (languageFilter.classifications.id.isSelected) {	
+			angular.forEach(languageFilter.classifications, function(classification){classification.isSelected = true; $scope.languageClassifications.badgeValue++;});
+			
+		} else {
+			angular.forEach(languageFilter.classifications, function(classification){classification.isSelected = false; $scope.languageClassifications.badgeValue--;});
+		}
+		//alert(languageFilter.classifications.id);
+	};
 
     function getSelectedLanguageClassifications(languageFilter) {
         return languageFilter.classifications.filter( function (classification) {
@@ -82,10 +93,19 @@ function LanguageCtrl($scope, searchModelService, LanguageClass, LanguageClassif
         });
         return languageQueryFilters;
     };
+	
+
 
     $scope.classificationSelectionChanged = function(classification) {
         // Since the selections are stored deep in the model, this is greatly simplified by +1 / -1
         // But if we add "select all", this will not work
+		currentSelection = $scope.getLanguageQueryFilters();
+		currentSelection.forEach(function(c) {
+			if (selected.indexOf(c) == -1) {
+				selected.push(c);
+			}
+		});
+
         if(classification.isSelected) {
             $scope.languageClassifications.badgeValue++;
         } else {
@@ -95,7 +115,7 @@ function LanguageCtrl($scope, searchModelService, LanguageClass, LanguageClassif
 
     $scope.doSearch = function() {
         var filters = $scope.getLanguageQueryFilters();
-        $scope.updateSearchQuery({ language_filters: filters });
+        $scope.updateSearchQuery({ language_filters: selected });
         $scope.searchSocieties();
     };
 
