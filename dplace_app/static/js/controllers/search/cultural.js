@@ -32,17 +32,20 @@ function CulturalCtrl($scope, searchModelService, Variable, CodeDescription) {
 			return trait.codes; 
 		}));
 		selectedCodes = allCodes.filter( function(c) { return c.isSelected; }).map( function(c) { return c.id; });
-        return selectedCodes;
+	   return selectedCodes;
     };
 
     $scope.traitCodeSelectionChanged = function(trait) {
         //trait.badgeValue = trait.codes.filter(function(code) { return code.isSelected; }).length;
-		 currentSelection = $scope.getSelectedTraitCodes();
+		
+		currentSelection = $scope.getSelectedTraitCodes();
+		 //alert(currentSelection.length);
 		currentSelection.forEach(function(code) {
 			if (selected.indexOf(code) == -1) { 
 			//if selected trait code is not already in the array of selected codes, add it to the array
 				selected.push(code);
 			}
+			
 		});
 		trait.badgeValue = selected.length; //update badge value
 	};
@@ -53,8 +56,8 @@ function CulturalCtrl($scope, searchModelService, Variable, CodeDescription) {
 
     // wired to the search button. Gets the code ids, adds cultural to the query, and invokes the search
     $scope.doSearch = function() {
-        //var code_ids = $scope.getSelectedTraitCodes();
-        $scope.updateSearchQuery({ variable_codes: selected });
+       var code_ids = $scope.getSelectedTraitCodes();			
+        $scope.updateSearchQuery({ variable_codes: code_ids });
         $scope.searchSocieties();
     };
 }
