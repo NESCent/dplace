@@ -49,7 +49,16 @@ function CulturalCtrl($scope, searchModelService, Variable, CodeDescription) {
 	};
 	
 	$scope.selectAllChanged = function(trait) { //this doesn't work
-		trait.codes.forEach(function(code){ code.isSelected = true; });
+		//if (trait.codes.id.isSelected) {
+		
+			trait.codes.forEach(function(code){ code.isSelected = true; selected.push(code);});
+		//} else {
+		//	trait.codes.forEach(function(code){ code.isSelected = true;});
+
+		//}
+		alert(selected.length);
+		
+		
 	};
 
     // wired to the search button. Gets the code ids, adds cultural to the query, and invokes the search

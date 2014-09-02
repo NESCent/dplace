@@ -20,6 +20,8 @@
                 </div>
             </div>
             <div class="panel-body scrollable">
+				<span class="variable-label" ng-show="languageFilter.classifications.length > 1">Select All<input type="checkbox" class="pull-right" ng-model="languageFilter.classifications.id.isSelected" ng-change="selectAllChanged(languageFilter)" />
+					</span>
                 <div ng-repeat="classification in languageFilter.classifications">
                     <span class="language-label">{{ classification.language.name }}</span>
                     <input class="pull-right" type="checkbox" ng-model="classification.isSelected" ng-change="classificationSelectionChanged(classification)">

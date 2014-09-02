@@ -33,7 +33,7 @@
 	
             <div class="panel-body scrollable">
 					 <span class="variable-label">
-						Select All<input type="checkbox" class="pull-right" ng-model="selectAll.isSelected" ng-click="selectAllChanged(trait)" />
+						Select All<input type="checkbox" class="pull-right" ng-model="trait.codes.id.isSelected" ng-click="selectAllChanged(trait)" />
 					</span>
                 <div ng-repeat="code in trait.codes">
                     <span class="variable-label pull-left">{{ code.code }}:</span>
