@@ -1,13 +1,13 @@
 function CulturalCtrl($scope, searchModelService, Variable, CodeDescription) {
-	var selected = []; //keeps track of selected codes
    var linkModel = function() {
         // Model/state lives in searchModelService
         $scope.traits = [searchModelService.getModel().getCulturalTraits()];
+		selected = [];
 
     };
     $scope.$on('searchModelReset', linkModel); // When model is reset, update our model
     linkModel();
-
+	var selected = [];
 	
     // triggered by the view when a category is changed
     $scope.categoryChanged = function(trait) {
@@ -37,6 +37,8 @@ function CulturalCtrl($scope, searchModelService, Variable, CodeDescription) {
 
     $scope.traitCodeSelectionChanged = function(trait) {
         //trait.badgeValue = trait.codes.filter(function(code) { return code.isSelected; }).length;
+		
+		
 		currentSelection = $scope.getSelectedTraitCodes();
 		currentSelection.forEach(function(code) {
 			if (selected.indexOf(code) == -1) { 
@@ -48,22 +50,24 @@ function CulturalCtrl($scope, searchModelService, Variable, CodeDescription) {
 		trait.badgeValue = selected.filter(function(code) { return code.isSelected; }).length;
 	};
 	
-	$scope.selectAllChanged = function(trait) { //this doesn't work
-		//if (trait.codes.id.isSelected) {
+	$scope.selectAllChanged = function(trait) { 
+		if (trait.codes.isSelected) {
+			trait.codes.forEach(function(code){ code.isSelected = true; 
+			if (selected.indexOf(code) == -1) {
+				selected.push(code); 
+			}
+			});
+		} else { trait.codes.forEach(function(code){ code.isSelected = false; });}
 		
-			trait.codes.forEach(function(code){ code.isSelected = true; selected.push(code);});
-		//} else {
-		//	trait.codes.forEach(function(code){ code.isSelected = true;});
+		trait.badgeValue = selected.filter(function(code) { return code.isSelected; }).length;
 
-		//}
-		alert(selected.length);
-		
-		
 	};
 
     // wired to the search button. Gets the code ids, adds cultural to the query, and invokes the search
     $scope.doSearch = function() {
        //var code_ids = $scope.getSelectedTraitCodes();		
+		//the selected array contains all the codes that have been selected (even if they were then unselected) 
+		//we need to filter it to only search for the codes that are currently selected
 		var code_ids = selected.filter(function(code) { return code.isSelected; }).map( function(c) { return c.id });
         $scope.updateSearchQuery({ variable_codes: code_ids });
         $scope.searchSocieties();
