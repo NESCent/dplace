@@ -3,6 +3,7 @@
 from django.contrib.gis.geos import Point
 from django.core.exceptions import ObjectDoesNotExist
 from dplace_app.models import *
+from sources import get_source
 
 ENVIRONMENTAL_MAP = {
     'AnnualMeanTemperature': {
@@ -90,7 +91,7 @@ ENVIRONMENTAL_MAP = {
 }
 
 def iso_from_code(code):
-    if code == 'NA':
+    if code == 'NA' or len(code) == 0:
         return None
     try:
         return ISOCode.objects.get(iso_code=code)
@@ -104,12 +105,12 @@ def create_environmental_variables():
 
 def load_environmental(env_dict):
     ext_id = env_dict['ID']
-    source = env_dict['Source']
+    source = get_source(env_dict['Source'])
 
     # hack for B109 vs. 109
-    if source == 'Binford' and ext_id.find('B') == -1:
+    if source.author == 'Binford' and ext_id.find('B') == -1:
         ext_id = 'B' + ext_id
-
+    
     try:
         society = Society.objects.get(ext_id=ext_id, source=source)
     except ObjectDoesNotExist:
@@ -121,11 +122,12 @@ def load_environmental(env_dict):
         reported_latlon =  Point(float(env_dict['Orig.longitude']),float(env_dict['Orig.latitude']))
         actual_latlon = Point(float(env_dict['longitude']), float(env_dict['latitude']))
         iso_code = iso_from_code(env_dict['iso'])
-
+        
         # Create the base Environmental
         environmental = Environmental(society=society,
                                       reported_location=reported_latlon,
                                       actual_location=actual_latlon,
+                                      source=source,
                                       iso_code=iso_code)
         environmental.save()
         for k in ENVIRONMENTAL_MAP: # keys are the columns in the CSV file
@@ -138,4 +140,6 @@ def load_environmental(env_dict):
                 continue
             if env_dict[k] and env_dict[k] != 'NA':
                 value = float(env_dict[k])
-                EnvironmentalValue.objects.get_or_create(variable=variable,value=value,environmental=environmental)
+                EnvironmentalValue.objects.get_or_create(variable=variable,value=value,
+                    environmental=environmental, source=source
+                )
