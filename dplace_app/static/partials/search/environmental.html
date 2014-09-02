@@ -1,8 +1,10 @@
 <div ng-controller="EnvironmentalCtrl">
     <h4>Search by Environmental Data</h4>
-    <form class="form-inline" role="form" name="environmentalForm">
+    <form class="form-inline" role="form" ng-submit="submit()" name="EnvironmentalForm" novalidate>
         <div class="panel panel-default">
             <div class="panel-heading">
+
+			
                 <div class="row">
                     <div class="form-group col-xs-4">
                         <select
@@ -26,15 +28,15 @@
                             </div>
                         </div>
                         <div class="fields-inrange" ng-show="environmentalData.selectedFilter.operator == 'inrange'">
-                            <div class="form-group col-xs-3" ng-class="{'has-error': environmentalForm.val0.$invalid}">
+                            <div class="form-group col-xs-3" ng-class="{'has-error':EnvironmentalForm.vals0inrange.$invalid && submitted}">
                                 <div class="input-group">
-                                    <input class="form-control input-xs" ng-model="environmentalData.vals[0]" name="val0" required/>
+                                    <input name="vals0inrange" class="form-control input-xs" ng-pattern="/^\d+$/" ng-model="environmentalData.vals[0]" required/>
                                     <span class="input-group-addon">{{ environmentalData.selectedVariable.units }}</span>
                                 </div>
                             </div>
-                            <div class="form-group col-xs-3">
+                            <div class="form-group col-xs-3" ng-class="{'has-error':EnvironmentalForm.vals1inrange.$invalid && submitted}">
                                 <div class="input-group">
-                                    <input class="form-control" ng-model="environmentalData.vals[1]" required/>
+                                    <input name="vals1inrange" class="form-control" ng-pattern="/^\d+$/" ng-model="environmentalData.vals[1]" required/>
                                     <span class="input-group-addon">{{ environmentalData.selectedVariable.units }}</span>
                                 </div>
                             </div>
@@ -79,9 +81,9 @@
                     ng-click="doSearch()">{{ searchButton.text }}</button>
             <button class="btn btn-danger form-control"
                     ng-click="resetSearch()">Reset</button>
-	    <span class="alert alert-danger" ng-show="errors">
+       <span class="alert alert-danger" ng-show="errors">
 	      {{ errors }}
-	    </span>
-	</div>
+	    </span> 
+		</div>
     </form>
 </div>
