@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import csv
 import sys
+from django.db import transaction
 from load.isocode import *
 from load.environmental import *
 from load.language import *
@@ -68,4 +69,10 @@ if __name__ == '__main__':
         print "You should run load_all_datasets.sh instead of this script directly."
         print
     else:
-        run(sys.argv[1], sys.argv[2])
+        try:
+            transaction.enter_transaction_management()
+            transaction.managed(True)
+            run(sys.argv[1], sys.argv[2])
+        finally:
+            transaction.commit()
+            

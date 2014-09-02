@@ -84,11 +84,13 @@ class FindSocietiesTestCase(APITestCase):
         self.languageA1 = Language.objects.create(name='languageA1',iso_code=iso_code1)
         self.languageC2 = Language.objects.create(name='languageC2',iso_code=iso_code2)
         self.languageB3 = Language.objects.create(name='languageB3',iso_code=iso_code3)
-
-        self.society1 = Society.objects.create(ext_id='society1',name='Society1',location=Point(1.0,1.0),source='EA',iso_code=iso_code1,language=self.languageA1)
-        self.society2 = Society.objects.create(ext_id='society2',name='Society2',location=Point(2.0,2.0),source='EA',iso_code=iso_code2,language=self.languageC2)
+        # Make source
+        self.source = Source.objects.create(year="2014", author="Greenhill", reference="Great paper")
+        
+        self.society1 = Society.objects.create(ext_id='society1',name='Society1',location=Point(1.0,1.0),source=self.source,iso_code=iso_code1,language=self.languageA1)
+        self.society2 = Society.objects.create(ext_id='society2',name='Society2',location=Point(2.0,2.0),source=self.source,iso_code=iso_code2,language=self.languageC2)
         # Society 3 has the same language characteristics as society 1 but different EA Vars
-        self.society3 = Society.objects.create(ext_id='society3',name='Society3',location=Point(3.0,3.0),source='EA',iso_code=iso_code3,language=self.languageB3)
+        self.society3 = Society.objects.create(ext_id='society3',name='Society3',location=Point(3.0,3.0),source=self.source,iso_code=iso_code3,language=self.languageB3)
 
         # make a language class tree
         self.root_language_class = LanguageClass.objects.create(name='root',level=1,parent=None)
@@ -119,25 +121,27 @@ class FindSocietiesTestCase(APITestCase):
         self.code1 = VariableCodeDescription.objects.create(variable=variable, code='1', description='Code 1')
         self.code2 = VariableCodeDescription.objects.create(variable=variable, code='2', description='Code 2')
         self.code3 = VariableCodeDescription.objects.create(variable=variable, code='3', description='Code 3')
-        value1 = VariableCodedValue.objects.create(variable=variable,society=self.society1,coded_value='1',code=self.code1)
-        value2 = VariableCodedValue.objects.create(variable=variable,society=self.society2,coded_value='2',code=self.code2)
+        value1 = VariableCodedValue.objects.create(variable=variable,society=self.society1,coded_value='1',code=self.code1, source=self.source)
+        value2 = VariableCodedValue.objects.create(variable=variable,society=self.society2,coded_value='2',code=self.code2, source=self.source)
         # Setup environmentals
         self.environmental1 = Environmental.objects.create(society=self.society1,
                                                            reported_location=Point(0,0),
                                                            actual_location=Point(0,0),
+                                                           source=self.source,
                                                            iso_code=iso_code1)
         self.environmental2 = Environmental.objects.create(society=self.society2,
                                                            reported_location=Point(1,1),
                                                            actual_location=Point(1,1),
+                                                           source=self.source,
                                                            iso_code=iso_code2)
 
         self.environmental_variable1 = EnvironmentalVariable.objects.create(name='precipitation',
                                                                             units='mm')
         self.environmental_value1 = EnvironmentalValue.objects.create(variable=self.environmental_variable1,
-                                                                      value=1.0,
+                                                                      value=1.0, source=self.source,
                                                                       environmental=self.environmental1)
         self.environmental_value2 = EnvironmentalValue.objects.create(variable=self.environmental_variable1,
-                                                                      value=2.0,
+                                                                      value=2.0, source=self.source,
                                                                       environmental=self.environmental2)
         # Geographic regions that contain societies
         poly2  = MultiPolygon(

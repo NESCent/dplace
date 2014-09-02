@@ -27,7 +27,7 @@ class Society(models.Model):
     ext_id = models.CharField('External ID', unique=True, max_length=10)
     name = models.CharField('Name', db_index=True, max_length=200)
     location = models.PointField('Location',null=True)
-    source = models.CharField(max_length=16,choices=SOCIETY_SOURCES)
+    source = models.ForeignKey('Source', null=True)
     iso_code = models.ForeignKey('ISOCode', null=True, related_name="societies")
     language = models.ForeignKey('Language', null=True, related_name="societies")
     objects = models.GeoManager()
@@ -61,6 +61,7 @@ UNIT_CHOICES = (
 class EnvironmentalVariable(models.Model):
     name = models.CharField(max_length=50, unique=True)
     units = models.CharField(max_length=10, choices=UNIT_CHOICES)
+    
     def __unicode__(self):
         return "%s (%s)" % (self.name, self.units)
     class Meta:
@@ -71,6 +72,8 @@ class EnvironmentalValue(models.Model):
     variable = models.ForeignKey('EnvironmentalVariable', related_name="values")
     value = models.FloatField(db_index=True)
     environmental = models.ForeignKey('Environmental', related_name="values")
+    source = models.ForeignKey('Source', null=True)
+    
     def society(self):
         return self.environmental.society
     def __unicode__(self):
@@ -90,6 +93,7 @@ class Environmental(models.Model):
     reported_location = models.PointField()
     actual_location = models.PointField()
     iso_code = models.ForeignKey('ISOCode', null=True, related_name="environmentals")
+    source = models.ForeignKey('Source', null=True)
 
     # For GeoDjango, must override the manager
     objects = models.GeoManager()
@@ -110,7 +114,7 @@ class VariableDescription(models.Model):
     """
     label = models.CharField(max_length=25, db_index=True)
     name = models.CharField(max_length=200, db_index=True, default='Unknown')
-    source = models.ForeignKey('Source',null=True)
+    source = models.ForeignKey('Source', null=True)
     index_categories = models.ManyToManyField('VariableCategory', related_name='index_variables')
     niche_categories = models.ManyToManyField('VariableCategory', related_name='niche_variables')
     def coded_societies(self):
@@ -185,6 +189,7 @@ class VariableCodedValue(models.Model):
     coded_value = models.CharField(max_length=100, db_index=True, null=False, default='.')
     code = models.ForeignKey('VariableCodeDescription', db_index=True, null=True)
     source = models.ForeignKey('Source', null=True)
+    
     def get_description(self):
         if self.code is not None:
             return self.code.description

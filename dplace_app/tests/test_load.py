@@ -39,7 +39,7 @@ class LoadISOCodeTestCase(TestCase):
         society = load_ea_society(row_dict)
         self.assertIsNotNone(society, 'unable to load society')
         self.assertIsNotNone(society.iso_code, 'society has no linked iso code')
-        self.assertEqual(society.source, 'EA', 'Society source should be EA')
+        self.assertEqual(society.source.author, 'Murdock et al.', 'Society source should be Murdock et al.')
         # Not testing language creation here
         self.assertIsNone(society.language, 'society should have no language')
     def test_load_bf_society(self):
@@ -55,7 +55,7 @@ class LoadISOCodeTestCase(TestCase):
         society = load_bf_society(row_dict)
         self.assertIsNotNone(society, 'unable to load society')
         self.assertIsNotNone(society.iso_code, 'society has no linked iso code')
-        self.assertEqual(society.source, 'Binford', 'Society source should be Binford')
+        self.assertEqual(society.source.author, 'Binford', 'Society source should be Binford')
         # Not testing language creation here
         self.assertIsNone(society.language, 'society should have no language')
     def test_load_language(self):
