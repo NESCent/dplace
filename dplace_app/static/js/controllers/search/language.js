@@ -81,6 +81,7 @@ function LanguageCtrl($scope, searchModelService, LanguageClass, LanguageClassif
 		} else {
 			angular.forEach(languageFilter.classifications, function(classification){classification.isSelected = false; $scope.languageClassifications.badgeValue--;});
 		}
+		//alert(languageFilter.classifications.id);
 	};
 
     function getSelectedLanguageClassifications(languageFilter) {
@@ -94,6 +95,10 @@ function LanguageCtrl($scope, searchModelService, LanguageClass, LanguageClassif
         $scope.languageClassifications.languageFilters.forEach(function(languageFilter) {
             var selectedClassifications = getSelectedLanguageClassifications(languageFilter);
             var languageIds = selectedClassifications.map(function (classification) { return classification.language.id; });
+            //languageQueryFilters.push({language_ids: languageIds});
+			selectedClassifications.forEach(function(f) {
+				selected.push(f);
+			});
 	   });
         return languageQueryFilters;
     };
