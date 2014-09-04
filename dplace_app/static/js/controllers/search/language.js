@@ -7,7 +7,7 @@ function LanguageCtrl($scope, searchModelService, LanguageClass, LanguageClassif
     linkModel();
 
     var levels = $scope.languageClassifications.levels;
-	var selected = [];
+	//var selected = [];
 
     function levelToIndex(levelObject) {
         return levelObject.level - 1;
@@ -25,22 +25,18 @@ function LanguageCtrl($scope, searchModelService, LanguageClass, LanguageClassif
     }
 
     function updateClassifications(languageFilter) {
-        //alert("Updating classifications");
         var params = {};
         levels.forEach(function (levelObject) {
             var selectedItem = selectedItemAtLevel(languageFilter, levelObject);
             if(selectedItem) {
                 var param = queryParameterForLevel(levelObject);
                 params[param] = selectedItem.id;
-                alert(selectedItem.name);
             }
         });
-        //alert(Object.keys(params).length);
         if(Object.keys(params).length == 0) {
             /* Nothing selected at any level */
             languageFilter.classifications = [];
         } else {
-            alert("Running else");
             languageFilter.classifications = LanguageClassification.query(params);
         }
     }
@@ -70,14 +66,13 @@ function LanguageCtrl($scope, searchModelService, LanguageClass, LanguageClassif
             clearItems(languageFilter, childLevel);
         }
         updateClassifications(languageFilter);
-        alert(languageFilter.classifications);
     };
 	
 	$scope.selectAllChanged = function(languageFilter) {
 		if (languageFilter.classifications.id.isSelected) {	
 			languageFilter.classifications.forEach(function(classification) {
 			classification.isSelected = true; 
-			selected.push(classification);
+			$scope.languageClassifications.selected.push(classification);
 			$scope.languageClassifications.badgeValue++;		
 			});
 		} else {
@@ -98,7 +93,7 @@ function LanguageCtrl($scope, searchModelService, LanguageClass, LanguageClassif
             var languageIds = selectedClassifications.map(function (classification) { return classification.language.id; });
             //languageQueryFilters.push({language_ids: languageIds});
 			selectedClassifications.forEach(function(f) {
-				selected.push(f);
+				$scope.languageClassifications.selected.push(f);
 			});
 	   });
         return languageQueryFilters;
@@ -118,7 +113,7 @@ function LanguageCtrl($scope, searchModelService, LanguageClass, LanguageClassif
     $scope.doSearch = function() {
 	//the selected array contains all languages that were selected (even if they were then unselected)
 	//so we filter the selected array so we only search for currently selected languages 
-		var filters = selected.filter(function(classification) { return classification.isSelected; }).map(function(c) { return {language_ids:[c.language.id]}; });
+		var filters = $scope.languageClassifications.selected.filter(function(classification) { return classification.isSelected; }).map(function(c) { return {language_ids:[c.language.id]}; });
 	  // var filters = $scope.getLanguageQueryFilters();
         $scope.updateSearchQuery({ language_filters: filters });
         $scope.searchSocieties();
