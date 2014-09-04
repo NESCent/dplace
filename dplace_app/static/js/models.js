@@ -48,6 +48,7 @@ function SearchModel(VariableCategory, GeographicRegion, EnvironmentalVariable, 
 // Depends on VariableCategory for initial load. Somewhat messy, requires entire model to know about that API
 function CulturalTraitModel(VariableCategory) {
     this.categories = VariableCategory.query(); // these objects get annotated with variables
+    this.selected = [];
     this.selectedCategory = null;
     this.selectedVariable = null;
     this.badgeValue = 0;
