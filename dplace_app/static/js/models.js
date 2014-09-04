@@ -10,6 +10,7 @@ function SearchModel(VariableCategory, GeographicRegion, EnvironmentalVariable, 
         this.query = {}; // Parameters sent to the FindSocieties API
         this.results.societies = [];
         this.results.languageTrees = [];
+        this.selected = [];
         this.params.culturalTraits = new CulturalTraitModel(VariableCategory);
         this.params.geographicRegions = new GeographicRegionModel(GeographicRegion);
         this.params.environmentalData = new EnvironmentalDataModel(EnvironmentalVariable);

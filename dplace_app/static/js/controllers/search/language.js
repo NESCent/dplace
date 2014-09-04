@@ -2,7 +2,6 @@ function LanguageCtrl($scope, searchModelService, LanguageClass, LanguageClassif
 	var linkModel = function() {
         // Get a reference to the language classifications from the model
         $scope.languageClassifications = searchModelService.getModel().getLanguageClassifications();
-		selected = [];
 	};
     $scope.$on('searchModelReset', linkModel); // When model is reset, update our model
     linkModel();
@@ -26,18 +25,22 @@ function LanguageCtrl($scope, searchModelService, LanguageClass, LanguageClassif
     }
 
     function updateClassifications(languageFilter) {
+        //alert("Updating classifications");
         var params = {};
         levels.forEach(function (levelObject) {
             var selectedItem = selectedItemAtLevel(languageFilter, levelObject);
             if(selectedItem) {
                 var param = queryParameterForLevel(levelObject);
                 params[param] = selectedItem.id;
+                alert(selectedItem.name);
             }
         });
+        //alert(Object.keys(params).length);
         if(Object.keys(params).length == 0) {
             /* Nothing selected at any level */
             languageFilter.classifications = [];
         } else {
+            alert("Running else");
             languageFilter.classifications = LanguageClassification.query(params);
         }
     }
@@ -67,6 +70,7 @@ function LanguageCtrl($scope, searchModelService, LanguageClass, LanguageClassif
             clearItems(languageFilter, childLevel);
         }
         updateClassifications(languageFilter);
+        alert(languageFilter.classifications);
     };
 	
 	$scope.selectAllChanged = function(languageFilter) {

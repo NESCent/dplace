@@ -2,7 +2,6 @@ function CulturalCtrl($scope, searchModelService, Variable, CodeDescription) {
    var linkModel = function() {
         // Model/state lives in searchModelService
         $scope.traits = [searchModelService.getModel().getCulturalTraits()];
-		selected = [];
 
     };
     $scope.$on('searchModelReset', linkModel); // When model is reset, update our model
