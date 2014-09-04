@@ -74,14 +74,11 @@ function LanguageCtrl($scope, searchModelService, LanguageClass, LanguageClassif
 			languageFilter.classifications.forEach(function(classification) {
 			classification.isSelected = true; 
 			selected.push(classification);
-			$scope.languageClassifications.badgeValue++;
-			
+			$scope.languageClassifications.badgeValue++;		
 			});
-	
 		} else {
-			angular.forEach(languageFilter.classifications, function(classification){classification.isSelected = false; $scope.languageClassifications.badgeValue--;});
-		}
-		//alert(languageFilter.classifications.id);
+			languageFilter.classifications.forEach(function(classification){ classification.isSelected = false; $scope.languageClassifications.badgeValue--;} );
+        }
 	};
 
     function getSelectedLanguageClassifications(languageFilter) {
@@ -107,12 +104,6 @@ function LanguageCtrl($scope, searchModelService, LanguageClass, LanguageClassif
         // Since the selections are stored deep in the model, this is greatly simplified by +1 / -1
         // get the currently selected languages and add them to the "selected" array
 		currentSelection = $scope.getLanguageQueryFilters();
-		currentSelection.forEach(function(c) {
-			if (selected.indexOf(c) == -1) {
-				selected.push(c);
-			}
-		});
-
         if(classification.isSelected) {
             $scope.languageClassifications.badgeValue++;
         } else {
