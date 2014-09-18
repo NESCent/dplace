@@ -7,7 +7,8 @@ __author__ = 'dan'
 def load_tree(file_name):
     # make a tree if not exists. Use the name of the tree
     tree_name = basename(file_name)
-    tree, created = LanguageTree.objects.get_or_create(name=tree_name)
+    with open(file_name,'r') as f:
+        tree, created = LanguageTree.objects.get_or_create(name=tree_name,file=f)
     # now add languages to the tree
     reader = NexusReader(file_name)
     for language_name in reader.trees.taxa:
