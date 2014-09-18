@@ -299,3 +299,4 @@ class GeographicRegion(models.Model):
 class LanguageTree(models.Model):
     name = models.CharField(max_length=50, db_index=True)
     languages = models.ManyToManyField(to='Language')
+    file = models.FileField(upload_to='language_trees',null=True)
