@@ -38,7 +38,7 @@ function CulturalCtrl($scope, searchModelService, Variable, CodeDescription) {
 
 		currentSelection = $scope.getSelectedTraitCodes();
 		currentSelection.forEach(function(code) {
-			if (trait.selected.indexOf(code) == -1) { 
+			if (trait.selected.indexOf(code) == -1) {
 			//if selected trait code is not already in the array of selected codes, add it to the array
 				trait.selected.push(code);
 			}
@@ -46,15 +46,15 @@ function CulturalCtrl($scope, searchModelService, Variable, CodeDescription) {
 		trait.badgeValue = trait.selected.filter(function(code) { return code.isSelected; }).length;
 	};
 	
-	$scope.selectAllChanged = function(trait) { 
+	$scope.selectAllChanged = function(trait) {
 		if (trait.codes.isSelected) {
-			trait.codes.forEach(function(code){ code.isSelected = true; 
+			trait.codes.forEach(function(code){ code.isSelected = true;
 			if (trait.selected.indexOf(code) == -1) {
-				trait.selected.push(code); 
+				trait.selected.push(code);
 			}
 			});
 		} else { trait.codes.forEach(function(code){ code.isSelected = false; });}
-		
+
 		trait.badgeValue = trait.selected.filter(function(code) { return code.isSelected; }).length;
 
 	};
@@ -64,13 +64,11 @@ function CulturalCtrl($scope, searchModelService, Variable, CodeDescription) {
         var code_ids = [];
         traits = $scope.traits;
         traits.forEach(function(trait) {
-            //the selected array contains all the codes that have been selected (even if they were then unselected) 
+            //the selected array contains all the codes that have been selected (even if they were then unselected)
             //we need to filter it to only search for the codes that are currently selected
             trait.selected.filter(function(code){ return code.isSelected; }).map( function(c) { code_ids.push(c.id); });
         });
-            
-       //var code_ids = $scope.getSelectedTraitCodes();		
-		//var code_ids = selected.filter(function(code) { return code.isSelected; }).map( function(c) { return c.id });
+
         $scope.updateSearchQuery({ variable_codes: code_ids });
         $scope.searchSocieties();
     };
