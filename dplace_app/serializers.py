@@ -193,3 +193,16 @@ class SocietyResultSetSerializer(serializers.Serializer):
     languages = LanguageSerializer(many=True)
     # Geographic Regions - does not map to a more specific value
     geographic_regions = GeographicRegionSerializer(many=True)
+
+class NewickTree(object):
+    '''
+    Lightweight wrapper around a newick tree string
+    '''
+    def __init__(self, newickTree=None):
+        self.newickTree = newickTree
+
+class NewickTreeSerializer(serializers.Serializer):
+    '''
+    Serializer for NewickTree object
+    '''
+    newickTree = serializers.CharField()

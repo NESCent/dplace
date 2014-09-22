@@ -1,3 +1,6 @@
+import re
+from django.core.exceptions import ObjectDoesNotExist
+from nexus import NexusReader
 from models import *
 from rest_framework import viewsets
 from serializers import *
@@ -178,3 +181,21 @@ def trees_from_languages(request):
         trees = None
     return Response(LanguageTreeSerializer(trees, many=True).data,)
 
+@api_view(['GET'])
+@permission_classes((AllowAny,))
+def newick_tree(request, *args, **kwargs):
+    # Get a newick format tree from a language tree id
+    language_tree_id = kwargs['pk']
+    try:
+        language_tree = LanguageTree.objects.get(pk=language_tree_id)
+    except ObjectDoesNotExist:
+        raise Http404
+    n = NexusReader(language_tree.file.path)
+    # Remove '[&R]' from newick string
+    tree = re.sub(r'\[.*?\]', '', n.trees.trees[0])
+    # Remove data before the =
+    try:
+        tree = tree[tree.index('=')+1:]
+    except ValueError:
+        tree = tree
+    return Response(NewickTreeSerializer(NewickTree(tree)).data,)

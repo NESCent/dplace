@@ -65,5 +65,8 @@ python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/binford_vals.csv" b
 echo "Loading Geographic regions from shapefile"
 python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/geo/level2-shape/level2.shp" geo
 
-echo "Loading Language trees"
-python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/trees/a400-m1pcv-substitutions.mcct.trees" tree
+TREE_FILES="${REPO_DEST}/trees/*.trees"
+for tree_file in $TREE_FILES; do
+    echo "Loading Language tree $tree_file"
+    python "${DPLACE_PATH}/dplace_app/load.py" "$tree_file" tree
+done
