@@ -61,6 +61,7 @@ UNIT_CHOICES = (
 class EnvironmentalVariable(models.Model):
     name = models.CharField(max_length=50, unique=True)
     units = models.CharField(max_length=10, choices=UNIT_CHOICES)
+    codebook_info = models.CharField(max_length=500, default='None')
     
     def __unicode__(self):
         return "%s (%s)" % (self.name, self.units)
