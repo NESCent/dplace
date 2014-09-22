@@ -117,6 +117,7 @@ class VariableDescription(models.Model):
     source = models.ForeignKey('Source', null=True)
     index_categories = models.ManyToManyField('VariableCategory', related_name='index_variables')
     niche_categories = models.ManyToManyField('VariableCategory', related_name='niche_variables')
+    codebook_info = models.CharField(max_length=500, default='None')
     def coded_societies(self):
         return Society.objects.filter(variablecodedvalue__in=self.values.all())
     def __unicode__(self):
