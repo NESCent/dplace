@@ -4,10 +4,11 @@ from django.core.exceptions import ObjectDoesNotExist
 from nexus import NexusReader
 from rest_framework import viewsets
 from serializers import *
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, renderer_classes
 from rest_framework.permissions import *
 from rest_framework.views import Request, Response
 from filters import *
+from renderers import DPLACECsvRenderer
 
 # Resource routes
 class VariableDescriptionViewSet(viewsets.ReadOnlyModelViewSet):
@@ -207,6 +208,7 @@ def newick_tree(request, *args, **kwargs):
 
 @api_view(['GET'])
 @permission_classes((AllowAny,))
+@renderer_classes((DPLACECsvRenderer,))
 def csv_download(request):
     # Ideally these would be handled by serializers, but we've already got logic to parse a query object
     query_string = request.QUERY_PARAMS['query']
