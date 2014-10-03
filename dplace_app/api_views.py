@@ -210,9 +210,13 @@ def newick_tree(request, *args, **kwargs):
 @permission_classes((AllowAny,))
 @renderer_classes((DPLACECsvRenderer,))
 def csv_download(request):
+    import datetime
     # Ideally these would be handled by serializers, but we've already got logic to parse a query object
     query_string = request.QUERY_PARAMS['query']
     # Need to parse the JSON
     query_dict = json.loads(query_string)
     result_set = result_set_from_query_dict(query_dict)
-    return Response(SocietyResultSetSerializer(result_set).data)
+    response = Response(SocietyResultSetSerializer(result_set).data)
+    filename = "dplace-societies-%s.csv" % datetime.datetime.now().strftime("%Y-%m-%d")
+    response['Content-Disposition']  = 'attachment; filename="%s"' % filename
+    return response
