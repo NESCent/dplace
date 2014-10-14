@@ -61,6 +61,7 @@ UNIT_CHOICES = (
 class EnvironmentalVariable(models.Model):
     name = models.CharField(max_length=50, unique=True)
     units = models.CharField(max_length=10, choices=UNIT_CHOICES)
+    codebook_info = models.CharField(max_length=500, default='None')
     
     def __unicode__(self):
         return "%s (%s)" % (self.name, self.units)
@@ -117,6 +118,7 @@ class VariableDescription(models.Model):
     source = models.ForeignKey('Source', null=True)
     index_categories = models.ManyToManyField('VariableCategory', related_name='index_variables')
     niche_categories = models.ManyToManyField('VariableCategory', related_name='niche_variables')
+    codebook_info = models.CharField(max_length=500, default='None')
     def coded_societies(self):
         return Society.objects.filter(variablecodedvalue__in=self.values.all())
     def __unicode__(self):
