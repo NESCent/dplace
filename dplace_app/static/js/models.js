@@ -30,6 +30,9 @@ function SearchModel(VariableCategory, GeographicRegion, EnvironmentalVariable, 
     this.getLanguageClassifications = function() {
         return this.params.languageClassifications;
     };
+    this.getQuery = function() {
+        return this.query;
+    };
 
     // Includes the search query
     this.getResults = function() {

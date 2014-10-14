@@ -1,13 +1,14 @@
+import json
 import re
 from django.core.exceptions import ObjectDoesNotExist
 from nexus import NexusReader
-from models import *
 from rest_framework import viewsets
 from serializers import *
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, renderer_classes
 from rest_framework.permissions import *
 from rest_framework.views import Request, Response
 from filters import *
+from renderers import DPLACECsvRenderer
 
 # Resource routes
 class VariableDescriptionViewSet(viewsets.ReadOnlyModelViewSet):
@@ -94,25 +95,16 @@ class LanguageTreeViewSet(viewsets.ReadOnlyModelViewSet):
     filter_fields = ('name',)
     queryset = LanguageTree.objects.all()
 
-# search/filter APIs
-@api_view(['POST'])
-@permission_classes((AllowAny,))
-def find_societies(request):
-    """
-    View to find the societies that match an input request.  Currently expects
-    { language_filters: [{language_ids: [1,2,3]}], variable_codes: [4,5,6...],
-    environmental_filters: [{id: 1, operator: 'gt', params: [0.0]}, {id:3, operator 'inrange', params: [10.0,20.0] }] }
 
-    Returns serialized collection of SocietyResult objects
-    """
+def result_set_from_query_dict(query_dict):
     result_set = SocietyResultSet()
     # Criteria keeps track of what types of data were searched on, so that we can
     # AND them together
     criteria = []
 
-    if 'language_filters' in request.DATA:
+    if 'language_filters' in query_dict:
         criteria.append(SEARCH_LANGUAGE)
-        language_filters = request.DATA['language_filters']
+        language_filters = query_dict['language_filters']
         for filter in language_filters:
             language_ids = [int(x) for x in filter['language_ids']]
             languages = Language.objects.filter(pk__in=language_ids) # Returns a queryset
@@ -121,10 +113,10 @@ def find_societies(request):
                 for society in language.societies.all():
                     result_set.add_language(society,language)
 
-    if 'variable_codes' in request.DATA:
+    if 'variable_codes' in query_dict:
         criteria.append(SEARCH_VARIABLES)
         # Now get the societies from variables
-        variable_code_ids = [int(x) for x in request.DATA['variable_codes']]
+        variable_code_ids = [int(x) for x in query_dict['variable_codes']]
         codes = VariableCodeDescription.objects.filter(pk__in=variable_code_ids) # returns a queryset
         coded_value_ids = []
         # Aggregate all the coded values for each selected code
@@ -136,9 +128,9 @@ def find_societies(request):
         for value in values:
             result_set.add_cultural(value.society,value.variable,value)
 
-    if 'environmental_filters' in request.DATA:
+    if 'environmental_filters' in query_dict:
         criteria.append(SEARCH_ENVIRONMENTAL)
-        environmental_filters = request.DATA['environmental_filters']
+        environmental_filters = query_dict['environmental_filters']
         # There can be multiple filters, so we must aggregate the results.
         for filter in environmental_filters:
             values = EnvironmentalValue.objects.filter(variable=filter['id'])
@@ -155,15 +147,29 @@ def find_societies(request):
             # get the societies from the values
             for value in values:
                 result_set.add_environmental(value.society(), value.variable, value)
-    if 'geographic_regions' in request.DATA:
+    if 'geographic_regions' in query_dict:
         criteria.append(SEARCH_GEOGRAPHIC)
-        geographic_region_ids = [int(x) for x in request.DATA['geographic_regions']]
+        geographic_region_ids = [int(x) for x in query_dict['geographic_regions']]
         regions = GeographicRegion.objects.filter(pk__in=geographic_region_ids) # returns a queryset
         for region in regions:
             for society in Society.objects.filter(location__intersects=region.geom):
                 result_set.add_geographic_region(society, region)
     # Filter the results to those that matched all criteria
     result_set.finalize(criteria)
+    return result_set
+
+# search/filter APIs
+@api_view(['POST'])
+@permission_classes((AllowAny,))
+def find_societies(request):
+    """
+    View to find the societies that match an input request.  Currently expects
+    { language_filters: [{language_ids: [1,2,3]}], variable_codes: [4,5,6...],
+    environmental_filters: [{id: 1, operator: 'gt', params: [0.0]}, {id:3, operator 'inrange', params: [10.0,20.0] }] }
+
+    Returns serialized collection of SocietyResult objects
+    """
+    result_set = result_set_from_query_dict(request.DATA)
     return Response(SocietyResultSetSerializer(result_set).data)
 
 class GeographicRegionViewSet(viewsets.ReadOnlyModelViewSet):
@@ -199,3 +205,18 @@ def newick_tree(request, *args, **kwargs):
     except ValueError:
         tree = tree
     return Response(NewickTreeSerializer(NewickTree(tree)).data,)
+
+@api_view(['GET'])
+@permission_classes((AllowAny,))
+@renderer_classes((DPLACECsvRenderer,))
+def csv_download(request):
+    import datetime
+    # Ideally these would be handled by serializers, but we've already got logic to parse a query object
+    query_string = request.QUERY_PARAMS['query']
+    # Need to parse the JSON
+    query_dict = json.loads(query_string)
+    result_set = result_set_from_query_dict(query_dict)
+    response = Response(SocietyResultSetSerializer(result_set).data)
+    filename = "dplace-societies-%s.csv" % datetime.datetime.now().strftime("%Y-%m-%d")
+    response['Content-Disposition']  = 'attachment; filename="%s"' % filename
+    return response
