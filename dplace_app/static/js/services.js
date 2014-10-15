@@ -117,4 +117,28 @@ angular.module('dplaceServices', ['ngResource'])
             }
         )
     })
+   .factory('NewickTree', function($resource) {
+        return $resource(
+            '/api/v1/newick_tree/:id',
+            {}, {
+                query: {
+                    method: 'GET',
+                    isArray: false,
+                    transformResponse: function(data, headers) {
+                        return JSON.parse(data);
+                    }
+                }
+            });
+    })
+    .factory('getTree', function($resource) {
+        return $resource(
+            '/api/v1/get_trees',
+            {}, {
+                query: {
+                    method: 'GET',
+                    isArray: false
+                }
+            }
+        )
+    })
     ;

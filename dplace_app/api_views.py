@@ -177,21 +177,28 @@ class GeographicRegionViewSet(viewsets.ReadOnlyModelViewSet):
     model = GeographicRegion
     filter_class = GeographicRegionFilter
 
-@api_view(['POST'])
-@permission_classes((AllowAny,))
-def trees_from_languages(request):
-    if 'language_ids' in request.DATA:
-        language_ids = [int(x) for x in request.DATA['language_ids']]
+def get_language_trees_from_query_dict(query_dict):
+    f = open('dict.txt', 'w')
+    f.write(str(query_dict))
+    f.close()
+    if 'language_ids' in query_dict:
+        language_ids = [int(x) for x in query_dict['language_ids']]
         trees = LanguageTree.objects.filter(languages__pk__in=language_ids).distinct()
     else:
         trees = None
+    return trees
+    
+@api_view(['POST'])
+@permission_classes((AllowAny,))
+def trees_from_languages(request):
+    trees = get_language_trees_from_query_dict(request.DATA)
     return Response(LanguageTreeSerializer(trees, many=True).data,)
 
-@api_view(['GET'])
-@permission_classes((AllowAny,))
-def newick_tree(request, *args, **kwargs):
+#@api_view(['GET'])
+#@permission_classes((AllowAny,))
+def newick_tree(key):
     # Get a newick format tree from a language tree id
-    language_tree_id = kwargs['pk']
+    language_tree_id =key
     try:
         language_tree = LanguageTree.objects.get(pk=language_tree_id)
     except ObjectDoesNotExist:
@@ -204,7 +211,37 @@ def newick_tree(request, *args, **kwargs):
         tree = tree[tree.index('=')+1:]
     except ValueError:
         tree = tree
-    return Response(NewickTreeSerializer(NewickTree(tree)).data,)
+    return tree
+
+@api_view(['GET'])
+@permission_classes((AllowAny,))
+def get_newick_trees(request):
+    newick_trees = NewickResultSet()
+    #f = open('societies.txt', 'w')
+    query_string = request.QUERY_PARAMS['query'] #get the query parameters
+    #f.write(query_string)
+    # Need to parse the JSON
+    query_dict = json.loads(query_string)
+    result_set = result_set_from_query_dict(query_dict) #search for societies
+    languages = [] #list of language ids, used to find the language trees
+    if result_set.societies:
+        for s in result_set.societies:
+            if len(s.variable_coded_values) is 1:
+                for v in s.variable_coded_values:
+                    coded_value = v.coded_value
+            else:
+                coded_value = None
+            if s.society.language:
+                languages.append(s.society.language.id)
+                if coded_value:
+                    newick_trees.add_isocode(s.society.language.iso_code.iso_code, coded_value)
+        trees = get_language_trees_from_query_dict({'language_ids': languages}) #search for language trees
+        for t in trees:
+            newick_trees.add_string(t, NewickTreeSerializer(NewickTree(newick_tree(t.id))).data)
+        newick_trees.finalize()
+       # f.close()
+
+    return Response(NewickResultSetSerializer(newick_trees).data)
 
 @api_view(['GET'])
 @permission_classes((AllowAny,))

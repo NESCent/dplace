@@ -32,7 +32,7 @@ function TreeCtrl($scope,  NewickTree, Variable, CodeDescription, FindSocieties,
      $scope.doSearch = function() {
 
         $scope.resetVariables();
-                $scope.trait.forEach(function(trait) {
+        $scope.trait.forEach(function(trait) {
             $scope.code_ids.push(trait.id);
         });
 
@@ -40,8 +40,20 @@ function TreeCtrl($scope,  NewickTree, Variable, CodeDescription, FindSocieties,
         
        $scope.searchButton.disabled = true;
        $scope.searchButton.text = 'Working...';
-        $scope.query['variable_codes'] = $scope.code_ids;
+       $scope.query['variable_codes'] = $scope.code_ids;
        $scope.test = getTree.query({query:JSON.stringify($scope.query)});
+       
+       $scope.test.$promise.then(function(result) {
+            for (var i = 0; i < result.isocodes.length; i++) {
+                $scope.isocodes.push(result.isocodes[i].isocode);
+                $scope.results.push(result.isocodes[i]);
+            }
+            
+            for (var i = 0; i < result.finalResult.length; i++) {
+                $scope.constructTree(result.finalResult[i], 'name');
+            }
+       });
+       
       // $scope.test = FindSocieties.find({variable_codes: $scope.code_ids});  
     /*   $scope.test.$promise.then(function(result) {
        result.societies.forEach(function(society) {
@@ -85,6 +97,7 @@ function TreeCtrl($scope,  NewickTree, Variable, CodeDescription, FindSocieties,
         var w = 700;
         var tree = d3.layout.cluster().children(function(node) { return node.branchset; });
         var nodes = tree(newick);
+
         var h = nodes.length * 3.5; //height depends on # of nodes
         
         tree = d3.layout.cluster()
@@ -93,7 +106,7 @@ function TreeCtrl($scope,  NewickTree, Variable, CodeDescription, FindSocieties,
             .children(function(node) { return node.branchset; });
             
         nodes = tree(newick);
-            
+        if (nodes.length < 3) return; //check this
         var vis = d3.select("#trees").append("svg:svg")
             .attr("width", w+300)
             .attr("height", h+30)
@@ -139,7 +152,7 @@ function TreeCtrl($scope,  NewickTree, Variable, CodeDescription, FindSocieties,
                         .attr("stroke", "#000")
                         .attr("stroke-width", "0.5")
                         .attr("fill", function(n) {
-                            var hue = code.value * 240 / $scope.code_ids.length;
+                            var hue = code.result * 240 / $scope.code_ids.length;
                             return 'hsl('+hue+',100%, 50%)';
                         })
                     });

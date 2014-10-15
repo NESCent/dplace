@@ -200,9 +200,38 @@ class NewickTree(object):
     '''
     def __init__(self, newickTree=None):
         self.newickTree = newickTree
-
+        
 class NewickTreeSerializer(serializers.Serializer):
     '''
     Serializer for NewickTree object
     '''
     newickTree = serializers.CharField()
+
+class IsoResult(object):
+    def __init__(self, isocode=None, result=None):
+        self.isocode = isocode
+        self.result = result
+        
+class IsoResultSerializer(serializers.Serializer):
+    isocode = serializers.CharField()
+    result = serializers.IntegerField()
+
+class NewickResultSet(object):
+    def __init__(self):
+        self.results = dict()
+        self.finalResult = None
+        self.isocodes = set()
+    
+    def add_string(self, tree, newickString):
+        if tree.id not in self.results.keys():
+            self.results[tree.id] = newickString
+            
+    def add_isocode(self, isocode, result):
+        self.isocodes.add(IsoResult(isocode, result))
+        
+    def finalize(self):
+        self.finalResult = [x for x in self.results.values()]
+
+class NewickResultSetSerializer(serializers.Serializer):
+    finalResult = NewickTreeSerializer(many=True)
+    isocodes = IsoResultSerializer(many=True)
