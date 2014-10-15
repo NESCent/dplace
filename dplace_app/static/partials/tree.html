@@ -1,0 +1,19 @@
+<div class="container">
+    <h4>Search by Cultural Trait</h4>
+    <form class="form-inline" role="form">
+        <select
+                ng-model="vari.selectedVariable"
+                class="form-control"
+                style="width:100%"
+                ng-options="variable.name for variable in cultureVariables"
+                ng-change="varChanged()"
+                >
+                <option value="">Select a Variable</option>
+            </select>
+ <div>
+  <button class="btn btn-primary form-control" ng-disabled="searchButton.disabled" ng-click="doSearch()" style="margin-top:10px;">{{searchButton.text}}</button>
+</div>
+  </form>
+<div id = "trees">
+</div>
+</div>

@@ -1,0 +1,206 @@
+function TreeCtrl($scope,  NewickTree, Variable, CodeDescription, FindSocieties, TreesFromLanguages, getTree) {
+    $scope.setActive('tree');
+    $scope.cultureVariables = Variable.query();
+    $scope.selected = '';
+    $scope.trait = '';
+    //move these to model?
+    $scope.isocodes = []; //move this to model
+    $scope.results = []; // move this to model
+    $scope.languageIDS = [];
+    $scope.languageTrees = [];
+    $scope.query = {};
+    
+    $scope.resetVariables = function() {
+        $scope.code_ids = [];
+        $scope.results = [];
+        $scope.trees = [];
+        $scope.isocodes =  [];
+    }
+    
+    $scope.varChanged = function() {
+
+        $scope.selected = $scope.vari.selectedVariable.id;
+        $scope.trait = CodeDescription.query({variable: $scope.selected });        
+        $scope.trait.$promise.then(function(result) {
+            if (result.length == 0) { //continuous data, need to bin variables
+                console.log("A continuous variable. Need to bin the data.");
+            }
+        });
+        console.log($scope.trait);
+    };
+
+     $scope.doSearch = function() {
+
+        $scope.resetVariables();
+                $scope.trait.forEach(function(trait) {
+            $scope.code_ids.push(trait.id);
+        });
+
+        d3.select("#trees").html('');
+        
+       $scope.searchButton.disabled = true;
+       $scope.searchButton.text = 'Working...';
+        $scope.query['variable_codes'] = $scope.code_ids;
+       $scope.test = getTree.query({query:JSON.stringify($scope.query)});
+      // $scope.test = FindSocieties.find({variable_codes: $scope.code_ids});  
+    /*   $scope.test.$promise.then(function(result) {
+       result.societies.forEach(function(society) {
+            $scope.results.push({"isocode": society.society.iso_code, "value": society.variable_coded_values[0].coded_value});
+            $scope.isocodes.push(society.society.iso_code);
+            if (society.society.language != null) $scope.languageIDS.push(society.society.language.id);
+       });
+       
+        $scope.languageTrees = TreesFromLanguages.find({language_ids: $scope.languageIDS});
+        $scope.languageTrees.$promise.then(function(result) {
+            result.forEach(function(tree) {
+                NewickTree.query({id: tree.id}).$promise.then(function(langTree) {
+                    $scope.constructTree(langTree, tree.name);
+                });
+            
+            });
+        });
+*/
+        $scope.searchButton.disabled = false;
+        $scope.searchButton.text = 'Search';
+       //});
+    };
+    
+    $scope.constructTree = function(tree, tree_name) {
+        var newick = Newick.parse(tree.newickTree);
+        res = $scope.isocodes;
+        $scope.searchBranches(newick.branchset, newick);
+        $scope.deleteParents(newick, newick.branchset);
+        $scope.deleteChildrenOfRoot(newick);
+        
+        var rightAngleDiagonal = function() {
+            function diagonal(diagonalPath) {
+                var source = diagonalPath.source,
+                    target = diagonalPath.target,
+                    pathData = [source, {x: target.x, y: source.y}, target].map(function(d) { return [d.y, d.x]; });
+                return "M" + pathData[0] + ' ' + pathData[1] + ' ' + pathData[2];
+            }
+            return diagonal;
+        }
+        
+        var w = 700;
+        var tree = d3.layout.cluster().children(function(node) { return node.branchset; });
+        var nodes = tree(newick);
+        var h = nodes.length * 3.5; //height depends on # of nodes
+        
+        tree = d3.layout.cluster()
+            .size([h, w])
+            .sort(function comparator(a, b) { return d3.ascending(a.length, b.length); })
+            .children(function(node) { return node.branchset; });
+            
+        nodes = tree(newick);
+            
+        var vis = d3.select("#trees").append("svg:svg")
+            .attr("width", w+300)
+            .attr("height", h+30)
+            .append("svg:g")
+            .attr("transform", "translate(40, 0)");
+
+         var diagonal = rightAngleDiagonal();
+                    nodes.forEach(function(node) {
+                    node.rootDist = (node.parent ? node.parent.rootDist : 0) + (node.length || 0);
+                });
+                var rootDists = nodes.map(function(n) { return n.rootDist; });
+                var yscale = d3.scale.linear()
+                    .domain([0, d3.max(rootDists)])
+                    .range([0, w]);
+                nodes.forEach(function(node) {
+                    node.y = yscale(node.rootDist);
+                });
+                var links = tree.links(nodes);
+                var link = vis.selectAll("path.link")
+                    .data(links)
+                    .enter().append("svg:path")
+                    .attr("class", "link")
+                    .attr("d", diagonal)
+                    .attr("fill", "none")
+                    .attr("stroke", "#ccc")
+                    .attr("stroke-width", "4px")
+                var node = vis.selectAll("g.node")
+                    .data(nodes)
+                    .enter().append("svg:g")
+                    .attr("transform", function(d) { return "translate(" + d.y + ", "+ d.x + ")"; });
+                node.append("svg:text")
+                    .attr("dx", 25)
+                    .attr("dy", 3)
+                    .attr("text-anchor", 'end')
+                    .attr("font-size", "10px")
+                    .text(function(d) { return d.name; });
+                $scope.results.forEach(function(code) {
+                    var selected = node.filter(function(d) {
+                        return d.name == code.isocode;
+                    });
+                    selected.append("svg:circle")
+                        .attr("r", 4.5)
+                        .attr("stroke", "#000")
+                        .attr("stroke-width", "0.5")
+                        .attr("fill", function(n) {
+                            var hue = code.value * 240 / $scope.code_ids.length;
+                            return 'hsl('+hue+',100%, 50%)';
+                        })
+                    });
+        
+        
+    };
+    
+    $scope.deleteNode = function(branchset, toDelete) {
+        indexToDelete = branchset.indexOf(toDelete);
+        branchset.splice(indexToDelete, 1); 
+    };
+    
+    $scope.deleteParents = function(newick, branchset) {
+        for (var i = 0; i < branchset.length; i++) {
+            if (branchset[i].branchset && branchset[i].branchset.length == 0) {
+                if ($scope.getParent(newick.branchset, branchset[i])) {
+                    $scope.deleteNode($scope.getParent(newick.branchset, branchset[i]).branchset, branchset[i]);
+                    $scope.deleteParents(newick, newick.branchset);
+                } 
+            } else if (branchset[i].branchset) {
+                $scope.deleteParents(newick, branchset[i].branchset);
+            }
+        }
+    };
+    
+    $scope.deleteChildrenOfRoot = function(newick) {
+        for (var i = 0; i < newick.branchset.length; i++) {
+            if (newick.branchset[i].branchset.length == 0) {
+                $scope.deleteNode(newick.branchset, newick.branchset[i]);
+            }
+        }
+    };
+    
+    $scope.getParent = function(branchset, node) { 
+        for (var i = 0; i < branchset.length; i++) {
+            if (branchset[i].branchset) {
+                if (branchset[i].branchset.indexOf(node) != -1) {
+                    return branchset[i];
+                } else {
+                    var result = $scope.getParent(branchset[i].branchset, node);
+                    if (result) return result;
+                }
+            }                
+        }
+    };
+    
+    $scope.searchBranches = function(branchset, parent) {
+        for (var i = 0; i < branchset.length; i++) {
+            if (branchset[i]) {
+                if (branchset[i].branchset) {
+                    $scope.searchBranches(branchset[i].branchset, branchset);
+                } else {    
+                    //if the node is not in the array, then delete it
+                    //branchset[i] = a leaf node
+                    if (res.indexOf(branchset[i].name) == -1) {               
+                        lengthToAdd = branchset[i].length;
+                        $scope.deleteNode(branchset, branchset[i]);
+                        i--;
+                    }
+                }
+            } 
+        } 
+    };
+}
