@@ -239,7 +239,7 @@ def get_newick_trees(request):
             newick_string = Tree(str(newick_tree(t.id)))
             
             #this try-except block is only if we prune trees using ete2.
-           try: 
+            try: 
                 #this doesn't work when the .trees file doesn't use isocodes as node labels
                 #only tree giving this problem is substitutions.mcct.trees
                 #delete societies that we don't have data for
