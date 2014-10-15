@@ -63,10 +63,12 @@ function TreeCtrl($scope,  NewickTree, Variable, CodeDescription, FindSocieties,
     
     $scope.constructTree = function(tree, tree_name) {
         var newick = Newick.parse(tree.newickTree);
+        //var newick = Newick.parse(tree);
+       // console.log(tree);
         res = $scope.isocodes;
-        $scope.searchBranches(newick.branchset, newick);
-        $scope.deleteParents(newick, newick.branchset);
-        $scope.deleteChildrenOfRoot(newick);
+       // $scope.searchBranches(newick.branchset, newick);
+        //$scope.deleteParents(newick, newick.branchset);
+        //$scope.deleteChildrenOfRoot(newick);
         
         var rightAngleDiagonal = function() {
             function diagonal(diagonalPath) {
@@ -81,8 +83,8 @@ function TreeCtrl($scope,  NewickTree, Variable, CodeDescription, FindSocieties,
         var w = 700;
         var tree = d3.layout.cluster().children(function(node) { return node.branchset; });
         var nodes = tree(newick);
-
-        var h = nodes.length * 3.5; //height depends on # of nodes
+        
+        var h = nodes.length * 5; //height depends on # of nodes
         
         tree = d3.layout.cluster()
             .size([h, w])

@@ -216,6 +216,7 @@ def newick_tree(key):
 @api_view(['GET'])
 @permission_classes((AllowAny,))
 def get_newick_trees(request):
+    from ete2 import Tree
     newick_trees = NewickResultSet()
     #f = open('societies.txt', 'w')
     query_string = request.QUERY_PARAMS['query'] #get the query parameters
@@ -223,21 +224,33 @@ def get_newick_trees(request):
     # Need to parse the JSON
     query_dict = json.loads(query_string)
     result_set = result_set_from_query_dict(query_dict) #search for societies
-    languages = [] #list of language ids, used to find the language trees
+    languages = set() #list of language ids, used to find the language trees
     if result_set.societies:
         for s in result_set.societies:
-            if len(s.variable_coded_values) is 1:
+            if len(s.variable_coded_values) is 1: #can only handle one variable at a time
                 for v in s.variable_coded_values:
                     coded_value = v.coded_value
             else:
                 coded_value = None
             if s.society.language:
-                languages.append(s.society.language.id)
-                if coded_value:
+                languages.add(s.society.language.id)
+                if coded_value: #mapping of results and isocodes, used to color the nodes
                     newick_trees.add_isocode(s.society.language.iso_code.iso_code, coded_value)
         trees = get_language_trees_from_query_dict({'language_ids': languages}) #search for language trees
         for t in trees:
-            newick_trees.add_string(t, NewickTreeSerializer(NewickTree(newick_tree(t.id))).data)
+            #get a list of societies that we have data for
+            langs_in_tree = [str(l.iso_code.iso_code) for l in t.languages.all() if l.id in languages]
+            newick_string = Tree(str(newick_tree(t.id)))
+            #f.write(str(t.id))
+            try: 
+                #this doesn't work when the .trees file doesn't use isocodes as node labels
+                #only tree giving this problem is substitutions.mcct.trees
+                #delete societies that we don't have data for
+                newick_string.prune(langs_in_tree, preserve_branch_length=True)
+            except:
+                continue
+            #newick_trees.add_string(t, NewickTreeSerializer(NewickTree(newick_tree(t.id))).data)
+            newick_trees.add_string(t, NewickTree(newick_string.write(format=5)))
         newick_trees.finalize()
        # f.close()
 
@@ -257,3 +270,4 @@ def csv_download(request):
     filename = "dplace-societies-%s.csv" % datetime.datetime.now().strftime("%Y-%m-%d")
     response['Content-Disposition']  = 'attachment; filename="%s"' % filename
     return response
+    

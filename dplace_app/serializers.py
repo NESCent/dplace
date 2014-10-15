@@ -218,9 +218,9 @@ class IsoResultSerializer(serializers.Serializer):
 
 class NewickResultSet(object):
     def __init__(self):
-        self.results = dict()
+        self.results = dict() 
         self.finalResult = None
-        self.isocodes = set()
+        self.isocodes = set() #contains mapping of isocode to coded_value
     
     def add_string(self, tree, newickString):
         if tree.id not in self.results.keys():
