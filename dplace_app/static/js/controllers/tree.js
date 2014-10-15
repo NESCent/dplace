@@ -18,7 +18,7 @@ function TreeCtrl($scope,  NewickTree, Variable, CodeDescription, FindSocieties,
     }
     
     $scope.varChanged = function() {
-
+         d3.select("#trees").html('');
         $scope.selected = $scope.vari.selectedVariable.id;
         $scope.trait = CodeDescription.query({variable: $scope.selected });        
         $scope.trait.$promise.then(function(result) {
@@ -30,16 +30,15 @@ function TreeCtrl($scope,  NewickTree, Variable, CodeDescription, FindSocieties,
     };
 
      $scope.doSearch = function() {
-
+        $scope.searchButton.disabled = true;
+        $scope.searchButton.text = 'Working...';
         $scope.resetVariables();
         $scope.trait.forEach(function(trait) {
             $scope.code_ids.push(trait.id);
         });
 
         d3.select("#trees").html('');
-        
-       $scope.searchButton.disabled = true;
-       $scope.searchButton.text = 'Working...';
+
        $scope.query['variable_codes'] = $scope.code_ids;
        $scope.test = getTree.query({query:JSON.stringify($scope.query)});
        
@@ -52,29 +51,14 @@ function TreeCtrl($scope,  NewickTree, Variable, CodeDescription, FindSocieties,
             for (var i = 0; i < result.finalResult.length; i++) {
                 $scope.constructTree(result.finalResult[i], 'name');
             }
-       });
-       
-      // $scope.test = FindSocieties.find({variable_codes: $scope.code_ids});  
-    /*   $scope.test.$promise.then(function(result) {
-       result.societies.forEach(function(society) {
-            $scope.results.push({"isocode": society.society.iso_code, "value": society.variable_coded_values[0].coded_value});
-            $scope.isocodes.push(society.society.iso_code);
-            if (society.society.language != null) $scope.languageIDS.push(society.society.language.id);
-       });
-       
-        $scope.languageTrees = TreesFromLanguages.find({language_ids: $scope.languageIDS});
-        $scope.languageTrees.$promise.then(function(result) {
-            result.forEach(function(tree) {
-                NewickTree.query({id: tree.id}).$promise.then(function(langTree) {
-                    $scope.constructTree(langTree, tree.name);
-                });
             
-            });
-        });
-*/
+             
         $scope.searchButton.disabled = false;
         $scope.searchButton.text = 'Search';
-       //});
+        
+       });
+       
+
     };
     
     $scope.constructTree = function(tree, tree_name) {
