@@ -42,15 +42,16 @@ function TreeCtrl($scope,  NewickTree, Variable, CodeDescription, FindSocieties,
        
        $scope.languageTrees.$promise.then(function(result) {
             for (var i = 0; i < result.isocodes.length; i++) {
-                //the line below is needed if we prune trees using JavaScript
-                //$scope.isocodes.push(result.isocodes[i].isocode); 
+                //$scope.isocodes.push(result.isocodes[i].isocode);  //needed to prune trees using JavaScript
                 $scope.results.push(result.isocodes[i]);
             }
-            for (var i = 0; i < result.finalResult.length; i++) {
-                $scope.constructTree(result.finalResult[i], 'name');
+            if (result.finalResult) {
+                for (var i = 0; i < result.finalResult.length; i++) {
+                    $scope.constructTree(result.finalResult[i], 'name');
+                }
+            $scope.searchButton.disabled = false;
+            $scope.searchButton.text = 'Search';
             }
-        $scope.searchButton.disabled = false;
-        $scope.searchButton.text = 'Search'      
        });
     };
     
@@ -76,15 +77,15 @@ function TreeCtrl($scope,  NewickTree, Variable, CodeDescription, FindSocieties,
         var tree = d3.layout.cluster().children(function(node) { return node.branchset; });
         var nodes = tree(newick);
         
-        var h = nodes.length * 6; //height depends on # of nodes
+        var h = nodes.length * 7; //height depends on # of nodes
         
         tree = d3.layout.cluster()
             .size([h, w])
             .sort(function comparator(a, b) { return d3.ascending(a.length, b.length); })
-            .children(function(node) { return node.branchset; });
-            
+            .children(function(node) { return node.branchset; })
+            .separation(function separation(a, b) { return 5; });
+         
         nodes = tree(newick);
-        if (nodes.length < 3) return; //check this
         var vis = d3.select("#trees").append("svg:svg")
             .attr("width", w+300)
             .attr("height", h+30)
@@ -116,10 +117,9 @@ function TreeCtrl($scope,  NewickTree, Variable, CodeDescription, FindSocieties,
             .enter().append("svg:g")
             .attr("transform", function(d) { return "translate(" + d.y + ", "+ d.x + ")"; });
         node.append("svg:text")
-            .attr("dx", 25)
+            .attr("dx", 10)
             .attr("dy", 3)
-            .attr("text-anchor", 'end')
-            .attr("font-size", "10px")
+            .attr("font-size", "14px")
             .text(function(d) { return d.name; });
         $scope.results.forEach(function(code) {
             var selected = node.filter(function(d) {
