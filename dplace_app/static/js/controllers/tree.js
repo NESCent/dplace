@@ -39,7 +39,6 @@ function TreeCtrl($scope,  NewickTree, Variable, CodeDescription, FindSocieties,
 
        $scope.query['variable_codes'] = $scope.code_ids;
        $scope.languageTrees = getTree.query({query:JSON.stringify($scope.query)});
-       
        $scope.languageTrees.$promise.then(function(result) {
             for (var i = 0; i < result.isocodes.length; i++) {
                 //$scope.isocodes.push(result.isocodes[i].isocode);  //needed to prune trees using JavaScript
@@ -47,7 +46,7 @@ function TreeCtrl($scope,  NewickTree, Variable, CodeDescription, FindSocieties,
             }
             if (result.finalResult) {
                 for (var i = 0; i < result.finalResult.length; i++) {
-                    $scope.constructTree(result.finalResult[i], 'name');
+                    $scope.constructTree(result.finalResult[i]);
                 }
             $scope.searchButton.disabled = false;
             $scope.searchButton.text = 'Search';
@@ -55,8 +54,8 @@ function TreeCtrl($scope,  NewickTree, Variable, CodeDescription, FindSocieties,
        });
     };
     
-    $scope.constructTree = function(tree, tree_name) {
-        var newick = Newick.parse(tree.newickTree);
+    $scope.constructTree = function(langTree) {
+        var newick = Newick.parse(langTree.newickTree);
         //code below uses JavaScript to prune trees instead of ete2 - keeping just in case
        /* res = $scope.isocodes;
         $scope.searchBranches(newick.branchset, newick);
@@ -92,7 +91,13 @@ function TreeCtrl($scope,  NewickTree, Variable, CodeDescription, FindSocieties,
             .append("svg:g")
             .attr("transform", "translate(40, 0)");
 
-         var diagonal = rightAngleDiagonal();
+        vis.append("svg:text")
+            .attr("dx", 10)
+            .attr("dy", 20)
+            .attr("font-size", "14px")
+            .text(langTree.name);
+            
+        var diagonal = rightAngleDiagonal();
             nodes.forEach(function(node) {
             node.rootDist = (node.parent ? node.parent.rootDist : 0) + (node.length || 0);
         });

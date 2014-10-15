@@ -198,14 +198,16 @@ class NewickTree(object):
     '''
     Lightweight wrapper around a newick tree string
     '''
-    def __init__(self, newickTree=None):
+    def __init__(self, newickTree=None, name=None):
         self.newickTree = newickTree
+        self.name = name
         
 class NewickTreeSerializer(serializers.Serializer):
     '''
     Serializer for NewickTree object
     '''
     newickTree = serializers.CharField()
+    name = serializers.CharField()
 
 class IsoResult(object):
     def __init__(self, isocode=None, result=None):
@@ -224,7 +226,7 @@ class NewickResultSet(object):
     
     def add_string(self, tree, newickString):
         if tree.id not in self.results.keys():
-            self.results[tree.id] = newickString
+            self.results[tree.id] = NewickTree(newickString, tree.name)
             
     def add_isocode(self, isocode, result):
         self.isocodes.add(IsoResult(isocode, result))

@@ -247,7 +247,7 @@ def get_newick_trees(request):
             except:
                 continue
             #newick_trees.add_string(t, NewickTreeSerializer(NewickTree(newick_tree(t.id))).data) #if pruning using JavaScript
-            newick_trees.add_string(t, NewickTree(newick_string.write(format=5))) #if pruning using ete2
+            newick_trees.add_string(t, newick_string.write(format=5)) #if pruning using ete2
         newick_trees.finalize()
     return Response(NewickResultSetSerializer(newick_trees).data)
 
