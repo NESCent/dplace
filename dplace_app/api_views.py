@@ -194,8 +194,6 @@ def trees_from_languages(request):
     trees = get_language_trees_from_query_dict(request.DATA)
     return Response(LanguageTreeSerializer(trees, many=True).data,)
 
-#@api_view(['GET'])
-#@permission_classes((AllowAny,))
 def newick_tree(key):
     # Get a newick format tree from a language tree id
     language_tree_id =key
@@ -218,9 +216,7 @@ def newick_tree(key):
 def get_newick_trees(request):
     from ete2 import Tree
     newick_trees = NewickResultSet()
-    #f = open('societies.txt', 'w')
     query_string = request.QUERY_PARAMS['query'] #get the query parameters
-    #f.write(query_string)
     # Need to parse the JSON
     query_dict = json.loads(query_string)
     result_set = result_set_from_query_dict(query_dict) #search for societies
@@ -241,19 +237,18 @@ def get_newick_trees(request):
             #get a list of societies that we have data for
             langs_in_tree = [str(l.iso_code.iso_code) for l in t.languages.all() if l.id in languages]
             newick_string = Tree(str(newick_tree(t.id)))
-            #f.write(str(t.id))
-            try: 
+            
+            #this try-except block is only if we prune trees using ete2.
+           try: 
                 #this doesn't work when the .trees file doesn't use isocodes as node labels
                 #only tree giving this problem is substitutions.mcct.trees
                 #delete societies that we don't have data for
                 newick_string.prune(langs_in_tree, preserve_branch_length=True)
             except:
                 continue
-            #newick_trees.add_string(t, NewickTreeSerializer(NewickTree(newick_tree(t.id))).data)
-            newick_trees.add_string(t, NewickTree(newick_string.write(format=5)))
+            #newick_trees.add_string(t, NewickTreeSerializer(NewickTree(newick_tree(t.id))).data) #if pruning using JavaScript
+            newick_trees.add_string(t, NewickTree(newick_string.write(format=5))) #if pruning using ete2
         newick_trees.finalize()
-       # f.close()
-
     return Response(NewickResultSetSerializer(newick_trees).data)
 
 @api_view(['GET'])

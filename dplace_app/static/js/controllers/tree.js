@@ -3,9 +3,8 @@ function TreeCtrl($scope,  NewickTree, Variable, CodeDescription, FindSocieties,
     $scope.cultureVariables = Variable.query();
     $scope.selected = '';
     $scope.trait = '';
-    //move these to model?
-    $scope.isocodes = []; //move this to model
-    $scope.results = []; // move this to model
+    $scope.isocodes = []; 
+    $scope.results = []; 
     $scope.languageIDS = [];
     $scope.languageTrees = [];
     $scope.query = {};
@@ -18,7 +17,7 @@ function TreeCtrl($scope,  NewickTree, Variable, CodeDescription, FindSocieties,
     }
     
     $scope.varChanged = function() {
-         d3.select("#trees").html('');
+        d3.select("#trees").html('');
         $scope.selected = $scope.vari.selectedVariable.id;
         $scope.trait = CodeDescription.query({variable: $scope.selected });        
         $scope.trait.$promise.then(function(result) {
@@ -26,7 +25,6 @@ function TreeCtrl($scope,  NewickTree, Variable, CodeDescription, FindSocieties,
                 console.log("A continuous variable. Need to bin the data.");
             }
         });
-        console.log($scope.trait);
     };
 
      $scope.doSearch = function() {
@@ -40,35 +38,29 @@ function TreeCtrl($scope,  NewickTree, Variable, CodeDescription, FindSocieties,
         d3.select("#trees").html('');
 
        $scope.query['variable_codes'] = $scope.code_ids;
-       $scope.test = getTree.query({query:JSON.stringify($scope.query)});
+       $scope.languageTrees = getTree.query({query:JSON.stringify($scope.query)});
        
-       $scope.test.$promise.then(function(result) {
+       $scope.languageTrees.$promise.then(function(result) {
             for (var i = 0; i < result.isocodes.length; i++) {
-                $scope.isocodes.push(result.isocodes[i].isocode);
+                //the line below is needed if we prune trees using JavaScript
+                //$scope.isocodes.push(result.isocodes[i].isocode); 
                 $scope.results.push(result.isocodes[i]);
             }
-            
             for (var i = 0; i < result.finalResult.length; i++) {
                 $scope.constructTree(result.finalResult[i], 'name');
             }
-            
-             
         $scope.searchButton.disabled = false;
-        $scope.searchButton.text = 'Search';
-        
+        $scope.searchButton.text = 'Search'      
        });
-       
-
     };
     
     $scope.constructTree = function(tree, tree_name) {
         var newick = Newick.parse(tree.newickTree);
-        //var newick = Newick.parse(tree);
-       // console.log(tree);
-        res = $scope.isocodes;
-       // $scope.searchBranches(newick.branchset, newick);
-        //$scope.deleteParents(newick, newick.branchset);
-        //$scope.deleteChildrenOfRoot(newick);
+        //code below uses JavaScript to prune trees instead of ete2 - keeping just in case
+       /* res = $scope.isocodes;
+        $scope.searchBranches(newick.branchset, newick);
+        $scope.deleteParents(newick, newick.branchset);
+        $scope.deleteChildrenOfRoot(newick);*/
         
         var rightAngleDiagonal = function() {
             function diagonal(diagonalPath) {
@@ -84,7 +76,7 @@ function TreeCtrl($scope,  NewickTree, Variable, CodeDescription, FindSocieties,
         var tree = d3.layout.cluster().children(function(node) { return node.branchset; });
         var nodes = tree(newick);
         
-        var h = nodes.length * 5; //height depends on # of nodes
+        var h = nodes.length * 6; //height depends on # of nodes
         
         tree = d3.layout.cluster()
             .size([h, w])
@@ -100,57 +92,57 @@ function TreeCtrl($scope,  NewickTree, Variable, CodeDescription, FindSocieties,
             .attr("transform", "translate(40, 0)");
 
          var diagonal = rightAngleDiagonal();
-                    nodes.forEach(function(node) {
-                    node.rootDist = (node.parent ? node.parent.rootDist : 0) + (node.length || 0);
-                });
-                var rootDists = nodes.map(function(n) { return n.rootDist; });
-                var yscale = d3.scale.linear()
-                    .domain([0, d3.max(rootDists)])
-                    .range([0, w]);
-                nodes.forEach(function(node) {
-                    node.y = yscale(node.rootDist);
-                });
-                var links = tree.links(nodes);
-                var link = vis.selectAll("path.link")
-                    .data(links)
-                    .enter().append("svg:path")
-                    .attr("class", "link")
-                    .attr("d", diagonal)
-                    .attr("fill", "none")
-                    .attr("stroke", "#ccc")
-                    .attr("stroke-width", "4px")
-                var node = vis.selectAll("g.node")
-                    .data(nodes)
-                    .enter().append("svg:g")
-                    .attr("transform", function(d) { return "translate(" + d.y + ", "+ d.x + ")"; });
-                node.append("svg:text")
-                    .attr("dx", 25)
-                    .attr("dy", 3)
-                    .attr("text-anchor", 'end')
-                    .attr("font-size", "10px")
-                    .text(function(d) { return d.name; });
-                $scope.results.forEach(function(code) {
-                    var selected = node.filter(function(d) {
-                        return d.name == code.isocode;
-                    });
-                    selected.append("svg:circle")
-                        .attr("r", 4.5)
-                        .attr("stroke", "#000")
-                        .attr("stroke-width", "0.5")
-                        .attr("fill", function(n) {
-                            var hue = code.result * 240 / $scope.code_ids.length;
-                            return 'hsl('+hue+',100%, 50%)';
-                        })
-                    });
-        
-        
-    };
+            nodes.forEach(function(node) {
+            node.rootDist = (node.parent ? node.parent.rootDist : 0) + (node.length || 0);
+        });
+        var rootDists = nodes.map(function(n) { return n.rootDist; });
+        var yscale = d3.scale.linear()
+            .domain([0, d3.max(rootDists)])
+            .range([0, w]);
+        nodes.forEach(function(node) {
+            node.y = yscale(node.rootDist);
+        });
+        var links = tree.links(nodes);
+        var link = vis.selectAll("path.link")
+            .data(links)
+            .enter().append("svg:path")
+            .attr("class", "link")
+            .attr("d", diagonal)
+            .attr("fill", "none")
+            .attr("stroke", "#ccc")
+            .attr("stroke-width", "4px")
+        var node = vis.selectAll("g.node")
+            .data(nodes)
+            .enter().append("svg:g")
+            .attr("transform", function(d) { return "translate(" + d.y + ", "+ d.x + ")"; });
+        node.append("svg:text")
+            .attr("dx", 25)
+            .attr("dy", 3)
+            .attr("text-anchor", 'end')
+            .attr("font-size", "10px")
+            .text(function(d) { return d.name; });
+        $scope.results.forEach(function(code) {
+            var selected = node.filter(function(d) {
+                return d.name == code.isocode;
+            });
+            selected.append("svg:circle")
+                .attr("r", 4.5)
+                .attr("stroke", "#000")
+                .attr("stroke-width", "0.5")
+                .attr("fill", function(n) {
+                    var hue = code.result * 240 / $scope.code_ids.length;
+                    return 'hsl('+hue+',100%, 50%)';
+                })
+            });
+        };
     
+    //deletes a node from the tree
     $scope.deleteNode = function(branchset, toDelete) {
         indexToDelete = branchset.indexOf(toDelete);
         branchset.splice(indexToDelete, 1); 
     };
     
+    //deletes parents of nodes
     $scope.deleteParents = function(newick, branchset) {
         for (var i = 0; i < branchset.length; i++) {
             if (branchset[i].branchset && branchset[i].branchset.length == 0) {
@@ -164,6 +156,8 @@ function TreeCtrl($scope,  NewickTree, Variable, CodeDescription, FindSocieties,
         }
     };
     
+    //deletes any empty children of the root
+    //this must be called last - after deleteParents
     $scope.deleteChildrenOfRoot = function(newick) {
         for (var i = 0; i < newick.branchset.length; i++) {
             if (newick.branchset[i].branchset.length == 0) {
@@ -172,6 +166,8 @@ function TreeCtrl($scope,  NewickTree, Variable, CodeDescription, FindSocieties,
         }
     };
     
+    //returns the parent of a node
+    //we don't have access to node.parent when we are pruning the tree
     $scope.getParent = function(branchset, node) { 
         for (var i = 0; i < branchset.length; i++) {
             if (branchset[i].branchset) {
@@ -185,6 +181,7 @@ function TreeCtrl($scope,  NewickTree, Variable, CodeDescription, FindSocieties,
         }
     };
     
+    //go through branches and delete societies that don't have data
     $scope.searchBranches = function(branchset, parent) {
         for (var i = 0; i < branchset.length; i++) {
             if (branchset[i]) {
@@ -194,7 +191,6 @@ function TreeCtrl($scope,  NewickTree, Variable, CodeDescription, FindSocieties,
                     //if the node is not in the array, then delete it
                     //branchset[i] = a leaf node
                     if (res.indexOf(branchset[i].name) == -1) {               
-                        lengthToAdd = branchset[i].length;
                         $scope.deleteNode(branchset, branchset[i]);
                         i--;
                     }
