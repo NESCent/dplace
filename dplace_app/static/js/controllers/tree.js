@@ -85,18 +85,16 @@ function TreeCtrl($scope,  NewickTree, Variable, CodeDescription, FindSocieties,
             .separation(function separation(a, b) { return 5; });
          
         nodes = tree(newick);
+        
+        d3.select("#trees").append("h4")
+            .text(langTree.name);
+        
         var vis = d3.select("#trees").append("svg:svg")
             .attr("width", w+300)
             .attr("height", h+30)
             .append("svg:g")
             .attr("transform", "translate(40, 0)");
 
-        vis.append("svg:text")
-            .attr("dx", 10)
-            .attr("dy", 20)
-            .attr("font-size", "14px")
-            .text(langTree.name);
-            
         var diagonal = rightAngleDiagonal();
             nodes.forEach(function(node) {
             node.rootDist = (node.parent ? node.parent.rootDist : 0) + (node.length || 0);
@@ -123,7 +121,7 @@ function TreeCtrl($scope,  NewickTree, Variable, CodeDescription, FindSocieties,
             .attr("transform", function(d) { return "translate(" + d.y + ", "+ d.x + ")"; });
         node.append("svg:text")
             .attr("dx", 10)
-            .attr("dy", 3)
+            .attr("dy", 4)
             .attr("font-size", "14px")
             .text(function(d) { return d.name; });
         $scope.results.forEach(function(code) {
