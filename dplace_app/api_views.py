@@ -178,9 +178,6 @@ class GeographicRegionViewSet(viewsets.ReadOnlyModelViewSet):
     filter_class = GeographicRegionFilter
 
 def get_language_trees_from_query_dict(query_dict):
-    f = open('dict.txt', 'w')
-    f.write(str(query_dict))
-    f.close()
     if 'language_ids' in query_dict:
         language_ids = [int(x) for x in query_dict['language_ids']]
         trees = LanguageTree.objects.filter(languages__pk__in=language_ids).distinct()
