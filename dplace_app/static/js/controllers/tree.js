@@ -75,13 +75,13 @@ function TreeCtrl($scope,  NewickTree, Variable, CodeDescription, FindSocieties,
         var tree = d3.layout.cluster().children(function(node) { return node.branchset; });
         var nodes = tree(newick);
         
-        var h = nodes.length * 7; //height depends on # of nodes
+        var h = nodes.length * 9; //height depends on # of nodes
         
         tree = d3.layout.cluster()
             .size([h, w])
             .sort(function comparator(a, b) { return d3.ascending(a.length, b.length); })
             .children(function(node) { return node.branchset; })
-            .separation(function separation(a, b) { return 5; });
+            .separation(function separation(a, b) { return 8; });
          
         nodes = tree(newick);
         
