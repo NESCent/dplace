@@ -5,7 +5,6 @@ function TreeCtrl($scope,  NewickTree, Variable, CodeDescription, FindSocieties,
     $scope.trait = '';
     $scope.isocodes = []; 
     $scope.results = []; 
-    $scope.languageIDS = [];
     $scope.languageTrees = [];
     $scope.query = {};
     
