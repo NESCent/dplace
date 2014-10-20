@@ -10,6 +10,17 @@
                 >
                 <option value="">Select a Variable</option>
         </select>
+        <h4> or Search by Environmental Variable</h4>
+        <select
+                ng-model="selectedEnvVariable"
+                class="form-control"
+                style="width:100%"
+                ng-options="variable.name for variable in environmentalVariables"
+                ng-change="envVarChanged()"
+                >
+                <option value="">Select a Variable</option>
+        </select>
+        
         <div>
             <button class="btn btn-primary form-control" ng-disabled="searchButton.disabled" ng-click="doSearch()" style="margin-top:10px;">{{searchButton.text}}</button>
         </div>

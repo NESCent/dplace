@@ -94,7 +94,39 @@ class LanguageTreeViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = LanguageTreeSerializer
     filter_fields = ('name',)
     queryset = LanguageTree.objects.all()
-
+    
+def bin_data(values):
+    min_value = 0
+    max_value = 0
+    bins = []
+    for v in values:
+        if v.value < min_value:
+            min_value = v.value
+        elif v.value > max_value:
+            max_value = v.value
+    data_range = max_value - min_value
+    bin_size = data_range / 5
+    for x in range(0, 5):
+        bins.append({
+            'code':x,
+            'min':min_value,
+            'max':min_value+bin_size
+        })
+        min_value = min_value + bin_size
+    return bins
+    
+@api_view(['GET'])
+@permission_classes((AllowAny,))
+def get_bins(request):
+    query_string = request.QUERY_PARAMS['query']
+    query_dict = json.loads(query_string)
+    if 'variable_id' in query_dict:
+        values = EnvironmentalValue.objects.filter(variable=query_dict['variable_id'])
+        bins = bin_data(values)
+    else:
+        bins = None
+    return Response(bins)
+    
 
 def result_set_from_query_dict(query_dict):
     result_set = SocietyResultSet()
@@ -144,6 +176,13 @@ def result_set_from_query_dict(query_dict):
             elif operator == 'lt':
                 values = values.filter(value__lt=filter['params'][0])
             values = values.select_related('variable','environmental__society')
+            if operator == 'all':
+                bins = bin_data(values)
+                for value in values:
+                    for b in bins:
+                        if float(value.value) < float(b['max']):
+                            value.value = b['code']
+                            break
             # get the societies from the values
             for value in values:
                 result_set.add_environmental(value.society(), value.variable, value)
@@ -223,11 +262,14 @@ def get_newick_trees(request):
             if len(s.variable_coded_values) is 1: #can only handle one variable at a time
                 for v in s.variable_coded_values:
                     coded_value = v.coded_value
+            elif len(s.environmental_values) is 1:
+                for v in s.environmental_values:
+                    coded_value = v.value
             else:
                 coded_value = None
             if s.society.language:
                 languages.add(s.society.language.id)
-                if coded_value: #mapping of results and isocodes, used to color the nodes
+                if coded_value is not None: #mapping of results and isocodes, used to color the nodes
                     newick_trees.add_isocode(s.society.language.iso_code.iso_code, coded_value)
         trees = get_language_trees_from_query_dict({'language_ids': languages}) #search for language trees
         for t in trees:
@@ -243,7 +285,7 @@ def get_newick_trees(request):
                 newick_string.prune(langs_in_tree, preserve_branch_length=True)
             except:
                 continue
-            #newick_trees.add_string(t, NewickTreeSerializer(NewickTree(newick_tree(t.id))).data) #if pruning using JavaScript
+            #newick_trees.add_string(t, newick_tree(t.id)) #if pruning using JavaScript
             newick_trees.add_string(t, newick_string.write(format=5)) #if pruning using ete2
         newick_trees.finalize()
     return Response(NewickResultSetSerializer(newick_trees).data)

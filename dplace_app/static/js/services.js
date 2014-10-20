@@ -130,6 +130,17 @@ angular.module('dplaceServices', ['ngResource'])
                 }
             });
     })
+    .factory('GetBins', function($resource) {
+        return $resource(
+            '/api/v1/get_bins',
+            {}, {
+                query: {
+                    method: 'GET',
+                    isArray: true
+                }
+            }
+        )
+    })
     .factory('getTree', function($resource) {
         return $resource(
             '/api/v1/get_trees',

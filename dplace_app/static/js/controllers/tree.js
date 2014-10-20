@@ -1,10 +1,12 @@
-function TreeCtrl($scope,  NewickTree, Variable, CodeDescription, FindSocieties, TreesFromLanguages, getTree) {
+function TreeCtrl($scope,  NewickTree, Variable, EnvironmentalVariable, CodeDescription, FindSocieties, TreesFromLanguages, getTree, GetBins) {
     $scope.setActive('tree');
     $scope.cultureVariables = Variable.query();
+    $scope.environmentalVariables = EnvironmentalVariable.query();
     $scope.selected = '';
     $scope.trait = '';
     $scope.isocodes = []; 
     $scope.results = []; 
+    $scope.bins = [];
     $scope.languageTrees = [];
     $scope.query = {};
     
@@ -17,13 +19,21 @@ function TreeCtrl($scope,  NewickTree, Variable, CodeDescription, FindSocieties,
     
     $scope.varChanged = function() {
         d3.select("#trees").html('');
+        $scope.query = {};
+        $scope.bins = [];
         $scope.selected = $scope.selectedVariable.id;
-        $scope.trait = CodeDescription.query({variable: $scope.selected });        
-        $scope.trait.$promise.then(function(result) {
-            if (result.length == 0) { //continuous data, need to bin variables
-                console.log("A continuous variable. Need to bin the data.");
-            }
-        });
+        $scope.selectedEnvVariable = '';
+        $scope.trait = CodeDescription.query({variable: $scope.selected });
+    };
+    
+    $scope.envVarChanged = function() {
+        d3.select("#trees").html('');
+        $scope.trait = [];
+        $scope.query = {};
+        $scope.selectedVariable = '';
+        $scope.selected = $scope.selectedEnvVariable.id;
+        $scope.query['environmental_filters'] = [{id: $scope.selected, operator: 'all'}];
+        $scope.bins = GetBins.query({query: JSON.stringify({variable_id: $scope.selected})});
     };
 
      $scope.doSearch = function() {
@@ -33,12 +43,18 @@ function TreeCtrl($scope,  NewickTree, Variable, CodeDescription, FindSocieties,
         $scope.trait.forEach(function(trait) {
             $scope.code_ids.push(trait.id);
         });
+        if ($scope.code_ids.length > 0) $scope.query['variable_codes'] = $scope.code_ids;
 
         d3.select("#trees").html('');
 
-       $scope.query['variable_codes'] = $scope.code_ids;
-       $scope.languageTrees = getTree.query({query:JSON.stringify($scope.query)});
-       $scope.languageTrees.$promise.then(function(result) {
+        $scope.bins.forEach(function(bin) {
+            $scope.code_ids.push(bin.code);
+            $scope.trait.push({'code':bin.code, 'description': bin.min + '-' + bin.max});
+        });
+        
+        $scope.languageTrees = getTree.query({query:JSON.stringify($scope.query)});
+        $scope.languageTrees.$promise.then(function(result) {
+            console.log(result);
             for (var i = 0; i < result.isocodes.length; i++) {
                 //$scope.isocodes.push(result.isocodes[i].isocode);  //needed to prune trees using JavaScript
                 $scope.results.push(result.isocodes[i]);
@@ -47,17 +63,17 @@ function TreeCtrl($scope,  NewickTree, Variable, CodeDescription, FindSocieties,
                 for (var i = 0; i < result.finalResult.length; i++) {
                     $scope.constructTree(result.finalResult[i]);
                 }
+            }
             $scope.searchButton.disabled = false;
             $scope.searchButton.text = 'Search';
-            }
+            
        });
     };
     
     $scope.constructTree = function(langTree) {
         var newick = Newick.parse(langTree.newickTree);
         //code below uses JavaScript to prune trees instead of ete2 - keeping just in case
-       /* res = $scope.isocodes;
-        $scope.searchBranches(newick.branchset, newick);
+       /* $scope.searchBranches(newick.branchset, newick);
         $scope.deleteParents(newick, newick.branchset);
         $scope.deleteChildrenOfRoot(newick);*/
         
@@ -192,7 +208,7 @@ function TreeCtrl($scope,  NewickTree, Variable, CodeDescription, FindSocieties,
                 } else {    
                     //if the node is not in the array, then delete it
                     //branchset[i] = a leaf node
-                    if (res.indexOf(branchset[i].name) == -1) {               
+                    if ($scope.isocodes.indexOf(branchset[i].name) == -1) {               
                         $scope.deleteNode(branchset, branchset[i]);
                         i--;
                     }
