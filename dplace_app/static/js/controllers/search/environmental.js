@@ -25,7 +25,6 @@ function EnvironmentalCtrl($scope, searchModelService) {
         }
     };
     $scope.doSearch = function() {
-		$scope.submitted = true;
         var filters = getSelectedFilters();
         $scope.updateSearchQuery({ environmental_filters: filters });
         $scope.searchSocieties();
