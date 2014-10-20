@@ -17,7 +17,7 @@ function TreeCtrl($scope,  NewickTree, Variable, CodeDescription, FindSocieties,
     
     $scope.varChanged = function() {
         d3.select("#trees").html('');
-        $scope.selected = $scope.vari.selectedVariable.id;
+        $scope.selected = $scope.selectedVariable.id;
         $scope.trait = CodeDescription.query({variable: $scope.selected });        
         $scope.trait.$promise.then(function(result) {
             if (result.length == 0) { //continuous data, need to bin variables
