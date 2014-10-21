@@ -52,7 +52,7 @@ function EnvironmentalCtrl($scope, searchModelService, EnvironmentalValue) {
                     $scope.environmentalData.vals[0] = max_value;
                 }
             });
-        }
+       }
     };
     
     $scope.doSearch = function() {
