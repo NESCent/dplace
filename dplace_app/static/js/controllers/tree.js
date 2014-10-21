@@ -34,6 +34,7 @@ function TreeCtrl($scope,  NewickTree, Variable, EnvironmentalVariable, CodeDesc
         $scope.selected = $scope.selectedEnvVariable.id;
         $scope.query['environmental_filters'] = [{id: $scope.selected, operator: 'all'}];
         $scope.bins = GetBins.query({query: JSON.stringify({variable_id: $scope.selected})});
+       
     };
 
      $scope.doSearch = function() {
@@ -49,7 +50,7 @@ function TreeCtrl($scope,  NewickTree, Variable, EnvironmentalVariable, CodeDesc
 
         $scope.bins.forEach(function(bin) {
             $scope.code_ids.push(bin.code);
-            $scope.trait.push({'code':bin.code, 'description': bin.min + '-' + bin.max});
+            $scope.trait.push({'code':bin.code, 'description': bin.min + '-' + bin.max + ' ' + $scope.selectedEnvVariable.units});
         });
         
         $scope.languageTrees = getTree.query({query:JSON.stringify($scope.query)});
