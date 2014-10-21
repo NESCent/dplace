@@ -73,7 +73,7 @@
                         </div>
                         <span class="variable-label pull-right"> All Values
                             <input type="checkbox" ng-model="allValues.isSelected" ng-change="allValues(environmentalData.selectedVariable)"/>
-                            <div ng-show="allValues.isSelected && !environmentalData.vals[0]"> Working... </div>
+                            <div ng-show="allValues.isSelected && (environmentalData.vals[0] != '0' && !environmentalData.vals[0])"> Working... </div>
                         </span>
                     </div>
                 </div>
