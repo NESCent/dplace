@@ -22,7 +22,7 @@
                                 <button class="btn btn-default dropdown-toggle form-control">{{ environmentalData.selectedFilter.name }} <span class="caret"></span></button>
                                 <ul class="dropdown-menu">
                                     <li ng-repeat="environmentalFilter in environmentalData.filters">
-                                        <a ng-click="environmentalData.selectedFilter = environmentalFilter">{{ environmentalFilter.name }}</a>
+                                        <a ng-click="environmentalData.selectedFilter = environmentalFilter; filterChanged(environmentalFilter);">{{ environmentalFilter.name }}</a>
                                     </li>
                                 </ul>
                             </div>
