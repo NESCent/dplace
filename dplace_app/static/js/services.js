@@ -78,7 +78,6 @@ angular.module('dplaceServices', ['ngResource'])
                     method: 'GET',
                     isArray: true,
                     transformResponse: function(data, headers) {
-                        console.log(JSON.parse(data));
                         return JSON.parse(data).results;
                     }
                 }
