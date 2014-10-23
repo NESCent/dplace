@@ -10,17 +10,38 @@ function TreeCtrl($scope,  NewickTree, Variable, EnvironmentalVariable, CodeDesc
     $scope.languageTrees = [];
     $scope.query = {};
     
+    //basic code to download tree
+    //currently only the first tree on the page can be downloaded
+    $scope.download = function() {
+        console.log("download");      
+        var html = d3.select("#trees").select("svg")
+            .attr("version", 1.1)
+            .attr("xmlns", "http://www.w3.org/2000/svg")
+            .node().parentNode.innerHTML;           
+        //console.log(html);
+        
+        var imgsrc = 'data:image/svg+xml;base64,' + btoa(html);
+        var img = '<img src="'+imgsrc+'">';      
+        //open("data:image/svg+xml," + encodeURIComponent(html)); //opens new window containing svg image
+        
+        var a = d3.select("#downloadLinks").append("a") //append download link to page
+            .attr("download", "tree.svg")
+            .attr("href", imgsrc);       
+        a[0][0].click(); //download tree       
+    };
+    
     $scope.resetVariables = function() {
         $scope.code_ids = [];
         $scope.results = [];
         $scope.trees = [];
         $scope.isocodes =  [];
-    }
+    };
     
     $scope.varChanged = function() {
         d3.select("#trees").html('');
         $scope.query = {};
         $scope.bins = [];
+        $scope.languageTrees = [];
         $scope.selected = $scope.selectedVariable.id;
         $scope.selectedEnvVariable = '';
         $scope.trait = CodeDescription.query({variable: $scope.selected });
@@ -30,6 +51,7 @@ function TreeCtrl($scope,  NewickTree, Variable, EnvironmentalVariable, CodeDesc
         d3.select("#trees").html('');
         $scope.trait = [];
         $scope.query = {};
+        $scope.languageTrees = [];
         $scope.selectedVariable = '';
         $scope.selected = $scope.selectedEnvVariable.id;
         $scope.query['environmental_filters'] = [{id: $scope.selected, operator: 'all'}];
@@ -55,7 +77,6 @@ function TreeCtrl($scope,  NewickTree, Variable, EnvironmentalVariable, CodeDesc
         
         $scope.languageTrees = getTree.query({query:JSON.stringify($scope.query)});
         $scope.languageTrees.$promise.then(function(result) {
-            console.log(result);
             for (var i = 0; i < result.isocodes.length; i++) {
                 //$scope.isocodes.push(result.isocodes[i].isocode);  //needed to prune trees using JavaScript
                 $scope.results.push(result.isocodes[i]);
@@ -105,7 +126,12 @@ function TreeCtrl($scope,  NewickTree, Variable, EnvironmentalVariable, CodeDesc
         d3.select("#trees").append("h4")
             .text(langTree.name);
         
-        var vis = d3.select("#trees").append("svg:svg")
+        var divName = langTree.name.replace(/\W/g, '') //remove any non-alphanumeric characters from the name
+        
+        d3.select("#trees").append("div")
+            .attr("id", divName);
+         
+        var vis = d3.select("#"+divName).append("svg:svg")
             .attr("width", w+300)
             .attr("height", h+30)
             .append("svg:g")
