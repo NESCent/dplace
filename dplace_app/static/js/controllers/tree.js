@@ -81,9 +81,9 @@ function TreeCtrl($scope,  NewickTree, Variable, EnvironmentalVariable, CodeDesc
                 //$scope.isocodes.push(result.isocodes[i].isocode);  //needed to prune trees using JavaScript
                 $scope.results.push(result.isocodes[i]);
             }
-            if (result.finalResult) {
-                for (var i = 0; i < result.finalResult.length; i++) {
-                    $scope.constructTree(result.finalResult[i]);
+            if (result.trees) {
+                for (var i = 0; i < result.trees.length; i++) {
+                    $scope.constructTree(result.trees[i]);
                 }
             }
             $scope.searchButton.disabled = false;

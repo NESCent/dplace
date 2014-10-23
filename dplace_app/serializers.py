@@ -221,7 +221,7 @@ class IsoResultSerializer(serializers.Serializer):
 class NewickResultSet(object):
     def __init__(self):
         self.results = dict() 
-        self.finalResult = None
+        self.trees = None
         self.isocodes = set() #contains mapping of isocode to coded_value
     
     def add_string(self, tree, newickString):
@@ -232,8 +232,8 @@ class NewickResultSet(object):
         self.isocodes.add(IsoResult(isocode, result))
         
     def finalize(self):
-        self.finalResult = [x for x in self.results.values()]
+        self.trees = [x for x in self.results.values()]
 
 class NewickResultSetSerializer(serializers.Serializer):
-    finalResult = NewickTreeSerializer(many=True)
+    trees = NewickTreeSerializer(many=True)
     isocodes = IsoResultSerializer(many=True)
