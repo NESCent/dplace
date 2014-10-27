@@ -11,23 +11,23 @@ function TreeCtrl($scope,  NewickTree, Variable, EnvironmentalVariable, CodeDesc
     $scope.query = {};
     
     //basic code to download tree
-    //currently only the first tree on the page can be downloaded
-    $scope.download = function() {
-        console.log("download");      
-        var html = d3.select("#trees").select("svg")
+    $scope.download = function() {        
+        //get all the trees on the page, loop through them and trigger download
+        var trees = d3.select("#trees").selectAll("svg")
             .attr("version", 1.1)
-            .attr("xmlns", "http://www.w3.org/2000/svg")
-            .node().parentNode.innerHTML;           
-        //console.log(html);
-        
-        var imgsrc = 'data:image/svg+xml;base64,' + btoa(html);
-        var img = '<img src="'+imgsrc+'">';      
-        //open("data:image/svg+xml," + encodeURIComponent(html)); //opens new window containing svg image
-        
-        var a = d3.select("#downloadLinks").append("a") //append download link to page
-            .attr("download", "tree.svg")
-            .attr("href", imgsrc);       
-        a[0][0].click(); //download tree       
+            .attr("xmlns", "http://www.w3.org/2000/svg");
+        trees = trees[0];
+        for (var i = 0; i < trees.length; i++) {
+            var name = trees[i].parentNode.id; //name of svg file is name of tree
+            var html = trees[i].parentNode.innerHTML;
+            var imgsrc = 'data:image/svg+xml;base64,' + btoa(html);
+            var img = '<img src="' + imgsrc + '">';
+            //open("data:image/svg+xml," + encodeURIComponent(html));
+            var a = d3.select("#downloadLinks").append("a")
+                .attr("download", name+".svg")
+                .attr("href", imgsrc);
+            a[0][0].click();
+      } 
     };
     
     $scope.resetVariables = function() {
