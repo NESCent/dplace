@@ -17,6 +17,8 @@ function TreeCtrl($scope,  NewickTree, Variable, EnvironmentalVariable, CodeDesc
             .attr("version", 1.1)
             .attr("xmlns", "http://www.w3.org/2000/svg");
         trees = trees[0];
+        var selectedVar = $scope.selectedVariable ? $scope.selectedVariable.name : $scope.selectedEnvVariable.name;
+        
         for (var i = 0; i < trees.length; i++) {
             var name = trees[i].parentNode.id; //name of svg file is name of tree
             var html = trees[i].parentNode.innerHTML;
@@ -24,7 +26,7 @@ function TreeCtrl($scope,  NewickTree, Variable, EnvironmentalVariable, CodeDesc
             var img = '<img src="' + imgsrc + '">';
             //open("data:image/svg+xml," + encodeURIComponent(html));
             var a = d3.select("#downloadLinks").append("a")
-                .attr("download", name+".svg")
+                .attr("download", selectedVar+" "+name+".svg")
                 .attr("href", imgsrc);
             a[0][0].click();
       } 
@@ -165,6 +167,7 @@ function TreeCtrl($scope,  NewickTree, Variable, EnvironmentalVariable, CodeDesc
             .attr("dx", 10)
             .attr("dy", 4)
             .attr("font-size", "14px")
+            .attr("font-family", "Arial")
             .text(function(d) { return d.name; });
         $scope.results.forEach(function(code) {
             var selected = node.filter(function(d) {
