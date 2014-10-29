@@ -1,4 +1,10 @@
 angular.module('dplaceFilters', [])
+    .filter('colorNode', function() {
+        return function(value, codes) {
+            var hue = value * 240 / codes.length;
+            return 'hsl('+hue+',100%, 50%)';
+        }
+    })
     .filter('formatVariableCodeValues', function() {
         return function(values) {
             return values.map( function(code_value) {
