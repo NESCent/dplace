@@ -35,7 +35,6 @@ function TreeCtrl($scope,  NewickTree, Variable, EnvironmentalVariable, CodeDesc
     $scope.resetVariables = function() {
         $scope.code_ids = [];
         $scope.results = [];
-        $scope.trees = [];
         $scope.isocodes =  [];
     };
     
