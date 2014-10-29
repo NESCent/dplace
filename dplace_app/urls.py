@@ -29,7 +29,7 @@ urlpatterns = patterns('dplace_app.views',
     url(r'^society/(?P<society_id>\d+)/$', 'view_society', name='view_society'),
     url(r'^language/(?P<language_id>\d+)/$', 'view_language', name='view_language'),
     url(r'^angular/$', 'angular', name='angular'),
-	# API
+    # API
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     url(r'^api/v1/', include(router.urls)),
     url(r'^api/v1/find_societies', api_views.find_societies, name='find_societies'),

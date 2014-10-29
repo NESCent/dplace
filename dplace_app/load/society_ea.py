@@ -106,13 +106,13 @@ def load_ea_var(var_dict):
 def clean_category(category):
     return category.strip().capitalize()
 
-SORT_COLUMN				= 0
+SORT_COLUMN             = 0
 VARIABLE_VNUMBER_COLUMN = 1
-VARIABLE_NUMBER_COLUMN 	= 2
-VARIABLE_NAME_COLUMN 	= 3
-N_COLUMN 				= 4
-CODE_COLUMN 			= 5
-DESCRIPTION_COLUMN 		= 6
+VARIABLE_NUMBER_COLUMN  = 2
+VARIABLE_NAME_COLUMN    = 3
+N_COLUMN                = 4
+CODE_COLUMN             = 5
+DESCRIPTION_COLUMN      = 6
 
 # e.g. N	CODE	DESCRIPTION
 def row_is_headers(row):
