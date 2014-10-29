@@ -22,17 +22,17 @@
                                 style="width:100%"
                                 ng-change="traitChanged(trait)"
 								ng-show="trait.indexVariables.length > 0"
-                                ng-options="variable.name for variable in trait.indexVariables"
+                                ng-options='variable.id as (variable.label + " - " + variable.name) for variable in trait.indexVariables'
                                 >
                             <option value="">Select a Variable</option>
                         </select>
                     </div>
                 </div>
+                <div ng-show="trait.codes.length > 0">Further Information: {{trait.selectedVariable.codebook_info}}</div>
             </div>
 			
 	
             <div class="panel-body scrollable">
-                <div ng-show="trait.codes.length > 0">{{trait.selectedVariable.codebook_info}}</div>
                 <span class="variable-label" ng-show="trait.codes.length > 1"> Select All
 				<input type="checkbox" class="pull-right" ng-model="trait.codes.isSelected" ng-change="selectAllChanged(trait)" />
               </span>
