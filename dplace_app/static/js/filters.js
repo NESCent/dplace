@@ -6,10 +6,11 @@ angular.module('dplaceFilters', [])
         }
     })
     .filter('formatVariableCodeValues', function() {
-        return function(values) {
+        return function(values, variable_id) {
             return values.map( function(code_value) {
-                return code_value.code_description.description;
-            }).join(',');
+                if (variable_id == code_value.code_description.variable) return code_value.code_description.description;
+                else return ''
+            }).join('');
         };
     })
     .filter('formatEnvironmentalValues', function () {
