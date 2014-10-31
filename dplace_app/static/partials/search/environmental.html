@@ -22,7 +22,7 @@
                                 <button class="btn btn-default dropdown-toggle form-control">{{ environmentalData.selectedFilter.name }} <span class="caret"></span></button>
                                 <ul class="dropdown-menu">
                                     <li ng-repeat="environmentalFilter in environmentalData.filters">
-                                        <a ng-click="environmentalData.selectedFilter = environmentalFilter; filterChanged(environmentalFilter);">{{ environmentalFilter.name }}</a>
+                                        <a ng-click="environmentalData.selectedFilter = environmentalFilter; filterChanged();">{{ environmentalFilter.name }}</a>
                                     </li>
                                 </ul>
                             </div>
@@ -71,10 +71,20 @@
                                 </div>
                             </div>
                         </div>
-                        <span class="variable-label pull-right"> All Values
-                            <input type="checkbox" ng-model="allValues.isSelected" ng-change="allValues(environmentalData.selectedVariable)"/>
-                            <div ng-show="allValues.isSelected && (environmentalData.vals[0] != '0' && !environmentalData.vals[0])"> Working... </div>
-                        </span>
+                        <div class="fields-inrange" ng-show="environmentalData.selectedFilter.operator == 'all'">
+                            <div class="form-group col-xs-3" ng-class="{'has-error': EnvironmentalForm.vals0all.$invalid && EnvironmentalForm.vals0all.$dirty}">
+                                <div class="input-group">
+                                    <input name="vals0all" class="form-control input-xs" ng-pattern="/^(0|\-?[1-9][0-9]*\.?[0-9]*)$/" ng-model="environmentalData.vals[0]" />
+                                    <span class="input-group-addon"> {{ environmentalData.selectedVariable.units }} </span>
+                                </div>
+                            </div>
+                            <div class="form-group col-xs-3" ng-class="{'has-error': EnvironmentalForm.vals0all.$invalid && EnvironmentalForm.vals1all.$dirty}">
+                                <div class="input-group">
+                                    <input name="vals1all" class="form-control input-xs" ng-pattern="/^(0|\-?[1-9][0-9]*\.?[0-9]*)$/" ng-model="environmentalData.vals[1]" />
+                                    <span class="input-group-addon"> {{ environmentalData.selectedVariable.units }} </span>
+                                </div>
+                            </div>           
+                        </div>
                     </div>
                 </div>
                 <div ng-show="environmentalData.selectedVariable">Further information: {{ environmentalData.selectedVariable.codebook_info }}</div>

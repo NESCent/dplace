@@ -16,21 +16,6 @@ function EnvironmentalCtrl($scope, searchModelService, EnvironmentalValue) {
         }];
         return filters;
     };
-    
-    $scope.filterChanged = function(filter) {
-        if (!$scope.allValues.isSelected) {
-            return;
-        } 
-    
-        if (filter.operator == 'inrange' || filter.operator == 'outrange') {
-            $scope.environmentalData.vals[0] = $scope.min_value;
-            $scope.environmentalData.vals[1] = $scope.max_value;
-        } else if (filter.operator == 'gt') { 
-            $scope.environmentalData.vals[0] = $scope.min_value;
-        } else if (filter.operator == 'lt') {
-            $scope.environmentalData.vals[0] = $scope.max_value;
-        }
-    };
 
     $scope.variableChanged = function(variable) {
         if(variable != null) {
@@ -38,38 +23,40 @@ function EnvironmentalCtrl($scope, searchModelService, EnvironmentalValue) {
         } else {
             $scope.environmentalData.badgeValue = 0;
         }
-        //reset 'all values' to false if the variable is changed
-        if ($scope.allValues.isSelected) {
-            $scope.environmentalData.vals[0] = '';
-            $scope.environmentalData.vals[1] = '';
-            $scope.allValues.isSelected = false;
+        $scope.environmentalData.vals[0] = '';
+        $scope.environmentalData.vals[1] = '';
+        
+        if ($scope.environmentalData.selectedFilter.operator == 'all') {
+            values = EnvironmentalValue.query({variable: $scope.environmentalData.selectedVariable.id});
+            min_value = 0, max_value = 0;
+            values.$promise.then(function(result) {
+                for (var i = 0; i < result.length; i++) {
+                    if (result[i].value < min_value) min_value = result[i].value;
+                    else if (result[i].value > max_value) max_value = result[i].value;
+                }
+            $scope.environmentalData.vals[0] = min_value;
+            $scope.environmentalData.vals[1] = max_value;
+            });
+        }
+    };
+    
+    $scope.filterChanged = function() {
+        if ($scope.environmentalData.selectedFilter.operator != 'all') return;
+        else {
+            values = EnvironmentalValue.query({variable: $scope.environmentalData.selectedVariable.id});
+            min_value = 0, max_value = 0;
+            values.$promise.then(function(result) {
+                for (var i = 0; i < result.length; i++) {
+                    if (result[i].value < min_value) min_value = result[i].value;
+                    else if (result[i].value > max_value) max_value = result[i].value;
+                }
+            $scope.environmentalData.vals[0] = min_value;
+            $scope.environmentalData.vals[1] = max_value;
+            });
         }
     };
     
     //gets the range of environmental values if the user selects 'all values'
-    $scope.allValues = function(variable) {
-        if ($scope.allValues.isSelected) {
-            //need to find a better way to deal with this page_size
-            values = EnvironmentalValue.query({variable: variable.id, page_size:'3000'}); //get all environmental values for the selected variable
-            operator = $scope.environmentalData.selectedFilter.operator;
-            $scope.min_value = 0, $scope.max_value = 0;
-            values.$promise.then(function (result) {
-                for (var i = 0; i < result.length; i++) {
-                    if (result[i].value < $scope.min_value) $scope.min_value = result[i].value;
-                    else if (result[i].value > $scope.max_value) $scope.max_value = result[i].value;
-                }
-                if (operator == 'inrange' || operator == 'outrange') {
-                    $scope.environmentalData.vals[0] = $scope.min_value;
-                    $scope.environmentalData.vals[1] = $scope.max_value;
-                } else if (operator == 'gt') {
-                    $scope.environmentalData.vals[0] = $scope.min_value;
-                } else if (operator == 'lt') {
-                    $scope.environmentalData.vals[0] = $scope.max_value;
-                }
-            });
-       }
-    };
-    
     $scope.doSearch = function() {
         var filters = getSelectedFilters();
         $scope.updateSearchQuery({ environmental_filters: filters });
