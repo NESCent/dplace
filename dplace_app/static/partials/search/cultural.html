@@ -22,7 +22,7 @@
                                 style="width:100%"
                                 ng-change="traitChanged(trait)"
 								ng-show="trait.indexVariables.length > 0"
-                                ng-options='variable.id as (variable.label + " - " + variable.name) for variable in trait.indexVariables'
+                                ng-options='variable as (variable.label + " - " + variable.name) for variable in trait.indexVariables'
                                 >
                             <option value="">Select a Variable</option>
                         </select>
