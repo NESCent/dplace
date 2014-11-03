@@ -18,7 +18,7 @@ function CulturalCtrl($scope, searchModelService, Variable, CodeDescription) {
     // triggered by the view when a trait is changed in the picker
     $scope.traitChanged = function(trait) {
         trait.selectedCode = "";
-        trait.codes = CodeDescription.query({variable: trait.selectedVariable });
+        trait.codes = CodeDescription.query({variable: trait.selectedVariable.id });
     };
 
     // used before searching to extract the codes from the search selection
