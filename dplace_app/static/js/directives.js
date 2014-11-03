@@ -107,7 +107,7 @@ angular.module('dplaceMapDirective', [])
                 });
             }
             scope.$on('mapTabActivated', function(event, args) {
-                scope.map.setSize();
+                scope.map.updateSize();
             });
 
             scope.$on('$destroy', function() {
