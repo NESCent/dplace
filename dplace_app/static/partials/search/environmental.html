@@ -1,5 +1,16 @@
 <div ng-controller="EnvironmentalCtrl">
-    <h4>Search by Environmental Data</h4>
+    <span class="form-inline clearfix">
+        <h4 class="pull-left">Search by Environmental Data</h4>
+       <div class="pull-right">
+            <button class="btn btn-primary form-control"
+                        ng-disabled="searchButton.disabled"
+                        ng-click="doSearch()">{{ searchButton.text }}
+            </button>
+            <button class="btn btn-danger form-control"
+                        ng-click="resetSearch()">Reset
+            </button>
+        </div>
+    </span>
     <form class="form-inline" role="form" ng-submit="submit()" name="EnvironmentalForm" novalidate>
         <div class="panel panel-default">
             <div class="panel-heading">
@@ -76,7 +87,7 @@
                 Further information: {{environmentalData.selectedVariable.codebook_info}}
             </div>
         </div>
-        <div>
+        <div class="pull-right">
             <button class="btn btn-primary form-control"
                     ng-disabled="searchButton.disabled"
                     ng-click="doSearch()">{{ searchButton.text }}</button>
