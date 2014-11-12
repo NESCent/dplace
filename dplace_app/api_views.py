@@ -227,7 +227,19 @@ def get_language_trees_from_query_dict(query_dict):
 @api_view(['POST'])
 @permission_classes((AllowAny,))
 def trees_from_languages(request):
+    from ete2 import Tree
     trees = get_language_trees_from_query_dict(request.DATA)
+    if 'language_ids' in request.DATA:
+        languages = request.DATA['language_ids']
+        for t in trees:
+            langs_in_tree = [str(l.iso_code.iso_code) for l in t.languages.all() if l.id in languages] 
+            newick = Tree(t.newick_string)
+            #only works if tips use isocodes
+            try:
+                newick.prune(langs_in_tree, preserve_branch_length=True)
+            except:
+                continue
+            t.newick_string = newick.write(format=5)
     return Response(LanguageTreeSerializer(trees, many=True).data,)
 
 def newick_tree(key):
