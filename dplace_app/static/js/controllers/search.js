@@ -54,14 +54,14 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties, 
         }).map(function (container) {
             return container.society.language.id;
         });
-        $scope.searchModel.languageTrees = TreesFromLanguages.find({language_ids: languageIDs}, addTreesToSocieties);
+        $scope.searchModel.results.languageTrees = TreesFromLanguages.find({language_ids: languageIDs}, addTreesToSocieties);
     }
     
     function addTreesToSocieties() {
         $scope.searchModel.getSocieties().forEach(function (container) {
             var language = container.society.language;
             if(language != null) {
-                container.society.trees = $scope.searchModel.languageTrees.filter(function (tree) {
+                container.society.trees = $scope.searchModel.results.languageTrees.filter(function (tree) {
                     return tree.languages.some(function (item) {
                         return angular.equals(language, item);
                     });
