@@ -1,3 +1,97 @@
+angular.module('languagePhylogenyDirective', [])
+    .directive('languagePhylogeny', function() {
+        function link(scope, element, attrs) {
+            var constructTree = function(langTree) {
+                d3.select("language-phylogeny").html('');
+                var newick = Newick.parse(langTree.newick_string);
+                var rightAngleDiagonal = function() {
+                    function diagonal(diagonalPath) {
+                        var source = diagonalPath.source,
+                            target = diagonalPath.target,
+                            pathData = [source, {x: target.x, y: source.y}, target].map(function(d) { return [d.y, d.x]; });
+                        return "M" + pathData[0] + ' ' + pathData[1] + ' ' + pathData[2];
+                    }
+                    return diagonal;
+                }
+                
+                var w = 700;
+                var tree = d3.layout.cluster().children(function(node) { return node.branchset; });
+                var nodes = tree(newick);
+                var h = nodes.length * 9; //height depends on # of nodes
+                
+                tree = d3.layout.cluster()
+                    .size([h, w])
+                    .sort(function comparator(a, b) { return d3.ascending(a.length, b.length); })
+                    .children(function(node) { return node.branchset; })
+                    .separation(function separation(a, b) { return 8; });
+                nodes = tree(newick);
+                
+                d3.select("language-phylogeny").append("h4")
+                    .text(langTree.name);
+                    
+                var vis = d3.select("language-phylogeny").append("svg:svg")
+                    .attr("width", w+300)
+                    .attr("height", h+30)
+                    .append("svg:g")
+                    .attr("transform", "translate(40, 0)");
+                    
+                var diagonal = rightAngleDiagonal();
+                
+                nodes.forEach(function(node) {
+                    node.rootDist = (node.parent ? node.parent.rootDist : 0) + (node.length || 0);
+                });
+                var rootDists = nodes.map(function(n) { return n.rootDist; });
+                var yscale = d3.scale.linear()
+                    .domain([0, d3.max(rootDists)])
+                    .range([0, w]);
+                nodes.forEach(function(node) {
+                    node.y = yscale(node.rootDist);
+                });
+                
+                var links = tree.links(nodes);
+                var link = vis.selectAll("path.link")
+                    .data(links)
+                    .enter().append("svg:path")
+                    .attr("class", "link")
+                    .attr("d", diagonal)
+                    .attr("fill", "none")
+                    .attr("stroke", "#ccc")
+                    .attr("stroke-width", "4px");
+                var node = vis.selectAll("g.node")
+                    .data(nodes)
+                    .enter().append("svg:g")
+                    .attr("transform", function(d) { return "translate(" + d.y + ", "+ d.x + ")"; });
+                node.append("svg:text")
+                    .attr("dx", 10)
+                    .attr("dy", 4)
+                    .attr("font-size", "14px")
+                    .attr("font-family", "Arial")
+                    .text(function(d) { return d.name; });  
+                    
+                scope.results.societies.forEach(function(society) {
+                    var selected = node.filter(function(d) {
+                        return d.name == society.society.iso_code;
+                    });
+                    selected.append("svg:circle")
+                        .attr("r", 4.5)
+                        .attr("stroke", "#000")
+                        .attr("stroke-width", "0.5");
+                });
+
+            };
+        
+        
+            scope.$on('treeSelected', function(event, args) {
+                    constructTree(args.tree);
+            });
+        }
+
+        return {
+            restrict: 'E',
+            link: link
+        };
+    });
+    
 angular.module('dplaceMapDirective', [])
     .directive('dplaceMap', function(colorMapService) {
         function link(scope, element, attrs) {
