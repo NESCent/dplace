@@ -304,3 +304,4 @@ class LanguageTree(models.Model):
     languages = models.ManyToManyField(to='Language')
     file = models.FileField(upload_to='language_trees',null=True)
     newick_string = models.TextField(default='')
+    source = models.ForeignKey('Source', null=True)
