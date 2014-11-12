@@ -4,6 +4,10 @@ function SocietiesCtrl($scope, searchModelService) {
     $scope.resizeMap = function() {
         $scope.$broadcast('mapTabActivated');
     };
+    
+    $scope.treeSelected = function() {
+        $scope.$broadcast('treeSelected', {tree: $scope.results.selectedTree});
+    };
 
     $scope.generateDownloadLinks = function() {
         // queryObject is the in-memory JS object representing the chosen search options
