@@ -49,6 +49,16 @@
         </tab>
         <tab heading="Tree">
             <h4> Phylogenies go here </h4>
+            <select
+                ng-model="results.selectedTree"
+                class="form-control"
+                style="width:100%"
+                ng-change="treeSelected()"
+                ng-options="tree.name for tree in results.languageTrees"
+                >
+                <option value="">Select a Phylogeny</option>
+            </select>
+            <language-phylogeny></language-phylogeny>
         </tab>
         <tab heading="Download" select="generateDownloadLinks()">
             <div class="row">
