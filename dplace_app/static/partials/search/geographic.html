@@ -1,5 +1,16 @@
 <div ng-controller="GeographicCtrl"> 
-    <h4>Search by Geographic Region</h4>
+    <span class="form-inline clearfix">
+        <h4 class="pull-left">Search by Geographic Region</h4>
+        <div class="pull-right">
+            <button class="btn btn-primary form-control"
+                        ng-disabled="searchButton.disabled"
+                        ng-click="doSearch()">{{ searchButton.text }}
+            </button>
+            <button class="btn btn-danger form-control"
+                        ng-click="resetSearch()">Reset
+            </button>
+        </div>
+    </span>
     <form class="form form-inline" role="form">
         <div class="panel panel-default">
             <div class="panel-heading">
@@ -13,7 +24,7 @@
                 <dplace-map selected-regions="geographic.selectedRegions"></dplace-map>
             </div>
         </div>
-        <div>
+        <div class="pull-right">
             <button class="btn btn-primary form-control"
                     ng-disabled="searchButton.disabled"
                     ng-click="doSearch()">{{ searchButton.text }}</button>
