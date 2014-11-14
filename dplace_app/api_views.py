@@ -148,7 +148,7 @@ def result_set_from_query_dict(query_dict):
     if 'variable_codes' in query_dict:
         criteria.append(SEARCH_VARIABLES)
         # Now get the societies from variables
-        variable_code_ids = [int(x) for x in query_dict['variable_codes']]
+        variable_code_ids = [int(x['id']) for x in query_dict['variable_codes']]
         codes = VariableCodeDescription.objects.filter(pk__in=variable_code_ids) # returns a queryset
         coded_value_ids = []
         # Aggregate all the coded values for each selected code
