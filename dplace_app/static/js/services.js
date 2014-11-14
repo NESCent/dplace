@@ -70,6 +70,20 @@ angular.module('dplaceServices', ['ngResource'])
                 }
             });
     })
+    .factory('EnvironmentalValue', function($resource) {
+        return $resource(
+            '/api/v1/environmental_values/?variable=:variable',
+            {}, {
+                query: {
+                    method: 'GET',
+                    isArray: true,
+                    transformResponse: function(data, headers) {
+                        return JSON.parse(data).results;
+                    }
+                }
+            }
+        )
+    })
     .factory('EnvironmentalVariable', function ($resource) {
         return $resource(
             '/api/v1/environmental_variables/:id',

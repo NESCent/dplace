@@ -71,6 +71,7 @@ function EnvironmentalDataModel(EnvironmentalVariable) {
         { operator: 'lt', name: 'less than'},
         { operator: 'gt', name: 'greater than'},
         { operator: 'outrange', name: 'outside'},
+        { operator: 'all', name: 'all values'},
     ];
     this.selectedFilter = this.filters[0];
     this.vals = [];
