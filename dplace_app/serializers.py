@@ -90,7 +90,7 @@ class LanguageTreeSerializer(serializers.ModelSerializer):
     languages = LanguageSerializer(source='languages', many=True)
     class Meta:
         model = LanguageTree
-        fields = ('id','name','languages')
+        fields = ('id','name','languages', 'newick_string')
 
 SEARCH_LANGUAGE = 'l'
 SEARCH_ENVIRONMENTAL = 'e'
