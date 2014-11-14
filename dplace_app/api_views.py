@@ -188,7 +188,7 @@ def result_set_from_query_dict(query_dict):
                 result_set.add_environmental(value.society(), value.variable, value)
     if 'geographic_regions' in query_dict:
         criteria.append(SEARCH_GEOGRAPHIC)
-        geographic_region_ids = [int(x) for x in query_dict['geographic_regions']]
+        geographic_region_ids = [int(x['id']) for x in query_dict['geographic_regions']]
         regions = GeographicRegion.objects.filter(pk__in=geographic_region_ids) # returns a queryset
         for region in regions:
             for society in Society.objects.filter(location__intersects=region.geom):
