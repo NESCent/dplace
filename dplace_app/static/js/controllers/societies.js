@@ -1,5 +1,16 @@
-function SocietiesCtrl($scope, searchModelService) {
+function SocietiesCtrl($scope, searchModelService, CodeDescription) {
     $scope.results = searchModelService.getModel().getResults();
+    if ($scope.results.variable_descriptions && $scope.results.variable_descriptions.length > 0) {
+        $scope.code_ids = {};
+        for (var i = 0; i < $scope.results.variable_descriptions.length; i++) {
+            results = CodeDescription.query({variable: $scope.results.variable_descriptions[i].id});
+            $scope.code_ids[$scope.results.variable_descriptions[i].id] = results;
+
+        }
+    }
+    
+    
+    
     $scope.setActive('societies');
     $scope.resizeMap = function() {
         $scope.$broadcast('mapTabActivated');

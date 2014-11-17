@@ -59,7 +59,7 @@ angular.module('dplaceServices', ['ngResource'])
     })
     .factory('CodeDescription', function ($resource) {
         return $resource(
-            '/api/v1/codes/:id',
+            '/api/v1/codes/?variable=:variable',
             {page_size: 1000}, {
                 query: {
                     method: 'GET',

@@ -61,21 +61,36 @@ angular.module('languagePhylogenyDirective', [])
                     .data(nodes)
                     .enter().append("svg:g")
                     .attr("transform", function(d) { return "translate(" + d.y + ", "+ d.x + ")"; });
-                node.append("svg:text")
-                    .attr("dx", 10)
-                    .attr("dy", 4)
-                    .attr("font-size", "14px")
-                    .attr("font-family", "Arial")
-                    .text(function(d) { return d.name; });  
-                    
+
                 scope.results.societies.forEach(function(society) {
                     var selected = node.filter(function(d) {
                         return d.name == society.society.iso_code;
                     });
-                    selected.append("svg:circle")
-                        .attr("r", 4.5)
-                        .attr("stroke", "#000")
-                        .attr("stroke-width", "0.5");
+                    if (society.variable_coded_values.length > 0) {
+                        translate = 0;
+                        for (var i = 0; i < society.variable_coded_values.length; i++) {
+                            selected.append("svg:circle")
+                                .attr("r", 4.5)
+                                .attr("stroke", "#000")
+                                .attr("stroke-width", "0.5")
+                                .attr("transform", "translate("+translate+", 0)")
+                                .attr("fill", function(n) {
+                                    value = society.variable_coded_values[i].coded_value;
+                                    hue = value * 240 / scope.code_ids[society.variable_coded_values[i].variable].length;
+                                    return 'hsl('+hue+',100%, 50%)';
+                                });                        
+                            translate += 15;
+                        }
+                        selected.append("svg:text") 
+                            .attr("dx", translate)
+                            .attr("dy", 4)
+                            .attr("font-size", "14px")
+                            .attr("font-family", "Arial")
+                            .text(function(d) { return d.name; });  
+                    
+                    }
+                    
+          
                 });
 
             };
