@@ -1,13 +1,16 @@
 angular.module('dplaceMapDirective', [])
     .directive('dplaceMap', function(colorMapService) {
         function link(scope, element, attrs) {
-            element.append("<div id='mapdiv' style='width:1140px; height:30rem;'></div>");
+            // jVectorMap requires an ID for the element
+            // If not present, default to 'mapDiv'
+            var divId = scope.mapDivId || 'mapDiv';
+            element.append("<div id='" + divId + "' style='width:1140px; height:30rem;'></div>");
             scope.localRegions = [];
             scope.checkDirty = function() {
                 return !(angular.equals(scope.localRegions, scope.selectedRegions));
             };
             scope.updatesEnabled = true;
-            scope.map = $('#mapdiv').vectorMap({
+            scope.map = $('#' + divId).vectorMap({
                 map: 'tdwg-level2_mill_en',
                 backgroundColor: 'white',
                 series: {
@@ -121,7 +124,8 @@ angular.module('dplaceMapDirective', [])
             scope: {
                 societies: '=',
                 region: '=',
-                selectedRegions: '='
+                selectedRegions: '=',
+                mapDivId: '@'
             },
             link: link
         };
