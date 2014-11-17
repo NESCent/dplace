@@ -102,7 +102,7 @@ angular.module('dplaceMapDirective', [])
             };
             scope.updatesEnabled = true;
             scope.map = $('#mapdiv').vectorMap({
-                map: 'tdwg-level2',
+                map: 'tdwg-level2_mill_en',
                 backgroundColor: 'white',
                 series: {
                     markers: [{
@@ -201,7 +201,7 @@ angular.module('dplaceMapDirective', [])
                 });
             }
             scope.$on('mapTabActivated', function(event, args) {
-                scope.map.setSize();
+                scope.map.updateSize();
             });
 
             scope.$on('$destroy', function() {
