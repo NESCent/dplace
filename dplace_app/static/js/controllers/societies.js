@@ -1,9 +1,6 @@
 function SocietiesCtrl($scope, searchModelService) {
     $scope.results = searchModelService.getModel().getResults();
     $scope.setActive('societies');
-    $scope.resizeMap = function() {
-        $scope.$broadcast('mapTabActivated');
-    };
 
     $scope.generateDownloadLinks = function() {
         // queryObject is the in-memory JS object representing the chosen search options
