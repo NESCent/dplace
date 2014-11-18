@@ -1,6 +1,7 @@
 __author__ = 'dan'
 
 from dplace_app.models import *
+from dplace_app.serializers import *
 from django.contrib.gis.geos import Polygon, Point, MultiPolygon
 from rest_framework import status
 from rest_framework.test import APIRequestFactory, APITestCase
@@ -177,8 +178,8 @@ class FindSocietiesTestCase(APITestCase):
         return self.assertNotIn(society.id, response_society_ids)
     def test_find_societies_by_language(self):
         # Find the societies that use language1
-        language_ids = [self.languageA1.id]
-        data = {'language_filters' : [{'language_ids': language_ids }]}
+        classifications = LanguageClassificationSerializer(self.languageA1.languageclassification_set.all(),many=True)
+        data = {'language_classifications' : classifications.data }
         response = self.client.post(self.url,data,format='json')
         self.assertSocietyInResponse(self.society1,response)
         self.assertSocietyNotInResponse(self.society2,response)
