@@ -134,11 +134,11 @@ def result_set_from_query_dict(query_dict):
     # AND them together
     criteria = []
 
-    if 'language_filters' in query_dict:
+    if 'language_classifications' in query_dict:
         criteria.append(SEARCH_LANGUAGE)
-        language_filters = query_dict['language_filters']
-        for filter in language_filters:
-            language_ids = [int(x) for x in filter['language_ids']]
+        classifications = query_dict['language_classifications']
+        for classification in classifications:
+            language_ids = [int(classification['language']['id'])]
             languages = Language.objects.filter(pk__in=language_ids) # Returns a queryset
             languages.select_related('societies')
             for language in languages:
