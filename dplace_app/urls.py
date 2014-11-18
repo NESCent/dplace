@@ -36,6 +36,5 @@ urlpatterns = patterns('dplace_app.views',
     url(r'^api/v1/trees_from_languages', api_views.trees_from_languages, name='trees_from_languages'),
     url(r'^api/v1/newick_tree/(?P<pk>\d+)/?$', api_views.newick_tree, name='newick_tree'),
     url(r'^api/v1/get_trees', api_views.get_newick_trees, name="get_trees"),
-    url(r'^api/v1/get_bins', api_views.get_bins, name="get_bins"),
     url(r'^api/v1/csv_download', api_views.csv_download, name='csv_download'),
 )

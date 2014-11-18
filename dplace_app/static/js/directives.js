@@ -89,7 +89,7 @@ angular.module('dplaceMapDirective', [])
                     });
 
                     // Map IDs to colors
-                    var colorMap = colorMapService.generateColorMap(societyIds);
+                    var colorMap = colorMapService.generateColorMap(scope.societies, scope.query);
                     scope.map.series.markers[0].setValues(colorMap);
                 };
 
@@ -156,7 +156,8 @@ angular.module('dplaceMapDirective', [])
                 region: '=',
                 selectedRegions: '=',
                 mapDivId: '@',
-                visible: '='
+                visible: '=',
+                query: '='
             },
             link: link
         };

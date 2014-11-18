@@ -94,39 +94,6 @@ class LanguageTreeViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = LanguageTreeSerializer
     filter_fields = ('name',)
     queryset = LanguageTree.objects.all()
-    
-def bin_data(values):
-    min_value = 0
-    max_value = 0
-    bins = []
-    for v in values:
-        if v.value < min_value:
-            min_value = v.value
-        elif v.value > max_value:
-            max_value = v.value
-    data_range = max_value - min_value
-    bin_size = data_range / 5
-    for x in range(0, 5):
-        bins.append({
-            'code':x,
-            'min':min_value,
-            'max':min_value+bin_size
-        })
-        min_value = min_value + bin_size
-    return bins
-    
-@api_view(['GET'])
-@permission_classes((AllowAny,))
-def get_bins(request):
-    query_string = request.QUERY_PARAMS['query']
-    query_dict = json.loads(query_string)
-    if 'variable_id' in query_dict:
-        values = EnvironmentalValue.objects.filter(variable=query_dict['variable_id'])
-        bins = bin_data(values)
-    else:
-        bins = None
-    return Response(bins)
-    
 
 def result_set_from_query_dict(query_dict):
     result_set = SocietyResultSet()
@@ -176,13 +143,6 @@ def result_set_from_query_dict(query_dict):
             elif operator == 'lt':
                 values = values.filter(value__lt=filter['params'][0])
             values = values.select_related('variable','environmental__society')
-            if operator == 'all':
-                bins = bin_data(values)
-                for value in values:
-                    for b in bins:
-                        if float(value.value) < float(b['max']):
-                            value.value = b['code']
-                            break
             # get the societies from the values
             for value in values:
                 result_set.add_environmental(value.society(), value.variable, value)

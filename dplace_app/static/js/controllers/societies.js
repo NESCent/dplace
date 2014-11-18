@@ -1,5 +1,6 @@
 function SocietiesCtrl($scope, searchModelService) {
     $scope.results = searchModelService.getModel().getResults();
+    $scope.query = searchModelService.getModel().getQuery();
     $scope.setActive('societies');
 
     $scope.generateDownloadLinks = function() {
