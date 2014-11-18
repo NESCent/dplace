@@ -66,8 +66,8 @@ angular.module('languagePhylogenyDirective', [])
                     var selected = node.filter(function(d) {
                         return d.name == society.society.iso_code;
                     });
+                    translate = 0;
                     if (society.variable_coded_values.length > 0) {
-                        translate = 0;
                         for (var i = 0; i < society.variable_coded_values.length; i++) {
                             selected.append("svg:circle")
                                 .attr("r", 4.5)
@@ -81,14 +81,14 @@ angular.module('languagePhylogenyDirective', [])
                                 });                        
                             translate += 15;
                         }
-                        selected.append("svg:text") 
+                    }
+                    
+                    selected.append("svg:text") 
                             .attr("dx", translate)
                             .attr("dy", 4)
                             .attr("font-size", "14px")
                             .attr("font-family", "Arial")
                             .text(function(d) { return d.name; });  
-                    
-                    }
                     
           
                 });
