@@ -164,17 +164,17 @@ def result_set_from_query_dict(query_dict):
         criteria.append(SEARCH_ENVIRONMENTAL)
         environmental_filters = query_dict['environmental_filters']
         # There can be multiple filters, so we must aggregate the results.
-        for filter in environmental_filters:
-            values = EnvironmentalValue.objects.filter(variable=filter['id'])
-            operator = filter['operator']
+        for environmental_filter in environmental_filters:
+            values = EnvironmentalValue.objects.filter(variable=environmental_filter['id'])
+            operator = environmental_filter['operator']
             if operator == 'inrange':
-                values = values.filter(value__gt=filter['params'][0]).filter(value__lt=filter['params'][1])
+                values = values.filter(value__gt=environmental_filter['params'][0]).filter(value__lt=environmental_filter['params'][1])
             elif operator == 'outrange':
-                values = values.filter(value__gt=filter['params'][1]).filter(value__lt=filter['params'][0])
+                values = values.filter(value__gt=environmental_filter['params'][1]).filter(value__lt=environmental_filter['params'][0])
             elif operator == 'gt':
-                values = values.filter(value__gt=filter['params'][0])
+                values = values.filter(value__gt=environmental_filter['params'][0])
             elif operator == 'lt':
-                values = values.filter(value__lt=filter['params'][0])
+                values = values.filter(value__lt=environmental_filter['params'][0])
             values = values.select_related('variable','environmental__society')
             if operator == 'all':
                 bins = bin_data(values)
