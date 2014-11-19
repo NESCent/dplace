@@ -8,9 +8,6 @@ function SocietiesCtrl($scope, searchModelService, CodeDescription) {
 
         }
     }
-    
-    
-    
     $scope.setActive('societies');
 
     $scope.resizeMap = function() {
