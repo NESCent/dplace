@@ -6,11 +6,10 @@ function SocietiesCtrl($scope, searchModelService, CodeDescription) {
         for (var i = 0; i < $scope.results.variable_descriptions.length; i++) {
             results = CodeDescription.query({variable: $scope.results.variable_descriptions[i].id});
             $scope.code_ids[$scope.results.variable_descriptions[i].id] = results;
-
         }
     }
     
-    if ($scope.results.environmental_variables) {
+    if ($scope.results.environmental_variables && $scope.results.environmental_variables.length > 0) {
         var min_value = 0, max_value = 0;
         
         for (var i = 0; i < $scope.results.societies.length; i++) {

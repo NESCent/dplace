@@ -69,6 +69,7 @@ angular.module('languagePhylogenyDirective', [])
                     
                     //append the circles
                     translate = 0;
+                    
                     if (society.variable_coded_values.length > 0) {
                         for (var i = 0; i < society.variable_coded_values.length; i++) {
                             selected.append("svg:circle")
