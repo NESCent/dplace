@@ -185,17 +185,18 @@ class FindSocietiesTestCase(APITestCase):
         self.assertSocietyNotInResponse(self.society2,response)
         self.assertSocietyNotInResponse(self.society3,response)
     def test_find_society_by_var(self):
-        data = {'variable_codes': [self.code1.pk]}
+        data = {'variable_codes': VariableCodeDescriptionSerializer([self.code1],many=True).data}
         response = self.client.post(self.url,data,format='json')
         self.assertSocietyInResponse(self.society1,response)
         self.assertSocietyNotInResponse(self.society2,response)
     def test_find_societies_by_var(self):
-        data = {'variable_codes': [self.code1.pk, self.code2.pk]}
+        serialized_codes = VariableCodeDescriptionSerializer([self.code1,self.code2],many=True).data
+        data = {'variable_codes': serialized_codes}
         response = self.client.post(self.url,data,format='json')
         self.assertSocietyInResponse(self.society1,response)
         self.assertSocietyInResponse(self.society2,response)
     def test_find_no_societies(self):
-        data = {'variable_codes': [self.code3.pk]}
+        data = {'variable_codes': VariableCodeDescriptionSerializer([self.code3],many=True).data }
         response = self.client.post(self.url,data,format='json')
         self.assertEqual(len(response.data['societies']),0)
     def test_find_society_by_language_and_var(self):
@@ -204,9 +205,11 @@ class FindSocietiesTestCase(APITestCase):
         # this should return only 1 and not 2 or 3
         # This tests that results should be intersection (AND), not union (OR)
         # Society 3 is not coded for any variables, so it should not appear in the list.
-        language_ids = [self.languageA1.id, self.languageB3.id]
-        data = {'variable_codes': [self.code1.pk, self.code2.pk],
-                'language_filters' : [{'language_ids': language_ids }]}
+        serialized_vcs = VariableCodeDescriptionSerializer([self.code1, self.code2], many=True).data
+        language_classifications = LanguageClassification.objects.filter(language_id__in=[self.languageA1.id, self.languageB3.id])
+        serialized_lcs = LanguageClassificationSerializer(language_classifications, many=True).data
+        data = {'variable_codes': serialized_lcs,
+                'language_classifications' : serialized_lcs}
         response = self.client.post(self.url,data,format='json')
         self.assertSocietyInResponse(self.society1,response)
         self.assertSocietyNotInResponse(self.society2,response)
@@ -243,7 +246,7 @@ class FindSocietiesTestCase(APITestCase):
         '''
         This uses a region that contains a single polygon around society 2
         '''
-        data = {'geographic_regions': [str(self.geographic_region2.pk)]}
+        data = {'geographic_regions': [GeographicRegionSerializer(self.geographic_region2).data]}
         response = self.client.post(self.url,data,format='json')
         self.assertSocietyInResponse(self.society2,response)
         self.assertSocietyNotInResponse(self.society1,response)
@@ -252,7 +255,7 @@ class FindSocietiesTestCase(APITestCase):
         '''
         This uses a region that contains two polygons that should overlap societies 1 and 3
         '''
-        data = {'geographic_regions': [str(self.geographic_region13.pk)]}
+        data = {'geographic_regions': [GeographicRegionSerializer(self.geographic_region13).data]}
         response = self.client.post(self.url,data,format='json')
         self.assertSocietyInResponse(self.society1,response)
         self.assertSocietyInResponse(self.society3,response)
