@@ -85,26 +85,18 @@ angular.module('languagePhylogenyDirective', [])
                         }
                     }
                     
-                    if (society.environmental_values.length > 0) { //need to calculate this on its own (range) cause this is just failing
-                        //calculate the range first
-                        var min_value = 0, max_value = 0;
-                        for (var i = 0; i < society.environmental_values.length; i++) {
-                            if (society.environmental_values[i].value < min_value) min_value = society.environmental_values[i].value;
-                            else if (society.environmental_values[i].value > max_value) max_value = society.environmental_values[i].value;
-                        }
-                        var range = max_value - min_value;
-                        console.log(max_value);
-                        console.log(min_value);
-                        selected.append("svg:circle")
+                    if (society.environmental_values.length > 0) {
+                            selected.append("svg:circle")
                                 .attr("r", 4.5)
                                 .attr("stroke", "#000")
                                 .attr("stroke-width", "0.5")
                                 .attr("transform", "translate("+translate+", 0)")
                                 .attr("fill", function(n) {
                                     value = society.environmental_values[0].value;
-                                    hue = value * 240 / range;
+                                    hue = value * 240 / scope.range;
                                     return 'hsl('+hue+',100%, 50%)';
                                 });
+                                translate += 15;
                         }
                     
                     

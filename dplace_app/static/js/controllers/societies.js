@@ -1,5 +1,6 @@
 function SocietiesCtrl($scope, searchModelService, CodeDescription) {
     $scope.results = searchModelService.getModel().getResults();
+    console.log($scope.results);
     if ($scope.results.variable_descriptions && $scope.results.variable_descriptions.length > 0) {
         $scope.code_ids = {};
         for (var i = 0; i < $scope.results.variable_descriptions.length; i++) {
@@ -8,6 +9,19 @@ function SocietiesCtrl($scope, searchModelService, CodeDescription) {
 
         }
     }
+    
+    if ($scope.results.environmental_variables) {
+        var min_value = 0, max_value = 0;
+        
+        for (var i = 0; i < $scope.results.societies.length; i++) {
+            if ($scope.results.societies[i].environmental_values[0].value < min_value) min_value = $scope.results.societies[i].environmental_values[0].value;
+            else if ($scope.results.societies[i].environmental_values[0].value > max_value) max_value = $scope.results.societies[i].environmental_values[0].value;
+        }
+        $scope.range = max_value - min_value;
+    
+    }
+    
+    
     $scope.setActive('societies');
 
     $scope.resizeMap = function() {
