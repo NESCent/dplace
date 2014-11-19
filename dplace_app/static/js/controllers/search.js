@@ -42,7 +42,7 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties, 
     };
 
     $scope.assignColors = function() {
-        var colorMap = colorMapService.generateColorMap($scope.searchModel.getSocieties(), $scope.searchModel.query);
+        var colorMap = colorMapService.generateColorMap($scope.searchModel.getSocieties(), $scope.searchModel.query, -1);
         $scope.searchModel.getSocieties().forEach(function(container) {
             container.society.style = {'background-color' : colorMap[container.society.id] };
         });

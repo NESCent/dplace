@@ -1,8 +1,26 @@
-function SocietiesCtrl($scope, searchModelService) {
+function SocietiesCtrl($scope, searchModelService, CodeDescription) {
     $scope.results = searchModelService.getModel().getResults();
     $scope.query = searchModelService.getModel().getQuery();
     $scope.setActive('societies');
+    $scope.variables = [];
+    
+    if ('variable_codes' in $scope.query) {
+        codes = [];
+        for (var i = 0; i < $scope.query.variable_codes.length; i++) {
+            codes.push(CodeDescription.query({id: $scope.query.variable_codes[i]}));
+        }
+        
+        $scope.query['variable_codes'] = codes;
+    }
+    
 
+    
+    if ($scope.results.variable_descriptions)
+        $scope.variables = $scope.variables.concat($scope.results.variable_descriptions);
+        
+    if ($scope.results.environmental_variables)
+        $scope.variables = $scope.variables.concat($scope.results.environmental_variables);
+        
     $scope.generateDownloadLinks = function() {
         // queryObject is the in-memory JS object representing the chosen search options
         var queryObject = searchModelService.getModel().getQuery();

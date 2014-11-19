@@ -70,9 +70,15 @@ angular.module('dplaceMapDirective', [])
                     regionsSelectable: true
                 }).vectorMap('get','mapObject');
 
+                scope.societies.forEach(function(societyResult) {
+                    var society = societyResult.society;
+                    society.location.coordinates = society.location.coordinates.reverse();
+                });
+                
+                
                 scope.addMarkers = function() {
                     scope.map.removeAllMarkers();
-                    if(!scope.societies) {
+                    if(!scope.societies || !scope.chosen) {
                         return;
                     }
 
@@ -80,16 +86,19 @@ angular.module('dplaceMapDirective', [])
                     var societyIds = scope.societies.map(function(societyResult) {
                         return societyResult.society.id;
                     });
-
+                                        
                     scope.societies.forEach(function(societyResult) {
                         var society = societyResult.society;
                         // Add a marker for each point
-                        var marker = {latLng: society.location.coordinates.reverse(), name: society.name}
+                        var marker = {latLng: society.location.coordinates, name: society.name}
                         scope.map.addMarker(society.id, marker);
                     });
 
                     // Map IDs to colors
-                    var colorMap = colorMapService.generateColorMap(scope.societies, scope.query);
+                    console.log(scope.query);
+                    
+
+                    var colorMap = colorMapService.generateColorMap(scope.societies, scope.query, scope.chosen.id);
                     scope.map.series.markers[0].setValues(colorMap);
                 };
 
@@ -99,7 +108,14 @@ angular.module('dplaceMapDirective', [])
                         scope.addMarkers();
                     });
                 }
-
+                scope.$watchCollection('chosen', function(oldvalue, newvalue) {
+                       console.log(scope.chosen);
+                       colorMap = colorMapService.generateColorMap(scope.societies, scope.query, scope.chosen.id);
+                       scope.map.series.markers[0].setValues(colorMap);
+                       scope.addMarkers(); 
+                    });
+                
+                
                 if(attrs.selectedRegions) {
                     scope.$watchCollection('selectedRegions', function(oldvalue, newvalue) {
                         var dirty = scope.checkDirty();
@@ -157,7 +173,8 @@ angular.module('dplaceMapDirective', [])
                 selectedRegions: '=',
                 mapDivId: '@',
                 visible: '=',
-                query: '='
+                query: '=',
+                chosen: '='
             },
             link: link
         };
