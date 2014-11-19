@@ -7,7 +7,7 @@ function ColorMapService() {
     this.generateColorMap = function(societies, query, var_id) {
         console.log(societies);
         var colors = {};
-        /*if ('environmental_filters' in query) {
+        if ('environmental_filters' in query) {
             var min_value = 0, max_value = 0;
             for (var i = 0; i < societies.length; i++) {
                 for (var e = 0; e < societies[i].environmental_values.length; e++) {
@@ -30,12 +30,13 @@ function ColorMapService() {
                 var color = mapColor(value, range);
                 colors[id] = color;
             }
-        } else*/ if ('variable_codes' in query) {
+        } 
+        
+        if ('variable_codes' in query) {
             console.log(query);
             var numCodes = 0;
             for (var i = 0; i < query.variable_codes.length; i++) {
                 if (query.variable_codes[i][0] && query.variable_codes[i][0].variable == var_id) numCodes++;
-            
             }
             
             console.log(numCodes);

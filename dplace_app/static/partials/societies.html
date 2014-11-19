@@ -45,7 +45,16 @@
             </div>
         </tab>
         <tab heading="Map" select="visible=true" deselect="visible=false">
-            <dplace-map societies="results.societies" map-div-id="result-map" visible="visible" query="query"></dplace-map>
+            <select
+                ng-model="results.chosen"
+                ng-options="variable.name for variable in variables"
+                ng-init="results.chosen=variables[0]"
+            >
+            
+            </select>
+           
+
+            <dplace-map societies="results.societies" map-div-id="result-map" visible="visible" query="query" chosen="results.chosen"></dplace-map>
         </tab>
         <tab heading="Download" select="generateDownloadLinks()">
             <div class="row">
