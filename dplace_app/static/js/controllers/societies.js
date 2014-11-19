@@ -1,6 +1,5 @@
 function SocietiesCtrl($scope, searchModelService, CodeDescription) {
     $scope.results = searchModelService.getModel().getResults();
-    console.log($scope.results);
     if ($scope.results.variable_descriptions && $scope.results.variable_descriptions.length > 0) {
         $scope.code_ids = {};
         for (var i = 0; i < $scope.results.variable_descriptions.length; i++) {
@@ -19,8 +18,8 @@ function SocietiesCtrl($scope, searchModelService, CodeDescription) {
         $scope.range = max_value - min_value;
     
     }
-    
-    
+
+    $scope.query = searchModelService.getModel().getQuery();
     $scope.setActive('societies');
 
     $scope.resizeMap = function() {

@@ -143,7 +143,6 @@ def result_set_from_query_dict(query_dict):
             elif operator == 'lt':
                 values = values.filter(value__lt=filter['params'][0])
             values = values.select_related('variable','environmental__society')
-           
             # get the societies from the values
             for value in values:
                 result_set.add_environmental(value.society(), value.variable, value)
