@@ -72,7 +72,7 @@ angular.module('dplaceServices', ['ngResource'])
     })
     .factory('EnvironmentalValue', function($resource) {
         return $resource(
-            '/api/v1/environmental_values/?variable=:variable',
+            '/api/v1/environmental_values/:id',
             {}, {
                 query: {
                     method: 'GET',
@@ -80,6 +80,17 @@ angular.module('dplaceServices', ['ngResource'])
                     transformResponse: function(data, headers) {
                         return JSON.parse(data).results;
                     }
+                }
+            }
+        )
+    })
+    .factory('MinAndMax', function($resource) {
+        return $resource(
+            '/api/v1/min_and_max',
+            {}, {
+                query: {
+                    method: 'GET',
+                    isArray:false
                 }
             }
         )
