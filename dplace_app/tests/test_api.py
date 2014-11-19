@@ -208,7 +208,7 @@ class FindSocietiesTestCase(APITestCase):
         serialized_vcs = VariableCodeDescriptionSerializer([self.code1, self.code2], many=True).data
         language_classifications = LanguageClassification.objects.filter(language_id__in=[self.languageA1.id, self.languageB3.id])
         serialized_lcs = LanguageClassificationSerializer(language_classifications, many=True).data
-        data = {'variable_codes': serialized_lcs,
+        data = {'variable_codes': serialized_vcs,
                 'language_classifications' : serialized_lcs}
         response = self.client.post(self.url,data,format='json')
         self.assertSocietyInResponse(self.society1,response)
