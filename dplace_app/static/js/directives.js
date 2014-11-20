@@ -70,12 +70,6 @@ angular.module('dplaceMapDirective', [])
                     regionsSelectable: true
                 }).vectorMap('get','mapObject');
 
-                scope.societies.forEach(function(societyResult) {
-                    var society = societyResult.society;
-                    society.location.coordinates = society.location.coordinates.reverse();
-                });
-                
-                
                 scope.addMarkers = function() {
                     scope.map.removeAllMarkers();
                     if(!scope.societies || !scope.chosen) {
@@ -95,9 +89,6 @@ angular.module('dplaceMapDirective', [])
                     });
 
                     // Map IDs to colors
-                    console.log(scope.query);
-                    
-
                     var colorMap = colorMapService.generateColorMap(scope.societies, scope.query, scope.chosen.id);
                     scope.map.series.markers[0].setValues(colorMap);
                 };
@@ -105,16 +96,20 @@ angular.module('dplaceMapDirective', [])
                 if(attrs.societies) {
                     // Update markers when societies change
                     scope.$watchCollection('societies', function(oldvalue, newvalue) {
+                        scope.societies.forEach(function(societyResult) {
+                            var society = societyResult.society;
+                            society.location.coordinates = society.location.coordinates.reverse();
+                        });
                         scope.addMarkers();
                     });
                 }
-                scope.$watchCollection('chosen', function(oldvalue, newvalue) {
-                       console.log(scope.chosen);
-                       colorMap = colorMapService.generateColorMap(scope.societies, scope.query, scope.chosen.id);
-                       scope.map.series.markers[0].setValues(colorMap);
-                       scope.addMarkers(); 
+                if (attrs.chosen) {
+                    scope.$watchCollection('chosen', function(oldvalue, newvalue) {
+                           colorMap = colorMapService.generateColorMap(scope.societies, scope.query, scope.chosen.id);
+                           scope.map.series.markers[0].setValues(colorMap);
+                           scope.addMarkers(); 
                     });
-                
+                }
                 
                 if(attrs.selectedRegions) {
                     scope.$watchCollection('selectedRegions', function(oldvalue, newvalue) {

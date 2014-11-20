@@ -4,17 +4,6 @@ function SocietiesCtrl($scope, searchModelService, CodeDescription) {
     $scope.setActive('societies');
     $scope.variables = [];
     
-    if ('variable_codes' in $scope.query) {
-        codes = [];
-        for (var i = 0; i < $scope.query.variable_codes.length; i++) {
-            codes.push(CodeDescription.query({id: $scope.query.variable_codes[i]}));
-        }
-        
-        $scope.query['variable_codes'] = codes;
-    }
-    
-
-    
     if ($scope.results.variable_descriptions)
         $scope.variables = $scope.variables.concat($scope.results.variable_descriptions);
         
