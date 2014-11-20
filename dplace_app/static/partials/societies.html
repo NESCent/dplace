@@ -51,10 +51,29 @@
                 class="form-control"
                 ng-options="variable.name for variable in variables"
                 ng-init="results.chosenVariable=variables[0]"
+                ng-change="changeLegend(results.chosenVariable)"
             >
             </select>
            
             <dplace-map societies="results.societies" map-div-id="result-map" visible="visible" query="query" chosen="results.chosenVariable"></dplace-map>
+            <table id="mapLegend">
+                <tr ng-repeat="code in legend">
+                    <td>
+                    <svg height="20" width="20">
+                        <circle
+                            cx="10"
+                            cy="10"
+                            r="4.5"
+                            fill="{{code.code|colorNode:legend}}"
+                            stroke="#000"
+                            stroke-width="0.5"
+                            />
+                    </svg>
+                    </td>
+                    <td>{{code.description}}</td>
+                </tr>
+            </table>
+            
         </tab>
         <tab heading="Download" select="generateDownloadLinks()">
             <div class="row">

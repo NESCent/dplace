@@ -4,12 +4,24 @@ function SocietiesCtrl($scope, searchModelService, CodeDescription) {
     $scope.setActive('societies');
     $scope.variables = [];
     
-    if ($scope.results.variable_descriptions)
+    if ($scope.results.variable_descriptions) {
         $scope.variables = $scope.variables.concat($scope.results.variable_descriptions);
+    }
         
-    if ($scope.results.environmental_variables)
+    if ($scope.results.environmental_variables) {
         $scope.variables = $scope.variables.concat($scope.results.environmental_variables);
-        
+    }
+    
+    $scope.changeLegend = function(chosenVariable) {
+        chosenVariableId = chosenVariable.id;
+        if ($scope.query.variable_codes) {
+            $scope.legend = $scope.query.variable_codes.filter(function(code) { if (code.variable == chosenVariableId) return code; });
+            console.log($scope.legend);
+        }
+    };
+    
+    if ($scope.variables[0]) $scope.changeLegend($scope.variables[0]); //initial value of chosen variable is first variable in array
+    
     $scope.generateDownloadLinks = function() {
         // queryObject is the in-memory JS object representing the chosen search options
         var queryObject = searchModelService.getModel().getQuery();
