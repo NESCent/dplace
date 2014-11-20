@@ -23,7 +23,6 @@ function ColorMapService() {
         } 
         
         if ('variable_codes' in query) {
-            console.log(query);
             var numCodes = 0;
             for (var i = 0; i < query.variable_codes.length; i++) {
                 if (query.variable_codes[i].variable == var_id) numCodes++;

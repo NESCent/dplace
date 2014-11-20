@@ -91,6 +91,12 @@ angular.module('dplaceMapDirective', [])
                     // Map IDs to colors
                     var colorMap = colorMapService.generateColorMap(scope.societies, scope.query, scope.chosen.id);
                     scope.map.series.markers[0].setValues(colorMap);
+                    
+                    for (var i = 0; i < societyIds.length; i++) {
+                        if (societyIds[i] in colorMap) continue;
+                        else scope.map.removeMarkers([societyIds[i]]);
+                    }
+                    
                 };
 
                 if(attrs.societies) {
@@ -105,8 +111,6 @@ angular.module('dplaceMapDirective', [])
                 }
                 if (attrs.chosen) {
                     scope.$watchCollection('chosen', function(oldvalue, newvalue) {
-                           colorMap = colorMapService.generateColorMap(scope.societies, scope.query, scope.chosen.id);
-                           scope.map.series.markers[0].setValues(colorMap);
                            scope.addMarkers(); 
                     });
                 }
