@@ -41,17 +41,14 @@ function EnvironmentalCtrl($scope, searchModelService, EnvironmentalValue) {
     };
     
     $scope.filterChanged = function() {
-        if ($scope.environmentalData.selectedFilter.operator != 'all') return;
-        else {
-            values = EnvironmentalValue.query({variable: $scope.environmentalData.selectedVariable.id});
-            min_value = 0, max_value = 0;
-            values.$promise.then(function(result) {
-                for (var i = 0; i < result.length; i++) {
-                    if (result[i].value < min_value) min_value = result[i].value;
-                    else if (result[i].value > max_value) max_value = result[i].value;
-                }
-            $scope.environmentalData.vals[0] = min_value;
-            $scope.environmentalData.vals[1] = max_value;
+        if ($scope.environmentalData.selectedFilter.operator != 'all') {
+            return;
+        } else {
+            // Place the min/max values into the text fields as placeholders.
+            EnvironmentalValue.query({variable: $scope.environmentalData.selectedVariable.id}, function(results) {
+                var extractedValues = results.map(function(o) { return o.value; });
+                $scope.environmentalData.vals[0] = Math.min.apply(null, extractedValues);
+                $scope.environmentalData.vals[1] = Math.max.apply(null, extractedValues);
             });
         }
     };

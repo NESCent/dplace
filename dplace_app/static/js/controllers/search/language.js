@@ -110,8 +110,8 @@ function LanguageCtrl($scope, searchModelService, LanguageClass, LanguageClassif
     $scope.doSearch = function() {
 	//the selected array contains all languages that were selected (even if they were then unselected)
 	//so we filter the selected array so we only search for currently selected languages
-		var filters = $scope.languageClassifications.selected.filter(function(classification) { return classification.isSelected; }).map(function(c) { return {language_ids:[c.language.id]}; });
-        $scope.updateSearchQuery({ language_filters: filters });
+		var classifications = $scope.languageClassifications.selected.filter(function(classification) { return classification.isSelected; });
+        $scope.updateSearchQuery({ language_classifications: classifications});
         $scope.searchSocieties();
     };
 
