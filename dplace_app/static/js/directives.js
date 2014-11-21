@@ -64,10 +64,8 @@ angular.module('languagePhylogenyDirective', [])
                     
                 //keeps track of how many variables are mapped on the tree
                 //sometimes variables are searched for, but do not appear on any trees
-                var keyCount = 0; 
                 translate = 0;
                 for (var key in scope.code_ids) {
-                    keyCount++;
                     scope.results.societies.forEach(function(society) {
                         var selected = node.filter(function(d) {
                             return d.name == society.society.iso_code;
@@ -86,40 +84,19 @@ angular.module('languagePhylogenyDirective', [])
                                                 hue = value * 240 / scope.code_ids[society.variable_coded_values[i].variable];
                                                 return 'hsl('+hue+',100%, 50%)';
                                             });                        
-                                        if (i >= keyCount) keyCount = i+1;
                                         continue;
                                 } 
-                                keyCount--;
                             }
                         }
                     });
                     translate += 20;
                 }
-                
                 scope.results.societies.forEach(function(society) {
                     var selected = node.filter(function(d) {
                         return d.name == society.society.iso_code;
                     });
                     
                     //append the circles
-                    //translate = 0;
-                   /* if (society.variable_coded_values.length > 0) {
-                        for (var i = 0; i < society.variable_coded_values.length; i++) {
-                            selected.append("svg:circle")
-                                .attr("r", 4.5)
-                                .attr("stroke", "#000")
-                                .attr("stroke-width", "0.5")
-                                .attr("transform", "translate("+translate+", 0)")
-                                .attr("fill", function(n) {
-                                    value = society.variable_coded_values[i].coded_value;
-                                    hue = value * 240 / scope.code_ids[society.variable_coded_values[i].variable];
-                                    return 'hsl('+hue+',100%, 50%)';
-                                });                        
-                            translate += 20;
-                            if (i >= keyCount) keyCount = i+1;
-                        }
-                    }*/
-                    
                     if (society.environmental_values.length > 0) {
                         selected.append("svg:circle")
                             .attr("r", 4.5)
@@ -135,8 +112,6 @@ angular.module('languagePhylogenyDirective', [])
                     }
                     
                     //lastly, append the text
-                    //if (keyCount * 20 != translate) translate = keyCount * 20;
-                    //if (society.environmental_values.length > 0) translate += 20;
                         selected.append("svg:text") 
                             .attr("dx", translate-10)
                             .attr("dy", 4)
@@ -152,20 +127,17 @@ angular.module('languagePhylogenyDirective', [])
                         .attr("dy", 20)
                         .text("E1");
                 }
-                
+                keysWritten = 1;
                 if (scope.query.variable_codes) {
-                    keysWritten = 0;
-                    translate = 15;
+                    translate = 20;
                     for (var key in scope.code_ids) {
-                        while (keysWritten < keyCount) {
-                            d3.select("language-phylogeny").select("svg").append("svg:text")
-                                .attr("dx", w+15+translate)
-                                .attr("dy", 20)
-                                .text("C"+(keysWritten+1));
-                            keysWritten++;
-                            translate += 20;
+                        d3.select("language-phylogeny").select("svg").append("svg:text")
+                            .attr("dx", w+15+translate)
+                            .attr("dy", 20)
+                            .text("C"+keysWritten);
+                        keysWritten++;
+                        translate += 20;
                                
-                        }
                     }
                 }
                 
