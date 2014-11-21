@@ -33,7 +33,7 @@ angular.module('languagePhylogenyDirective', [])
                     .attr("width", w+300)
                     .attr("height", h+30)
                     .append("svg:g")
-                    .attr("transform", "translate(40, 0)");
+                    .attr("transform", "translate(40, 20)");
                     
                 var diagonal = rightAngleDiagonal();
                 
@@ -61,7 +61,11 @@ angular.module('languagePhylogenyDirective', [])
                     .data(nodes)
                     .enter().append("svg:g")
                     .attr("transform", function(d) { return "translate(" + d.y + ", "+ d.x + ")"; });
-
+                    
+                //keeps track of how many variables are mapped on the tree
+                //sometimes variables are searched for, but do not appear on any trees
+                var keyCount = 0; 
+                
                 scope.results.societies.forEach(function(society) {
                     var selected = node.filter(function(d) {
                         return d.name == society.society.iso_code;
@@ -69,7 +73,6 @@ angular.module('languagePhylogenyDirective', [])
                     
                     //append the circles
                     translate = 0;
-                    
                     if (society.variable_coded_values.length > 0) {
                         for (var i = 0; i < society.variable_coded_values.length; i++) {
                             selected.append("svg:circle")
@@ -79,40 +82,63 @@ angular.module('languagePhylogenyDirective', [])
                                 .attr("transform", "translate("+translate+", 0)")
                                 .attr("fill", function(n) {
                                     value = society.variable_coded_values[i].coded_value;
-                                    hue = value * 240 / scope.code_ids[society.variable_coded_values[i].variable].length;
+                                    hue = value * 240 / scope.code_ids[society.variable_coded_values[i].variable];
                                     return 'hsl('+hue+',100%, 50%)';
                                 });                        
-                            translate += 15;
+                            translate += 20;
+                            if (i >= keyCount) keyCount = i+1;
                         }
                     }
                     
                     if (society.environmental_values.length > 0) {
-                            selected.append("svg:circle")
-                                .attr("r", 4.5)
-                                .attr("stroke", "#000")
-                                .attr("stroke-width", "0.5")
-                                .attr("transform", "translate("+translate+", 0)")
-                                .attr("fill", function(n) {
-                                    value = society.environmental_values[0].value;
-                                    hue = value * 240 / scope.range;
-                                    return 'hsl('+hue+',100%, 50%)';
-                                });
-                                translate += 15;
-                        }
-                    
-                    
+                        selected.append("svg:circle")
+                            .attr("r", 4.5)
+                            .attr("stroke", "#000")
+                            .attr("stroke-width", "0.5")
+                            .attr("transform", "translate("+translate+", 0)")
+                            .attr("fill", function(n) {
+                                value = society.environmental_values[0].value; //only 1 environmental value at a time so we can search like this
+                                hue = value * 240 / scope.range;
+                                return 'hsl('+hue+',100%, 50%)';
+                            });
+                        translate += 20;
+                    }
                     
                     //lastly, append the text
-                    selected.append("svg:text") 
-                            .attr("dx", translate)
+                    if (keyCount * 20 != translate) translate = keyCount * 20;
+                    if (society.environmental_values.length > 0) translate += 20;
+                        selected.append("svg:text") 
+                            .attr("dx", translate-10)
                             .attr("dy", 4)
                             .attr("font-size", "14px")
                             .attr("font-family", "Arial")
                             .text(function(d) { return d.name; });  
-                    
-          
                 });
-
+                
+                if (scope.query.environmental_filters) {
+                    if (translate == keyCount * 20) translate += 20;
+                    d3.select("language-phylogeny").select("svg").append("svg:text")
+                        .attr("dx", w+15+translate)
+                        .attr("dy", 20)
+                        .text("E1");
+                }
+                
+                if (scope.query.variable_codes) {
+                    keysWritten = 0;
+                    translate = 15;
+                    for (var key in scope.code_ids) {
+                        while (keysWritten < keyCount) {
+                            d3.select("language-phylogeny").select("svg").append("svg:text")
+                                .attr("dx", w+15+translate)
+                                .attr("dy", 20)
+                                .text("C"+(keysWritten+1));
+                            keysWritten++;
+                            translate += 20;
+                               
+                        }
+                    }
+                }
+                
             };
         
         

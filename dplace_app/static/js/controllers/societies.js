@@ -1,25 +1,24 @@
 function SocietiesCtrl($scope, searchModelService, CodeDescription) {
     $scope.results = searchModelService.getModel().getResults();
-    if ($scope.results.variable_descriptions && $scope.results.variable_descriptions.length > 0) {
+    $scope.query = searchModelService.getModel().getQuery();
+    if ($scope.query.variable_codes) {
         $scope.code_ids = {};
-        for (var i = 0; i < $scope.results.variable_descriptions.length; i++) {
-            results = CodeDescription.query({variable: $scope.results.variable_descriptions[i].id});
-            $scope.code_ids[$scope.results.variable_descriptions[i].id] = results;
+        for (var i = 0; i < $scope.query.variable_codes.length; i++) {
+            if ($scope.query.variable_codes[i].variable in $scope.code_ids) {
+                $scope.code_ids[$scope.query.variable_codes[i].variable] = $scope.code_ids[$scope.query.variable_codes[i].variable] + 1;
+            } else {
+                $scope.code_ids[$scope.query.variable_codes[i].variable] = 1;
+            }
         }
     }
     
-    if ($scope.results.environmental_variables && $scope.results.environmental_variables.length > 0) {
-        var min_value = 0, max_value = 0;
-        
-        for (var i = 0; i < $scope.results.societies.length; i++) {
-            if ($scope.results.societies[i].environmental_values[0].value < min_value) min_value = $scope.results.societies[i].environmental_values[0].value;
-            else if ($scope.results.societies[i].environmental_values[0].value > max_value) max_value = $scope.results.societies[i].environmental_values[0].value;
-        }
+    if ($scope.query.environmental_filters) {
+        var extractedValues = $scope.results.societies.map(function(society) { return society.environmental_values[0].value; } );
+        var min_value = Math.min.apply(null, extractedValues);
+        var max_value = Math.max.apply(null, extractedValues);
         $scope.range = max_value - min_value;
-    
     }
 
-    $scope.query = searchModelService.getModel().getQuery();
     $scope.setActive('societies');
 
     $scope.resizeMap = function() {
