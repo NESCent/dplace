@@ -113,7 +113,7 @@ angular.module('languagePhylogenyDirective', [])
                     
                     //lastly, append the text
                         selected.append("svg:text") 
-                            .attr("dx", translate-10)
+                            .attr("dx", translate)
                             .attr("dy", 4)
                             .attr("font-size", "14px")
                             .attr("font-family", "Arial")
