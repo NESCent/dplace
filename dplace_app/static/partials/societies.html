@@ -59,6 +59,13 @@
                 <option value="">Select a Phylogeny</option>
             </select>
             
+            <script type="text/javascript">
+                $(window).scroll(function() {
+                    $("#varLabels").stop().animate({"marginTop":($(window).scrollTop()) + "px"}, "slow");
+                });
+            
+            </script>
+            
             <table ng-repeat="(id, code) in code_ids" id="legend">
             <tr><th>{{id}}</th></tr>
             <tr ng-repeat="c in code">
@@ -76,6 +83,7 @@
             </td><td>{{c.description}}</td>
             </tr>
             </table>
+
             <language-phylogeny></language-phylogeny>
         </tab>
         <tab heading="Download" select="generateDownloadLinks()">

@@ -28,12 +28,37 @@ angular.module('languagePhylogenyDirective', [])
                 
                 d3.select("language-phylogeny").append("h4")
                     .text(langTree.name);
+                
+                var labels = d3.select("language-phylogeny").append("svg:svg")
+                        .attr("width", w+300)
+                        .attr("height", 15)
+                        .attr("style", "position:absolute; background-color:#fff")
+                        .attr("id", "varLabels");
+                keysWritten = 1;
+                translate = 20;
+                if (scope.query.variable_codes) {
+                    for (var key in scope.code_ids) {
+                        labels.append("svg:text")
+                            .attr("dx", w+15+translate)
+                            .attr("dy", 15)
+                            .attr("id", "varLabel")
+                            .text("C"+keysWritten);
+                        keysWritten++;
+                        translate += 20;    
+                    }
+                }                     
+                if (scope.query.environmental_filters) {     
+                        labels.append("svg:text")
+                        .attr("dx", w+15+translate)
+                        .attr("dy", 15)
+                        .text("E1");
+                }
                     
                 var vis = d3.select("language-phylogeny").append("svg:svg")
                     .attr("width", w+300)
                     .attr("height", h+30)
                     .append("svg:g")
-                    .attr("transform", "translate(40, 20)");
+                    .attr("transform", "translate(40, 0)");
                     
                 var diagonal = rightAngleDiagonal();
                 
@@ -122,30 +147,9 @@ angular.module('languagePhylogenyDirective', [])
                             .attr("font-family", "Arial")
                             .text(function(d) { return d.name; });  
                 });
-                
-                
-                keysWritten = 1;
-                if (scope.query.variable_codes) {
-                    translate = 20;
-                    for (var key in scope.code_ids) {
-                        d3.select("language-phylogeny").select("svg").append("svg:text")
-                            .attr("dx", w+15+translate)
-                            .attr("dy", 20)
-                            .text("C"+keysWritten);
-                        keysWritten++;
-                        translate += 20;    
-                    }
-                }
-                if (scope.query.environmental_filters) {
-                    d3.select("language-phylogeny").select("svg").append("svg:text")
-                        .attr("dx", w+15+translate)
-                        .attr("dy", 20)
-                        .text("E1");
-                }
-                
+
             };
-        
-        
+
             scope.$on('treeSelected', function(event, args) {
                     constructTree(args.tree);
             });
