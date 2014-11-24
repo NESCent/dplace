@@ -64,6 +64,7 @@ angular.module('languagePhylogenyDirective', [])
                     
                 translate = 0;
                 if (scope.query.variable_codes) {
+                    console.log(scope.code_ids);
                     for (var key in scope.code_ids) {
                         scope.results.societies.forEach(function(society) {
                             var selected = node.filter(function(d) {
@@ -80,7 +81,7 @@ angular.module('languagePhylogenyDirective', [])
                                                 .attr("transform", "translate("+translate+", 0)")
                                                 .attr("fill", function(n) {
                                                     value = society.variable_coded_values[i].coded_value;
-                                                    hue = value * 240 / scope.code_ids[society.variable_coded_values[i].variable];
+                                                    hue = value * 240 / scope.code_ids[society.variable_coded_values[i].variable].length;
                                                     return 'hsl('+hue+',100%, 50%)';
                                                 });                        
                                             continue;

@@ -48,7 +48,7 @@
             <dplace-map societies="results.societies" map-div-id="result-map" visible="visible" query="query"></dplace-map>
         </tab>
         <tab heading="Tree">
-            <h4> Phylogenies go here </h4>
+            <h4> Phylogenies </h4>
             <select
                 ng-model="results.selectedTree"
                 class="form-control"
@@ -58,6 +58,24 @@
                 >
                 <option value="">Select a Phylogeny</option>
             </select>
+            
+            <table ng-repeat="(id, code) in code_ids" id="legend">
+            <tr><th>{{id}}</th></tr>
+            <tr ng-repeat="c in code">
+            <td>
+            <svg height="20" width="20">
+                <circle
+                    cx="10"
+                    cy="10"
+                    r="4.5"
+                    fill="{{c.code|colorNode:code}}"
+                    stroke="#000"
+                    stroke-width="0.5"
+                />
+           </svg>
+            </td><td>{{c.description}}</td>
+            </tr>
+            </table>
             <language-phylogeny></language-phylogeny>
         </tab>
         <tab heading="Download" select="generateDownloadLinks()">
