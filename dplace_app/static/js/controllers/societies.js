@@ -1,6 +1,9 @@
 function SocietiesCtrl($scope, searchModelService, Variable) {
     $scope.results = searchModelService.getModel().getResults();
+    console.log($scope.results);
     $scope.query = searchModelService.getModel().getQuery();
+        console.log($scope.query);
+
     if ($scope.query.variable_codes) {
         $scope.code_ids = {};
         for (var i = 0; i < $scope.query.variable_codes.length; i++) {
@@ -26,6 +29,7 @@ function SocietiesCtrl($scope, searchModelService, Variable) {
         var max_value = Math.max.apply(null, extractedValues);
         $scope.range = max_value - min_value;
     }
+    
 
     $scope.setActive('societies');
 

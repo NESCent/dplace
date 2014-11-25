@@ -117,7 +117,31 @@ angular.module('languagePhylogenyDirective', [])
                         });
                         translate += 20;
                     }
+                } else if (scope.query.language_classifications && !scope.query.environmental_filters) {
+                    //get lang classification
+                    scope.results.societies.forEach(function(society) {
+                        var selected = node.filter(function(d) {
+                            return d.name == society.society.iso_code;
+                        });
+                        
+                        for (var i = 0; i < society.languages.length; i++) {
+                            classification = scope.query.language_classifications.filter(function(l) { return l.language.id == society.languages[i].id });
+                            selected.append("svg:circle")
+                                .attr("r", 4.5)
+                                .attr("stroke", "#000")
+                                .attr("stroke-width", "0.5")
+                                .attr("fill", function(n) {
+                                    if (classification.length > 0)
+                                        value = classification[0].class_subfamily;
+                                        hue = value * 240 / society.languages.length; //need to return total # of subfamilies for the /.length
+                                        return 'hsl('+hue+',100%, 50%)';
+                                
+                                });
+                        }
+                    });
                 }
+                
+                    
                 scope.results.societies.forEach(function(society) {
                     var selected = node.filter(function(d) {
                         return d.name == society.society.iso_code;
@@ -134,13 +158,14 @@ angular.module('languagePhylogenyDirective', [])
                                 hue = value * 240 / scope.range;
                                 return 'hsl('+hue+',100%, 50%)';
                             });
-                    }
+                    } 
                     
                     //lastly, append the text
                         selected.append("svg:text") 
                             .attr("dx", function(n) {
                                 if (scope.query.environmental_filters && scope.query.variable_codes) return translate+20;
                                 else if (scope.query.environmental_filters) return translate+10;
+                                else if (scope.query.language_classifications) return translate+10;
                                 else return translate;
                             })                           
                             .attr("dy", 4)
