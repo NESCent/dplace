@@ -1,4 +1,4 @@
-function SocietiesCtrl($scope, searchModelService, CodeDescription) {
+function SocietiesCtrl($scope, searchModelService, Variable) {
     $scope.results = searchModelService.getModel().getResults();
     $scope.query = searchModelService.getModel().getQuery();
     if ($scope.query.variable_codes) {
@@ -10,8 +10,16 @@ function SocietiesCtrl($scope, searchModelService, CodeDescription) {
                 $scope.code_ids[$scope.query.variable_codes[i].variable] = [$scope.query.variable_codes[i]];
             }
         }
+        
+        if ($scope.results.variable_descriptions) {
+            for (var i = 0; i < $scope.results.variable_descriptions.length; i++){
+                if ($scope.code_ids[$scope.results.variable_descriptions[i].id].name) continue;
+                else $scope.code_ids[$scope.results.variable_descriptions[i].id].name = $scope.results.variable_descriptions[i].name;
+            
+            }
+        }
     }
-    
+        
     if ($scope.query.environmental_filters) {
         var extractedValues = $scope.results.societies.map(function(society) { return society.environmental_values[0].value; } );
         var min_value = Math.min.apply(null, extractedValues);
