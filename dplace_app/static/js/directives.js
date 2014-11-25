@@ -43,6 +43,7 @@ angular.module('languagePhylogenyDirective', [])
                             .attr("dx", w+15+translate)
                             .attr("dy", 15)
                             .text("C"+keysWritten);
+                        scope.code_ids[key].CID = "C"+keysWritten;
                         keysWritten++;
                         translate += 20;    
                     }
@@ -151,7 +152,6 @@ angular.module('languagePhylogenyDirective', [])
                 phyloWidth = d3.select("g").node().getBBox().width;
                 d3.select("#legend")
                     .attr("style", "width:"+($(window).width()-phyloWidth-100)+"px; position:absolute; right:5px; z-index:1; margin-top:10px;");
-
             };
 
             scope.$on('treeSelected', function(event, args) {
