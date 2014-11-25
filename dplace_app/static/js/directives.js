@@ -28,12 +28,13 @@ angular.module('languagePhylogenyDirective', [])
                 
                 d3.select("language-phylogeny").append("h4")
                     .text(langTree.name);
-                
+                    
                 var labels = d3.select("language-phylogeny").append("svg:svg")
                         .attr("width", w+300)
                         .attr("height", 15)
-                        .attr("style", "position:absolute; background-color:#fff")
-                        .attr("id", "varLabels");
+                        //.attr("style", "position:absolute; background-color:#fff")
+                        .attr("id", "varLabels")
+                        .attr("transform", "translate(-40, 0)");
                 keysWritten = 1;
                 translate = 20;
                 if (scope.query.variable_codes) {
@@ -41,7 +42,6 @@ angular.module('languagePhylogenyDirective', [])
                         labels.append("svg:text")
                             .attr("dx", w+15+translate)
                             .attr("dy", 15)
-                            .attr("id", "varLabel")
                             .text("C"+keysWritten);
                         keysWritten++;
                         translate += 20;    
@@ -58,7 +58,7 @@ angular.module('languagePhylogenyDirective', [])
                     .attr("width", w+300)
                     .attr("height", h+30)
                     .append("svg:g")
-                    .attr("transform", "translate(40, 0)");
+                    .attr("transform", "translate(2, 0)");
                     
                 var diagonal = rightAngleDiagonal();
                 
@@ -147,6 +147,10 @@ angular.module('languagePhylogenyDirective', [])
                             .attr("font-family", "Arial")
                             .text(function(d) { return d.name; });  
                 });
+                
+                phyloWidth = d3.select("g").node().getBBox().width;
+                d3.select("#legend")
+                    .attr("style", "width:"+($(window).width()-phyloWidth-100)+"px; position:absolute; right:5px; z-index:1; margin-top:10px;");
 
             };
 

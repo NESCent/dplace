@@ -61,12 +61,13 @@
             
             <script type="text/javascript">
                 $(window).scroll(function() {
-                    $("#varLabels").stop().animate({"marginTop":($(window).scrollTop()) + "px"}, "slow");
+                if ($(window).scrollTop() > 100)
+                   $("#legend").stop().animate({"marginTop":($(window).scrollTop() - 100) + "px"}, "slow");
                 });
-            
             </script>
             
-            <table ng-repeat="(id, code) in code_ids" id="legend">
+            <div id="legend" ng-show="results.selectedTree">
+            <table ng-repeat="(id, code) in code_ids">
             <tr><th>{{id}}</th></tr>
             <tr ng-repeat="c in code">
             <td>
@@ -83,7 +84,7 @@
             </td><td>{{c.description}}</td>
             </tr>
             </table>
-
+            </div>
             <language-phylogeny></language-phylogeny>
         </tab>
         <tab heading="Download" select="generateDownloadLinks()">
