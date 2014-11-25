@@ -85,6 +85,9 @@
                         <td>{{c.description}}</td>
                     </tr>
                 </table>
+                <table ng-repeat="environmental in results.environmental_variables">
+                <tr><th>E1: {{environmental.name}}</th></tr>
+                </table>
             </div>
             <language-phylogeny></language-phylogeny>
         </tab>
