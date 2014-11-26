@@ -1,4 +1,4 @@
-function SocietiesCtrl($scope, searchModelService, Variable) {
+function SocietiesCtrl($scope, searchModelService, LanguageClass) {
     $scope.results = searchModelService.getModel().getResults();
     console.log($scope.results);
     $scope.query = searchModelService.getModel().getQuery();
@@ -30,6 +30,27 @@ function SocietiesCtrl($scope, searchModelService, Variable) {
         $scope.range = max_value - min_value;
     }
     
+    if ($scope.query.language_classifications) {
+        //get lang classifications in tree
+        $scope.classifications = [];
+        $scope.languageClasses = [];
+        LanguageClass.query().$promise.then(function(result) {
+            console.log(result);
+             for (var i = 0; i < $scope.results.societies.length; i++) {
+            for (var j = 0; j < $scope.results.societies[i].languages.length; j++) {
+                classification = $scope.query.language_classifications.filter(function(l) { return l.language.id == $scope.results.societies[i].languages[j].id; });
+                toAdd = result.filter(function(l) { return l.id == classification[0].class_subfamily; });
+                if (toAdd[0] && $scope.classifications.indexOf(toAdd[0]) == -1)
+                    $scope.classifications = $scope.classifications.concat(toAdd); 
+            }
+        }
+        });
+        
+        
+   
+        
+        
+    }
 
     $scope.setActive('societies');
 

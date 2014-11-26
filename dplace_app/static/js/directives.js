@@ -125,23 +125,25 @@ angular.module('languagePhylogenyDirective', [])
                         });
                         
                         for (var i = 0; i < society.languages.length; i++) {
-                            classification = scope.query.language_classifications.filter(function(l) { return l.language.id == society.languages[i].id });
+                            var classification = scope.query.language_classifications.filter(function(l) { return l.language.id == society.languages[i].id });
                             selected.append("svg:circle")
                                 .attr("r", 4.5)
                                 .attr("stroke", "#000")
                                 .attr("stroke-width", "0.5")
                                 .attr("fill", function(n) {
-                                    if (classification.length > 0)
+                                    if (classification.length > 0) {
                                         value = classification[0].class_subfamily;
-                                        hue = value * 240 / society.languages.length; //need to return total # of subfamilies for the /.length
+                                        hue = value * 240 / scope.classifications.length;
                                         return 'hsl('+hue+',100%, 50%)';
-                                
+                                    }
                                 });
+                            
+                            
                         }
+                        
                     });
                 }
                 
-                    
                 scope.results.societies.forEach(function(society) {
                     var selected = node.filter(function(d) {
                         return d.name == society.society.iso_code;
