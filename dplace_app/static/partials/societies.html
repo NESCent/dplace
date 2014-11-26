@@ -45,13 +45,14 @@
             </div>
         </tab>
         <tab heading="Map" select="visible=true" deselect="visible=false">
-            <h4>Choose a variable:</h4>
+            <h4 ng-show="variables.length > 0">Choose a variable:</h4>
             <select
                 ng-model="results.chosenVariable"
                 class="form-control"
                 ng-options="variable.name for variable in variables"
                 ng-init="results.chosenVariable=variables[0]"
                 ng-change="changeLegend(results.chosenVariable)"
+                ng-show="variables.length > 0"
             >
             </select>
            

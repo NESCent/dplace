@@ -72,7 +72,7 @@ angular.module('dplaceMapDirective', [])
 
                 scope.addMarkers = function() {
                     scope.map.removeAllMarkers();
-                    if(!scope.societies || !scope.chosen) {
+                    if(!scope.societies || (!scope.chosen && !scope.query.language_classifications)) {
                         return;
                     }
 
@@ -89,7 +89,12 @@ angular.module('dplaceMapDirective', [])
                     });
 
                     // Map IDs to colors
-                    var colorMap = colorMapService.generateColorMap(scope.societies, scope.query, scope.chosen.id);
+                    if (scope.query.language_classifications && !scope.chosen) { //scope.chosen undefined for geographic and language searches
+                        var colorMap = colorMapService.generateColorMap(scope.societies, scope.query, -1);
+                    } else {
+                        var colorMap = colorMapService.generateColorMap(scope.societies, scope.query, scope.chosen.id);
+
+                    }
                     scope.map.series.markers[0].setValues(colorMap);
                     
                     for (var i = 0; i < societyIds.length; i++) {
@@ -111,7 +116,7 @@ angular.module('dplaceMapDirective', [])
                 }
                 if (attrs.chosen) {
                     scope.$watchCollection('chosen', function(oldvalue, newvalue) {
-                           scope.addMarkers(); 
+                        scope.addMarkers(); 
                     });
                 }
                 
@@ -136,6 +141,7 @@ angular.module('dplaceMapDirective', [])
                 scope.$on('$destroy', function() {
                     hideMap(scope);
                 });
+                                
                 scope.map.updateSize();
             };
 
