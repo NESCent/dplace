@@ -93,10 +93,9 @@ angular.module('dplaceMapDirective', [])
                         var colorMap = colorMapService.generateColorMap(scope.societies, scope.query, -1);
                     } else {
                         var colorMap = colorMapService.generateColorMap(scope.societies, scope.query, scope.chosen.id);
-
                     }
                     scope.map.series.markers[0].setValues(colorMap);
-                    
+
                     for (var i = 0; i < societyIds.length; i++) {
                         if (societyIds[i] in colorMap) continue;
                         else scope.map.removeMarkers([societyIds[i]]);

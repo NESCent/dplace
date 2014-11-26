@@ -25,6 +25,7 @@ function ColorMapService() {
             } 
             if ('variable_codes' in query) {
                 var numCodes = 0;
+                var missingData = false;
                 for (var i = 0; i < query.variable_codes.length; i++) {
                     if (query.variable_codes[i].variable == var_id) numCodes++;
                 }  
@@ -34,9 +35,14 @@ function ColorMapService() {
                     for (var v = 0; v < society.variable_coded_values.length; v++) {
                         if (society.variable_coded_values[v].variable == var_id) {
                             var value = society.variable_coded_values[v].coded_value;
-                            var count = query.variable_codes.length;
-                            var color = mapColor(value, numCodes);
-                            colors[id] = color;
+                            if (society.variable_coded_values[v].code_description.description.indexOf("Missing data") != -1) {
+                                colors[id] = 'hsl(0, 0%, 100%)';
+                                //if (!missingData) numCodes--;
+                                missingData = true;
+                            } else {
+                                var color = mapColor(value, numCodes);
+                                colors[id] = color;
+                            }
                         } else {
                             continue;
                         }
