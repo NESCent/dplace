@@ -16,7 +16,8 @@ function SocietiesCtrl($scope, searchModelService) {
         chosenVariableId = chosenVariable.id;
         if ($scope.query.variable_codes) {
             $scope.legend = $scope.query.variable_codes.filter(function(code) { if (code.variable == chosenVariableId) return code; });
-        } else if ($scope.query.language_classifications) {
+        } 
+        else if ($scope.query.language_classifications && !$scope.query.environmental_filters) {
             $scope.classifications = {};
             $scope.legend = [];
             for (var i = 0; i < $scope.results.societies.length; i++) {
