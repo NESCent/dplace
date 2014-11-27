@@ -52,7 +52,6 @@ function ColorMapService() {
             }
         } else if ('language_classifications' in query) {
             var classifications = [];
-            console.log("Langs");
             for (var i = 0; i < societies.length; i++) {
                 //go through societies, add unique classifications to an array
                 for (var j = 0; j < societies[i].languages.length; j++) {
@@ -65,9 +64,7 @@ function ColorMapService() {
                 var society = societies[i];
                 var id = society.society.id;
                 for (var l = 0; l < society.languages.length; l++) {
-                    console.log(society);
                     var classification = query.language_classifications.filter(function(m) { return m.language.id == society.languages[l].id; });
-                    console.log(classification);
                     if (classification[0])
                         var value = classification[0].class_subfamily;
                     var count = classifications.length;
