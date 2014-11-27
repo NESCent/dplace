@@ -57,7 +57,7 @@ class ISOCodeViewSet(viewsets.ReadOnlyModelViewSet):
 
 class EnvironmentalVariableViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = EnvironmentalVariableSerializer
-    filter_fields = ('name', 'units',)
+    filter_fields = ('name', 'category', 'units',)
     queryset = EnvironmentalVariable.objects.all()
 
 class EnvironmentalValueViewSet(viewsets.ReadOnlyModelViewSet):
