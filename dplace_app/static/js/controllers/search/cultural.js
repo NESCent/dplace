@@ -61,15 +61,16 @@ function CulturalCtrl($scope, searchModelService, Variable, CodeDescription) {
 
     // wired to the search button. Gets the code ids, adds cultural to the query, and invokes the search
     $scope.doSearch = function() {
-        var code_ids = [];
+        var codes = [];
         traits = $scope.traits;
         traits.forEach(function(trait) {
             //the selected array contains all the codes that have been selected (even if they were then unselected)
             //we need to filter it to only search for the codes that are currently selected
-            trait.selected.filter(function(code){ return code.isSelected; }).map( function(c) { code_ids.push(c.id); });
+            var selected = trait.selected.filter(function(code){ return code.isSelected; });
+            codes = codes.concat(selected);
         });
 
-        $scope.updateSearchQuery({ variable_codes: code_ids });
+        $scope.updateSearchQuery({ variable_codes: codes });
         $scope.searchSocieties();
     };
 }

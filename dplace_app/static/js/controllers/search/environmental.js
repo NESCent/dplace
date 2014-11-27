@@ -48,7 +48,6 @@ function EnvironmentalCtrl($scope, searchModelService, EnvironmentalValue, MinAn
             values.$promise.then(function(result) {
                 $scope.environmentalData.vals[0] = result.min;
                 $scope.environmentalData.vals[1] = result.max;
-            
             });
         }
     };
