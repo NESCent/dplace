@@ -57,7 +57,7 @@ class ISOCodeViewSet(viewsets.ReadOnlyModelViewSet):
 
 class EnvironmentalVariableViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = EnvironmentalVariableSerializer
-    filter_fields = ('name', 'units',)
+    filter_fields = ('name', 'category', 'units',)
     queryset = EnvironmentalVariable.objects.all()
 
 class EnvironmentalValueViewSet(viewsets.ReadOnlyModelViewSet):
@@ -102,11 +102,11 @@ def result_set_from_query_dict(query_dict):
     # AND them together
     criteria = []
 
-    if 'language_filters' in query_dict:
+    if 'language_classifications' in query_dict:
         criteria.append(SEARCH_LANGUAGE)
-        language_filters = query_dict['language_filters']
-        for filter in language_filters:
-            language_ids = [int(x) for x in filter['language_ids']]
+        classifications = query_dict['language_classifications']
+        for classification in classifications:
+            language_ids = [int(classification['language']['id'])]
             languages = Language.objects.filter(pk__in=language_ids) # Returns a queryset
             languages.select_related('societies')
             for language in languages:
@@ -116,7 +116,7 @@ def result_set_from_query_dict(query_dict):
     if 'variable_codes' in query_dict:
         criteria.append(SEARCH_VARIABLES)
         # Now get the societies from variables
-        variable_code_ids = [int(x) for x in query_dict['variable_codes']]
+        variable_code_ids = [int(x['id']) for x in query_dict['variable_codes']]
         codes = VariableCodeDescription.objects.filter(pk__in=variable_code_ids) # returns a queryset
         coded_value_ids = []
         # Aggregate all the coded values for each selected code
@@ -132,24 +132,24 @@ def result_set_from_query_dict(query_dict):
         criteria.append(SEARCH_ENVIRONMENTAL)
         environmental_filters = query_dict['environmental_filters']
         # There can be multiple filters, so we must aggregate the results.
-        for filter in environmental_filters:
-            values = EnvironmentalValue.objects.filter(variable=filter['id'])
-            operator = filter['operator']
+        for environmental_filter in environmental_filters:
+            values = EnvironmentalValue.objects.filter(variable=environmental_filter['id'])
+            operator = environmental_filter['operator']
             if operator == 'inrange':
-                values = values.filter(value__gt=filter['params'][0]).filter(value__lt=filter['params'][1])
+                values = values.filter(value__gt=environmental_filter['params'][0]).filter(value__lt=environmental_filter['params'][1])
             elif operator == 'outrange':
-                values = values.filter(value__gt=filter['params'][1]).filter(value__lt=filter['params'][0])
+                values = values.filter(value__gt=environmental_filter['params'][1]).filter(value__lt=environmental_filter['params'][0])
             elif operator == 'gt':
-                values = values.filter(value__gt=filter['params'][0])
+                values = values.filter(value__gt=environmental_filter['params'][0])
             elif operator == 'lt':
-                values = values.filter(value__lt=filter['params'][0])
+                values = values.filter(value__lt=environmental_filter['params'][0])
             values = values.select_related('variable','environmental__society')
             # get the societies from the values
             for value in values:
                 result_set.add_environmental(value.society(), value.variable, value)
     if 'geographic_regions' in query_dict:
         criteria.append(SEARCH_GEOGRAPHIC)
-        geographic_region_ids = [int(x) for x in query_dict['geographic_regions']]
+        geographic_region_ids = [int(x['id']) for x in query_dict['geographic_regions']]
         regions = GeographicRegion.objects.filter(pk__in=geographic_region_ids) # returns a queryset
         for region in regions:
             for society in Society.objects.filter(location__intersects=region.geom):

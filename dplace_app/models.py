@@ -69,6 +69,7 @@ class EnvironmentalCategory(models.Model):
 
 class EnvironmentalVariable(models.Model):
     name = models.CharField(max_length=50, unique=True)
+    category = models.ForeignKey('EnvironmentalCategory', null=True)
     units = models.CharField(max_length=10, choices=UNIT_CHOICES)
     codebook_info = models.CharField(max_length=500, default='None')
     category = models.ForeignKey('EnvironmentalCategory', null=True)
