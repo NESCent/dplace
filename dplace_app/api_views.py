@@ -54,6 +54,11 @@ class ISOCodeViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = ISOCodeSerializer
     filter_fields = ('iso_code',)
     queryset = ISOCode.objects.all()
+    
+class EnvironmentalCategoryViewSet(viewsets.ReadOnlyModelViewSet):
+    serializer_class = EnvironmentalCategorySerializer
+    filter_fields = ('name',)
+    queryset = EnvironmentalCategory.objects.all()
 
 class EnvironmentalVariableViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = EnvironmentalVariableSerializer
