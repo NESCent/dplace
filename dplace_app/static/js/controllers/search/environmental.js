@@ -1,4 +1,4 @@
-function EnvironmentalCtrl($scope, searchModelService, EnvironmentalValue, MinAndMax) {
+function EnvironmentalCtrl($scope, searchModelService, EnvironmentalVariable, EnvironmentalValue, MinAndMax) {
     var linkModel = function() {
         // Get a reference to the environmental search params from the model
         $scope.environmentalData = searchModelService.getModel().getEnvironmentalData();
@@ -15,6 +15,10 @@ function EnvironmentalCtrl($scope, searchModelService, EnvironmentalValue, MinAn
             params: environmental.vals
         }];
         return filters;
+    };
+    
+    $scope.categoryChanged = function(category) {
+        $scope.environmentalData.variables = EnvironmentalVariable.query({category: category.id});    
     };
 
     $scope.variableChanged = function(variable) {
