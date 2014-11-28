@@ -56,7 +56,7 @@
             >
             </select>
            
-            <dplace-map societies="results.societies" map-div-id="result-map" visible="visible" query="query" chosen="results.chosenVariable"></dplace-map>
+            <dplace-map societies="results.societies" map-div-id="result-map" visible="visible" query="query" chosen="results.chosenVariable" link="mapLink"></dplace-map>
             <table id="mapLegend">
                 <tr ng-repeat="code in legend">
                     <td>
@@ -79,7 +79,7 @@
         <tab heading="Download" select="generateDownloadLinks()">
             <div class="row">
                 <h4>Download results as:</h4>
-                <ul>
+                <ul class="download-links">
                     <li>
                         <a ng-href="{{ csvDownloadLink }}" class="btn btn-info btn-dplace-download">CSV</a>
                     </li>

@@ -102,6 +102,18 @@ angular.module('dplaceMapDirective', [])
                     }
                     
                 };
+                
+                //this function gets the svg code and passes it to societies.js for download
+                //we can't access the map's svg code in societies.js (the map needs to be active)
+                //so this is a solution (?) maybe there's a better way to do this in the future
+                scope.mapLink = function() { 
+                    var map_svg = d3.select(".jvectormap-container").select("svg")
+                        .attr("version", 1.1)
+                        .attr("xmlns", "http://www.w3.org/2000/svg")
+                        .node().parentNode.innerHTML;
+                    map_svg = map_svg.substring(0, map_svg.indexOf("<div")); //remove zoom in/out buttons from map
+                    scope.link()(map_svg);
+                };
 
                 if(attrs.societies) {
                     // Update markers when societies change
@@ -116,6 +128,7 @@ angular.module('dplaceMapDirective', [])
                 if (attrs.chosen) {
                     scope.$watchCollection('chosen', function(oldvalue, newvalue) {
                         scope.addMarkers(); 
+                        scope.mapLink();
                     });
                 }
                 
@@ -142,6 +155,7 @@ angular.module('dplaceMapDirective', [])
                 });
                                 
                 scope.map.updateSize();
+                
             };
 
             // Handle visibility toggle
@@ -178,7 +192,8 @@ angular.module('dplaceMapDirective', [])
                 mapDivId: '@',
                 visible: '=',
                 query: '=',
-                chosen: '='
+                chosen: '=',
+                link: '&',
             },
             link: link
         };
