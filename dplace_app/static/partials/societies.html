@@ -58,13 +58,6 @@
                 >
                 <option value="">Select a Phylogeny</option>
             </select>
-            
-            <script type="text/javascript">
-                $(window).scroll(function() {
-                if ($(window).scrollTop() > 100)
-                   $("#legend").stop().animate({"marginTop":($(window).scrollTop() - 100) + "px"}, "slow");
-                });
-            </script>
             <div id="legend" ng-show="results.selectedTree">
                 <table ng-repeat="(id, code) in code_ids">
                     <tr><th colspan="2">{{code.CID}}: {{code.name}}</th></tr>

@@ -45,11 +45,6 @@ function SocietiesCtrl($scope, searchModelService, LanguageClass) {
             }
         }
         });
-        
-        
-   
-        
-        
     }
 
     $scope.setActive('societies');

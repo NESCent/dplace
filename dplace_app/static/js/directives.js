@@ -90,7 +90,6 @@ angular.module('languagePhylogenyDirective', [])
                     
                 translate = 0;
                 if (scope.query.variable_codes) {
-                    console.log(scope.code_ids);
                     for (var key in scope.code_ids) {
                         scope.results.societies.forEach(function(society) {
                             var selected = node.filter(function(d) {
@@ -182,7 +181,16 @@ angular.module('languagePhylogenyDirective', [])
             };
 
             scope.$on('treeSelected', function(event, args) {
-                    constructTree(args.tree);
+                constructTree(args.tree);
+                var pos = $("#varLabels").offset();
+                $(window).scroll(function() {
+                    if ($(window).scrollTop() > 100)
+                        $("#legend").stop().animate({"marginTop":($(window).scrollTop() - 100) + "px"}, "slow");
+                    if ($(window).scrollTop() > (pos.top - 20) && $("#varLabels").css('position') == 'static') 
+                        d3.select("#varLabels").attr('class', 'var-labels-fixed');
+                    else if ($(window).scrollTop() < pos.top)
+                        d3.select("#varLabels").classed('var-labels-fixed', false);
+                });
             });
         }
 
