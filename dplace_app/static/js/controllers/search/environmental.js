@@ -1,4 +1,4 @@
-function EnvironmentalCtrl($scope, searchModelService, EnvironmentalValue) {
+function EnvironmentalCtrl($scope, searchModelService, EnvironmentalVariable, EnvironmentalValue, MinAndMax) {
     var linkModel = function() {
         // Get a reference to the environmental search params from the model
         $scope.environmentalData = searchModelService.getModel().getEnvironmentalData();
@@ -15,6 +15,10 @@ function EnvironmentalCtrl($scope, searchModelService, EnvironmentalValue) {
             params: environmental.vals
         }];
         return filters;
+    };
+    
+    $scope.categoryChanged = function(category) {
+        $scope.environmentalData.variables = EnvironmentalVariable.query({category: category.id});    
     };
 
     $scope.variableChanged = function(variable) {
@@ -41,14 +45,13 @@ function EnvironmentalCtrl($scope, searchModelService, EnvironmentalValue) {
     };
     
     $scope.filterChanged = function() {
-        if ($scope.environmentalData.selectedFilter.operator != 'all') {
-            return;
-        } else {
-            // Place the min/max values into the text fields as placeholders.
-            EnvironmentalValue.query({variable: $scope.environmentalData.selectedVariable.id}, function(results) {
-                var extractedValues = results.map(function(o) { return o.value; });
-                $scope.environmentalData.vals[0] = Math.min.apply(null, extractedValues);
-                $scope.environmentalData.vals[1] = Math.max.apply(null, extractedValues);
+        if ($scope.environmentalData.selectedFilter.operator != 'all') return;
+        else {
+            values = MinAndMax.query({query: {environmental_id: $scope.environmentalData.selectedVariable.id}});
+            
+            values.$promise.then(function(result) {
+                $scope.environmentalData.vals[0] = result.min;
+                $scope.environmentalData.vals[1] = result.max;
             });
         }
     };

@@ -4,7 +4,7 @@ angular.module('dplaceServices', ['ngResource'])
         $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
     })
     .service('colorMapService', [ColorMapService])
-    .service('searchModelService',['VariableCategory','GeographicRegion','EnvironmentalVariable','LanguageClass',SearchModelService])
+    .service('searchModelService',['VariableCategory','GeographicRegion','EnvironmentalCategory', 'LanguageClass',SearchModelService])
     .factory('LanguageClass', function ($resource) {
         return $resource(
             '/api/v1/language_classes/:id',
@@ -72,7 +72,7 @@ angular.module('dplaceServices', ['ngResource'])
     })
     .factory('EnvironmentalValue', function($resource) {
         return $resource(
-            '/api/v1/environmental_values/?variable=:variable',
+            '/api/v1/environmental_values/:id',
             {}, {
                 query: {
                     method: 'GET',
@@ -83,6 +83,30 @@ angular.module('dplaceServices', ['ngResource'])
                 }
             }
         )
+    })
+    .factory('MinAndMax', function($resource) {
+        return $resource(
+            '/api/v1/min_and_max',
+            {}, {
+                query: {
+                    method: 'GET',
+                    isArray:false
+                }
+            }
+        )
+    })
+    .factory('EnvironmentalCategory', function($resource) {
+        return $resource(
+            '/api/v1/environmental_categories/:id',
+            {}, {
+                query: {
+                    method: 'GET',
+                    isArray: true,
+                    transformResponse: function(data, headers) {
+                        return JSON.parse(data).results;
+                    }
+                }
+            });
     })
     .factory('EnvironmentalVariable', function ($resource) {
         return $resource(

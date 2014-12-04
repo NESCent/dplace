@@ -7,6 +7,7 @@ from serializers import *
 from rest_framework.decorators import api_view, permission_classes, renderer_classes
 from rest_framework.permissions import *
 from rest_framework.views import Request, Response
+from rest_framework.renderers import JSONRenderer
 from filters import *
 from renderers import DPLACECsvRenderer
 
@@ -53,10 +54,15 @@ class ISOCodeViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = ISOCodeSerializer
     filter_fields = ('iso_code',)
     queryset = ISOCode.objects.all()
+    
+class EnvironmentalCategoryViewSet(viewsets.ReadOnlyModelViewSet):
+    serializer_class = EnvironmentalCategorySerializer
+    filter_fields = ('name',)
+    queryset = EnvironmentalCategory.objects.all()
 
 class EnvironmentalVariableViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = EnvironmentalVariableSerializer
-    filter_fields = ('name', 'units',)
+    filter_fields = ('name', 'category', 'units',)
     queryset = EnvironmentalVariable.objects.all()
 
 class EnvironmentalValueViewSet(viewsets.ReadOnlyModelViewSet):
@@ -94,7 +100,7 @@ class LanguageTreeViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = LanguageTreeSerializer
     filter_fields = ('name',)
     queryset = LanguageTree.objects.all()
-
+    
 def result_set_from_query_dict(query_dict):
     result_set = SocietyResultSet()
     # Criteria keeps track of what types of data were searched on, so that we can
@@ -187,6 +193,50 @@ def get_language_trees_from_query_dict(query_dict):
 @api_view(['POST'])
 @permission_classes((AllowAny,))
 def trees_from_languages(request):
+    trees = get_language_trees_from_query_dict(request.DATA)
+    return Response(LanguageTreeSerializer(trees, many=True).data,)
+    
+@api_view(['GET'])
+@permission_classes((AllowAny,))
+@renderer_classes((JSONRenderer,))
+def get_min_and_max(request):
+    query_string = request.QUERY_PARAMS['query']
+    query_dict = json.loads(query_string)
+    if 'environmental_id' in query_dict:
+        values = EnvironmentalValue.objects.filter(variable__id=query_dict['environmental_id'])
+        min_value = 0
+        max_value = 0
+        for v in values:
+            if v.value < min_value:
+                min_value = v.value
+            elif v.value > max_value:
+                max_value = v.value
+    else:
+        min_value = None
+        max_value = None
+    return Response({'min': min_value, 'max': max_value})
+    
+
+def newick_tree(key):
+    # Get a newick format tree from a language tree id
+    language_tree_id =key
+    try:
+        language_tree = LanguageTree.objects.get(pk=language_tree_id)
+    except ObjectDoesNotExist:
+        raise Http404
+    n = NexusReader(language_tree.file.path)
+    # Remove '[&R]' from newick string
+    tree = re.sub(r'\[.*?\]', '', n.trees.trees[0])
+    # Remove data before the =
+    try:
+        tree = tree[tree.index('=')+1:]
+    except ValueError:
+        tree = tree
+    return tree
+
+@api_view(['GET'])
+@permission_classes((AllowAny,))
+def get_newick_trees(request):
     from ete2 import Tree
     trees = get_language_trees_from_query_dict(request.DATA)
     if 'language_ids' in request.DATA:
