@@ -10,6 +10,7 @@ class DPLACECSVResults(object):
                             'ISO code', 'Language name']
         self.rows = []
         self.parse()
+        self.encode_field_names()
         self.flatten()
 
     def field_names_for_cultural_variable(self, variable):
@@ -37,6 +38,10 @@ class DPLACECSVResults(object):
                 field_names = self.field_names_for_environmental_variable(v)
                 self.field_map['environmental_variables'][v['id']] = field_names
                 self.field_names.append(field_names['name'])
+
+    def encode_field_names(self):
+        # Field names must also be utf-8 encoded
+        self.field_names = [field.encode("utf-8") for field in self.field_names]
 
     def flatten(self):
     # data is a dictionary with a list of societies
@@ -76,11 +81,15 @@ class DPLACECSVResults(object):
             #
             self.rows.append(row)
 
+def encode_if_text(val):
+    return val.encode('utf-8') if isinstance(val, text_type) else val
+
 def encode_rowdict(rowdict):
     encoded = dict()
     for k in rowdict:
+        encoded_k = encode_if_text(k)
         elem = rowdict[k]
-        encoded[k] = elem.encode('utf-8') if isinstance(elem, text_type) else elem
+        encoded[encoded_k] = encode_if_text(elem)
     return encoded
 
 class DPLACECsvRenderer(renderers.BaseRenderer):
