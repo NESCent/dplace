@@ -46,6 +46,10 @@ class ISOCodeSerializer(gis_serializers.GeoModelSerializer):
         model = ISOCode
 
 # Environmental Data
+class EnvironmentalCategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EnvironmentalCategory
+
 class EnvironmentalVariableSerializer(serializers.ModelSerializer):
     class Meta:
         model = EnvironmentalVariable

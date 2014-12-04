@@ -11,6 +11,7 @@ router.register(r'categories', api_views.VariableCategoryViewSet)
 router.register(r'codes', api_views.VariableCodeDescriptionViewSet)
 router.register(r'values', api_views.VariableCodedValueViewSet)
 router.register(r'societies', api_views.SocietyViewSet)
+router.register(r'environmental_categories', api_views.EnvironmentalCategoryViewSet)
 router.register(r'environmental_variables', api_views.EnvironmentalVariableViewSet)
 router.register(r'environmentals', api_views.EnvironmentalViewSet)
 router.register(r'environmental_values', api_views.EnvironmentalValueViewSet)
@@ -36,5 +37,6 @@ urlpatterns = patterns('dplace_app.views',
     url(r'^api/v1/trees_from_languages', api_views.trees_from_languages, name='trees_from_languages'),
     url(r'^api/v1/newick_tree/(?P<pk>\d+)/?$', api_views.newick_tree, name='newick_tree'),
     url(r'^api/v1/get_trees', api_views.get_newick_trees, name="get_trees"),
+    url(r'^api/v1/min_and_max', api_views.get_min_and_max, name="min_and_max"),
     url(r'^api/v1/csv_download', api_views.csv_download, name='csv_download'),
 )
