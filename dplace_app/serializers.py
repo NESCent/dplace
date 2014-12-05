@@ -68,6 +68,7 @@ class LanguageClassSerializer(serializers.ModelSerializer):
         model = LanguageClass
 
 class LanguageSerializer(serializers.ModelSerializer):
+    language_family = LanguageClassSerializer(source='languageclassification_set.first.class_family')
     class Meta:
         model = Language
 
