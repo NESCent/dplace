@@ -31,8 +31,8 @@ angular.module('dplaceMapDirective', [])
                       initial: {
                         fill: '#428bca',
                         "fill-opacity": 1,
-                        stroke: '#357ebd',
-                        "stroke-width": 0,;;
+                        "stroke": '#357ebd',
+                        "stroke-width": 0,
                         "stroke-opacity": 1
                       },
                       hover: {
@@ -84,7 +84,7 @@ angular.module('dplaceMapDirective', [])
                     scope.societies.forEach(function(societyResult) {
                         var society = societyResult.society;
                         // Add a marker for each point
-                        var marker = {latLng: society.location.coordinates, name: society.name}
+                        var marker = {latLng: [society.location.coordinates[1], society.location.coordinates[0]], name: society.name}
                         scope.map.addMarker(society.id, marker);
                     });
 
@@ -118,10 +118,6 @@ angular.module('dplaceMapDirective', [])
                 if(attrs.societies) {
                     // Update markers when societies change
                     scope.$watchCollection('societies', function(oldvalue, newvalue) {
-                        scope.societies.forEach(function(societyResult) {
-                            var society = societyResult.society;
-                            society.location.coordinates = society.location.coordinates.reverse();
-                        });
                         scope.addMarkers();
                     });
                 }
