@@ -38,18 +38,6 @@ function SocietiesCtrl($scope, searchModelService) {
     if ($scope.variables[0]) $scope.changeLegend($scope.variables[0]); //initial value of chosen variable is first variable in array
     else $scope.changeLegend(-1);
     
-    //get the svg code from the directive to construct the download link
-    $scope.mapLink = function(map_svg) {
-        var imgsrc = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(map_svg)));
-        if ($scope.results.chosenVariable) {
-            d3.select(".download-links").append("li").append("a")
-                .attr("class", "btn btn-info btn-dplace-download")
-                .attr("download", "map.svg")
-                .attr("href", imgsrc)
-                .html($scope.results.chosenVariable.name + " - Map ");
-        }
-    };
-    
     $scope.generateDownloadLinks = function() {
         // queryObject is the in-memory JS object representing the chosen search options
         var queryObject = searchModelService.getModel().getQuery();
