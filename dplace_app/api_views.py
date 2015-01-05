@@ -42,7 +42,7 @@ class VariableCodeDescriptionViewSet(viewsets.ReadOnlyModelViewSet):
 # Can filter by code, code__variable, or society
 class VariableCodedValueViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = VariableCodedValueSerializer
-    filter_fields = ('variable','coded_value','code','society','code',)
+    filter_fields = ('variable','coded_value','code','society',)
     # Avoid additional database trips by select_related for foreign keys
     queryset = VariableCodedValue.objects.select_related('variable').select_related('code').all()
 
@@ -93,7 +93,7 @@ class LanguageClassificationViewSet(viewsets.ReadOnlyModelViewSet):
 
 class LanguageViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = LanguageSerializer
-    filter_fields = ('name', 'iso_code', 'society',)
+    filter_fields = ('name', 'iso_code', 'societies',)
     queryset = Language.objects.all()
 
 class LanguageTreeViewSet(viewsets.ReadOnlyModelViewSet):
