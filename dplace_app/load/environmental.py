@@ -126,7 +126,6 @@ def create_environmental_variables():
             obj, created = EnvironmentalVariable.objects.get_or_create(name=var_dict['name'],units=var_dict['units'])
             obj.category = env_category
             obj.save()
-            print obj
         else:
             EnvironmentalVariable.objects.get_or_create(name=var_dict['name'],units=var_dict['units']) 
 
