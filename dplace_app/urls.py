@@ -35,5 +35,6 @@ urlpatterns = patterns('dplace_app.views',
     url(r'^api/v1/', include(router.urls)),
     url(r'^api/v1/find_societies', api_views.find_societies, name='find_societies'),
     url(r'^api/v1/trees_from_languages', api_views.trees_from_languages, name='trees_from_languages'),
+    url(r'^api/v1/min_and_max', api_views.get_min_and_max, name="min_and_max"),
     url(r'^api/v1/csv_download', api_views.csv_download, name='csv_download'),
 )
