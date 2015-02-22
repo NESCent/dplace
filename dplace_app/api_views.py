@@ -193,29 +193,20 @@ def get_language_trees_from_query_dict(query_dict):
 @api_view(['POST'])
 @permission_classes((AllowAny,))
 def trees_from_languages(request):
+    from ete2 import Tree
     trees = get_language_trees_from_query_dict(request.DATA)
+    if 'language_ids' in request.DATA:
+        languages = request.DATA['language_ids']
+        for t in trees:
+            langs_in_tree = [str(l.iso_code.iso_code) for l in t.languages.all() if l.id in languages] 
+            newick = Tree(t.newick_string)
+            #only works if tips use isocodes
+            try:
+                newick.prune(langs_in_tree, preserve_branch_length=True)
+            except:
+                continue
+            t.newick_string = newick.write(format=5)
     return Response(LanguageTreeSerializer(trees, many=True).data,)
-    
-@api_view(['GET'])
-@permission_classes((AllowAny,))
-@renderer_classes((JSONRenderer,))
-def get_min_and_max(request):
-    query_string = request.QUERY_PARAMS['query']
-    query_dict = json.loads(query_string)
-    if 'environmental_id' in query_dict:
-        values = EnvironmentalValue.objects.filter(variable__id=query_dict['environmental_id'])
-        min_value = 0
-        max_value = 0
-        for v in values:
-            if v.value < min_value:
-                min_value = v.value
-            elif v.value > max_value:
-                max_value = v.value
-    else:
-        min_value = None
-        max_value = None
-    return Response({'min': min_value, 'max': max_value})
-    
 
 def newick_tree(key):
     # Get a newick format tree from a language tree id
