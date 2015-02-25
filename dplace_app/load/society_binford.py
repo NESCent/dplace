@@ -47,12 +47,25 @@ def load_bf_var(var_dict):
     Variables are loaded form binford_variable_names+categories.csv for simplicity,
     but there is more detailed information in bf_codebook.csv
     """
-    label = var_dict['Field name'].strip()
+   
+    label = var_dict['Field Name'].strip()
     name = var_dict['Variable name'].strip()
     description = var_dict['Detailed description'].strip()
-
-    variable, created = VariableDescription.objects.get_or_create(label=label,name=name,source=get_source("Binford"))
-
+    data_type = var_dict['DataType'].strip()
+    
+    found_variables = VariableDescription.objects.filter(label=label)
+    if len(found_variables) == 0: #creating a new variable isn't working at the moment
+        print name
+        return None
+    else:
+        variable = found_variables.first()
+        print variable
+        variable.data_type = data_type
+        try:
+            variable.save()
+        except BaseException as e:
+            print e
+    
     index_categories = [clean_category(x) for x in var_dict['IndexCategory'].split(',')]
     # Currently max 1 niche category
     niche_categories = [clean_category(x) for x in var_dict['NicheCategory'].split(',')]
