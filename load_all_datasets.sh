@@ -67,6 +67,13 @@ python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/geo/level2-shape/level2
 
 TREE_FILES="${REPO_DEST}/trees/*.trees"
 for tree_file in $TREE_FILES; do
-    echo "Loading Language tree $tree_file"
-    python "${DPLACE_PATH}/dplace_app/load.py" "$tree_file" tree
+    echo "Loading Language tree $tree_file"   
+    if [[ $tree_file == *"glotto"* ]]
+    then
+        python "${DPLACE_PATH}/dplace_app/load.py" "$tree_file" glottotree
+    else
+        python "${DPLACE_PATH}/dplace_app/load.py" "$tree_file" tree
+    fi
 done
+
+

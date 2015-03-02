@@ -47,3 +47,24 @@ def load_tree(file_name):
         if language is not None:
             tree.languages.add(language)
             tree.save()
+ 
+#NexusReader needs .trees file - save Newick trees in this format?
+def load_glotto_tree(file_name):
+    #make a tree if not exists. Use the name of the tree.
+    tree_name = basename(file_name)
+    print tree_name
+    #with open (file_name, 'r') as f:
+        #tree, created = LanguageTree.objects.get_or_create(name=tree_name)
+        #if created:
+         #   tree.file = File(f)
+         #   tree.save()
+    #now add languages to the tree
+    reader = NexusReader(file_name)
+    newick = reader.trees.trees[0]
+    print "Formatting newick string %s" % file_name
+    try:
+        newick = newick[newick.index('=')+1:]
+    except ValueError:
+        newick = newick
+    print "Formatted string %s" % (newick)
+    
