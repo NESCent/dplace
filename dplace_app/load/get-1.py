@@ -40,8 +40,6 @@ def clean_tree(tree):
 
 GLOTTOLOG_FAMILIES = "http://glottolog.org/glottolog/language.atom?type=families&sSearch_1=Top-level+unit"
 
-
-#need to write taxa too
 if __name__ == '__main__':
     urls = {}
     
