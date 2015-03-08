@@ -65,6 +65,7 @@ def load_glotto_tree(file_name):
         newick = newick[newick.index('=')+1:]
     except ValueError:
         newick = newick
+    tree.newick_string = str(newick)
     print "Formatted string %s" % (newick)
     for taxon_name in reader.trees.taxa:
         language = get_language(taxon_name)
