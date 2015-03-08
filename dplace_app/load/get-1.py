@@ -59,7 +59,12 @@ if __name__ == '__main__':
             tree = clean_tree(tree)
             if tree is not None:
                 with codecs.open(filename, 'w', encoding="utf-8") as handle:
-                    handle.write("#NEXUS\nBegin trees;\ntree UNTITLED = ")
+                    handle.write("#NEXUS\nBegin taxa;\n") #write taxa to file
+                    for leaf in tree.iter_leaves():
+                        handle.write(leaf.name)
+                        handle.write("\n")
+                    handle.write(";\nend;")
+                    handle.write("\nBegin trees;\ntree UNTITLED = ") #write newick string to file
                     handle.write(tree.write())
                     handle.write("\nend;")
         else:
