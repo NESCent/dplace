@@ -266,8 +266,18 @@ def bin_bfcont_data(request):
         values = VariableCodedValue.objects.filter(variable__id=query_dict['bf_id'])
         min_value = 0.0
         max_value = 0.0
+        missing_data_option = False
+        bins = []
+
         for v in values:
             if re.search('[a-zA-Z]', v.coded_value):
+                if not missing_data_option:
+                    bins.append({
+                        'code': v.coded_value,
+                        'description': v.code.description,
+                        'bf_id': query_dict['bf_id']
+                    })
+                    missing_data_option = True
                 continue
             elif float(v.coded_value) < min_value:
                 min_value = float(v.coded_value)
@@ -276,7 +286,6 @@ def bin_bfcont_data(request):
 
         data_range = max_value - min_value
         bin_size = data_range / 5
-        bins = []
         min_bin = min_value
         for x in range(0, 5):
             min = min_bin
