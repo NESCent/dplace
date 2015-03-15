@@ -95,6 +95,20 @@ angular.module('dplaceServices', ['ngResource'])
             }
         )
     })
+    .factory('BfContinuousVariable', function($resource) {
+        return $resource(
+            '/api/v1/bf_cont_variable',
+            {}, {
+                query: {
+                    method: 'GET',
+                    isArray:true,
+                    transformResponse: function(data, headers) {
+                        return JSON.parse(data);
+                    }
+                }
+            }
+        )
+    })
     .factory('EnvironmentalCategory', function($resource) {
         return $resource(
             '/api/v1/environmental_categories/:id',

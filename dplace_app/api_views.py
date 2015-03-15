@@ -120,18 +120,43 @@ def result_set_from_query_dict(query_dict):
 
     if 'variable_codes' in query_dict:
         criteria.append(SEARCH_VARIABLES)
+        f = open('var_codes.txt', 'w')
+        for x in query_dict['variable_codes']:
+            if 'bf_id' in x:
+                min = x['min']
+                max = x['max']
+                values = VariableCodedValue.objects.filter(variable__id=x['bf_id'])
+                values.filter(coded_value__gt=min).filter(coded_value__lt=max)
+                values.select_related('society', 'variable')
+            else:
+                variable_code_ids = [int(x['id']) for x in query_dict['variable_codes']]
+                codes = VariableCodeDescription.objects.filter(pk__in=variable_code_ids) # returns a queryset
+                coded_value_ids = []
+                # Aggregate all the coded values for each selected code
+                for code in codes:
+                    coded_value_ids += code.variablecodedvalue_set.values_list('id', flat=True)
+                # Coded values have a FK to society.  Aggregate the societies from each value
+                values = VariableCodedValue.objects.filter(id__in=coded_value_ids)
+                values = values.select_related('society','variable')
+                
+            for value in values:
+                result_set.add_cultural(value.society, value.variable, value)
+        
         # Now get the societies from variables
-        variable_code_ids = [int(x['id']) for x in query_dict['variable_codes']]
-        codes = VariableCodeDescription.objects.filter(pk__in=variable_code_ids) # returns a queryset
-        coded_value_ids = []
-        # Aggregate all the coded values for each selected code
-        for code in codes:
-            coded_value_ids += code.variablecodedvalue_set.values_list('id', flat=True)
-        # Coded values have a FK to society.  Aggregate the societies from each value
-        values = VariableCodedValue.objects.filter(id__in=coded_value_ids)
-        values = values.select_related('society','variable')
-        for value in values:
-            result_set.add_cultural(value.society,value.variable,value)
+       # try:
+       #     variable_code_ids = [int(x['id']) for x in query_dict['variable_codes']]
+        #    codes = VariableCodeDescription.objects.filter(pk__in=variable_code_ids) # returns a queryset
+         #   coded_value_ids = []
+            # Aggregate all the coded values for each selected code
+          #  for code in codes:
+           #     coded_value_ids += code.variablecodedvalue_set.values_list('id', flat=True)
+            # Coded values have a FK to society.  Aggregate the societies from each value
+            #values = VariableCodedValue.objects.filter(id__in=coded_value_ids)
+            #values = values.select_related('society','variable')
+            #for value in values:
+            #    result_set.add_cultural(value.society,value.variable,value)
+        #except:
+         #   f.write("BF_ID")
 
     if 'environmental_filters' in query_dict:
         criteria.append(SEARCH_ENVIRONMENTAL)
@@ -228,6 +253,48 @@ def get_min_and_max(request):
         max_value = None
     return Response({'min': min_value, 'max': max_value})
     
+@api_view(['GET'])
+@permission_classes((AllowAny,))
+@renderer_classes((JSONRenderer,))
+def bin_bfcont_data(request):
+    f = open('tes.txt', 'w')
+    query_string = request.QUERY_PARAMS['query']
+    f.write(query_string)
+    query_dict = json.loads(query_string)
+    if 'bf_id' in query_dict:
+        bf_variable = VariableDescription.objects.filter(id=query_dict['bf_id'])
+        values = VariableCodedValue.objects.filter(variable__id=query_dict['bf_id'])
+        min_value = 0.0
+        max_value = 0.0
+        for v in values:
+            if re.search('[a-zA-Z]', v.coded_value):
+                continue
+            elif float(v.coded_value) < min_value:
+                min_value = float(v.coded_value)
+            elif float(v.coded_value) > max_value:
+                max_value = float(v.coded_value)
+
+        data_range = max_value - min_value
+        bin_size = data_range / 5
+        bins = []
+        min_bin = min_value
+        for x in range(0, 5):
+            min = min_bin
+            max = min_bin + bin_size
+            bins.append({
+                'code': x,
+                'description': str(min) + ' - ' + str(max),
+                'min': min_bin,
+                'max': min_bin + bin_size,
+                'bf_id': query_dict['bf_id']
+            })
+            min_bin = min_bin + bin_size + 1
+        f.write(str(bins))
+    else:
+        min_value = None
+        max_value = None
+
+    return Response(bins)
 
 def newick_tree(key):
     # Get a newick format tree from a language tree id
