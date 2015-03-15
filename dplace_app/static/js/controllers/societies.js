@@ -7,15 +7,23 @@ function SocietiesCtrl($scope, searchModelService, LanguageClass) {
     if ($scope.query.variable_codes) {
         $scope.code_ids = {};
         for (var i = 0; i < $scope.query.variable_codes.length; i++) {
-            if ($scope.query.variable_codes[i].variable in $scope.code_ids) {
+            if ($scope.query.variable_codes[i].bf_id) {
+                if ($scope.query.variable_codes[i].bf_id in $scope.code_ids) 
+                    $scope.code_ids[$scope.query.variable_codes[i].bf_id] = $scope.code_ids[$scope.query.variable_codes[i].bf_id].concat([$scope.query.variable_codes[i]]);
+                else    
+                    $scope.code_ids[$scope.query.variable_codes[i].bf_id] = [$scope.query.variable_codes[i]];
+            
+            } 
+            else if ($scope.query.variable_codes[i].variable in $scope.code_ids) 
                 $scope.code_ids[$scope.query.variable_codes[i].variable] = $scope.code_ids[$scope.query.variable_codes[i].variable].concat([$scope.query.variable_codes[i]]);
-            } else {
+            else 
                 $scope.code_ids[$scope.query.variable_codes[i].variable] = [$scope.query.variable_codes[i]];
-            }
+            
         }
         
         if ($scope.results.variable_descriptions) {
             for (var i = 0; i < $scope.results.variable_descriptions.length; i++){
+                if ($scope.results.variable_descriptions[i].data_type == 'CONTINUOUS') $scope.code_ids[$scope.results.variable_descriptions[i].id].name = $scope.results.variable_descriptions[i].name;
                 if ($scope.code_ids[$scope.results.variable_descriptions[i].id].name) continue;
                 else $scope.code_ids[$scope.results.variable_descriptions[i].id].name = $scope.results.variable_descriptions[i].name;
             
