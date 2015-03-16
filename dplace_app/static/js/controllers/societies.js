@@ -12,7 +12,6 @@ function SocietiesCtrl($scope, searchModelService, LanguageClass) {
                     $scope.code_ids[$scope.query.variable_codes[i].bf_id] = $scope.code_ids[$scope.query.variable_codes[i].bf_id].concat([$scope.query.variable_codes[i]]);
                 else    
                     $scope.code_ids[$scope.query.variable_codes[i].bf_id] = [$scope.query.variable_codes[i]];
-            
             } 
             else if ($scope.query.variable_codes[i].variable in $scope.code_ids) 
                 $scope.code_ids[$scope.query.variable_codes[i].variable] = $scope.code_ids[$scope.query.variable_codes[i].variable].concat([$scope.query.variable_codes[i]]);
