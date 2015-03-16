@@ -120,44 +120,29 @@ def result_set_from_query_dict(query_dict):
 
     if 'variable_codes' in query_dict:
         criteria.append(SEARCH_VARIABLES)
-        f = open('var_codes.txt', 'w')
         for x in query_dict['variable_codes']:
             if 'bf_id' in x:
-                min = x['min']
-                max = x['max']
                 values = VariableCodedValue.objects.filter(variable__id=x['bf_id'])
-                values.filter(coded_value__gt=min).filter(coded_value__lt=max)
+                if 'min' in x:
+                    min = x['min']
+                    max = x['max']
+                    values = values.exclude(coded_value='NA')
+                    values.filter(coded_value__gt=min).filter(coded_value__lt=max)
+                else: #NA selected
+                    values.filter(coded_value=x['code'])
                 values.select_related('society', 'variable')
             else:
-                variable_code_ids = [int(x['id']) for x in query_dict['variable_codes']]
-                codes = VariableCodeDescription.objects.filter(pk__in=variable_code_ids) # returns a queryset
+                codes = VariableCodeDescription.objects.filter(id=x['id'])
                 coded_value_ids = []
                 # Aggregate all the coded values for each selected code
                 for code in codes:
                     coded_value_ids += code.variablecodedvalue_set.values_list('id', flat=True)
                 # Coded values have a FK to society.  Aggregate the societies from each value
                 values = VariableCodedValue.objects.filter(id__in=coded_value_ids)
-                values = values.select_related('society','variable')
-                
+                values = values.select_related('society','variable')         
             for value in values:
                 result_set.add_cultural(value.society, value.variable, value)
         
-        # Now get the societies from variables
-       # try:
-       #     variable_code_ids = [int(x['id']) for x in query_dict['variable_codes']]
-        #    codes = VariableCodeDescription.objects.filter(pk__in=variable_code_ids) # returns a queryset
-         #   coded_value_ids = []
-            # Aggregate all the coded values for each selected code
-          #  for code in codes:
-           #     coded_value_ids += code.variablecodedvalue_set.values_list('id', flat=True)
-            # Coded values have a FK to society.  Aggregate the societies from each value
-            #values = VariableCodedValue.objects.filter(id__in=coded_value_ids)
-            #values = values.select_related('society','variable')
-            #for value in values:
-            #    result_set.add_cultural(value.society,value.variable,value)
-        #except:
-         #   f.write("BF_ID")
-
     if 'environmental_filters' in query_dict:
         criteria.append(SEARCH_ENVIRONMENTAL)
         environmental_filters = query_dict['environmental_filters']
