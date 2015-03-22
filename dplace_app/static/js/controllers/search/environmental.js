@@ -1,6 +1,5 @@
 function EnvironmentalCtrl($scope, searchModelService, EnvironmentalVariable, EnvironmentalValue, MinAndMax) {
     var linkModel = function() {
-        $scope.searchModel = searchModelService.getModel();
         // Get a reference to the environmental search params from the model
         $scope.environmentalData = searchModelService.getModel().getEnvironmentalData();
     };
