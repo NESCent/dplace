@@ -29,8 +29,8 @@ function SocietiesCtrl($scope, searchModelService, LanguageClass) {
         var max_value = Math.max.apply(null, extractedValues);
         $scope.range = max_value - min_value;
     }
-    
-    if ($scope.query.language_classifications) {
+
+    if ($scope.query.language_classifications && !$scope.query.variable_codes && !$scope.query.environmental_filters) {
         //get lang classifications in tree
         $scope.classifications = [];
         $scope.languageClasses = [];
