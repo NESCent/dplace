@@ -1,5 +1,6 @@
 function CulturalCtrl($scope, searchModelService, Variable, CodeDescription) {
    var linkModel = function() {
+        $scope.searchModel = searchModelService.getModel();
         // Model/state lives in searchModelService
         $scope.traits = [searchModelService.getModel().getCulturalTraits()];
 

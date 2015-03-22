@@ -19,26 +19,13 @@ function ColorMapService() {
                 }
                     
             }
+            
+            for (var j = 0; j < society.variable_coded_values.length; j++) {
+                var color = mapColor(society.variable_coded_values[j].coded_value, society.variable_coded_values[j].total_codes_selected);
+                colors[society.society.id] = color;
+            }
         
         }
-        
-        //for (var i = 0; i < societies.length; i++) {
-          //  var color = mapColor(societies[i].environmental_values[0].value, 40);
-            //colors[societies[i].society.id] = color;
-        //}
-        
-        //if ('variable_codes' in query) {
-          //  for (var i = 0; i < societies.length; i++) {
-            //    var society = societies[i];
-              //  var id = society.society.id;
-                //if (society.variable_coded_values.length > 0) {
-                  //  var value = society.variable_coded_values[0].coded_value;
-                    //var count = query.variable_codes.length;
-                    //var color = mapColor(value, count);
-                    //colors[id] = color;
-                //}
-            //}
-        //}
         return colors;
     };
 }
