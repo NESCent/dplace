@@ -9,20 +9,35 @@
             <button class="btn btn-danger form-control"
                         ng-click="resetSearch()">Reset
             </button>
+           <span class="alert alert-danger" ng-show="errors">
+            {{ errors }}
+            </span> 
         </div>
     </span>
     <form class="form-inline" role="form" ng-submit="submit()" name="EnvironmentalForm" novalidate>
         <div class="panel panel-default">
             <div class="panel-heading">
-
-			
                 <div class="row">
+                    <div class="form-group col-xs-4">
+                        <select
+                            ng-model="environmentalData.selectedCategory"
+                            class="form-control"
+                            ng-options="category.name for category in environmentalData.categories"
+                            ng-change="categoryChanged(environmentalData.selectedCategory)"
+                            >
+                            <option value="">Select a category</option>
+                        </select>
+                    </div>
+                </div>
+			
+                <div class="row row-margin-top">
                     <div class="form-group col-xs-4">
                         <select
                                 ng-model="environmentalData.selectedVariable"
                                 class="form-control"
                                 ng-options="environmental.name for environmental in environmentalData.variables"
                                 ng-change="variableChanged(environmentalData.selectedVariable)"
+                                ng-show="environmentalData.variables.length > 0"
                                 >
                             <option value="">Select an environmental variable</option>
                         </select>

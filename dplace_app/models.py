@@ -58,11 +58,22 @@ UNIT_CHOICES = (
     ('',''),
 )
 
+class EnvironmentalCategory(models.Model):
+    name = models.CharField(max_length=30, db_index=True, unique=True)
+    def __unicode__(self):
+        return self.name
+    class Meta:
+        verbose_name = "Category"
+        verbose_name_plural = "Categories"
+        ordering=("name",)
+
 class EnvironmentalVariable(models.Model):
     name = models.CharField(max_length=50, unique=True)
+    category = models.ForeignKey('EnvironmentalCategory', null=True)
     units = models.CharField(max_length=10, choices=UNIT_CHOICES)
     codebook_info = models.CharField(max_length=500, default='None')
-
+    category = models.ForeignKey('EnvironmentalCategory', null=True)
+    
     def __unicode__(self):
         return "%s (%s)" % (self.name, self.units)
     class Meta:

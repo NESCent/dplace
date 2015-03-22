@@ -9,6 +9,9 @@
             <button class="btn btn-danger form-control"
                         ng-click="resetSearch()">Reset
             </button>
+            <span class="alert alert-danger" ng-show="errors">
+                {{ errors }}
+            </span> 
         </div>
     </span>
     <form class="form-inline" role="form">

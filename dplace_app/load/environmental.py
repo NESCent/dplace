@@ -8,84 +8,104 @@ from sources import get_source
 ENVIRONMENTAL_MAP = {
     'AnnualMeanTemperature': {
         'name': 'Annual Mean Temperature',
+        'category': 'Climate',
         'units': '℃',
     },
     'AnnualTemperatureVariance': {
         'name': 'Annual Temperature Variance',
+        'category': 'Climate',
         'units': '℃',
     },
     'TemperatureConstancy': {
         'name': 'Temperature Constancy',
+        'category': 'Climate',
         'units': '',
     },
     'TemperatureContingency': {
         'name': 'Temperature Contingency',
+        'category': 'Climate',
         'units': '',
     },
     'TemperaturePredictability': {
         'name': 'Temperature Predictability',
+        'category': 'Climate',
         'units': '',
     },
     'AnnualMeanPrecipitation': {
         'name': 'Annual Mean Precipitation',
+        'category': 'Climate',
         'units': 'mm',
     },
     'AnnualPrecipitationVariance': {
         'name': 'Annual Precipitation Variance',
+        'category': 'Climate',
         'units': '',
     },
     'PrecipitationConstancy': {
         'name': 'Precipitation Constancy',
+        'category': 'Climate',
         'units': '',
     },
     'PrecipitationContingency': {
         'name': 'Precipitation Contingency',
+        'category': 'Climate',
         'units': '',
     },
     'PrecipitationPredictability': {
         'name': 'Precipitation Predictability',
+        'category': 'Climate',
         'units': '',
     },
     'BirdRichness': {
         'name': 'Bird Richness',
+        'category': 'Ecology',
         'units': '',
     },
     'MammalRichness': {
         'name': 'Mammal Richness',
+        'category': 'Ecology',
         'units': '',
     },
     'AmphibianRichness': {
         'name': 'Amphibian Richness',
+        'category': 'Ecology',
         'units': '',
     },
     'VascularPlantsRichness': {
         'name': 'Vascular Plants Richness',
+        'category': 'Ecology',
         'units': '',
     },
     # TODO: EcoRegion! (text)
     'Elevation': {
         'name': 'Elevation',
+        'category': 'Physical landscape',
         'units': '',
     },
     'Slope': {
         'name': 'Slope',
+        'category': 'Physical landscape',
         'units': '',
     },
     # TODO: Coastal (Bool)
     'NetPrimaryProduction': {
         'name': 'Net Primary Production',
+        'category': 'Ecology',
         'units': '',
     },
     'DurationOfGrowingSeason': {
         'name': 'Duration of Growing Season',
+        'category': 'Climate',
         'units': 'mo',
     },
     'MeanGrowingSeason.NPP': {
         'name': 'Mean Growing Season NPP',
+        'category': 'Ecology',
         'units': '',
     },
     'InterYearVariance.GrowingSeason.NPP': {
         'name': 'Inter-Year Variance Growing Season NPP',
+        'category': 'Ecology',
         'units': '',
     },
 }
@@ -101,7 +121,14 @@ def iso_from_code(code):
 def create_environmental_variables():
     for k in ENVIRONMENTAL_MAP:
         var_dict = ENVIRONMENTAL_MAP[k]
-        EnvironmentalVariable.objects.get_or_create(name=var_dict['name'],units=var_dict['units'])
+        if 'category' in var_dict:
+            env_category, created = EnvironmentalCategory.objects.get_or_create(name=var_dict['category'])
+            obj, created = EnvironmentalVariable.objects.get_or_create(name=var_dict['name'],units=var_dict['units'])
+            obj.category = env_category
+            obj.save()
+            print obj
+        else:
+            EnvironmentalVariable.objects.get_or_create(name=var_dict['name'],units=var_dict['units']) 
 
 def load_environmental(env_dict):
     ext_id = env_dict['ID']
