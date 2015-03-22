@@ -16,13 +16,6 @@ class ISOCode(models.Model):
     class Meta:
         verbose_name = "ISO Code"
 
-SOCIETY_SOURCES = (
-    ('EA', 'EA'),
-    ('EA_Korotayev', 'EA_Korotayev'),
-    ('EA_Bodarenko', 'EA_Bodarenko'),
-    ('Binford', 'Binford'),
-)
-
 class Society(models.Model):
     ext_id = models.CharField('External ID', unique=True, max_length=10)
     name = models.CharField('Name', db_index=True, max_length=200)
@@ -199,7 +192,7 @@ class VariableCodedValue(models.Model):
 
     """
     variable = models.ForeignKey('VariableDescription', related_name="values")
-    society = models.ForeignKey('Society', limit_choices_to={'source__in': [x[0] for x in SOCIETY_SOURCES]}, null=True)
+    society = models.ForeignKey('Society', null=True)
     coded_value = models.CharField(max_length=100, db_index=True, null=False, default='.')
     code = models.ForeignKey('VariableCodeDescription', db_index=True, null=True)
     source = models.ForeignKey('Source', null=True)

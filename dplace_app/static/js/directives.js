@@ -231,7 +231,7 @@ angular.module('dplaceMapDirective', [])
                     },
                     regionStyle: {
                       initial: {
-                        fill: '#428bca',
+                        fill: '#C0C6C6',
                         "fill-opacity": 1,
                         stroke: '#357ebd',
                         "stroke-width": 0,
