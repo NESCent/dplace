@@ -291,7 +291,7 @@ angular.module('dplaceMapDirective', [])
                     });
 
                     // Map IDs to colors
-                    var colorMap = colorMapService.generateColorMap(scope.results, scope.query);
+                    var colorMap = colorMapService.generateColorMap(scope.results);
                     scope.map.series.markers[0].setValues(colorMap);
                 };
 

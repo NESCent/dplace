@@ -4,7 +4,7 @@ function ColorMapService() {
         return 'hsl(' + hue + ',100%,50%)';
     }
 
-    this.generateColorMap = function(results, query) {
+    this.generateColorMap = function(results) {
         var colors = {};
         
         for (var i = 0; i < results.societies.length; i++) {

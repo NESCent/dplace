@@ -89,7 +89,7 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties, 
             $scope.getCodeIDs(results, $scope.searchModel.query);
         console.log(results);
 
-        var colorMap = colorMapService.generateColorMap(results, $scope.searchModel.query);
+        var colorMap = colorMapService.generateColorMap(results);
         console.log(colorMap);
         $scope.searchModel.getSocieties().forEach(function(container) {
             container.society.style = {'background-color' : colorMap[container.society.id] };
