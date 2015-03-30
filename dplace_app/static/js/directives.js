@@ -274,16 +274,16 @@ angular.module('dplaceMapDirective', [])
 
                 scope.addMarkers = function() {
                     scope.map.removeAllMarkers();
-                    if(!scope.societies) {
+                    if(!scope.results) {
                         return;
                     }
 
                     // get the society IDs
-                    var societyIds = scope.societies.map(function(societyResult) {
+                    var societyIds = scope.results.societies.map(function(societyResult) {
                         return societyResult.society.id;
                     });
 
-                    scope.societies.forEach(function(societyResult) {
+                    scope.results.societies.forEach(function(societyResult) {
                         var society = societyResult.society;
                         // Add a marker for each point
                         var marker = {latLng: society.location.coordinates.reverse(), name: society.name}
@@ -291,13 +291,13 @@ angular.module('dplaceMapDirective', [])
                     });
 
                     // Map IDs to colors
-                    var colorMap = colorMapService.generateColorMap(scope.societies, scope.query);
+                    var colorMap = colorMapService.generateColorMap(scope.results);
                     scope.map.series.markers[0].setValues(colorMap);
                 };
 
-                if(attrs.societies) {
+                if(attrs.results) {
                     // Update markers when societies change
-                    scope.$watchCollection('societies', function(oldvalue, newvalue) {
+                    scope.$watchCollection('results', function(oldvalue, newvalue) {
                         scope.addMarkers();
                     });
                 }
@@ -354,7 +354,7 @@ angular.module('dplaceMapDirective', [])
         return {
             restrict: 'E',
             scope: {
-                societies: '=',
+                results: '=',
                 region: '=',
                 selectedRegions: '=',
                 mapDivId: '@',

@@ -31,15 +31,10 @@ function EnvironmentalCtrl($scope, searchModelService, EnvironmentalVariable, En
         $scope.environmentalData.vals[1] = '';
         
         if ($scope.environmentalData.selectedFilter.operator == 'all') {
-            values = EnvironmentalValue.query({variable: $scope.environmentalData.selectedVariable.id});
-            min_value = 0, max_value = 0;
+            values = MinAndMax.query({query: {environmental_id: $scope.environmentalData.selectedVariable.id}});
             values.$promise.then(function(result) {
-                for (var i = 0; i < result.length; i++) {
-                    if (result[i].value < min_value) min_value = result[i].value;
-                    else if (result[i].value > max_value) max_value = result[i].value;
-                }
-            $scope.environmentalData.vals[0] = min_value;
-            $scope.environmentalData.vals[1] = max_value;
+                $scope.environmentalData.vals[0] = result.min;
+                $scope.environmentalData.vals[1] = result.max;
             });
         }
     };
@@ -48,7 +43,6 @@ function EnvironmentalCtrl($scope, searchModelService, EnvironmentalVariable, En
         if ($scope.environmentalData.selectedFilter.operator != 'all') return;
         else {
             values = MinAndMax.query({query: {environmental_id: $scope.environmentalData.selectedVariable.id}});
-            
             values.$promise.then(function(result) {
                 $scope.environmentalData.vals[0] = result.min;
                 $scope.environmentalData.vals[1] = result.max;
@@ -61,5 +55,6 @@ function EnvironmentalCtrl($scope, searchModelService, EnvironmentalVariable, En
         var filters = getSelectedFilters();
         $scope.updateSearchQuery({ environmental_filters: filters });
         $scope.searchSocieties();
+
     };
 }
