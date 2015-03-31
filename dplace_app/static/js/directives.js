@@ -99,7 +99,8 @@ angular.module('languagePhylogenyDirective', [])
                             if (society.variable_coded_values.length > 0) {
                                 for (var i = 0; i < society.variable_coded_values.length; i++) {
                                     if (society.variable_coded_values[i].variable == key) {
-                                            var hover_text = society.variable_coded_values[i].code_description.description;
+                                            var hover_text = society.society.name;
+                                            var hover_text_value = society.variable_coded_values[i].code_description.description;
                                             selected.append("svg:circle")
                                                 .attr("r", 4.5)
                                                 .attr("stroke", "#000")
@@ -112,22 +113,25 @@ angular.module('languagePhylogenyDirective', [])
                                                     return 'hsl('+hue+',100%, 50%)';
                                                 })
                                                 .on("mouseover", function() { //need to add text here!
-                                                    translate += 20;
                                                       var g = selected.append("svg:g")
-                                                  .attr("transform", "translate("+translate+", 0)");
-                                                        g.select('text').remove();
+                                                            .attr("transform", "translate(20, -10)");
                                                         g.append("svg:rect")
-                                                        .attr("width", hover_text.length * 10)
-                                                        .attr("height", "23")
-                                                        .attr("fill", "white");
-                                                        g.append("svg:text")
-                                                        .attr("dy", "12")
-                                                        .text(hover_text);
+                                                            .attr("width", hover_text_value.length * 8)
+                                                            .attr("height", "40")
+                                                            .attr("fill", "white");
+                                                        var txt = g.append("svg:text")
+                                                            .attr("dy", "15")
+                                                            .attr("dx", "5")
+                                                        txt.append("svg:tspan")
+                                                            .text(hover_text)
+                                                        txt.append("svg:tspan")
+                                                            .attr("dy", "15")
+                                                            .attr("x", "5")
+                                                            .text(hover_text_value);
                                                   })
                                                   .on("mouseout", function() {
                                                       // Remove the info text on mouse out.
                                                       selected.select('g').remove();
-                                                      translate -= 20;
                                                 })
                                                 
                                                 ; 
