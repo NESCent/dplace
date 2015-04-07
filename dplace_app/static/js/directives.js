@@ -3,6 +3,8 @@ angular.module('languagePhylogenyDirective', [])
         function link(scope, element, attrs) {
             var constructTree = function(langTree) {
                 d3.select("language-phylogeny").html('');
+               
+                
                 var newick = Newick.parse(langTree.newick_string);
                 var rightAngleDiagonal = function() {
                     function diagonal(diagonalPath) {
@@ -99,7 +101,7 @@ angular.module('languagePhylogenyDirective', [])
                             if (society.variable_coded_values.length > 0) {
                                 for (var i = 0; i < society.variable_coded_values.length; i++) {
                                     if (society.variable_coded_values[i].variable == key) {
-                                            var hover_text = society.society.name;
+                                            var society_name = society.society.name + " (" + society.society.iso_code + ")";
                                             var hover_text_value = society.variable_coded_values[i].code_description.description;
                                             selected.append("svg:circle")
                                                 .attr("r", 4.5)
@@ -107,35 +109,21 @@ angular.module('languagePhylogenyDirective', [])
                                                 .attr("stroke-width", "0.5")
                                                 .attr("transform", "translate("+translate+", 0)")
                                                 .attr("fill", function(n) {
-                                                    console.log(i);
                                                     value = society.variable_coded_values[i].coded_value;
                                                     hue = value * 240 / scope.code_ids[society.variable_coded_values[i].variable].length;
                                                     return 'hsl('+hue+',100%, 50%)';
                                                 })
-                                                .on("mouseover", function() { //need to add text here!
-                                                      var g = selected.append("svg:g")
-                                                            .attr("transform", "translate(20, -10)");
-                                                        g.append("svg:rect")
-                                                            .attr("width", hover_text_value.length * 8)
-                                                            .attr("height", "40")
-                                                            .attr("fill", "white");
-                                                        var txt = g.append("svg:text")
-                                                            .attr("dy", "15")
-                                                            .attr("dx", "5")
-                                                        txt.append("svg:tspan")
-                                                            .text(hover_text)
-                                                        txt.append("svg:tspan")
-                                                            .attr("dy", "15")
-                                                            .attr("x", "5")
-                                                            .text(hover_text_value);
+                                                .on("mouseover", function() { 
+                                                     d3.select("body").append("div")
+                                                        .attr("class", "tooltip")
+                                                        .html("<b>"+society_name+":</b><br>"+hover_text_value)
+                                                        .style("left", (d3.event.pageX + 10)+"px")
+                                                        .style("top", (d3.event.pageY + 5)+"px")
+                                                        .style("opacity", .9);
                                                   })
                                                   .on("mouseout", function() {
-                                                      // Remove the info text on mouse out.
-                                                      selected.select('g').remove();
-                                                })
-                                                
-                                                ; 
-
+                                                      d3.select(".tooltip").remove();
+                                                }); 
                                     } 
                                 }
                             }
@@ -198,7 +186,7 @@ angular.module('languagePhylogenyDirective', [])
                             .attr("dy", 4)
                             .attr("font-size", "14px")
                             .attr("font-family", "Arial")
-                            .text(function(d) { return d.name; });  
+                            .text(function(d) { return d.name; });
                 });
                 
                 phyloWidth = d3.select("g").node().getBBox().width;
