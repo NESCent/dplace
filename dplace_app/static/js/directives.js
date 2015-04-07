@@ -109,6 +109,9 @@ angular.module('languagePhylogenyDirective', [])
                                                 .attr("stroke-width", "0.5")
                                                 .attr("transform", "translate("+translate+", 0)")
                                                 .attr("fill", function(n) {
+                                                    if (society.variable_coded_values[i].code_description.description.indexOf("Missing data") != -1) {
+                                                        return 'hsl(360, 100%, 100%)';
+                                                    }
                                                     value = society.variable_coded_values[i].coded_value;
                                                     hue = value * 240 / scope.code_ids[society.variable_coded_values[i].variable].length;
                                                     return 'hsl('+hue+',100%, 50%)';

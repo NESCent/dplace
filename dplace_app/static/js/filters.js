@@ -1,6 +1,9 @@
 angular.module('dplaceFilters', [])
     .filter('colorNode', function() {
         return function(value, codes) {
+            this_code = codes.filter(function(code) { return code.code == value });
+            if (this_code.length > 0 && this_code[0].description.indexOf("Missing data") != -1)
+                return 'hsl(360, 100%, 100%)';
             var hue = value * 240 / codes.length;
             return 'hsl('+hue+',100%, 50%)';
         }
