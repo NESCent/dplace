@@ -40,8 +40,56 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties, 
         $scope.searchButton.disabled = false;
         $scope.searchButton.text = 'Search';
     };
-
+    
+    //this function is needed for the coloring of markers
+    //it converts the coded_value into the bin's code
+    //it also constructs var_bins, which is needed for display of legends
+    //NEEDS FURTHER WORK
+    $scope.assignBins = function(variable_codes) {
+        var_bins = {};
+        for (var i = 0; i < variable_codes.length; i++) {
+            if (variable_codes[i].bf_id) {
+                if (variable_codes[i].bf_id in var_bins)
+                    var_bins[variable_codes[i].bf_id] = var_bins[variable_codes[i].bf_id].concat([variable_codes[i]]);
+                else 
+                    var_bins[variable_codes[i].bf_id] = [variable_codes[i]];
+            } else if (variable_codes[i].variable in var_bins)
+                var_bins[variable_codes[i].variable] = var_bins[variable_codes[i].variable].concat([variable_codes[i]]);
+            else
+                var_bins[variable_codes[i].variable] = [variable_codes[i]];
+        }
+        
+        if ($scope.searchModel.results.variable_descriptions) {
+            for (var i = 0; i < $scope.searchModel.results.variable_descriptions.length; i++){
+                if ($scope.searchModel.results.variable_descriptions[i].data_type == 'CONTINUOUS') 
+                    var_bins[$scope.searchModel.results.variable_descriptions[i].id].name = $scope.searchModel.results.variable_descriptions[i].name;
+                if (var_bins[$scope.searchModel.results.variable_descriptions[i].id].name) continue;
+                else var_bins[$scope.searchModel.results.variable_descriptions[i].id].name = $scope.searchModel.results.variable_descriptions[i].name;
+            }
+        }
+        $scope.searchModel.results.code_ids = var_bins;
+        
+        for (var i = 0; i < $scope.searchModel.results.societies.length; i++) {
+            for (var v = 0; v < $scope.searchModel.results.societies[i].variable_coded_values.length; v++) {
+                variable = $scope.searchModel.results.societies[i].variable_coded_values[v].variable;
+                bins = var_bins[variable];
+                for (var b = 0; b < bins.length; b++) {
+                    try {
+                        if (parseFloat($scope.searchModel.results.societies[i].variable_coded_values[v].coded_value) < bins[b].max) {
+                            $scope.searchModel.results.societies[i].variable_coded_values[v]['bf_code'] = bins[b].code;
+                            break;
+                        }                        
+                        
+                    } catch (err) {
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    
     $scope.assignColors = function() {
+        if ($scope.searchModel.query.variable_codes) $scope.assignBins($scope.searchModel.query.variable_codes);
         var colorMap = colorMapService.generateColorMap($scope.searchModel.getSocieties(), $scope.searchModel.query);
         $scope.searchModel.getSocieties().forEach(function(container) {
             container.society.style = {'background-color' : colorMap[container.society.id] };

@@ -25,7 +25,10 @@ function ColorMapService() {
                 var society = societies[i];
                 var id = society.society.id;
                 if (society.variable_coded_values.length > 0) {
-                    var value = society.variable_coded_values[0].coded_value;
+                    if (society.variable_coded_values[0].bf_code)  //CHECK THE USE OF [0] HERE
+                        var value = society.variable_coded_values[0].bf_code; //NOT WORKING
+                    else 
+                        var value = society.variable_coded_values[0].coded_value;
                     var count = query.variable_codes.length;
                     var color = mapColor(value, count);
                     colors[id] = color;
