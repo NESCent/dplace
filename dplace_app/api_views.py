@@ -120,14 +120,19 @@ def result_set_from_query_dict(query_dict):
 
     if 'variable_codes' in query_dict:
         criteria.append(SEARCH_VARIABLES)
+        f = open('tes.txt', 'w')
         for x in query_dict['variable_codes']:
             if 'bf_id' in x:
                 values = VariableCodedValue.objects.filter(variable__id=x['bf_id'])
                 if 'min' in x:
                     min = x['min']
                     max = x['max']
+                    f.write(str(min))
+                    f.write("//")
+                    f.write(str(max))
+                    f.write("..")
                     values = values.exclude(coded_value='NA')
-                    values.filter(coded_value__gt=min).filter(coded_value__lt=max)
+                    values = values.filter(coded_value__gt=min).filter(coded_value__lt=max)
                 else: #NA selected
                     values.filter(coded_value=x['code'])
                 values.select_related('society', 'variable')
@@ -139,7 +144,8 @@ def result_set_from_query_dict(query_dict):
                     coded_value_ids += code.variablecodedvalue_set.values_list('id', flat=True)
                 # Coded values have a FK to society.  Aggregate the societies from each value
                 values = VariableCodedValue.objects.filter(id__in=coded_value_ids)
-                values = values.select_related('society','variable')         
+                values = values.select_related('society','variable')  
+
             for value in values:
                 result_set.add_cultural(value.society, value.variable, value)
         
@@ -242,14 +248,12 @@ def get_min_and_max(request):
 @permission_classes((AllowAny,))
 @renderer_classes((JSONRenderer,))
 def bin_bfcont_data(request):
-    f = open('tes.txt', 'w')
     query_string = request.QUERY_PARAMS['query']
-    f.write(query_string)
     query_dict = json.loads(query_string)
     if 'bf_id' in query_dict:
         bf_variable = VariableDescription.objects.filter(id=query_dict['bf_id'])
         values = VariableCodedValue.objects.filter(variable__id=query_dict['bf_id'])
-        min_value = 0.0
+        min_value = None
         max_value = 0.0
         missing_data_option = False
         bins = []
@@ -264,11 +268,14 @@ def bin_bfcont_data(request):
                     })
                     missing_data_option = True
                 continue
-            elif float(v.coded_value) < min_value:
-                min_value = float(v.coded_value)
-            elif float(v.coded_value) > max_value:
-                max_value = float(v.coded_value)
-
+            else:
+                if min_value is None:
+                    min_value = float(v.coded_value)
+                elif float(v.coded_value) < min_value:
+                    min_value = float(v.coded_value)
+                elif float(v.coded_value) > max_value:
+                    max_value = float(v.coded_value)
+        
         data_range = max_value - min_value
         bin_size = data_range / 5
         min_bin = min_value
@@ -283,11 +290,9 @@ def bin_bfcont_data(request):
                 'bf_id': query_dict['bf_id']
             })
             min_bin = min_bin + bin_size + 1
-        f.write(str(bins))
     else:
         min_value = None
         max_value = None
-
     return Response(bins)
 
 def newick_tree(key):
