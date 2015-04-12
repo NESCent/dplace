@@ -76,7 +76,7 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties, 
                 for (var b = 0; b < bins.length; b++) {
                     try {
                         if (parseFloat($scope.searchModel.results.societies[i].variable_coded_values[v].coded_value) < bins[b].max) {
-                            $scope.searchModel.results.societies[i].variable_coded_values[v]['bf_code'] = bins[b].code;
+                            $scope.searchModel.results.societies[i].variable_coded_values[v]['bf_code'] = ""+bins[b].code;
                             break;
                         }                        
                         

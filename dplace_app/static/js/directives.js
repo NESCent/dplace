@@ -99,13 +99,18 @@ angular.module('languagePhylogenyDirective', [])
                             if (society.variable_coded_values.length > 0) {
                                 for (var i = 0; i < society.variable_coded_values.length; i++) {
                                     if (society.variable_coded_values[i].variable == key) {
+
                                             selected.append("svg:circle")
                                                 .attr("r", 4.5)
                                                 .attr("stroke", "#000")
                                                 .attr("stroke-width", "0.5")
                                                 .attr("transform", "translate("+translate+", 0)")
                                                 .attr("fill", function(n) {
-                                                    value = society.variable_coded_values[i].coded_value;
+                                                    if (society.variable_coded_values[i].bf_code) {
+                                                        value = parseInt(society.variable_coded_values[i].bf_code);
+                                                    } else {
+                                                        value = society.variable_coded_values[i].coded_value;
+                                                    }
                                                     hue = value * 240 / scope.code_ids[society.variable_coded_values[i].variable].length;
                                                     return 'hsl('+hue+',100%, 50%)';
                                                 });                        
