@@ -46,6 +46,10 @@ class ISOCodeSerializer(gis_serializers.GeoModelSerializer):
         model = ISOCode
 
 # Environmental Data
+class EnvironmentalCategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EnvironmentalCategory
+
 class EnvironmentalVariableSerializer(serializers.ModelSerializer):
     class Meta:
         model = EnvironmentalVariable
@@ -64,6 +68,7 @@ class LanguageClassSerializer(serializers.ModelSerializer):
         model = LanguageClass
 
 class LanguageSerializer(serializers.ModelSerializer):
+    language_family = LanguageClassSerializer(source='languageclassification_set.first.class_family')
     class Meta:
         model = Language
 
@@ -193,47 +198,3 @@ class SocietyResultSetSerializer(serializers.Serializer):
     languages = LanguageSerializer(many=True)
     # Geographic Regions - does not map to a more specific value
     geographic_regions = GeographicRegionSerializer(many=True)
-
-class NewickTree(object):
-    '''
-    Lightweight wrapper around a newick tree string
-    '''
-    def __init__(self, newickTree=None, name=None):
-        self.newickTree = newickTree
-        self.name = name
-        
-class NewickTreeSerializer(serializers.Serializer):
-    '''
-    Serializer for NewickTree object
-    '''
-    newickTree = serializers.CharField()
-    name = serializers.CharField()
-
-class IsoResult(object):
-    def __init__(self, isocode=None, result=None):
-        self.isocode = isocode
-        self.result = result
-        
-class IsoResultSerializer(serializers.Serializer):
-    isocode = serializers.CharField()
-    result = serializers.IntegerField()
-
-class NewickResultSet(object):
-    def __init__(self):
-        self.results = dict() 
-        self.trees = None
-        self.isocodes = set() #contains mapping of isocode to coded_value
-    
-    def add_string(self, tree, newickString):
-        if tree.id not in self.results.keys():
-            self.results[tree.id] = NewickTree(newickString, tree.name)
-            
-    def add_isocode(self, isocode, result):
-        self.isocodes.add(IsoResult(isocode, result))
-        
-    def finalize(self):
-        self.trees = [x for x in self.results.values()]
-
-class NewickResultSetSerializer(serializers.Serializer):
-    trees = NewickTreeSerializer(many=True)
-    isocodes = IsoResultSerializer(many=True)

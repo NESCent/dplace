@@ -3,7 +3,7 @@
  * Created by dan on 7/30/14.
  */
 
-function SearchModel(VariableCategory, GeographicRegion, EnvironmentalVariable, LanguageClass) {
+function SearchModel(VariableCategory, GeographicRegion, EnvironmentalCategory, LanguageClass) {
     this.reset = function() {
         this.results = {}; // Populated after search is run
         this.params = {}; // state for individual controllers
@@ -13,7 +13,7 @@ function SearchModel(VariableCategory, GeographicRegion, EnvironmentalVariable, 
         this.selected = [];
         this.params.culturalTraits = new CulturalTraitModel(VariableCategory);
         this.params.geographicRegions = new GeographicRegionModel(GeographicRegion);
-        this.params.environmentalData = new EnvironmentalDataModel(EnvironmentalVariable);
+        this.params.environmentalData = new EnvironmentalDataModel(EnvironmentalCategory);
         this.params.languageClassifications = new LanguageClassificationModel(LanguageClass)
     };
 
@@ -37,6 +37,10 @@ function SearchModel(VariableCategory, GeographicRegion, EnvironmentalVariable, 
     // Includes the search query
     this.getResults = function() {
         return this.results;
+    };
+    
+    this.getLanguageTrees = function() {
+        return this.results.languageTrees;
     };
 
     // Just the societies object
@@ -63,8 +67,9 @@ function GeographicRegionModel(GeographicRegion) {
     this.badgeValue = 0;
 }
 
-function EnvironmentalDataModel(EnvironmentalVariable) {
-    this.variables = EnvironmentalVariable.query();
+function EnvironmentalDataModel(EnvironmentalCategory) {
+    this.variables = [];
+    this.categories = EnvironmentalCategory.query();
     this.selectedVariable = null;
     this.filters = [
         { operator: 'inrange', name: 'between' },
