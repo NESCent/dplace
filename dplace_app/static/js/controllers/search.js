@@ -83,18 +83,11 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties, 
 
     
     $scope.assignColors = function() {
-<<<<<<< HEAD
-        var colorMap = colorMapService.generateColorMap($scope.searchModel.getSocieties(), $scope.searchModel.query, -1);
-=======
         results = $scope.searchModel.getResults();
         $scope.calculateRange(results);
         if ($scope.searchModel.query.variable_codes)
             $scope.getCodeIDs(results, $scope.searchModel.query);
-        console.log(results);
-
         var colorMap = colorMapService.generateColorMap(results);
-        console.log(colorMap);
->>>>>>> upstream/master
         $scope.searchModel.getSocieties().forEach(function(container) {
             container.society.style = {'background-color' : colorMap[container.society.id] };
         });

@@ -12,7 +12,9 @@ function SocietiesCtrl($scope, searchModelService, LanguageClass) {
             }
         }
         
+        $scope.variables = [];
         if ($scope.results.variable_descriptions) {
+            $scope.variables = $scope.variables.concat($scope.results.variable_descriptions);
             for (var i = 0; i < $scope.results.variable_descriptions.length; i++){
                 if ($scope.code_ids[$scope.results.variable_descriptions[i].id].name) continue;
                 else $scope.code_ids[$scope.results.variable_descriptions[i].id].name = $scope.results.variable_descriptions[i].name;
@@ -54,6 +56,10 @@ function SocietiesCtrl($scope, searchModelService, LanguageClass) {
     $scope.treeSelected = function() {
         $scope.$broadcast('treeSelected', {tree: $scope.results.selectedTree});
     };
+    
+    $scope.changeMap = function(chosenVariable) {
+        chosenVariableId = chosenVariable.id;
+    }
 
     $scope.generateDownloadLinks = function() {
         // queryObject is the in-memory JS object representing the chosen search options

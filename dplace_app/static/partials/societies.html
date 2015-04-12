@@ -45,7 +45,22 @@
             </div>
         </tab>
         <tab heading="Map" select="visible=true" deselect="visible=false">
-            <dplace-map results="results" map-div-id="result-map" visible="visible" query="query"></dplace-map>
+            <div class="row">
+                <h4 ng-show="variables.length > 0">Choose a variable:</h4>
+                <select 
+                    ng-model="results.chosenVariable"
+                    class="form-control"
+                    ng-options="variable.name for variable in variables"
+                    ng-init="results.chosenVariable=variables[0]"
+                    ng-change="changeMap(results.chosenVariable)"
+                    ng-show="variables.length > 0"
+                 >
+                 </select>
+             </div>
+            
+            
+            
+            <dplace-map results="results" map-div-id="result-map" visible="visible" query="query" chosen="results.chosenVariable"></dplace-map>
         </tab>
         <tab heading="Tree">
             <h4> Phylogenies </h4>
@@ -111,7 +126,6 @@
                 </table>
             </div>
             <language-phylogeny></language-phylogeny>
->>>>>>> upstream/master
         </tab>
         <tab heading="Download" select="generateDownloadLinks()">
             <div class="row">

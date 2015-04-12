@@ -296,7 +296,7 @@ angular.module('dplaceMapDirective', [])
 
                 scope.addMarkers = function() {
                     scope.map.removeAllMarkers();
-                    if(!scope.results) {
+                    if(!scope.results || (!scope.chosen)) {
                         return;
                     }
 
@@ -304,16 +304,26 @@ angular.module('dplaceMapDirective', [])
                     var societyIds = scope.results.societies.map(function(societyResult) {
                         return societyResult.society.id;
                     });
-
+                    var results = {};
+                    results.societies = [];
                     scope.results.societies.forEach(function(societyResult) {
                         var society = societyResult.society;
                         // Add a marker for each point
                         var marker = {latLng: [society.location.coordinates[1], society.location.coordinates[0]], name: society.name}
                         scope.map.addMarker(society.id, marker);
+                        societyResult.variable_coded_values.forEach(function(coded_value) {
+                            if (coded_value.variable == scope.chosen.id) {
+                                results.societies.push({
+                                    'variable_coded_values':[coded_value],
+                                    'society':society,
+                                });
+                            }
+                        });
+                        
                     });
-
                     // Map IDs to colors
-                    var colorMap = colorMapService.generateColorMap(scope.results);
+
+                    var colorMap = colorMapService.generateColorMap(results);
                     scope.map.series.markers[0].setValues(colorMap);
 
                     for (var i = 0; i < societyIds.length; i++) {
