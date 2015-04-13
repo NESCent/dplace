@@ -1,4 +1,14 @@
 angular.module('dplaceFilters', [])
+    .filter('multiply', function() {
+        return function(value1, value2) {
+            return value1 * value2;
+        }
+    })
+    .filter('tableTranslate', function() {
+        return function(x, y) {
+            return 'translate(0,'+(x*y)+')';
+        }
+    })
     .filter('colorNode', function() {
         return function(value, codes) {
             var missingData = false;

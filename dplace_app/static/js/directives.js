@@ -339,8 +339,31 @@ angular.module('dplaceMapDirective', [])
                         var map_svg = d3.select(".jvectormap-container").select("svg")
                             .attr("version", 1.1)
                             .attr("xmlns", "http://www.w3.org/2000/svg")
+                            .attr("height", "900")
                             .node().parentNode.innerHTML;
                         map_svg = map_svg.substring(0, map_svg.indexOf("<div")); //remove zoom in/out buttons from map
+                        
+                        //append legend to svg for download
+                        var legend_svg = d3.select(".legend-for-download").node().innerHTML;
+                        legend_svg = legend_svg.substring(legend_svg.indexOf("-->")+3);
+                        var to_append = legend_svg.split("<!-- end ngRepeat: code in code_ids[results.chosenVariable.id] -->");
+                        var remove_ng_repeat = [];
+                        for (var i = 0; i < to_append.length; i++) {
+                            if (to_append[i].indexOf("ng-repeat") != -1) {
+                                remove_ng_repeat.push(to_append[i].substring(0, to_append[i].indexOf("ng-repeat")));
+                                remove_ng_repeat.push(to_append[i].substring(to_append[i].indexOf("transform")));
+                            }
+                        }
+                        var edited_append = "<g transform='translate(0, 300)'>";
+                        for (var i = 0; i < remove_ng_repeat.length; i++) {
+                            edited_append = edited_append.concat(remove_ng_repeat[i]);
+                        }
+                        edited_append = edited_append.concat("</g>");
+                        map_append = map_svg.substring(0, map_svg.indexOf(">")+1);
+                        map_append = map_append.concat(edited_append);
+                        map_svg = map_append.concat(map_svg.substring(map_svg.indexOf(">")));
+                        
+                        //generate download
                         var imgsrc = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(map_svg)));
                         d3.select(".download-links").append("td")
                             .attr("colspan", "2")

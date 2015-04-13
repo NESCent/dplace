@@ -77,6 +77,22 @@
                 <tr class="download-links">
                 </tr>
             </table>
+            
+            <svg class="legend-for-download" style="visibility:hidden;">
+                <g ng-repeat="code in code_ids[results.chosenVariable.id]" transform="{{25|tableTranslate:$index}}">
+                    <circle
+                            cx="10"
+                            cy="10"
+                            r="4.5"
+                            fill="{{code.code|colorNode:code_ids[results.chosenVariable.id]}}"
+                            stroke="#000"
+                            stroke-width="0.5"
+                        />
+                    <text x="20" y="15" font-size="14px">
+                        {{code.description}}
+                    </text>
+                </g>
+            </svg>
         </tab>
         <tab heading="Tree">
             <h4> Phylogenies </h4>
