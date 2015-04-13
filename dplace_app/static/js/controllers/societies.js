@@ -18,7 +18,6 @@ function SocietiesCtrl($scope, searchModelService, LanguageClass) {
             for (var i = 0; i < $scope.results.variable_descriptions.length; i++){
                 if ($scope.code_ids[$scope.results.variable_descriptions[i].id].name) continue;
                 else $scope.code_ids[$scope.results.variable_descriptions[i].id].name = $scope.results.variable_descriptions[i].name;
-            
             }
         }
     }
