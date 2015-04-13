@@ -335,20 +335,20 @@ angular.module('dplaceMapDirective', [])
                 
                 //constructs download link for map
                 scope.mapLink = function() {                     
-                    if (!scope.chosen.download_link_generated) {
+                        d3.select(".download-links").html('');
                         var map_svg = d3.select(".jvectormap-container").select("svg")
                             .attr("version", 1.1)
                             .attr("xmlns", "http://www.w3.org/2000/svg")
                             .node().parentNode.innerHTML;
                         map_svg = map_svg.substring(0, map_svg.indexOf("<div")); //remove zoom in/out buttons from map
                         var imgsrc = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(map_svg)));
-                        d3.select(".download-links").append("li").append("a")
+                        d3.select(".download-links").append("td")
+                            .attr("colspan", "2")
+                            .append("a")
                             .attr("class", "btn btn-info btn-dplace-download")
                             .attr("download", scope.chosen.name+"map.svg")
                             .attr("href", imgsrc)
                             .html("Download Map: " + scope.chosen.name);
-                        scope.chosen.download_link_generated = true;
-                    }
                 };
 
                 if(attrs.results) {
