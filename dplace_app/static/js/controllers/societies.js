@@ -1,9 +1,12 @@
 function SocietiesCtrl($scope, searchModelService, LanguageClass) {
     $scope.results = searchModelService.getModel().getResults();
+    console.log($scope.results);
     $scope.query = searchModelService.getModel().getQuery();
+    console.log($scope.query);
+    $scope.variables = [];
+    $scope.results.code_ids = {};
 
     if ($scope.query.variable_codes) {
-        $scope.results.code_ids = {};
         for (var i = 0; i < $scope.query.variable_codes.length; i++) {
             if ($scope.query.variable_codes[i].variable in $scope.results.code_ids) {
                 $scope.results.code_ids[$scope.query.variable_codes[i].variable] = $scope.results.code_ids[$scope.query.variable_codes[i].variable].concat([$scope.query.variable_codes[i]]);
@@ -12,7 +15,6 @@ function SocietiesCtrl($scope, searchModelService, LanguageClass) {
             }
         }
         
-        $scope.variables = [];
         if ($scope.results.variable_descriptions) {
             $scope.variables = $scope.variables.concat($scope.results.variable_descriptions);
             for (var i = 0; i < $scope.results.variable_descriptions.length; i++){
@@ -23,6 +25,8 @@ function SocietiesCtrl($scope, searchModelService, LanguageClass) {
     }
         
     if ($scope.query.environmental_filters) {
+        $scope.variables = $scope.variables.concat($scope.results.environmental_variables);
+        $scope.results.code_ids[$scope.results.environmental_variables[0].id] = [];
         var extractedValues = $scope.results.societies.map(function(society) { return society.environmental_values[0].value; } );
         var min_value = Math.min.apply(null, extractedValues);
         var max_value = Math.max.apply(null, extractedValues);
@@ -57,6 +61,7 @@ function SocietiesCtrl($scope, searchModelService, LanguageClass) {
     };
     
     $scope.changeMap = function(chosenVariable) {
+        console.log(chosenVariable);
         chosenVariableId = chosenVariable.id;
         d3.select(".legend-for-download").html('');
     }

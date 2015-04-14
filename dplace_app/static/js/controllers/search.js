@@ -57,13 +57,14 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties, 
             var range = max_value - min_value;
             results.environmental_variables[i]['range'] = range;
         }
+        return results;
     };
     
     //calculates number of codes selected for each variable and saves to coded_value
     //needed for coloring of markers
+    //THIS IS PROBABLY NOT NECESSARY
     $scope.getCodeIDs = function(results, query) {
         code_ids = {};
-    
         for (var i = 0; i < query.variable_codes.length; i++) {
             for (var j = 0; j < results.variable_descriptions.length; j++) {
                 if (query.variable_codes[i].variable == results.variable_descriptions[j].id) {                   
@@ -81,10 +82,9 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties, 
         }
     }
 
-    
     $scope.assignColors = function() {
         results = $scope.searchModel.getResults();
-        $scope.calculateRange(results);
+        results = $scope.calculateRange(results);
         if ($scope.searchModel.query.variable_codes)
             $scope.getCodeIDs(results, $scope.searchModel.query);
         var colorMap = colorMapService.generateColorMap(results);

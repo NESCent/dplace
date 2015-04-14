@@ -304,6 +304,8 @@ angular.module('dplaceMapDirective', [])
                     var societyIds = scope.results.societies.map(function(societyResult) {
                         return societyResult.society.id;
                     });
+                    
+                    //maybe this code isn't needed?
                     var results = {};
                     results.societies = [];
                     scope.results.societies.forEach(function(societyResult) {
@@ -311,10 +313,19 @@ angular.module('dplaceMapDirective', [])
                         // Add a marker for each point
                         var marker = {latLng: [society.location.coordinates[1], society.location.coordinates[0]], name: society.name}
                         scope.map.addMarker(society.id, marker);
+                        
                         societyResult.variable_coded_values.forEach(function(coded_value) {
                             if (coded_value.variable == scope.chosen.id) {
                                 results.societies.push({
                                     'variable_coded_values':[coded_value],
+                                    'society':society,
+                                });
+                            }
+                        });
+                        societyResult.environmental_values.forEach(function(coded_value) {
+                            if (coded_value.variable == scope.chosen.id) {
+                                results.societies.push({
+                                    'environmental_values': [coded_value],
                                     'society':society,
                                 });
                             }
@@ -344,6 +355,7 @@ angular.module('dplaceMapDirective', [])
                         map_svg = map_svg.substring(0, map_svg.indexOf("<div")); //remove zoom in/out buttons from map
                         //construct legend for download
                         var legend = d3.select(".legend-for-download");
+                        if (scope.results.code_ids) {
                         for (var i = 0; i < scope.results.code_ids[scope.chosen.id].length; i++) {
                             g = legend.append("svg:g")
                                 .attr("transform", function() {
@@ -366,9 +378,11 @@ angular.module('dplaceMapDirective', [])
                                 .text(scope.results.code_ids[scope.chosen.id][i].description);
                         }
                         var legend_svg = "<g transform='translate(0,300)'>"+legend.node().innerHTML+"</g>";
+                        
                         var map_svg = map_svg.substring(0, map_svg.indexOf("</svg>"));
                         map_svg = map_svg.concat(legend_svg+"</svg>");
                         //generate download
+                        }
                         var imgsrc = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(map_svg)));
                         d3.select(".download-links").append("td")
                             .attr("colspan", "2")
