@@ -38,12 +38,12 @@ angular.module('languagePhylogenyDirective', [])
                 keysWritten = 1;
                 translate = 20;
                 if (scope.query.variable_codes) {
-                    for (var key in scope.code_ids) {
+                    for (var key in scope.results.code_ids) {
                         labels.append("svg:text")
                             .attr("dx", w+15+translate)
                             .attr("dy", 15)
                             .text("C"+keysWritten);
-                        scope.code_ids[key].CID = "C"+keysWritten;
+                        scope.results.code_ids[key].CID = "C"+keysWritten;
                         keysWritten++;
                         translate += 20;    
                     }
@@ -90,7 +90,7 @@ angular.module('languagePhylogenyDirective', [])
                     
                 translate = 0;
                 if (scope.query.variable_codes) {
-                    for (var key in scope.code_ids) {
+                    for (var key in scope.results.code_ids) {
                         scope.results.societies.forEach(function(society) {
                             var selected = node.filter(function(d) {
                                 return d.name == society.society.iso_code;
@@ -108,7 +108,7 @@ angular.module('languagePhylogenyDirective', [])
                                                 .attr("fill", function(n) {
                                                     console.log(i);
                                                     value = society.variable_coded_values[i].coded_value;
-                                                    hue = value * 240 / scope.code_ids[society.variable_coded_values[i].variable].length;
+                                                    hue = value * 240 / scope.results.code_ids[society.variable_coded_values[i].variable].length;
                                                     return 'hsl('+hue+',100%, 50%)';
                                                 })
                                                 .on("mouseover", function() { //need to add text here!
@@ -342,27 +342,32 @@ angular.module('dplaceMapDirective', [])
                             .attr("height", "900")
                             .node().parentNode.innerHTML;
                         map_svg = map_svg.substring(0, map_svg.indexOf("<div")); //remove zoom in/out buttons from map
-                        
-                        //append legend to svg for download
-                        var legend_svg = d3.select(".legend-for-download").node().innerHTML;
-                        legend_svg = legend_svg.substring(legend_svg.indexOf("-->")+3);
-                        var to_append = legend_svg.split("<!-- end ngRepeat: code in code_ids[results.chosenVariable.id] -->");
-                        var remove_ng_repeat = [];
-                        for (var i = 0; i < to_append.length; i++) {
-                            if (to_append[i].indexOf("ng-repeat") != -1) {
-                                remove_ng_repeat.push(to_append[i].substring(0, to_append[i].indexOf("ng-repeat")));
-                                remove_ng_repeat.push(to_append[i].substring(to_append[i].indexOf("transform")));
-                            }
+                        //construct legend for download
+                        var legend = d3.select(".legend-for-download");
+                        for (var i = 0; i < scope.results.code_ids[scope.chosen.id].length; i++) {
+                            g = legend.append("svg:g")
+                                .attr("transform", function() {
+                                    return 'translate(0,'+i*25+')';
+                                });
+                            g.append("svg:circle")
+                                .attr("cx", "10")
+                                .attr("cy", "10")
+                                .attr("r", "4.5")
+                                .attr("stroke", "#000")
+                                .attr("stroke-width", "0.5")
+                                .attr("fill", function() {
+                                    var value = scope.results.code_ids[scope.chosen.id][i].code;
+                                    var hue = value * 240 / scope.results.code_ids[scope.chosen.id].length;
+                                    return 'hsl('+hue+',100%,50%)';
+                                });
+                            g.append("svg:text")
+                                .attr("x", "20")
+                                .attr("y", "15")
+                                .text(scope.results.code_ids[scope.chosen.id][i].description);
                         }
-                        var edited_append = "<g transform='translate(0, 300)'>";
-                        for (var i = 0; i < remove_ng_repeat.length; i++) {
-                            edited_append = edited_append.concat(remove_ng_repeat[i]);
-                        }
-                        edited_append = edited_append.concat("</g>");
-                        map_append = map_svg.substring(0, map_svg.indexOf(">")+1);
-                        map_append = map_append.concat(edited_append);
-                        map_svg = map_append.concat(map_svg.substring(map_svg.indexOf(">")));
-                        
+                        var legend_svg = "<g transform='translate(0,300)'>"+legend.node().innerHTML+"</g>";
+                        var map_svg = map_svg.substring(0, map_svg.indexOf("</svg>"));
+                        map_svg = map_svg.concat(legend_svg+"</svg>");
                         //generate download
                         var imgsrc = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(map_svg)));
                         d3.select(".download-links").append("td")
