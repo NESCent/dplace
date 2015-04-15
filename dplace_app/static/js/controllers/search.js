@@ -7,7 +7,7 @@
  * @param FindSocieties
  * @constructor
  */
-function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties, TreesFromLanguages) {
+function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties, LanguageClass, TreesFromLanguages) {
     $scope.setActive('search');
     $scope.searchModel = searchModelService.getModel();
     $scope.selectedButton = $scope.searchModel.selectedButton;
@@ -64,7 +64,25 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties, 
     //needed for coloring of markers
     $scope.getCodeIDs = function() {
         $scope.searchModel.results.code_ids = {};
+        if ($scope.searchModel.query.language_classifications && !$scope.searchModel.query.variable_codes && !$scope.searchModel.query.environmental_filters) {
+            $scope.searchModel.results.classifications = [];
+            LanguageClass.query().$promise.then(function(result) {
+                for (var i = 0; i < $scope.searchModel.results.societies.length; i++) {
+                    for (var j = 0; j < $scope.searchModel.results.societies[i].languages.length; j++) {
+                        classification = $scope.searchModel.query.language_classifications.filter(function(l) { return l.language.id == $scope.searchModel.results.societies[i].languages[j].id; });
+                        if (classification.length > 0) {
+                            toAdd = result.filter(function(l) { return l.id == classification[0].class_subfamily; });
+                            if (toAdd[0] && $scope.searchModel.results.classifications.indexOf(toAdd[0]) == -1)
+                                $scope.searchModel.results.classifications = $scope.searchModel.results.classifications.concat(toAdd); 
+                        }
+                    }
+                }
+            });
+        
+        }
         if (!$scope.searchModel.query.variable_codes) return;
+
+        
         for (var i = 0; i < $scope.searchModel.query.variable_codes.length; i++) {
             if ($scope.searchModel.query.variable_codes[i].variable in $scope.searchModel.results.code_ids) {
                 $scope.searchModel.results.code_ids[$scope.searchModel.query.variable_codes[i].variable] = $scope.searchModel.results.code_ids[$scope.searchModel.query.variable_codes[i].variable].concat([$scope.searchModel.query.variable_codes[i]]);

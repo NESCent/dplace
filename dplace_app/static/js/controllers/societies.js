@@ -16,7 +16,7 @@ function SocietiesCtrl($scope, searchModelService, LanguageClass) {
         $scope.range = max_value - min_value;
     }
 
-    if ($scope.query.language_classifications && !$scope.query.variable_codes && !$scope.query.environmental_filters) {
+    /*if ($scope.query.language_classifications && !$scope.query.variable_codes && !$scope.query.environmental_filters) {
         //get lang classifications in tree
         $scope.results.classifications = [];
         $scope.languageClasses = [];
@@ -33,7 +33,7 @@ function SocietiesCtrl($scope, searchModelService, LanguageClass) {
             }
         });
         $scope.results.chosenVariable = -1;
-    }
+    }*/
 
     $scope.setActive('societies');
 

@@ -4,7 +4,7 @@ angular.module('dplaceFilters', [])
             var missingData = false;
             var missingDataValue;
             for (var i = 0; i < codes.length; i++) {
-                if (codes[i].description.indexOf("Missing data") != -1) {
+                if (codes[i].description && codes[i].description.indexOf("Missing data") != -1) {
                     missingData = true;
                     missingDataValue = codes[i].code;
                     break;
