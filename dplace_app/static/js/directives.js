@@ -305,35 +305,40 @@ angular.module('dplaceMapDirective', [])
                         return societyResult.society.id;
                     });
                     
-                    //maybe this code isn't needed?
+                    //needed for colorMap construction - creates a results object specific to the chosen variable
                     var results = {};
                     results.societies = [];
+                    results.environmental_variables = scope.results.environmental_variables;
                     scope.results.societies.forEach(function(societyResult) {
                         var society = societyResult.society;
                         // Add a marker for each point
                         var marker = {latLng: [society.location.coordinates[1], society.location.coordinates[0]], name: society.name}
                         scope.map.addMarker(society.id, marker);
-                        
+                        if (scope.results.variable_descriptions.indexOf(scope.chosen) != -1) {
                         societyResult.variable_coded_values.forEach(function(coded_value) {
                             if (coded_value.variable == scope.chosen.id) {
                                 results.societies.push({
                                     'variable_coded_values':[coded_value],
+                                    'environmental_values': [],
                                     'society':society,
                                 });
                             }
                         });
+                        }
+                        else if (scope.results.environmental_variables.indexOf(scope.chosen) != -1) {
                         societyResult.environmental_values.forEach(function(coded_value) {
                             if (coded_value.variable == scope.chosen.id) {
                                 results.societies.push({
                                     'environmental_values': [coded_value],
+                                    'variable_coded_values':[],
                                     'society':society,
                                 });
                             }
                         });
-                        
+                    }    
                     });
+                    
                     // Map IDs to colors
-
                     var colorMap = colorMapService.generateColorMap(results);
                     scope.map.series.markers[0].setValues(colorMap);
 
