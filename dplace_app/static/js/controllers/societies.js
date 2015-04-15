@@ -1,28 +1,11 @@
 function SocietiesCtrl($scope, searchModelService, LanguageClass) {
     $scope.results = searchModelService.getModel().getResults();
-    console.log($scope.results);
     $scope.query = searchModelService.getModel().getQuery();
-    console.log($scope.query);
     $scope.variables = [];
-    $scope.results.code_ids = {};
-
-    if ($scope.query.variable_codes) {
-        for (var i = 0; i < $scope.query.variable_codes.length; i++) {
-            if ($scope.query.variable_codes[i].variable in $scope.results.code_ids) {
-                $scope.results.code_ids[$scope.query.variable_codes[i].variable] = $scope.results.code_ids[$scope.query.variable_codes[i].variable].concat([$scope.query.variable_codes[i]]);
-            } else {
-                $scope.results.code_ids[$scope.query.variable_codes[i].variable] = [$scope.query.variable_codes[i]];
-            }
-        }
-        
-        if ($scope.results.variable_descriptions) {
-            $scope.variables = $scope.variables.concat($scope.results.variable_descriptions);
-            for (var i = 0; i < $scope.results.variable_descriptions.length; i++){
-                if ($scope.results.code_ids[$scope.results.variable_descriptions[i].id].name) continue;
-                else $scope.results.code_ids[$scope.results.variable_descriptions[i].id].name = $scope.results.variable_descriptions[i].name;
-            }
-        }
+    if ($scope.results.variable_descriptions) {
+        $scope.variables = $scope.variables.concat($scope.results.variable_descriptions);
     }
+    
         
     if ($scope.query.environmental_filters) {
         $scope.variables = $scope.variables.concat($scope.results.environmental_variables);
@@ -35,19 +18,21 @@ function SocietiesCtrl($scope, searchModelService, LanguageClass) {
 
     if ($scope.query.language_classifications && !$scope.query.variable_codes && !$scope.query.environmental_filters) {
         //get lang classifications in tree
-        $scope.classifications = [];
+        $scope.results.classifications = [];
         $scope.languageClasses = [];
         LanguageClass.query().$promise.then(function(result) {
-            console.log(result);
-             for (var i = 0; i < $scope.results.societies.length; i++) {
-            for (var j = 0; j < $scope.results.societies[i].languages.length; j++) {
-                classification = $scope.query.language_classifications.filter(function(l) { return l.language.id == $scope.results.societies[i].languages[j].id; });
-                toAdd = result.filter(function(l) { return l.id == classification[0].class_subfamily; });
-                if (toAdd[0] && $scope.classifications.indexOf(toAdd[0]) == -1)
-                    $scope.classifications = $scope.classifications.concat(toAdd); 
+            for (var i = 0; i < $scope.results.societies.length; i++) {
+                for (var j = 0; j < $scope.results.societies[i].languages.length; j++) {
+                    classification = $scope.query.language_classifications.filter(function(l) { return l.language.id == $scope.results.societies[i].languages[j].id; });
+                    if (classification.length > 0) {
+                        toAdd = result.filter(function(l) { return l.id == classification[0].class_subfamily; });
+                        if (toAdd[0] && $scope.results.classifications.indexOf(toAdd[0]) == -1)
+                            $scope.results.classifications = $scope.results.classifications.concat(toAdd); 
+                    }
+                }
             }
-        }
         });
+        $scope.results.chosenVariable = -1;
     }
 
     $scope.setActive('societies');
@@ -61,7 +46,6 @@ function SocietiesCtrl($scope, searchModelService, LanguageClass) {
     };
     
     $scope.changeMap = function(chosenVariable) {
-        console.log(chosenVariable);
         chosenVariableId = chosenVariable.id;
         d3.select(".legend-for-download").html('');
     }
