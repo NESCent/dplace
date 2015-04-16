@@ -1,8 +1,6 @@
 function SocietiesCtrl($scope, searchModelService, LanguageClass) {
     $scope.results = searchModelService.getModel().getResults();
-    console.log($scope.results);
     $scope.query = searchModelService.getModel().getQuery();
-        console.log($scope.query);
 
     if ($scope.query.variable_codes) {
         $scope.code_ids = {};

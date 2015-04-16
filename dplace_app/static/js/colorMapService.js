@@ -4,33 +4,27 @@ function ColorMapService() {
         return 'hsl(' + hue + ',100%,50%)';
     }
 
-    this.generateColorMap = function(societies, query) {
+    this.generateColorMap = function(results) {
         var colors = {};
-        if ('environmental_filters' in query) {
-            var min_value = 0, max_value = 0;
-            for (var i = 0; i < societies.length; i++) {
-                if (societies[i].environmental_values[0].value < min_value) min_value = societies[i].environmental_values[0].value;
-                else if (societies[i].environmental_values[0].value > max_value) max_value = societies[i].environmental_values[0].value;
-            }
-            var range = max_value - min_value;
-            for (var i = 0; i < societies.length; i++) {
-                var society = societies[i];
-                var id = society.society.id;
-                var value = society.environmental_values[0].value;
-                var color = mapColor(value, range);
-                colors[id] = color;
-            }
-        } else if ('variable_codes' in query) {
-            for (var i = 0; i < societies.length; i++) {
-                var society = societies[i];
-                var id = society.society.id;
-                if (society.variable_coded_values.length > 0) {
-                    var value = society.variable_coded_values[0].coded_value;
-                    var count = query.variable_codes.length;
-                    var color = mapColor(value, count);
-                    colors[id] = color;
+        
+        for (var i = 0; i < results.societies.length; i++) {
+            var society = results.societies[i];
+            for (var j = 0; j < society.environmental_values.length; j++) {
+                variable = results.environmental_variables.filter(function(env_var) {
+                    return env_var.id == society.environmental_values[j].variable;
+                });
+                if (variable.length > 0) {
+                    var color = mapColor(society.environmental_values[0].value, variable[0].range);
+                    colors[society.society.id] = color;
                 }
+                    
             }
+            
+            for (var j = 0; j < society.variable_coded_values.length; j++) {
+                var color = mapColor(society.variable_coded_values[j].coded_value, society.variable_coded_values[j].total_codes_selected);
+                colors[society.society.id] = color;
+            }
+        
         }
         return colors;
     };
