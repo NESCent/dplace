@@ -374,41 +374,81 @@ angular.module('dplaceMapDirective', [])
                         //construct legend for download
                         var legend = d3.select(".legend-for-download");
                         if (scope.results.code_ids && scope.chosen) {
-                        for (var i = 0; i < scope.results.code_ids[scope.chosen.id].length; i++) {
-                            g = legend.append("svg:g")
-                                .attr("transform", function() {
-                                    return 'translate(0,'+i*25+')';
-                                });
-                            g.append("svg:circle")
-                                .attr("cx", "10")
-                                .attr("cy", "10")
-                                .attr("r", "4.5")
-                                .attr("stroke", "#000")
-                                .attr("stroke-width", "0.5")
-                                .attr("fill", function() {
-                                    var value = scope.results.code_ids[scope.chosen.id][i].code;
-                                    var hue = value * 240 / scope.results.code_ids[scope.chosen.id].length;
-                                    return 'hsl('+hue+',100%,50%)';
-                                });
-                            g.append("svg:text")
-                                .attr("x", "20")
-                                .attr("y", "15")
-                                .text(scope.results.code_ids[scope.chosen.id][i].description);
+                            for (var i = 0; i < scope.results.code_ids[scope.chosen.id].length; i++) {
+                                g = legend.append("svg:g")
+                                    .attr("transform", function() {
+                                        return 'translate(0,'+i*25+')';
+                                    });
+                                g.append("svg:circle")
+                                    .attr("cx", "10")
+                                    .attr("cy", "10")
+                                    .attr("r", "4.5")
+                                    .attr("stroke", "#000")
+                                    .attr("stroke-width", "0.5")
+                                    .attr("fill", function() {
+                                        var value = scope.results.code_ids[scope.chosen.id][i].code;
+                                        var hue = value * 240 / scope.results.code_ids[scope.chosen.id].length;
+                                        return 'hsl('+hue+',100%,50%)';
+                                    });
+                                g.append("svg:text")
+                                    .attr("x", "20")
+                                    .attr("y", "15")
+                                    .text(scope.results.code_ids[scope.chosen.id][i].description);
+                            }
+                            var legend_svg = "<g transform='translate(0,300)'>"+legend.node().innerHTML+"</g>";
+                            
+                            var map_svg = map_svg.substring(0, map_svg.indexOf("</svg>"));
+                            map_svg = map_svg.concat(legend_svg+"</svg>");
+                            //generate download
+                            
+                            var imgsrc = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(map_svg)));
+                            d3.select(".download-links").append("td")
+                                .attr("colspan", "2")
+                                .attr("style", "padding-bottom:20px")
+                                .append("a")
+                                .attr("class", "btn btn-info btn-dplace-download")
+                                .attr("download", scope.chosen.name+"map.svg")
+                                .attr("href", imgsrc)
+                                .html("Download Map: " + scope.chosen.name);
                         }
-                        var legend_svg = "<g transform='translate(0,300)'>"+legend.node().innerHTML+"</g>";
                         
-                        var map_svg = map_svg.substring(0, map_svg.indexOf("</svg>"));
-                        map_svg = map_svg.concat(legend_svg+"</svg>");
-                        //generate download
-                        
-                        var imgsrc = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(map_svg)));
-                        d3.select(".download-links").append("td")
-                            .attr("colspan", "2")
-                            .append("a")
-                            .attr("class", "btn btn-info btn-dplace-download")
-                            .attr("download", scope.chosen.name+"map.svg")
-                            .attr("href", imgsrc)
-                            .html("Download Map: " + scope.chosen.name);
+                        else if (scope.results.classifications && scope.results.languages.length > 0) {
+                            for (var i = 0; i < scope.results.classifications.length; i++) {
+                                g = legend.append("svg:g")
+                                    .attr("transform", function() {
+                                        return 'translate(0,'+ i*25 + ')';
+                                    });
+                                g.append("svg:circle")
+                                    .attr("cx", "10")
+                                    .attr("cy", "10")
+                                    .attr("r", "4.5")
+                                    .attr("stroke", "#000")
+                                    .attr("stroke-width", "0.5")
+                                    .attr("fill", function() {
+                                        var value = scope.results.classifications[i].id;
+                                        var hue = value * 240 / scope.results.classifications.length;
+                                        return 'hsl('+hue+',100%,50%)';
+                                    });
+                                g.append("svg:text")
+                                    .attr("x", "20")
+                                    .attr("y", "15")
+                                    .text(scope.results.classifications[i].name);
+                                
+                            }
+                            var legend_svg = "<g transform='translate(0,300)'>"+legend.node().innerHTML+"</g>";
+                            var map_svg = map_svg.substring(0, map_svg.indexOf("</svg>"));
+                            map_svg = map_svg.concat(legend_svg+"</svg>");
+                            var imgsrc = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(map_svg)));
+                            lang_family = scope.results.languages[0].language_family.name;
+                            
+                            d3.select(".download-links").append("td")
+                                .attr("colspan", "2")
+                                .attr("style", "padding-bottom:20px")
+                                .append("a")
+                                .attr("class", "btn btn-info btn-dplace-download")
+                                .attr("download", lang_family+"map.svg")
+                                .attr("href", imgsrc)
+                                .html("Download Map: " + lang_family);
                         }
                 };
 

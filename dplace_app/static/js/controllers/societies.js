@@ -2,6 +2,7 @@ function SocietiesCtrl($scope, searchModelService, LanguageClass) {
     $scope.results = searchModelService.getModel().getResults();
     $scope.query = searchModelService.getModel().getQuery();
     $scope.variables = [];
+    console.log($scope.results);
     if ($scope.results.variable_descriptions) {
         $scope.variables = $scope.variables.concat($scope.results.variable_descriptions);
     }
