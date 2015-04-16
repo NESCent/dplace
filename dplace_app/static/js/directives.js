@@ -34,7 +34,6 @@ angular.module('languagePhylogenyDirective', [])
                 var labels = d3.select("language-phylogeny").append("svg:svg")
                         .attr("width", w+300)
                         .attr("height", 15)
-                        //.attr("style", "position:absolute; background-color:#fff")
                         .attr("id", "varLabels")
                         .attr("transform", "translate(-40, 0)");
                 keysWritten = 1;
@@ -60,6 +59,7 @@ angular.module('languagePhylogenyDirective', [])
                 var vis = d3.select("language-phylogeny").append("svg:svg")
                     .attr("width", w+300)
                     .attr("height", h+30)
+                    .attr("class", "phylogeny")
                     .append("svg:g")
                     .attr("transform", "translate(2, 0)");
                     
