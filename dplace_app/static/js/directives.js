@@ -386,6 +386,8 @@ angular.module('dplaceMapDirective', [])
                                     .attr("stroke", "#000")
                                     .attr("stroke-width", "0.5")
                                     .attr("fill", function() {
+                                        if (scope.results.code_ids[scope.chosen.id][i].description.indexOf("Missing data") != -1)
+                                            return 'hsl(0, 0%, 100%)';
                                         var value = scope.results.code_ids[scope.chosen.id][i].code;
                                         var hue = value * 240 / scope.results.code_ids[scope.chosen.id].length;
                                         return 'hsl('+hue+',100%,50%)';
@@ -395,7 +397,7 @@ angular.module('dplaceMapDirective', [])
                                     .attr("y", "15")
                                     .text(scope.results.code_ids[scope.chosen.id][i].description);
                             }
-                            var legend_svg = "<g transform='translate(0,300)'>"+legend.node().innerHTML+"</g>";
+                            var legend_svg = "<g transform='translate(0,350)'>"+legend.node().innerHTML+"</g>";
                             
                             var map_svg = map_svg.substring(0, map_svg.indexOf("</svg>"));
                             map_svg = map_svg.concat(legend_svg+"</svg>");
@@ -435,7 +437,7 @@ angular.module('dplaceMapDirective', [])
                                     .text(scope.results.classifications[i].name);
                                 
                             }
-                            var legend_svg = "<g transform='translate(0,300)'>"+legend.node().innerHTML+"</g>";
+                            var legend_svg = "<g transform='translate(0,350)'>"+legend.node().innerHTML+"</g>";
                             var map_svg = map_svg.substring(0, map_svg.indexOf("</svg>"));
                             map_svg = map_svg.concat(legend_svg+"</svg>");
                             var imgsrc = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(map_svg)));

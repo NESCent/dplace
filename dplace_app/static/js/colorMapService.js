@@ -20,8 +20,13 @@ function ColorMapService() {
                 }
             
             for (var j = 0; j < society.variable_coded_values.length; j++) {
-                var color = mapColor(society.variable_coded_values[j].coded_value, results.code_ids[society.variable_coded_values[j].variable].length);
-                colors[society.society.id] = color;
+                //if missing data, color should be white
+                if (society.variable_coded_values[j].code_description.description.indexOf("Missing data") != -1)
+                    colors[society.society.id] = 'hsl(0, 0%, 100%)';
+                else {
+                    var color = mapColor(society.variable_coded_values[j].coded_value, results.code_ids[society.variable_coded_values[j].variable].length);
+                    colors[society.society.id] = color;
+                }
             }
             
             if (society.language_family) {
