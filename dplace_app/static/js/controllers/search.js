@@ -65,6 +65,7 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties, 
     $scope.getCodeIDs = function() {
         $scope.searchModel.results.code_ids = {};
         if ($scope.searchModel.query.language_classifications && !$scope.searchModel.query.variable_codes && !$scope.searchModel.query.environmental_filters) {
+            console.log("Doing");
             $scope.searchModel.results.classifications = [];
             LanguageClass.query().$promise.then(function(result) {
                 for (var i = 0; i < $scope.searchModel.results.societies.length; i++) {
