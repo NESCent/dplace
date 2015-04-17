@@ -1,15 +1,11 @@
 function SocietiesCtrl($scope, searchModelService, LanguageClass) {
     $scope.results = searchModelService.getModel().getResults();
     $scope.query = searchModelService.getModel().getQuery();
-
-    console.log($scope.results);
-
     $scope.variables = [];
     console.log($scope.results);
     if ($scope.results.variable_descriptions) {
         $scope.variables = $scope.variables.concat($scope.results.variable_descriptions);
     }
-    
         
     if ($scope.query.environmental_filters) {
         $scope.variables = $scope.variables.concat($scope.results.environmental_variables);
@@ -57,11 +53,9 @@ function SocietiesCtrl($scope, searchModelService, LanguageClass) {
             .attr("transform", function() {
                 return 'translate(0,0)';
             });
-        total_codes = 0;
-        for (var key in $scope.code_ids) {
+        for (var key in $scope.results.code_ids) {
             
-            for (var i = 0; i < $scope.code_ids[key].length; i++) {
-            total_codes = total_codes++;
+            for (var i = 0; i < $scope.results.code_ids[key].length; i++) {
             g = legend.append("svg:g")
                 .attr("transform", function() {
                     return 'translate(0,'+i*25+')';
@@ -73,20 +67,20 @@ function SocietiesCtrl($scope, searchModelService, LanguageClass) {
                 .attr("stroke", "#000")
                 .attr("stroke-width", "0.5")
                 .attr("fill", function() {
-                    var value = $scope.code_ids[key][i].code;
-                    var hue = value * 240 / $scope.code_ids[key].length;
+                    var value = $scope.results.code_ids[key][i].code;
+                    var hue = value * 240 / $scope.results.code_ids[key].length;
                     return 'hsl('+hue+',100%,50%)';
                 });
             g.append("svg:text")
                 .attr("x", "20")
                 .attr("y", "15")
-                .text($scope.code_ids[key][i].description);
+                .text($scope.results.code_ids[key][i].description);
             }        
         }
         
         d3.select(".tree-legend.DL")
             .attr("transform", function() {
-                return 'translate(0,'+total_codes*25+")";
+                return 'translate(0,0)';
             });
         
         d3.select(".tree-download").html('');
@@ -98,13 +92,14 @@ function SocietiesCtrl($scope, searchModelService, LanguageClass) {
         
         append_height = tree_svg.substring(0, tree_svg.indexOf("height="));
         d3_height = d3.select(".phylogeny").style("height");
-                console.log(parseInt(d3_height));
+        d3_height = parseInt(d3_height);
+        digits = d3_height.toString().length;
         d3_height += 500;
-        append_height = append_height.concat("height="+d3_height);
-        append_height = append_height.concat(tree_svg.substring(tree_svg.indexOf("height=")+9+d3_height.length));
+        append_height = append_height.concat("height="+'"'+d3_height+'"');
+        to_append = tree_svg.substring(tree_svg.indexOf("height=")+9+digits);
+        append_height = append_height.concat(to_append);
         console.log(append_height);
-
-        var imgsrc = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(tree_svg)));
+        var imgsrc = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(append_height)));
         d3.select(".tree-download").append("a")
             .attr("class", "btn btn-info btn-dplace-download")
             .attr("download", "tree.svg")
