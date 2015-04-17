@@ -6,25 +6,33 @@ function ColorMapService() {
 
     this.generateColorMap = function(results) {
         var colors = {};
-        
         for (var i = 0; i < results.societies.length; i++) {
             var society = results.societies[i];
-            for (var j = 0; j < society.environmental_values.length; j++) {
-                variable = results.environmental_variables.filter(function(env_var) {
-                    return env_var.id == society.environmental_values[j].variable;
-                });
-                if (variable.length > 0) {
-                    var color = mapColor(society.environmental_values[0].value, variable[0].range);
-                    colors[society.society.id] = color;
+                for (var j = 0; j < society.environmental_values.length; j++) {
+                    variable = results.environmental_variables.filter(function(env_var) {
+                        return env_var.id == society.environmental_values[j].variable;
+                    });
+                   
+                    if (variable.length > 0) {
+                        var color = mapColor(society.environmental_values[0].value, variable[0].range);
+                        colors[society.society.id] = color;
+                    }    
                 }
-                    
-            }
             
             for (var j = 0; j < society.variable_coded_values.length; j++) {
-                var color = mapColor(society.variable_coded_values[j].coded_value, society.variable_coded_values[j].total_codes_selected);
+                //if missing data, color should be white
+                if (society.variable_coded_values[j].code_description.description.indexOf("Missing data") != -1)
+                    colors[society.society.id] = 'hsl(0, 0%, 100%)';
+                else {
+                    var color = mapColor(society.variable_coded_values[j].coded_value, results.code_ids[society.variable_coded_values[j].variable].length);
+                    colors[society.society.id] = color;
+                }
+            }
+            
+            if (society.language_family) {
+                var color = mapColor(society.language_family, society.num_classifications);
                 colors[society.society.id] = color;
             }
-        
         }
         return colors;
     };
