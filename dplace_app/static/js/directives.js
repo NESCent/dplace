@@ -39,14 +39,16 @@ angular.module('languagePhylogenyDirective', [])
                 keysWritten = 1;
                 translate = 20;
                 if (scope.query.variable_codes) {
-                    for (var key in scope.code_ids) {
-                        labels.append("svg:text")
-                            .attr("dx", w+15+translate)
-                            .attr("dy", 15)
-                            .text("C"+keysWritten);
-                        scope.code_ids[key].CID = "C"+keysWritten;
-                        keysWritten++;
-                        translate += 20;    
+                    for (var key in scope.results.code_ids) {
+                        if (scope.results.code_ids[key].length > 0) {
+                            labels.append("svg:text")
+                                .attr("dx", w+15+translate)
+                                .attr("dy", 15)
+                                .text("C"+keysWritten);
+                            scope.results.code_ids[key].CID = "C"+keysWritten;
+                            keysWritten++;
+                            translate += 20;    
+                        }
                     }
                 }                     
                 if (scope.query.environmental_filters) {     
@@ -92,7 +94,7 @@ angular.module('languagePhylogenyDirective', [])
                     
                 translate = 0;
                 if (scope.query.variable_codes) {
-                    for (var key in scope.code_ids) {
+                    for (var key in scope.results.code_ids) {
                         scope.results.societies.forEach(function(society) {
                             var selected = node.filter(function(d) {
                                 return d.name == society.society.iso_code;
@@ -113,7 +115,7 @@ angular.module('languagePhylogenyDirective', [])
                                                         return 'hsl(360, 100%, 100%)';
                                                     }
                                                     value = society.variable_coded_values[i].coded_value;
-                                                    hue = value * 240 / scope.code_ids[society.variable_coded_values[i].variable].length;
+                                                    hue = value * 240 / scope.results.code_ids[society.variable_coded_values[i].variable].length;
                                                     return 'hsl('+hue+',100%, 50%)';
                                                 })
                                                 .on("mouseover", function() { 
@@ -149,12 +151,10 @@ angular.module('languagePhylogenyDirective', [])
                                 .attr("fill", function(n) {
                                     if (classification.length > 0) {
                                         value = classification[0].class_subfamily;
-                                        hue = value * 240 / scope.classifications.length;
+                                        hue = value * 240 / scope.results.classifications.length;
                                         return 'hsl('+hue+',100%, 50%)';
                                     }
                                 });
-                            
-                            
                         }
                         
                     });
@@ -224,7 +224,7 @@ angular.module('dplaceMapDirective', [])
             // If not present, default to 'mapDiv'
             var mapDivId = scope.mapDivId || 'mapDiv';
             // Not possible to assign default values to bound attributes, so check
-            element.append("<div id='" + mapDivId + "' style='width:1140px; height:30rem;'></div>");
+            element.append("<div id='" + mapDivId + "' style='width:900px; height:30rem;'></div>");
             scope.localRegions = [];
             scope.checkDirty = function() {
                 return !(angular.equals(scope.localRegions, scope.selectedRegions));
@@ -250,7 +250,7 @@ angular.module('dplaceMapDirective', [])
                       initial: {
                         fill: '#C0C6C6',
                         "fill-opacity": 1,
-                        stroke: '#357ebd',
+                        "stroke": '#357ebd',
                         "stroke-width": 0,
                         "stroke-opacity": 1
                       },
@@ -299,17 +299,156 @@ angular.module('dplaceMapDirective', [])
                     var societyIds = scope.results.societies.map(function(societyResult) {
                         return societyResult.society.id;
                     });
-
+                    
+                    //needed for colorMap construction - creates a results object specific to the chosen variable
+                    var results = {};
+                    results.societies = [];
+                    results.environmental_variables = scope.results.environmental_variables;
+                    results.code_ids = scope.results.code_ids;
                     scope.results.societies.forEach(function(societyResult) {
                         var society = societyResult.society;
                         // Add a marker for each point
-                        var marker = {latLng: society.location.coordinates.reverse(), name: society.name}
+                        var marker = {latLng: [society.location.coordinates[1], society.location.coordinates[0]], name: society.name}
                         scope.map.addMarker(society.id, marker);
+                        if (scope.results.variable_descriptions.indexOf(scope.chosen) != -1) {
+                            societyResult.variable_coded_values.forEach(function(coded_value) {
+                                if (coded_value.variable == scope.chosen.id) {
+                                    results.societies.push({
+                                        'variable_coded_values':[coded_value],
+                                        'environmental_values': [],
+                                        'society':society,
+                                    });
+                                }
+                            });
+                        }
+                        else if (scope.results.environmental_variables.indexOf(scope.chosen) != -1) {
+                            societyResult.environmental_values.forEach(function(coded_value) {
+                                if (coded_value.variable == scope.chosen.id) {
+                                    results.societies.push({
+                                        'environmental_values': [coded_value],
+                                        'variable_coded_values':[],
+                                        'society':society,
+                                    });
+                                }
+                            });
+                        } 
+                        else {
+                            societyResult.languages.forEach(function(language) {
+                                var classification = scope.query.language_classifications.filter(function(l) { return l.language.id == language.id });
+                                if (classification.length > 0) {
+                                    results.societies.push({
+                                    'society': society,
+                                        'language_family': classification[0].class_subfamily,
+                                        'num_classifications': scope.results.classifications.length,
+                                        'environmental_values': [],
+                                        'variable_coded_values': [],
+                                    });
+                                }
+                            });
+                        }
                     });
 
                     // Map IDs to colors
-                    var colorMap = colorMapService.generateColorMap(scope.results);
+                    var colorMap = colorMapService.generateColorMap(results);
                     scope.map.series.markers[0].setValues(colorMap);
+
+                    for (var i = 0; i < societyIds.length; i++) {
+                        if (societyIds[i] in colorMap) continue;
+                        else scope.map.removeMarkers([societyIds[i]]);
+                    }
+                    
+                };
+                
+                //constructs download link for map
+                scope.mapLink = function() {                     
+                        d3.select(".download-links").html('');
+                        var map_svg = d3.select(".jvectormap-container").select("svg")
+                            .attr("version", 1.1)
+                            .attr("xmlns", "http://www.w3.org/2000/svg")
+                            .attr("height", "900")
+                            .node().parentNode.innerHTML;
+                        map_svg = map_svg.substring(0, map_svg.indexOf("<div")); //remove zoom in/out buttons from map
+                        //construct legend for download
+                        var legend = d3.select(".legend-for-download");
+                        if (scope.results.code_ids && scope.chosen) {
+                            for (var i = 0; i < scope.results.code_ids[scope.chosen.id].length; i++) {
+                                g = legend.append("svg:g")
+                                    .attr("transform", function() {
+                                        return 'translate(0,'+i*25+')';
+                                    });
+                                g.append("svg:circle")
+                                    .attr("cx", "10")
+                                    .attr("cy", "10")
+                                    .attr("r", "4.5")
+                                    .attr("stroke", "#000")
+                                    .attr("stroke-width", "0.5")
+                                    .attr("fill", function() {
+                                        if (scope.results.code_ids[scope.chosen.id][i].description.indexOf("Missing data") != -1)
+                                            return 'hsl(0, 0%, 100%)';
+                                        var value = scope.results.code_ids[scope.chosen.id][i].code;
+                                        var hue = value * 240 / scope.results.code_ids[scope.chosen.id].length;
+                                        return 'hsl('+hue+',100%,50%)';
+                                    });
+                                g.append("svg:text")
+                                    .attr("x", "20")
+                                    .attr("y", "15")
+                                    .text(scope.results.code_ids[scope.chosen.id][i].description);
+                            }
+                            var legend_svg = "<g transform='translate(0,350)'>"+legend.node().innerHTML+"</g>";
+                            
+                            var map_svg = map_svg.substring(0, map_svg.indexOf("</svg>"));
+                            map_svg = map_svg.concat(legend_svg+"</svg>");
+                            //generate download
+                            
+                            var imgsrc = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(map_svg)));
+                            d3.select(".download-links").append("td")
+                                .attr("colspan", "2")
+                                .attr("style", "padding-bottom:20px")
+                                .append("a")
+                                .attr("class", "btn btn-info btn-dplace-download")
+                                .attr("download", scope.chosen.name+"map.svg")
+                                .attr("href", imgsrc)
+                                .html("Download Map: " + scope.chosen.name);
+                        }
+                        
+                        else if (scope.results.classifications && scope.results.languages.length > 0) {
+                            for (var i = 0; i < scope.results.classifications.length; i++) {
+                                g = legend.append("svg:g")
+                                    .attr("transform", function() {
+                                        return 'translate(0,'+ i*25 + ')';
+                                    });
+                                g.append("svg:circle")
+                                    .attr("cx", "10")
+                                    .attr("cy", "10")
+                                    .attr("r", "4.5")
+                                    .attr("stroke", "#000")
+                                    .attr("stroke-width", "0.5")
+                                    .attr("fill", function() {
+                                        var value = scope.results.classifications[i].id;
+                                        var hue = value * 240 / scope.results.classifications.length;
+                                        return 'hsl('+hue+',100%,50%)';
+                                    });
+                                g.append("svg:text")
+                                    .attr("x", "20")
+                                    .attr("y", "15")
+                                    .text(scope.results.classifications[i].name);
+                                
+                            }
+                            var legend_svg = "<g transform='translate(0,350)'>"+legend.node().innerHTML+"</g>";
+                            var map_svg = map_svg.substring(0, map_svg.indexOf("</svg>"));
+                            map_svg = map_svg.concat(legend_svg+"</svg>");
+                            var imgsrc = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(map_svg)));
+                            lang_family = scope.results.languages[0].language_family.name;
+                            
+                            d3.select(".download-links").append("td")
+                                .attr("colspan", "2")
+                                .attr("style", "padding-bottom:20px")
+                                .append("a")
+                                .attr("class", "btn btn-info btn-dplace-download")
+                                .attr("download", lang_family+"map.svg")
+                                .attr("href", imgsrc)
+                                .html("Download Map: " + lang_family);
+                        }
                 };
 
                 if(attrs.results) {
@@ -318,7 +457,14 @@ angular.module('dplaceMapDirective', [])
                         scope.addMarkers();
                     });
                 }
-
+                if (attrs.chosen) {
+                    scope.$watchCollection('chosen', function(oldvalue, newvalue) {
+                        scope.addMarkers(); 
+                        scope.mapLink();
+                    });
+                }
+                
+                
                 if(attrs.selectedRegions) {
                     scope.$watchCollection('selectedRegions', function(oldvalue, newvalue) {
                         var dirty = scope.checkDirty();
@@ -340,7 +486,9 @@ angular.module('dplaceMapDirective', [])
                 scope.$on('$destroy', function() {
                     hideMap(scope);
                 });
+                                
                 scope.map.updateSize();
+                
             };
 
             // Handle visibility toggle
@@ -376,7 +524,8 @@ angular.module('dplaceMapDirective', [])
                 selectedRegions: '=',
                 mapDivId: '@',
                 visible: '=',
-                query: '='
+                query: '=',
+                chosen: '=',
             },
             link: link
         };
