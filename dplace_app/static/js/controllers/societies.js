@@ -1,7 +1,7 @@
 function SocietiesCtrl($scope, searchModelService, LanguageClass) {
     $scope.results = searchModelService.getModel().getResults();
     $scope.query = searchModelService.getModel().getQuery();
-
+    console.log($scope.results);
     if ($scope.query.variable_codes) {
         $scope.code_ids = {};
         for (var i = 0; i < $scope.query.variable_codes.length; i++) {
@@ -57,14 +57,59 @@ function SocietiesCtrl($scope, searchModelService, LanguageClass) {
     };
     
     $scope.treeDownload = function() {
+        var legend = d3.select("language-phylogeny").select(".phylogeny")
+            .append("svg:g")
+            .attr("class", "tree-legend-DL")
+            .attr("transform", function() {
+                return 'translate(0,0)';
+            });
+        total_codes = 0;
+        for (var key in $scope.code_ids) {
+            
+            for (var i = 0; i < $scope.code_ids[key].length; i++) {
+            total_codes = total_codes++;
+            g = legend.append("svg:g")
+                .attr("transform", function() {
+                    return 'translate(0,'+i*25+')';
+                });
+            g.append("svg:circle")
+                .attr("cx", "10")
+                .attr("cy", "10")
+                .attr("r", "4.5")
+                .attr("stroke", "#000")
+                .attr("stroke-width", "0.5")
+                .attr("fill", function() {
+                    var value = $scope.code_ids[key][i].code;
+                    var hue = value * 240 / $scope.code_ids[key].length;
+                    return 'hsl('+hue+',100%,50%)';
+                });
+            g.append("svg:text")
+                .attr("x", "20")
+                .attr("y", "15")
+                .text($scope.code_ids[key][i].description);
+            }        
+        }
+        
+        d3.select(".tree-legend.DL")
+            .attr("transform", function() {
+                return 'translate(0,'+total_codes*25+")";
+            });
+        
         d3.select(".tree-download").html('');
-        var tree_svg = d3.select("language-phylogeny").select(".phylogeny")
+        var tree_svg = d3.select(".phylogeny")
             .attr("version", 1.1)
             .attr("xmlns", "http://www.w3.org/2000/svg")
             .node().parentNode.innerHTML;
         tree_svg = tree_svg.substring(tree_svg.indexOf("<svg xml"));
-        console.log(tree_svg);
         
+        append_height = tree_svg.substring(0, tree_svg.indexOf("height="));
+        d3_height = d3.select(".phylogeny").style("height");
+                console.log(parseInt(d3_height));
+        d3_height += 500;
+        append_height = append_height.concat("height="+d3_height);
+        append_height = append_height.concat(tree_svg.substring(tree_svg.indexOf("height=")+9+d3_height.length));
+        console.log(append_height);
+
         var imgsrc = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(tree_svg)));
         d3.select(".tree-download").append("a")
             .attr("class", "btn btn-info btn-dplace-download")

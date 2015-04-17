@@ -61,7 +61,7 @@ angular.module('languagePhylogenyDirective', [])
                     .attr("height", h+30)
                     .attr("class", "phylogeny")
                     .append("svg:g")
-                    .attr("transform", "translate(2, 0)");
+                    .attr("transform", "translate(5, 5)");
                     
                 var diagonal = rightAngleDiagonal();
                 
