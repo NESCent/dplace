@@ -17,8 +17,10 @@ function EnvironmentalCtrl($scope, searchModelService, EnvironmentalVariable, En
         return filters;
     };
     
+    
     $scope.categoryChanged = function(category) {
         $scope.environmentalData.variables = EnvironmentalVariable.query({category: category.id});    
+        $scope.environmentalData.selectedVariable = '';
     };
 
     $scope.variableChanged = function(variable) {
@@ -29,7 +31,7 @@ function EnvironmentalCtrl($scope, searchModelService, EnvironmentalVariable, En
         }
         $scope.environmentalData.vals[0] = '';
         $scope.environmentalData.vals[1] = '';
-        
+        $scope.EnvironmentalForm.$setPristine();
         if ($scope.environmentalData.selectedFilter.operator == 'all') {
             $scope.filterChanged();
         }
