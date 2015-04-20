@@ -38,6 +38,10 @@ function SearchModel(VariableCategory, GeographicRegion, EnvironmentalCategory, 
     this.getResults = function() {
         return this.results;
     };
+    
+    this.getLanguageTrees = function() {
+        return this.results.languageTrees;
+    };
 
     // Just the societies object
     this.getSocieties = function() {

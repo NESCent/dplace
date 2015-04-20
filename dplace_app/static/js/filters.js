@@ -1,8 +1,21 @@
 angular.module('dplaceFilters', [])
     .filter('colorNode', function() {
         return function(value, codes) {
-            var hue = value * 240 / codes.length;
+            var missingData = false;
+            var missingDataValue;
+            for (var i = 0; i < codes.length; i++) {
+                if (codes[i].description && codes[i].description.indexOf("Missing data") != -1) {
+                    missingData = true;
+                    missingDataValue = codes[i].code;
+                    break;
+                }
+            }
+            if (missingData && value == missingDataValue) return 'hsl(0, 0%, 100%)';
+            else {
+               var hue = value * 240 / codes.length;
+            }
             return 'hsl('+hue+',100%, 50%)';
+            
         }
     })
     .filter('formatVariableCodeValues', function() {

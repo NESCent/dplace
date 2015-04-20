@@ -42,7 +42,7 @@ class VariableCodeDescriptionViewSet(viewsets.ReadOnlyModelViewSet):
 # Can filter by code, code__variable, or society
 class VariableCodedValueViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = VariableCodedValueSerializer
-    filter_fields = ('variable','coded_value','code','society','code',)
+    filter_fields = ('variable','coded_value','code','society',)
     # Avoid additional database trips by select_related for foreign keys
     queryset = VariableCodedValue.objects.select_related('variable').select_related('code').all()
 
@@ -93,7 +93,7 @@ class LanguageClassificationViewSet(viewsets.ReadOnlyModelViewSet):
 
 class LanguageViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = LanguageSerializer
-    filter_fields = ('name', 'iso_code', 'society',)
+    filter_fields = ('name', 'iso_code', 'societies',)
     queryset = Language.objects.all()
 
 class LanguageTreeViewSet(viewsets.ReadOnlyModelViewSet):
@@ -193,7 +193,19 @@ def get_language_trees_from_query_dict(query_dict):
 @api_view(['POST'])
 @permission_classes((AllowAny,))
 def trees_from_languages(request):
+    from ete2 import Tree
     trees = get_language_trees_from_query_dict(request.DATA)
+    if 'language_ids' in request.DATA:
+        languages = request.DATA['language_ids']
+        for t in trees:
+            langs_in_tree = [str(l.iso_code.iso_code) for l in t.languages.all() if l.id in languages] 
+            newick = Tree(t.newick_string)
+            #only works if tips use isocodes
+            try:
+                newick.prune(langs_in_tree, preserve_branch_length=True)
+            except:
+                continue
+            t.newick_string = newick.write(format=5)
     return Response(LanguageTreeSerializer(trees, many=True).data,)
     
 @api_view(['GET'])
@@ -238,44 +250,19 @@ def newick_tree(key):
 @permission_classes((AllowAny,))
 def get_newick_trees(request):
     from ete2 import Tree
-    newick_trees = NewickResultSet()
-    query_string = request.QUERY_PARAMS['query'] #get the query parameters
-    # Need to parse the JSON
-    query_dict = json.loads(query_string)
-    result_set = result_set_from_query_dict(query_dict) #search for societies
-    languages = set() #list of language ids, used to find the language trees
-    if result_set.societies:
-        for s in result_set.societies:
-            if len(s.variable_coded_values) is 1: #can only handle one variable at a time
-                for v in s.variable_coded_values:
-                    coded_value = v.coded_value
-            elif len(s.environmental_values) is 1:
-                for v in s.environmental_values:
-                    coded_value = v.value
-            else:
-                coded_value = None
-            if s.society.language:
-                languages.add(s.society.language.id)
-                if coded_value is not None: #mapping of results and isocodes, used to color the nodes
-                    newick_trees.add_isocode(s.society.language.iso_code.iso_code, coded_value)
-        trees = get_language_trees_from_query_dict({'language_ids': languages}) #search for language trees
+    trees = get_language_trees_from_query_dict(request.DATA)
+    if 'language_ids' in request.DATA:
+        languages = request.DATA['language_ids']
         for t in trees:
-            #get a list of societies that we have data for
-            langs_in_tree = [str(l.iso_code.iso_code) for l in t.languages.all() if l.id in languages]
-            newick_string = Tree(str(newick_tree(t.id)))
-            
-            #this try-except block is only if we prune trees using ete2.
-            try: 
-                #this doesn't work when the .trees file doesn't use isocodes as node labels
-                #only tree giving this problem is substitutions.mcct.trees
-                #delete societies that we don't have data for
-                newick_string.prune(langs_in_tree, preserve_branch_length=True)
+            langs_in_tree = [str(l.iso_code.iso_code) for l in t.languages.all() if l.id in languages] 
+            newick = Tree(t.newick_string)
+            #only works if tips use isocodes
+            try:
+                newick.prune(langs_in_tree, preserve_branch_length=True)
             except:
                 continue
-            #newick_trees.add_string(t, newick_tree(t.id)) #if pruning using JavaScript
-            newick_trees.add_string(t, newick_string.write(format=5)) #if pruning using ete2
-        newick_trees.finalize()
-    return Response(NewickResultSetSerializer(newick_trees).data)
+            t.newick_string = newick.write(format=5)
+    return Response(LanguageTreeSerializer(trees, many=True).data,)
 
 @api_view(['GET'])
 @permission_classes((AllowAny,))

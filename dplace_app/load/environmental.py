@@ -9,14 +9,14 @@ ENVIRONMENTAL_MAP = {
     'AnnualMeanTemperature': {
         'name': 'Annual Mean Temperature',
         'category': 'Climate',
-        'units': '℃',
         'description': 'Mean value of monthly precipitation or temperature across the year',
+        'units': '°C',
     },
     'AnnualTemperatureVariance': {
         'name': 'Annual Temperature Variance',
         'category': 'Climate',
-        'units': '℃',
         'description': 'Variance in temperature means (averaged across years)', 
+        'units': '°C',
     },
     'TemperatureConstancy': {
         'name': 'Temperature Constancy',
