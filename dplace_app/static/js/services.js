@@ -148,6 +148,7 @@ angular.module('dplaceServices', ['ngResource'])
                 }
             });
     })
+    //not used at the moment
     .factory('TreesFromLanguages', function($resource) {
         return $resource(
             '/api/v1/trees_from_languages',
