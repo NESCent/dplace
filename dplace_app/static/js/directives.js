@@ -74,11 +74,19 @@ angular.module('languagePhylogenyDirective', [])
                 var yscale = d3.scale.linear()
                     .domain([0, d3.max(rootDists)])
                     .range([0, w]);
+                var leafDistFromRoot = 0;
                 nodes.forEach(function(node) {
+                    if (node.rootDist > leafDistFromRoot)
+                        leafDistFromRoot = node.rootDist;
                     node.y = yscale(node.rootDist);
                 });
                 
+                //calculate time scale
+                var timeScaleYears = leafDistFromRoot * 100; //convert to years
+                var pixelScale = (w / timeScaleYears) * 100;
+                
                 var links = tree.links(nodes);
+                console.log(nodes);
                 var link = vis.selectAll("path.link")
                     .data(links)
                     .enter().append("svg:path")
@@ -90,8 +98,12 @@ angular.module('languagePhylogenyDirective', [])
                 var node = vis.selectAll("g.node")
                     .data(nodes)
                     .enter().append("svg:g")
+                    .attr("class", function(n) {
+                        if (n.children) return "inner-node";
+                        else return "leaf-node";
+                    })
                     .attr("transform", function(d) { return "translate(" + d.y + ", "+ d.x + ")"; });
-                    
+                
                 translate = 0;
                 if (scope.query.variable_codes) {
                     for (var key in scope.results.code_ids) {
@@ -191,6 +203,23 @@ angular.module('languagePhylogenyDirective', [])
                             .attr("font-family", "Arial")
                             .text(function(d) { return d.name; });
                 });
+                
+                //APPEND LINE HERE
+                line_svg= d3.select('language-phylogeny').append("svg:svg")
+                    .attr("style", "margin-left:100px;");
+                line_svg.append("svg:line")
+                    .attr("x1", "0")
+                    .attr("y1", "0")
+                    .attr("x2", pixelScale)
+                    .attr("y2", "0")
+                    .attr("style", "stroke:#ccc;stroke-width:7;");
+                line_svg.append("svg:text")
+                    .attr("dy", "20")
+                    .attr("dx", function() {
+                        return (pixelScale - 63)/2;
+                    })
+                    .text("100 years");
+                    
                 
                 phyloWidth = d3.select("g").node().getBBox().width;
                 d3.select("#legend")
