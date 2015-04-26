@@ -9,12 +9,12 @@ ENVIRONMENTAL_MAP = {
     'AnnualMeanTemperature': {
         'name': 'Annual Mean Temperature',
         'category': 'Climate',
-        'units': '°C',
+        'units': '℃',
     },
     'AnnualTemperatureVariance': {
         'name': 'Annual Temperature Variance',
         'category': 'Climate',
-        'units': '°C',
+        'units': '℃',
     },
     'TemperatureConstancy': {
         'name': 'Temperature Constancy',
@@ -126,6 +126,7 @@ def create_environmental_variables():
             obj, created = EnvironmentalVariable.objects.get_or_create(name=var_dict['name'],units=var_dict['units'])
             obj.category = env_category
             obj.save()
+            print obj
         else:
             EnvironmentalVariable.objects.get_or_create(name=var_dict['name'],units=var_dict['units']) 
 

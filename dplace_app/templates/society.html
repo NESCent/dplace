@@ -6,45 +6,78 @@
         <h1>Language {{ language.name }} from {{ society.name }}</h1>
     {% else %}
         <h1>Society: {{ society.name }}</h1>
+        {% if society.language %}
+            <h3>Language: {{ society.language.name }}</h3>
+            {% if language_classification %}
+                Language Classification: {% for classification in language_classification %} {{ classification.ethnologue_classification }} {% endfor %}
+            {% endif %}
+        {% endif %}
     {% endif %}
     <h2>Environmental Data</h2>
-    {% for environmental in environmentals %}
-    <table class="table table-bordered table-condensed table-striped">
-        <tr>
-            <th>Variable</th>
-            <th>Value</th>
-        </tr>
-        {% for value in environmental.values.all %}
-            <tr>
-                <td>{{ value.variable.name }}</td>
-                <td>{{ value.value }}</td>
-            </tr>
-        {% endfor %}
-    </table>
+    {% for key, value in environmentals.items %}
+        <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+            <div class="panel panel-default">
+                <div class="panel-heading" role="tab" id="h{{key|cut:" "}}">
+                    <h4 class="panel-title">
+                        <a data-toggle="collapse" data-parent="#accordion" href="#c{{key|cut:" "}}" aria-expanded="true" aria-controls="c{{key|cut:" "}}">
+                            {{key}}
+                        </a>
+                    </h4>
+                </div>
+                <div id="c{{key|cut:" "}}" class="panel-collapse collapse out" role="tabpanel" aria-labelledby="h{{key|cut:" "}}">
+                    <table class="panel-body table table-condensed table-striped table-bordered">
+                        <tr>
+                            <th>Variable</th>
+                            <th>Value</th>
+                        </tr>
+                        {% for v in value %}
+                        <tr>
+                            <td>{{v.name}}</td>
+                            <td>{{v.value}}</td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+        </div>
     {% endfor %}
+    
     <h2>Cultural Trait Data</h2>
-    <table class="table table-condensed table-striped table-bordered">
-    <tr>
-        <th colspan="2">Variable</th>
-        <th colspan="2">Value</th>
-    </tr>
-    <tr>
-        <th>Label</th>
-        <th>Name</th>
-        <th>Code</th>
-        <th>Description</th>
-    </tr>
-    {% for cultural_trait in cultural_traits %}
-        <tr>
-        <td>{{ cultural_trait.label }}</td>
-        <td>{{ cultural_trait.name }}</td>
-        <td>{{ cultural_trait.code }}</td>
-        <td>{{ cultural_trait.description }}</td>
-        </tr>
-
+    {% for key, value in cultural_traits.items %}
+        <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+            <div class="panel panel-default">
+                <div class="panel-heading" role="tab" id="h{{key|cut:" "}}">
+                    <h4 class="panel-title">
+                        <a data-toggle="collapse" data-parent="#accordion" href="#c{{key|cut:" "}}" aria-expanded="true" aria-controls="c{{key|cut:" "}}">
+                            {{key}}
+                        </a>
+                    </h4>
+                </div>
+                <div id="c{{key|cut:" "}}" class="panel-collapse collapse out" role="tabpanel" aria-labelledby="h{{key|cut:" "}}">
+                    <table class="panel-body table table-condensed table-striped table-bordered">
+                        <tr>
+                            <th colspan="2">Variable</th>
+                            <th colspan="2">Value</th>
+                        </tr>
+                        <tr>
+                            <th>Label</th>
+                            <th>Name</th>
+                            <th>Code</th>
+                            <th>Description</th>
+                        </tr>
+                        {% for v in value %}
+                        <tr>
+                            <td>{{v.label}}</td>
+                            <td>{{v.name}}</td>
+                            <td>{{v.code}}</td>
+                            <td>{{v.description}}</td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+        </div>
     {% endfor %}
-
-    </table>
 
 </div>
 {% endblock %}
