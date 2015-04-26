@@ -13,7 +13,8 @@ from load.tree import *
 LOAD_BY_ROW=('iso', 'env_vals',
              'langs', 'iso_lat_long',
              'ea_soc', 'ea_vars', 'ea_vals',
-             'bf_soc', 'bf_vars', 'bf_vals')
+             'bf_soc', 'bf_vars', 'bf_vals',
+             'bf_harm')
 
 def run(file_name=None, mode=None):
     if mode == 'geo':
@@ -42,6 +43,8 @@ def run(file_name=None, mode=None):
                         load_lang(dict_row)
                     elif mode == 'bf_soc':
                         load_bf_society(dict_row)
+                    elif mode == 'bf_harm':
+                        load_bf_harm(dict_row)
                     elif mode == 'bf_vars':
                         load_bf_var(dict_row)
                     elif mode == 'bf_vals':
