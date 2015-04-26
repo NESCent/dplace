@@ -24,6 +24,9 @@ class Society(models.Model):
     iso_code = models.ForeignKey('ISOCode', null=True, related_name="societies")
     language = models.ForeignKey('Language', null=True, related_name="societies")
     objects = models.GeoManager()
+    focal_year = models.CharField('Focal Year', null=True, blank=True, max_length=100)
+    references = models.TextField('References', null=True)
+    society_links = models.ManyToManyField('Society', null=True, blank=True)
 
     def get_cultural_trait_data(self):
         """Returns the Ethnographic Atlas data for the given society"""
