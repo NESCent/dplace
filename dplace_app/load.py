@@ -20,6 +20,8 @@ def run(file_name=None, mode=None):
         load_regions(file_name)
     elif mode == 'tree':
         load_tree(file_name)
+    elif mode == 'glottotree':
+        load_glotto_tree(file_name)
     else:
         # read the csv file
         with open(file_name, 'rb') as csvfile:
