@@ -6,7 +6,6 @@ function SocietiesCtrl($scope, searchModelService, LanguageClass) {
     if ($scope.results.variable_descriptions) {
         $scope.variables = $scope.variables.concat($scope.results.variable_descriptions);
     }
-    
         
     if ($scope.query.environmental_filters) {
         $scope.variables = $scope.variables.concat($scope.results.environmental_variables);
@@ -44,6 +43,23 @@ function SocietiesCtrl($scope, searchModelService, LanguageClass) {
     
     $scope.treeSelected = function() {
         $scope.$broadcast('treeSelected', {tree: $scope.results.selectedTree});
+        d3.select(".tree-legend-DL").html('');
+        $scope.treeDownload();
+    };
+    
+    $scope.treeDownload = function() {
+        var tree_svg = d3.select(".phylogeny")
+            .attr("version", 1.1)
+            .attr("xmlns", "http://www.w3.org/2000/svg")
+            .node().parentNode.innerHTML;
+         tree_svg = tree_svg.substring(tree_svg.indexOf("<svg xml"));
+         tree_svg = tree_svg.substring(0, tree_svg.indexOf("</svg>"));
+        var imgsrc = 'data:image/svg:xml;base64,' + window.btoa(unescape(encodeURIComponent(tree_svg)));
+        d3.select(".tree-download").append("a")
+            .attr("class", "btn btn-info btn-dplace-download")
+            .attr("download", "tree.svg")
+            .attr("href", imgsrc)
+            .html("Download Phylogeny");
     };
     
     $scope.changeMap = function(chosenVariable) {
