@@ -9,104 +9,124 @@ ENVIRONMENTAL_MAP = {
     'AnnualMeanTemperature': {
         'name': 'Annual Mean Temperature',
         'category': 'Climate',
+        'description': 'Mean value of monthly precipitation or temperature across the year',
         'units': '°C',
     },
     'AnnualTemperatureVariance': {
         'name': 'Annual Temperature Variance',
         'category': 'Climate',
+        'description': 'Variance in temperature means (averaged across years)', 
         'units': '°C',
     },
     'TemperatureConstancy': {
         'name': 'Temperature Constancy',
         'category': 'Climate',
         'units': '',
+        'description': 'Colwell’s (1974) information theoretic index. Indicates the extent to which a climate patterns are predictable because conditions are constant.',
     },
     'TemperatureContingency': {
         'name': 'Temperature Contingency',
         'category': 'Climate',
         'units': '',
+        'description': 'Colwell’s (1974) information theoretic index. Indicates the extent to which a climate patterns are predictable because conditions oscillate in a very predictable manner.',
     },
     'TemperaturePredictability': {
         'name': 'Temperature Predictability',
         'category': 'Climate',
         'units': '',
+        'description': 'Colwell’s (1974) information theoretic index. Indicates the extent to which a climate patterns are predictable due to either constancy or contingency.',
     },
     'AnnualMeanPrecipitation': {
         'name': 'Annual Mean Precipitation',
         'category': 'Climate',
         'units': 'mm',
+        'description': 'Mean value of monthly precipitation.',
     },
     'AnnualPrecipitationVariance': {
         'name': 'Annual Precipitation Variance',
         'category': 'Climate',
         'units': '',
+        'description': 'Variance in monthly precipitation means (averaged across years)',
     },
     'PrecipitationConstancy': {
         'name': 'Precipitation Constancy',
         'category': 'Climate',
         'units': '',
+        'description': 'Colwell’s (1974) information theoretic index. Indicates the extent to which a climate patterns are predictable because conditions are constant.',
     },
     'PrecipitationContingency': {
         'name': 'Precipitation Contingency',
         'category': 'Climate',
         'units': '',
+        'description': 'Colwell’s (1974) information theoretic index. Indicates the extent to which a climate patterns are predictable because conditions oscillate in a very predictable manner.',
     },
     'PrecipitationPredictability': {
         'name': 'Precipitation Predictability',
         'category': 'Climate',
         'units': '',
+        'description': 'Colwell’s (1974) information theoretic index. Indicates the extent to which a climate patterns are predictable due to either constancy or contingency.'
     },
     'BirdRichness': {
         'name': 'Bird Richness',
         'category': 'Ecology',
         'units': '',
+        'description': 'Number of coexisting species in a given taxonomic group.',
     },
     'MammalRichness': {
         'name': 'Mammal Richness',
         'category': 'Ecology',
         'units': '',
+        'description': 'Number of coexisting species in a given taxonomic group.',
     },
     'AmphibianRichness': {
         'name': 'Amphibian Richness',
         'category': 'Ecology',
         'units': '',
+        'description': 'Number of coexisting species in a given taxonomic group.',
     },
     'VascularPlantsRichness': {
         'name': 'Vascular Plants Richness',
         'category': 'Ecology',
         'units': '',
+        'description': '',
     },
     # TODO: EcoRegion! (text)
     'Elevation': {
         'name': 'Elevation',
         'category': 'Physical landscape',
         'units': '',
+        'description': 'Meters above sea level',
     },
     'Slope': {
         'name': 'Slope',
         'category': 'Physical landscape',
         'units': '',
+        'description': 'Mean incline (in degrees) in the terrain (unit of sample 0.5 by 0.5 degree cell)',
     },
     # TODO: Coastal (Bool)
     'NetPrimaryProduction': {
         'name': 'Net Primary Production',
         'category': 'Ecology',
         'units': '',
+        'description': 'grams of carbon taken in by plants per square meter of land per day',
     },
     'DurationOfGrowingSeason': {
         'name': 'Duration of Growing Season',
         'category': 'Climate',
         'units': 'mo',
+        'description': 'Mean number of months in the year that net primary production is positive',
     },
     'MeanGrowingSeason.NPP': {
         'name': 'Mean Growing Season NPP',
         'category': 'Ecology',
         'units': '',
+        'description': 'Mean net primary production during growing season',
     },
     'InterYearVariance.GrowingSeason.NPP': {
         'name': 'Inter-Year Variance Growing Season NPP',
         'category': 'Ecology',
         'units': '',
+        'description': 'Variance among years in NPP for the growing season',
     },
 }
 
@@ -125,10 +145,11 @@ def create_environmental_variables():
             env_category, created = EnvironmentalCategory.objects.get_or_create(name=var_dict['category'])
             obj, created = EnvironmentalVariable.objects.get_or_create(name=var_dict['name'],units=var_dict['units'])
             obj.category = env_category
+            obj.codebook_info = var_dict['description']
             obj.save()
         else:
             EnvironmentalVariable.objects.get_or_create(name=var_dict['name'],units=var_dict['units']) 
-
+    
 def load_environmental(env_dict):
     ext_id = env_dict['ID']
     source = get_source(env_dict['Source'])
