@@ -86,7 +86,6 @@ angular.module('languagePhylogenyDirective', [])
                 var pixelScale = (w / timeScaleYears) * 100;
                 
                 var links = tree.links(nodes);
-                console.log(nodes);
                 var link = vis.selectAll("path.link")
                     .data(links)
                     .enter().append("svg:path")
@@ -221,7 +220,7 @@ angular.module('languagePhylogenyDirective', [])
                     .text("100 years");
                     
                 
-                phyloWidth = d3.select("g").node().getBBox().width;
+                phyloWidth = d3.select("language-phylogeny").select("g").node().getBBox().width;
                 d3.select("#legend")
                     .attr("style", "width:"+($(window).width()-phyloWidth-100)+"px; position:absolute; right:5px; z-index:1; margin-top:10px;");
             };

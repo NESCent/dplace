@@ -15,6 +15,10 @@ function SocietiesCtrl($scope, searchModelService, LanguageClass) {
         var max_value = Math.max.apply(null, extractedValues);
         $scope.range = max_value - min_value;
     }
+    for (var key in $scope.results.code_ids) {
+        $scope.results.code_ids[key]['svgSize'] = $scope.results.code_ids[key].length * 28;
+    
+    }
 
     /*if ($scope.query.language_classifications && !$scope.query.variable_codes && !$scope.query.environmental_filters) {
         //get lang classifications in tree
@@ -45,6 +49,7 @@ function SocietiesCtrl($scope, searchModelService, LanguageClass) {
         $scope.$broadcast('treeSelected', {tree: $scope.results.selectedTree});
         d3.select(".tree-legend-DL").html('');
         $scope.treeDownload();
+        $scope.legendDownload();
     };
     
     $scope.treeDownload = function() {
@@ -54,12 +59,39 @@ function SocietiesCtrl($scope, searchModelService, LanguageClass) {
             .node().parentNode.innerHTML;
          tree_svg = tree_svg.substring(tree_svg.indexOf("<svg xml"));
          tree_svg = tree_svg.substring(0, tree_svg.indexOf("</svg>"));
+         tree_svg = tree_svg.concat("</svg>");
         var imgsrc = 'data:image/svg:xml;base64,' + window.btoa(unescape(encodeURIComponent(tree_svg)));
         d3.select(".tree-download").append("a")
             .attr("class", "btn btn-info btn-dplace-download")
             .attr("download", "tree.svg")
             .attr("href", imgsrc)
             .html("Download Phylogeny");
+    };
+    
+    $scope.legendDownload = function() {
+        var legends = d3.selectAll('.tree-legend');
+
+        html_legends = [];
+        for (var i = 0; i < legends.length; i++) {
+            for (var j = 0; j < legends[i].length; j++) {
+                html_legends.push(legends[i][j].innerHTML);
+            }
+        }
+                    svg_string = '<svg version="1.1" xmlns="http://www.w3.org/2000/svg">'
+        //NEED TO TRANSLATE THE G
+        for (var i = 0; i < html_legends.length; i++) {
+            html_legends[i] = html_legends[i].substring(html_legends[i].indexOf("-->"), html_legends[i].indexOf("</svg>"));
+            console.log(html_legends[i]);
+            svg_string = svg_string.concat(html_legends[i]);
+            
+        }
+            svg_string = svg_string.concat('</svg>');
+            var imgsrc = 'data:image/svg:xml;base64,' + window.btoa(unescape(encodeURIComponent(svg_string)));
+        d3.select(".tree-download").append("a")
+            .attr("class", "btn btn-info btn-dplace-download")
+            .attr("download", "leg.svg")
+            .attr("href", imgsrc)
+            .html("Download Legend");
     };
     
     $scope.changeMap = function(chosenVariable) {
