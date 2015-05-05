@@ -1,0 +1,8 @@
+{
+  "input_file": "/Users/dan/Data/DPLACE/geo/level2-shape-wgs84/level2-fixed.shp",
+  "output_file": "/Users/dan/Code/django/dplace/dplace_app/static/js/lib/tdwg-level2-map.js",
+  "name_field": "REGION_NAM",
+  "code_field": "TDWG_CODE",
+  "name": "tdwg-level2",
+  "projection": "mill"
+}

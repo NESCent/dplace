@@ -46,6 +46,10 @@ class ISOCodeSerializer(gis_serializers.GeoModelSerializer):
         model = ISOCode
 
 # Environmental Data
+class EnvironmentalCategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EnvironmentalCategory
+
 class EnvironmentalVariableSerializer(serializers.ModelSerializer):
     class Meta:
         model = EnvironmentalVariable
@@ -64,6 +68,7 @@ class LanguageClassSerializer(serializers.ModelSerializer):
         model = LanguageClass
 
 class LanguageSerializer(serializers.ModelSerializer):
+    language_family = LanguageClassSerializer(source='languageclassification_set.first.class_family')
     class Meta:
         model = Language
 
@@ -87,10 +92,10 @@ class GeographicRegionSerializer(gis_serializers.GeoModelSerializer):
         fields = ('id','level_2_re','count','region_nam','continent','tdwg_code')
 
 class LanguageTreeSerializer(serializers.ModelSerializer):
-    languages = LanguageSerializer(source='languages', many=True)
-    class Meta:
+   languages = LanguageSerializer(source='languages', many=True)   
+   class Meta:
         model = LanguageTree
-        fields = ('id','name','languages')
+        fields = ('id','name','languages', 'newick_string')
 
 SEARCH_LANGUAGE = 'l'
 SEARCH_ENVIRONMENTAL = 'e'
@@ -142,6 +147,7 @@ class SocietyResultSet(object):
         self.environmental_variables = set()
         self.languages = set()
         self.geographic_regions = set()
+        self.language_trees = set()
 
     def _get_society_result(self,society):
         if society.id not in self._society_results.keys():
@@ -163,7 +169,10 @@ class SocietyResultSet(object):
     def add_geographic_region(self,society,geographic_region):
         self.geographic_regions.add(geographic_region)
         self._get_society_result(society).add_geographic_region(geographic_region)
-
+   
+    def add_language_tree(self,language_tree):
+        self.language_trees.add(language_tree)
+    
     def finalize(self,criteria):
         self.societies = [x for x in self._society_results.values() if x.includes_criteria(criteria)]
 
@@ -193,47 +202,6 @@ class SocietyResultSetSerializer(serializers.Serializer):
     languages = LanguageSerializer(many=True)
     # Geographic Regions - does not map to a more specific value
     geographic_regions = GeographicRegionSerializer(many=True)
+    #language trees for this society result set
+    language_trees = LanguageTreeSerializer(many=True)
 
-class NewickTree(object):
-    '''
-    Lightweight wrapper around a newick tree string
-    '''
-    def __init__(self, newickTree=None, name=None):
-        self.newickTree = newickTree
-        self.name = name
-        
-class NewickTreeSerializer(serializers.Serializer):
-    '''
-    Serializer for NewickTree object
-    '''
-    newickTree = serializers.CharField()
-    name = serializers.CharField()
-
-class IsoResult(object):
-    def __init__(self, isocode=None, result=None):
-        self.isocode = isocode
-        self.result = result
-        
-class IsoResultSerializer(serializers.Serializer):
-    isocode = serializers.CharField()
-    result = serializers.IntegerField()
-
-class NewickResultSet(object):
-    def __init__(self):
-        self.results = dict() 
-        self.trees = None
-        self.isocodes = set() #contains mapping of isocode to coded_value
-    
-    def add_string(self, tree, newickString):
-        if tree.id not in self.results.keys():
-            self.results[tree.id] = NewickTree(newickString, tree.name)
-            
-    def add_isocode(self, isocode, result):
-        self.isocodes.add(IsoResult(isocode, result))
-        
-    def finalize(self):
-        self.trees = [x for x in self.results.values()]
-
-class NewickResultSetSerializer(serializers.Serializer):
-    trees = NewickTreeSerializer(many=True)
-    isocodes = IsoResultSerializer(many=True)

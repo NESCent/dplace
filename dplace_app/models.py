@@ -16,13 +16,6 @@ class ISOCode(models.Model):
     class Meta:
         verbose_name = "ISO Code"
 
-SOCIETY_SOURCES = (
-    ('EA', 'EA'),
-    ('EA_Korotayev', 'EA_Korotayev'),
-    ('EA_Bodarenko', 'EA_Bodarenko'),
-    ('Binford', 'Binford'),
-)
-
 class Society(models.Model):
     ext_id = models.CharField('External ID', unique=True, max_length=10)
     name = models.CharField('Name', db_index=True, max_length=200)
@@ -58,10 +51,21 @@ UNIT_CHOICES = (
     ('',''),
 )
 
+class EnvironmentalCategory(models.Model):
+    name = models.CharField(max_length=30, db_index=True, unique=True)
+    def __unicode__(self):
+        return self.name
+    class Meta:
+        verbose_name = "Category"
+        verbose_name_plural = "Categories"
+        ordering=("name",)
+
 class EnvironmentalVariable(models.Model):
     name = models.CharField(max_length=50, unique=True)
+    category = models.ForeignKey('EnvironmentalCategory', null=True)
     units = models.CharField(max_length=10, choices=UNIT_CHOICES)
     codebook_info = models.CharField(max_length=500, default='None')
+    category = models.ForeignKey('EnvironmentalCategory', null=True)
     
     def __unicode__(self):
         return "%s (%s)" % (self.name, self.units)
@@ -119,6 +123,7 @@ class VariableDescription(models.Model):
     index_categories = models.ManyToManyField('VariableCategory', related_name='index_variables')
     niche_categories = models.ManyToManyField('VariableCategory', related_name='niche_variables')
     codebook_info = models.CharField(max_length=500, default='None')
+    
     def coded_societies(self):
         return Society.objects.filter(variablecodedvalue__in=self.values.all())
     def __unicode__(self):
@@ -187,7 +192,7 @@ class VariableCodedValue(models.Model):
 
     """
     variable = models.ForeignKey('VariableDescription', related_name="values")
-    society = models.ForeignKey('Society', limit_choices_to={'source__in': [x[0] for x in SOCIETY_SOURCES]}, null=True)
+    society = models.ForeignKey('Society', null=True)
     coded_value = models.CharField(max_length=100, db_index=True, null=False, default='.')
     code = models.ForeignKey('VariableCodeDescription', db_index=True, null=True)
     source = models.ForeignKey('Source', null=True)
@@ -302,3 +307,5 @@ class LanguageTree(models.Model):
     name = models.CharField(max_length=50, db_index=True)
     languages = models.ManyToManyField(to='Language')
     file = models.FileField(upload_to='language_trees',null=True)
+    newick_string = models.TextField(default='')
+    source = models.ForeignKey('Source', null=True)

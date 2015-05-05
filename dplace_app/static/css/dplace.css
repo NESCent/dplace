@@ -1,3 +1,20 @@
+div.tooltip {
+    position:absolute;
+    text-align:center;
+    width:auto;
+    height:auto;
+    padding:2px;
+    padding-left:10px;
+    padding-right:10px;
+    font-size:13px;
+    background:#E0E0E0;
+    border:0px;
+}
+
+.row-margin-top {
+    margin-top: 5px;
+}
+
 .indent1 {
     text-indent: 1rem;
 }
@@ -86,4 +103,9 @@ label.light {
     display: inline-block;
     width: 1.2rem;
     height: 1.2rem;
+}
+
+.var-labels-fixed {
+    position: fixed;
+    top: 50px;
 }
