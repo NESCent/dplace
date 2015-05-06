@@ -47,7 +47,7 @@ function SocietiesCtrl($scope, searchModelService, LanguageClass) {
     
     $scope.treeSelected = function() {
         $scope.$broadcast('treeSelected', {tree: $scope.results.selectedTree});
-        d3.select(".tree-legend-DL").html('');
+        d3.select(".tree-download").html('');
         $scope.treeDownload();
         $scope.legendDownload();
     };
@@ -77,25 +77,31 @@ function SocietiesCtrl($scope, searchModelService, LanguageClass) {
                 all_legends.push(legends[i][j]);
             }
         }
-        svg_string = '<svg version="1.1" xmlns="http://www.w3.org/2000/svg">'
-        //NEED TO TRANSLATE THE G
+        
+        count = 0;
+        for (var key in $scope.results.code_ids) {          
+            all_legends[count].name = $scope.results.code_ids[key].name;
+            count++;
+        }
         cumulative_height = 0;
+        svg_string = '';
         for (var i = 0; i < all_legends.length; i++) {
             legend = all_legends[i].innerHTML;
             html_legends[i] = legend;
             if (i == 0)
-                svg_string = svg_string.concat('<g transform="translate(0,0)">'+legend+"</g>");
+                svg_string = svg_string.concat('<g transform="translate(0,20)"><text>'+all_legends[i].name+'</text>'+legend+"</g>");
             else {
                 height = all_legends[i-1].attributes.height.nodeValue;
-                cumulative_height += parseInt(height);
-                svg_string = svg_string.concat('<g transform="translate(0,'+cumulative_height+')">'+legend+"</g>");
+                cumulative_height += parseInt(height)+30;
+                svg_string = svg_string.concat('<g transform="translate(0,'+cumulative_height+')"><text>'+all_legends[i].name+'</text>'+legend+"</g>");
             }            
         }
-            svg_string = svg_string.concat('</svg>');
-            var imgsrc = 'data:image/svg:xml;base64,' + window.btoa(unescape(encodeURIComponent(svg_string)));
+        full_height = cumulative_height+100;
+        svg_string = '<svg version="1.1" xmlns="http://www.w3.org/2000/svg" height="'+full_height+'">'+svg_string+'</svg>';
+        var imgsrc = 'data:image/svg:xml;base64,' + window.btoa(unescape(encodeURIComponent(svg_string)));
         d3.select(".tree-download").append("a")
             .attr("class", "btn btn-info btn-dplace-download")
-            .attr("download", "leg.svg")
+            .attr("download", "legend.svg")
             .attr("href", imgsrc)
             .html("Download Legend");
     };
