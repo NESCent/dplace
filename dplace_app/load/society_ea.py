@@ -86,7 +86,7 @@ def load_ea_var(var_dict):
     exclude = var_dict['Exclude from D-PLACE?']
     if exclude == '1':
         return
-
+    
     label = eavar_number_to_label(number)
     name = var_dict['Variable'].strip()
     variable, created = VariableDescription.objects.get_or_create(label=label,name=name,source=get_source("EA"))
@@ -192,7 +192,7 @@ def load_ea_codes(csvfile=None):
             except ObjectDoesNotExist:
                 variable = None
         else:
-            print "did not get anything from this row %s" % (','.join(row)).strip()
+            print "load_ea_codes: did not get anything from %s row %s " % (csvfile.name, ','.join(row)[0:30])
 
 
 
