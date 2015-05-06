@@ -245,12 +245,10 @@ def load_ea_val(val_row):
             
             code = get_description(variable, value)
             
-            try:
-                variable_value = VariableCodedValue(variable=variable,
-                                                    society=society,
-                                                    coded_value=value,
-                                                    source=source,
-                                                    code=code)
-                variable_value.save()
-            except IntegrityError:
-                print "Unable to store value '%s' for var %s in society %s, already exists" % (value, variable.label, society)
+            v, created = VariableCodedValue.objects.get_or_create(
+                variable=variable,
+                society=society,
+                coded_value=value,
+                source=source,
+                code=code
+            )
