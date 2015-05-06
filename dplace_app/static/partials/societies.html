@@ -114,8 +114,8 @@
                     <tr data-toggle="collapse" data-target="#{{code.CID}}" class="accordion-toggle" style="cursor:pointer;"><th colspan="2">{{code.CID}}: {{code.name}}</th></tr>
                     <tr>
                         <td class="hiddenRow">
-                            <div class="accordion-body collapse tree-legend" id="{{code.CID}}">
-                                <svg height="{{code.svgSize}}">
+                            <div class="accordion-body collapse" id="{{code.CID}}">
+                                <svg height="{{code.svgSize}}" class="tree-legend">
                                     <g ng-repeat="c in code" transform="{{$index|transformG}}">
                                         <circle
                                                 cx="10"

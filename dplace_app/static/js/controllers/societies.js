@@ -70,20 +70,26 @@ function SocietiesCtrl($scope, searchModelService, LanguageClass) {
     
     $scope.legendDownload = function() {
         var legends = d3.selectAll('.tree-legend');
-
-        html_legends = [];
+        html_legends = [legends.length];
+        all_legends = [];
         for (var i = 0; i < legends.length; i++) {
             for (var j = 0; j < legends[i].length; j++) {
-                html_legends.push(legends[i][j].innerHTML);
+                all_legends.push(legends[i][j]);
             }
         }
-                    svg_string = '<svg version="1.1" xmlns="http://www.w3.org/2000/svg">'
+        svg_string = '<svg version="1.1" xmlns="http://www.w3.org/2000/svg">'
         //NEED TO TRANSLATE THE G
-        for (var i = 0; i < html_legends.length; i++) {
-            html_legends[i] = html_legends[i].substring(html_legends[i].indexOf("-->"), html_legends[i].indexOf("</svg>"));
-            console.log(html_legends[i]);
-            svg_string = svg_string.concat(html_legends[i]);
-            
+        cumulative_height = 0;
+        for (var i = 0; i < all_legends.length; i++) {
+            legend = all_legends[i].innerHTML;
+            html_legends[i] = legend;
+            if (i == 0)
+                svg_string = svg_string.concat('<g transform="translate(0,0)">'+legend+"</g>");
+            else {
+                height = all_legends[i-1].attributes.height.nodeValue;
+                cumulative_height += parseInt(height);
+                svg_string = svg_string.concat('<g transform="translate(0,'+cumulative_height+')">'+legend+"</g>");
+            }            
         }
             svg_string = svg_string.concat('</svg>');
             var imgsrc = 'data:image/svg:xml;base64,' + window.btoa(unescape(encodeURIComponent(svg_string)));
