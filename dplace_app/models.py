@@ -68,7 +68,10 @@ class EnvironmentalVariable(models.Model):
     category = models.ForeignKey('EnvironmentalCategory', null=True)
     
     def __unicode__(self):
-        return "%s (%s)" % (self.name, self.units)
+        if self.units:
+            return "%s (%s)" % (self.name, self.units)
+        return self.name
+        
     class Meta:
         ordering=("name",)
 
