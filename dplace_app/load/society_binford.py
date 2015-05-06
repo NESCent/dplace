@@ -17,23 +17,27 @@ def load_bf_society(society_dict):
     source = get_source("Binford")
     found_societies = Society.objects.filter(ext_id=ext_id, source=source)
     if len(found_societies) == 0:
-        name = society_dict['STANDARD SOCIETY NAME Binford']
         iso_code = iso_from_code(get_isocode(society_dict))
+        
         if iso_code is None:
             print "Warning: Unable to find a record for ISO code %s" % get_isocode(society_dict)
+        
         # Get the language
         language_name = society_dict['LangNam']
         try:
-            language = Language.objects.get(name=language_name,iso_code=iso_code)
+            language = Language.objects.get(name=language_name, iso_code=iso_code)
         except ObjectDoesNotExist:
             language = None
             print "Warning: Creating society record for %s but no language found with name %s" % (ext_id, language_name)
-        society = Society(ext_id=ext_id,
-                          name=name,
-                          source=source,
-                          iso_code=iso_code,
-                          language=language
-                          )
+        
+        society = Society(
+            ext_id=ext_id,
+            name=society_dict['STANDARD SOCIETY NAME Binford'],
+            source=source,
+            iso_code=iso_code,
+            language=language
+        )
+        
         try:
             society.save()
         except BaseException as e:
