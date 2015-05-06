@@ -12,6 +12,9 @@ from environmental import iso_from_code
 from society_ea import clean_category
 from sources import get_source
 
+def _unicode_damnit(var):
+    return var.decode('latin1').encode('utf8')
+
 def load_bf_society(society_dict):
     ext_id = society_dict['ID']
     source = get_source("Binford")
@@ -51,12 +54,16 @@ def load_bf_var(var_dict):
     Variables are loaded form binford_variable_names+categories.csv for simplicity,
     but there is more detailed information in bf_codebook.csv
     """
-    label = var_dict['Field name'].strip()
-    name = var_dict['Variable name'].strip()
-    description = var_dict['Detailed description'].strip()
-
-    variable, created = VariableDescription.objects.get_or_create(label=label,name=name,source=get_source("Binford"))
-
+    label = _unicode_damnit(var_dict['Field Name']).strip()
+    name = _unicode_damnit(var_dict['Variable name']).strip()
+    description = _unicode_damnit(var_dict['Detailed description']).strip()
+    
+    variable, created = VariableDescription.objects.get_or_create(
+        label=label,
+        name=name,
+        source=get_source("Binford")
+    )
+    
     index_categories = [clean_category(x) for x in var_dict['IndexCategory'].split(',')]
     # Currently max 1 niche category
     niche_categories = [clean_category(x) for x in var_dict['NicheCategory'].split(',')]
@@ -68,6 +75,7 @@ def load_bf_var(var_dict):
     for category_name in niche_categories:
         niche_category, created = VariableCategory.objects.get_or_create(name=category_name)
         variable.niche_categories.add(niche_category)
+    return
 
 VARIABLE_DEF_EXPRESSION = 'B[0-9]{3}_.*'
 BF_CODE_COLUMN_VARIABLE_DEF = 0
