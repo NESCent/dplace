@@ -54,15 +54,19 @@ def load_bf_var(var_dict):
     Variables are loaded form binford_variable_names+categories.csv for simplicity,
     but there is more detailed information in bf_codebook.csv
     """
-    label = _unicode_damnit(var_dict['Field Name']).strip()
-    name = _unicode_damnit(var_dict['Variable name']).strip()
-    description = _unicode_damnit(var_dict['Detailed description']).strip()
-    
-    variable, created = VariableDescription.objects.get_or_create(
-        label=label,
-        name=name,
-        source=get_source("Binford")
-    )
+    label = var_dict['Field name'].strip()
+    name = _unicode_damnit(var_dict['Variable name'].strip())
+    source = get_source("Binford")
+    try:
+        var = VariableDescription.objects.get(label=label, name=name, source=source)
+    except ObjectDoesNotExist:
+        var = VariableDescription.objects.create(
+            label=label,
+            name=name,
+            source=source,
+            codebook_info=_unicode_damnit(var_dict['Detailed description']).strip()
+        )
+        var.save()
     
     index_categories = [clean_category(x) for x in var_dict['IndexCategory'].split(',')]
     # Currently max 1 niche category
@@ -71,10 +75,10 @@ def load_bf_var(var_dict):
     # when creating categories, ignore '?'
     for category_name in index_categories:
         index_category, created = VariableCategory.objects.get_or_create(name=category_name)
-        variable.index_categories.add(index_category)
+        var.index_categories.add(index_category)
     for category_name in niche_categories:
         niche_category, created = VariableCategory.objects.get_or_create(name=category_name)
-        variable.niche_categories.add(niche_category)
+        var.niche_categories.add(niche_category)
     return
 
 VARIABLE_DEF_EXPRESSION = 'B[0-9]{3}_.*'
@@ -135,6 +139,7 @@ def read_binford_code_rows(csv_reader):
             })
     return codes
 
+
 def load_bf_codes(csvfile=None):
     csv_reader = csv.reader(csvfile)
     # parse the file, looking for variable def, then header, then codes
@@ -142,7 +147,8 @@ def load_bf_codes(csvfile=None):
     while variable_def is not None:
         read_binford_header_row(csv_reader)
         codes = read_binford_code_rows(csv_reader)
-        variable = VariableDescription.objects.get(label=variable_def['field'])
+        label = _unicode_damnit(variable_def['field'])
+        variable = VariableDescription.objects.get(label=label)
         for code in codes:
             # Special cases
             if code['code'].startswith('class:'):
@@ -151,11 +157,15 @@ def load_bf_codes(csvfile=None):
             if code['code'].startswith('Value'):
                 print "Code %s starts with 'Value', skipping" % code['code']
                 continue
-            code_description = VariableCodeDescription.objects.get_or_create(variable=variable,
-                                                                             code=code['code'],
-                                                                             description=code['description'])
+            code_description = VariableCodeDescription.objects.get_or_create(
+                variable=variable,
+                code=code['code'],
+                description=_unicode_damnit(code['description'])
+            )
+        
         # Set up for next pass
         variable_def = read_binford_variable_def(csv_reader)
+
 
 def load_bf_val(val_row):
     ext_id = val_row['ID'].strip()
