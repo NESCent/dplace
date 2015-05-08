@@ -12,7 +12,7 @@ class VariableCodeDescriptionSerializer(serializers.ModelSerializer):
 class VariableDescriptionSerializer(serializers.ModelSerializer):
     class Meta:
         model = VariableDescription
-        fields = ('id', 'label', 'name', 'codebook_info')
+        fields = ('id', 'label', 'name', 'codebook_info', 'source')
 
 class VariableCategorySerializer(serializers.ModelSerializer):
     class Meta:
@@ -76,7 +76,10 @@ class LanguageClassificationSerializer(serializers.ModelSerializer):
     language = LanguageSerializer(source='language')
     class Meta:
         model = LanguageClassification
-
+class SourceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Source
+        
 # Societies
 class SocietySerializer(gis_serializers.GeoModelSerializer):
     iso_code = serializers.CharField(source='iso_code.iso_code')

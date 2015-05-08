@@ -14,7 +14,7 @@ from sources import get_source
 def load_ea_society(society_dict):
     ext_id = society_dict['ID']
     source = get_source('EA')
-    found_societies = Society.objects.filter(ext_id=ext_id, source=get_source("EA"))
+    found_societies = Society.objects.filter(ext_id=ext_id)
     if len(found_societies) == 0:
         name = society_dict['Society_name_EA']
         iso_code = iso_from_code(get_isocode(society_dict))
@@ -40,7 +40,16 @@ def load_ea_society(society_dict):
             print "Exception saving society: %s" % e.message
             return None
     else:
-        return found_societies.first()
+        society = found_societies.first()
+        if not society.source:
+            society.source = source
+        try:
+            society.save()
+        except BaseException as e:
+            print "Exception saving society: %s" % e.message
+            return None
+        return society
+    return found_societies.first()
 
 def postprocess_ea_societies():
     '''

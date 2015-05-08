@@ -47,6 +47,16 @@ def load_bf_society(society_dict):
             print "Exception saving society: %s" % e.message
             return None
         return society
+    else:
+        society = found_societies.first()
+        if not society.source:
+            society.source = source
+        try:
+            society.save()
+        except BaseException as e:
+            print "Exception saving society: %s" % e.message
+            return None
+        return society
     return found_societies.first()
 
 def load_bf_var(var_dict):

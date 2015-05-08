@@ -14,7 +14,7 @@ from renderers import DPLACECsvRenderer
 # Resource routes
 class VariableDescriptionViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = VariableDescriptionSerializer
-    filter_fields = ('label', 'name', 'index_categories', 'niche_categories',)
+    filter_fields = ('label', 'name', 'index_categories', 'niche_categories', 'source')
     queryset = VariableDescription.objects.all()
     # Override retrieve to use the detail serializer, which includes categories
     def retrieve(self, request, *args, **kwargs):
@@ -145,7 +145,13 @@ def trees_from_languages_array(language_ids):
             continue
         t.newick_string = newick.write(format=5)
     return trees
-    
+
+class SourceViewSet(viewsets.ReadOnlyModelViewSet):
+    serializer_class = SourceSerializer
+    filter_fields = ('author',)
+    queryset = Source.objects.all()
+
+
 def result_set_from_query_dict(query_dict):
     result_set = SocietyResultSet()
     # Criteria keeps track of what types of data were searched on, so that we can
