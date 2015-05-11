@@ -204,4 +204,28 @@ class SocietyResultSetSerializer(serializers.Serializer):
     geographic_regions = GeographicRegionSerializer(many=True)
     #language trees for this society result set
     language_trees = LanguageTreeSerializer(many=True)
+    
+class Legend(object):
+    def __init__(self, svg_string, name):
+        self.svg_string = svg_string
+        self.name = name
+    
+class LegendSerializer(serializers.Serializer):
+    svg_string = serializers.CharField()
+    name = serializers.CharField()
+
+class ZipResultSet(object):
+    def __init__(self):
+        self.files = set()
+        self.tree = None
+        
+    def add_legend(self,legend):
+        self.files.add(legend)
+    
+    def add_tree(self,tree):
+        self.tree = tree
+
+class ZipResultSetSerializer (serializers.Serializer):
+    files = LegendSerializer(many=True)
+    tree = serializers.CharField()
 

@@ -148,6 +148,18 @@ angular.module('dplaceServices', ['ngResource'])
                 }
             });
     })
+    .factory('ZipTest', function($resource) {
+        return $resource(
+            '/api/v1/zip_legends',
+            {}, {
+                 
+                query: {
+                    method: 'GET',
+                    isArray:false,
+                }
+            }
+        )
+    })
     //not used at the moment
     .factory('TreesFromLanguages', function($resource) {
         return $resource(

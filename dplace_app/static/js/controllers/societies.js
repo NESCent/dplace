@@ -1,4 +1,4 @@
-function SocietiesCtrl($scope, searchModelService, LanguageClass) {
+function SocietiesCtrl($scope, searchModelService, LanguageClass, ZipTest) {
     $scope.results = searchModelService.getModel().getResults();
     $scope.query = searchModelService.getModel().getQuery();
     $scope.variables = [];
@@ -16,7 +16,7 @@ function SocietiesCtrl($scope, searchModelService, LanguageClass) {
         $scope.range = max_value - min_value;
     }
     for (var key in $scope.results.code_ids) {
-        $scope.results.code_ids[key]['svgSize'] = $scope.results.code_ids[key].length * 28;
+        $scope.results.code_ids[key]['svgSize'] = $scope.results.code_ids[key].length * 25;
     
     }
 
@@ -49,9 +49,8 @@ function SocietiesCtrl($scope, searchModelService, LanguageClass) {
         $scope.$broadcast('treeSelected', {tree: $scope.results.selectedTree});
         d3.select(".tree-download").html('');
         $scope.treeDownload();
-        $scope.legendDownload();
     };
-    
+
     $scope.treeDownload = function() {
         var tree_svg = d3.select(".phylogeny")
             .attr("version", 1.1)
@@ -60,15 +59,7 @@ function SocietiesCtrl($scope, searchModelService, LanguageClass) {
          tree_svg = tree_svg.substring(tree_svg.indexOf("<svg xml"));
          tree_svg = tree_svg.substring(0, tree_svg.indexOf("</svg>"));
          tree_svg = tree_svg.concat("</svg>");
-        var imgsrc = 'data:image/svg:xml;base64,' + window.btoa(unescape(encodeURIComponent(tree_svg)));
-        d3.select(".tree-download").append("a")
-            .attr("class", "btn btn-info btn-dplace-download")
-            .attr("download", "tree.svg")
-            .attr("href", imgsrc)
-            .html("Download Phylogeny");
-    };
-    
-    $scope.legendDownload = function() {
+        
         var legends = d3.selectAll('.tree-legend');
         html_legends = [legends.length];
         all_legends = [];
@@ -77,33 +68,25 @@ function SocietiesCtrl($scope, searchModelService, LanguageClass) {
                 all_legends.push(legends[i][j]);
             }
         }
-        
         count = 0;
         for (var key in $scope.results.code_ids) {          
             all_legends[count].name = $scope.results.code_ids[key].name;
             count++;
         }
-        cumulative_height = 0;
-        svg_string = '';
+        legends = [];
         for (var i = 0; i < all_legends.length; i++) {
             legend = all_legends[i].innerHTML;
             html_legends[i] = legend;
-            if (i == 0)
-                svg_string = svg_string.concat('<g transform="translate(0,20)"><text>'+all_legends[i].name+'</text>'+legend+"</g>");
-            else {
-                height = all_legends[i-1].attributes.height.nodeValue;
-                cumulative_height += parseInt(height)+30;
-                svg_string = svg_string.concat('<g transform="translate(0,'+cumulative_height+')"><text>'+all_legends[i].name+'</text>'+legend+"</g>");
-            }            
-        }
-        full_height = cumulative_height+100;
-        svg_string = '<svg version="1.1" xmlns="http://www.w3.org/2000/svg" height="'+full_height+'">'+svg_string+'</svg>';
-        var imgsrc = 'data:image/svg:xml;base64,' + window.btoa(unescape(encodeURIComponent(svg_string)));
+            svg_string = '<g transform="translate(0, 20)"><text>'+all_legends[i].name+'</text>'+legend+"</g>";
+            svg_string = '<svg version="1.1" xmlns="http://www.w3.org/2000/svg">'+svg_string+'</svg>';
+            legends.push({'name': all_legends[i].name, 'svg':svg_string});
+         }
+        query = {"legends": legends, "tree":tree_svg};
         d3.select(".tree-download").append("a")
             .attr("class", "btn btn-info btn-dplace-download")
             .attr("download", "legend.svg")
-            .attr("href", imgsrc)
-            .html("Download Legend");
+            .attr("href", "/api/v1/zip_legends?query="+encodeURIComponent(JSON.stringify(query)))
+            .html("Download this phylogeny");
     };
     
     $scope.changeMap = function(chosenVariable) {
