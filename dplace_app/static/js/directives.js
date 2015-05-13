@@ -361,13 +361,17 @@ angular.module('dplaceMapDirective', [])
                             });
                         } 
                         else {
+                            num_classifications = 0;
+                            for (var key in scope.results.classifications) {
+                                num_classifications += scope.results.classifications[key].length;
+                            }
                             societyResult.languages.forEach(function(language) {
                                 var classification = scope.query.language_classifications.filter(function(l) { return l.language.id == language.id });
                                 if (classification.length > 0) {
                                     results.societies.push({
                                     'society': society,
                                         'language_family': classification[0].class_subfamily,
-                                        'num_classifications': scope.results.classifications.length,
+                                        'num_classifications': num_classifications,
                                         'environmental_values': [],
                                         'variable_coded_values': [],
                                     });
@@ -440,26 +444,35 @@ angular.module('dplaceMapDirective', [])
                         }
                         
                         else if (scope.results.classifications && scope.results.languages.length > 0) {
-                            for (var i = 0; i < scope.results.classifications.length; i++) {
-                                g = legend.append("svg:g")
-                                    .attr("transform", function() {
-                                        return 'translate(0,'+ i*25 + ')';
-                                    });
-                                g.append("svg:circle")
-                                    .attr("cx", "10")
-                                    .attr("cy", "10")
-                                    .attr("r", "4.5")
-                                    .attr("stroke", "#000")
-                                    .attr("stroke-width", "0.5")
-                                    .attr("fill", function() {
-                                        var value = scope.results.classifications[i].id;
-                                        var hue = value * 240 / scope.results.classifications.length;
-                                        return 'hsl('+hue+',100%,50%)';
-                                    });
-                                g.append("svg:text")
-                                    .attr("x", "20")
-                                    .attr("y", "15")
-                                    .text(scope.results.classifications[i].name);
+                            numClassifications = 0;
+                            for (var key in scope.results.classifications) {
+                                numClassifications += scope.results.classifications[key].length;
+                            }
+                        
+                            count = 0;
+                            for (var key in scope.results.classifications) {
+                                for (var i = 0; i < scope.results.classifications[key].length; i++) {
+                                    g = legend.append("svg:g")
+                                        .attr("transform", function() {
+                                            return 'translate(0,'+ count*25 + ')';
+                                        });
+                                    g.append("svg:circle")
+                                        .attr("cx", "10")
+                                        .attr("cy", "10")
+                                        .attr("r", "4.5")
+                                        .attr("stroke", "#000")
+                                        .attr("stroke-width", "0.5")
+                                        .attr("fill", function() {
+                                            var value = scope.results.classifications[key][i].id;
+                                            var hue = value * 240 / numClassifications;
+                                            return 'hsl('+hue+',100%,50%)';
+                                        });
+                                    g.append("svg:text")
+                                        .attr("x", "20")
+                                        .attr("y", "15")
+                                        .text(scope.results.classifications[key][i].name);
+                                    count++;
+                                }
                                 
                             }
                             var legend_svg = "<g transform='translate(0,350)'>"+legend.node().innerHTML+"</g>";

@@ -8,6 +8,15 @@ angular.module('dplaceFilters', [])
             }
         }
     })    
+    .filter('joinDictItems', function() {
+        return function(dict) {
+            items = []
+            for (var key in dict) {
+                items = items.concat(dict[key]);
+            }
+            return items;
+        }
+    })
     .filter('colorNode', function() {
         return function(value, codes) {
             var missingData = false;
