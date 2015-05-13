@@ -3,6 +3,8 @@ angular.module('languagePhylogenyDirective', [])
         function link(scope, element, attrs) {
             var constructTree = function(langTree) {
                 d3.select("language-phylogeny").html('');
+               
+                
                 var newick = Newick.parse(langTree.newick_string);
                 var rightAngleDiagonal = function() {
                     function diagonal(diagonalPath) {
@@ -59,8 +61,9 @@ angular.module('languagePhylogenyDirective', [])
                 var vis = d3.select("language-phylogeny").append("svg:svg")
                     .attr("width", w+300)
                     .attr("height", h+30)
+                    .attr("class", "phylogeny")
                     .append("svg:g")
-                    .attr("transform", "translate(2, 0)");
+                    .attr("transform", "translate(5, 5)");
                     
                 var diagonal = rightAngleDiagonal();
                 
@@ -71,11 +74,19 @@ angular.module('languagePhylogenyDirective', [])
                 var yscale = d3.scale.linear()
                     .domain([0, d3.max(rootDists)])
                     .range([0, w]);
+                var leafDistFromRoot = 0;
                 nodes.forEach(function(node) {
+                    if (node.rootDist > leafDistFromRoot)
+                        leafDistFromRoot = node.rootDist;
                     node.y = yscale(node.rootDist);
                 });
                 
+                //calculate time scale
+                var timeScaleYears = leafDistFromRoot * 100; //convert to years
+                var pixelScale = (w / timeScaleYears) * 100;
+                
                 var links = tree.links(nodes);
+                console.log(nodes);
                 var link = vis.selectAll("path.link")
                     .data(links)
                     .enter().append("svg:path")
@@ -87,8 +98,12 @@ angular.module('languagePhylogenyDirective', [])
                 var node = vis.selectAll("g.node")
                     .data(nodes)
                     .enter().append("svg:g")
+                    .attr("class", function(n) {
+                        if (n.children) return "inner-node";
+                        else return "leaf-node";
+                    })
                     .attr("transform", function(d) { return "translate(" + d.y + ", "+ d.x + ")"; });
-                    
+                
                 translate = 0;
                 if (scope.query.variable_codes) {
                     for (var key in scope.results.code_ids) {
@@ -100,38 +115,32 @@ angular.module('languagePhylogenyDirective', [])
                             if (society.variable_coded_values.length > 0) {
                                 for (var i = 0; i < society.variable_coded_values.length; i++) {
                                     if (society.variable_coded_values[i].variable == key) {
-                                            var hover_text = society.variable_coded_values[i].code_description.description;
+                                            var society_name = society.society.name + " (" + society.society.iso_code + ")";
+                                            var hover_text_value = society.variable_coded_values[i].code_description.description;
                                             selected.append("svg:circle")
                                                 .attr("r", 4.5)
                                                 .attr("stroke", "#000")
                                                 .attr("stroke-width", "0.5")
                                                 .attr("transform", "translate("+translate+", 0)")
                                                 .attr("fill", function(n) {
+                                                    if (society.variable_coded_values[i].code_description.description.indexOf("Missing data") != -1) {
+                                                        return 'hsl(360, 100%, 100%)';
+                                                    }
                                                     value = society.variable_coded_values[i].coded_value;
                                                     hue = value * 240 / scope.results.code_ids[society.variable_coded_values[i].variable].length;
                                                     return 'hsl('+hue+',100%, 50%)';
                                                 })
-                                                .on("mouseover", function() { //need to add text here!
-                                                    translate += 20;
-                                                      var g = selected.append("svg:g")
-                                                  .attr("transform", "translate("+translate+", 0)");
-                                                        g.select('text').remove();
-                                                        g.append("svg:rect")
-                                                        .attr("width", hover_text.length * 10)
-                                                        .attr("height", "23")
-                                                        .attr("fill", "white");
-                                                        g.append("svg:text")
-                                                        .attr("dy", "12")
-                                                        .text(hover_text);
+                                                .on("mouseover", function() { 
+                                                     d3.select("body").append("div")
+                                                        .attr("class", "tooltip")
+                                                        .html("<b>"+society_name+":</b><br>"+hover_text_value)
+                                                        .style("left", (d3.event.pageX + 10)+"px")
+                                                        .style("top", (d3.event.pageY + 5)+"px")
+                                                        .style("opacity", .9);
                                                   })
                                                   .on("mouseout", function() {
-                                                      // Remove the info text on mouse out.
-                                                      selected.select('g').remove();
-                                                      translate -= 20;
-                                                })
-                                                
-                                                ; 
-
+                                                      d3.select(".tooltip").remove();
+                                                }); 
                                     } 
                                 }
                             }
@@ -192,8 +201,25 @@ angular.module('languagePhylogenyDirective', [])
                             .attr("dy", 4)
                             .attr("font-size", "14px")
                             .attr("font-family", "Arial")
-                            .text(function(d) { return d.name; });  
+                            .text(function(d) { return d.name; });
                 });
+                
+                //APPEND LINE HERE
+                line_svg= d3.select('language-phylogeny').append("svg:svg")
+                    .attr("style", "margin-left:100px;");
+                line_svg.append("svg:line")
+                    .attr("x1", "0")
+                    .attr("y1", "0")
+                    .attr("x2", pixelScale)
+                    .attr("y2", "0")
+                    .attr("style", "stroke:#ccc;stroke-width:7;");
+                line_svg.append("svg:text")
+                    .attr("dy", "20")
+                    .attr("dx", function() {
+                        return (pixelScale - 63)/2;
+                    })
+                    .text("100 years");
+                    
                 
                 phyloWidth = d3.select("g").node().getBBox().width;
                 d3.select("#legend")

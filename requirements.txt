@@ -12,3 +12,5 @@ psycopg2==2.5.2
 python-nexus==0.87
 six==1.6.1
 wsgiref==0.1.2
+requests==2.5.3
+beautifulsoup4==4.3.2

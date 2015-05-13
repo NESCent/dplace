@@ -14,7 +14,7 @@ from sources import get_source
 def load_ea_society(society_dict):
     ext_id = society_dict['ID']
     source = get_source('EA')
-    found_societies = Society.objects.filter(ext_id=ext_id, source=get_source("EA"))
+    found_societies = Society.objects.filter(ext_id=ext_id)
     if len(found_societies) == 0:
         name = society_dict['Society_name_EA']
         iso_code = iso_from_code(get_isocode(society_dict))
@@ -40,7 +40,16 @@ def load_ea_society(society_dict):
             print "Exception saving society: %s" % e.message
             return None
     else:
-        return found_societies.first()
+        society = found_societies.first()
+        if not society.source:
+            society.source = source
+        try:
+            society.save()
+        except BaseException as e:
+            print "Exception saving society: %s" % e.message
+            return None
+        return society
+    return found_societies.first()
 
 def postprocess_ea_societies():
     '''
@@ -86,7 +95,7 @@ def load_ea_var(var_dict):
     exclude = var_dict['Exclude from D-PLACE?']
     if exclude == '1':
         return
-
+    
     label = eavar_number_to_label(number)
     name = var_dict['Variable'].strip()
     variable, created = VariableDescription.objects.get_or_create(label=label,name=name,source=get_source("EA"))
@@ -192,7 +201,7 @@ def load_ea_codes(csvfile=None):
             except ObjectDoesNotExist:
                 variable = None
         else:
-            print "did not get anything from this row %s" % (','.join(row)).strip()
+            print "load_ea_codes: did not get anything from %s row %s " % (csvfile.name, ','.join(row)[0:30])
 
 
 
@@ -245,12 +254,10 @@ def load_ea_val(val_row):
             
             code = get_description(variable, value)
             
-            try:
-                variable_value = VariableCodedValue(variable=variable,
-                                                    society=society,
-                                                    coded_value=value,
-                                                    source=source,
-                                                    code=code)
-                variable_value.save()
-            except IntegrityError:
-                print "Unable to store value '%s' for var %s in society %s, already exists" % (value, variable.label, society)
+            v, created = VariableCodedValue.objects.get_or_create(
+                variable=variable,
+                society=society,
+                coded_value=value,
+                source=source,
+                code=code
+            )
