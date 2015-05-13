@@ -229,3 +229,4 @@ class ZipResultSetSerializer (serializers.Serializer):
     files = LegendSerializer(many=True)
     tree = serializers.CharField()
 
+

@@ -162,7 +162,7 @@ angular.module('languagePhylogenyDirective', [])
                                 .attr("fill", function(n) {
                                     if (classification.length > 0) {
                                         value = classification[0].class_subfamily;
-                                        hue = value * 240 / scope.results.classifications.length;
+                                        hue = value * 240 / scope.results.classifications['NumClassifications'];
                                         return 'hsl('+hue+',100%, 50%)';
                                     }
                                 });
@@ -361,17 +361,13 @@ angular.module('dplaceMapDirective', [])
                             });
                         } 
                         else {
-                            num_classifications = 0;
-                            for (var key in scope.results.classifications) {
-                                num_classifications += scope.results.classifications[key].length;
-                            }
                             societyResult.languages.forEach(function(language) {
                                 var classification = scope.query.language_classifications.filter(function(l) { return l.language.id == language.id });
                                 if (classification.length > 0) {
                                     results.societies.push({
                                     'society': society,
                                         'language_family': classification[0].class_subfamily,
-                                        'num_classifications': num_classifications,
+                                        'num_classifications': scope.results.classifications['NumClassifications'],
                                         'environmental_values': [],
                                         'variable_coded_values': [],
                                     });
@@ -440,15 +436,10 @@ angular.module('dplaceMapDirective', [])
                                 .attr("class", "btn btn-info btn-dplace-download")
                                 .attr("download", scope.chosen.name+"map.svg")
                                 .attr("href", imgsrc)
-                                .html("Download Map: " + scope.chosen.name);
+                                .html("Download Map");
                         }
                         
                         else if (scope.results.classifications && scope.results.languages.length > 0) {
-                            numClassifications = 0;
-                            for (var key in scope.results.classifications) {
-                                numClassifications += scope.results.classifications[key].length;
-                            }
-                        
                             count = 0;
                             for (var key in scope.results.classifications) {
                                 for (var i = 0; i < scope.results.classifications[key].length; i++) {
@@ -464,7 +455,7 @@ angular.module('dplaceMapDirective', [])
                                         .attr("stroke-width", "0.5")
                                         .attr("fill", function() {
                                             var value = scope.results.classifications[key][i].id;
-                                            var hue = value * 240 / numClassifications;
+                                            var hue = value * 240 / scope.results.classifications['NumClassifications'];
                                             return 'hsl('+hue+',100%,50%)';
                                         });
                                     g.append("svg:text")

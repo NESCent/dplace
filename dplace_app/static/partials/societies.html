@@ -143,12 +143,12 @@
                         <td class="">
                             <div id="{{classification}}">
                                 <svg height="100" class="tree-legend">
-                                    <g ng-repeat="classification in results.classifications" transform="{{$index|transformG}}">
+                                    <g ng-repeat="classification in results.classifications|joinDictItems" transform="{{$index|transformG}}">
                                         <circle
                                                 cx="10"
                                                 cy="10"
                                                 r="4.5"
-                                                fill="{{classification.id|colorNode:results.classifications}}"
+                                                fill="{{classification.id|colorNode:(results.classifications|joinDictItems)}}"
                                                 stroke="#000"
                                                 stroke-width="0.5"
                                                 />

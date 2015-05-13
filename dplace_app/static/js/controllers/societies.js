@@ -17,28 +17,8 @@ function SocietiesCtrl($scope, searchModelService, LanguageClass, ZipTest) {
     }
     for (var key in $scope.results.code_ids) {
         $scope.results.code_ids[key]['svgSize'] = $scope.results.code_ids[key].length * 25;
-    
     }
-
-    /*if ($scope.query.language_classifications && !$scope.query.variable_codes && !$scope.query.environmental_filters) {
-        //get lang classifications in tree
-        $scope.results.classifications = [];
-        $scope.languageClasses = [];
-        LanguageClass.query().$promise.then(function(result) {
-            for (var i = 0; i < $scope.results.societies.length; i++) {
-                for (var j = 0; j < $scope.results.societies[i].languages.length; j++) {
-                    classification = $scope.query.language_classifications.filter(function(l) { return l.language.id == $scope.results.societies[i].languages[j].id; });
-                    if (classification.length > 0) {
-                        toAdd = result.filter(function(l) { return l.id == classification[0].class_subfamily; });
-                        if (toAdd[0] && $scope.results.classifications.indexOf(toAdd[0]) == -1)
-                            $scope.results.classifications = $scope.results.classifications.concat(toAdd); 
-                    }
-                }
-            }
-        });
-        $scope.results.chosenVariable = -1;
-    }*/
-
+    
     $scope.setActive('societies');
 
     $scope.resizeMap = function() {
@@ -77,10 +57,17 @@ function SocietiesCtrl($scope, searchModelService, LanguageClass, ZipTest) {
         for (var i = 0; i < all_legends.length; i++) {
             legend = all_legends[i].innerHTML;
             html_legends[i] = legend;
-            svg_string = '<g transform="translate(0, 20)"><text>'+all_legends[i].name+'</text>'+legend+"</g>";
+            if (all_legends[i].name)
+                svg_string = '<g transform="translate(0, 20)"><text>'+all_legends[i].name+'</text>'+legend+"</g>";
+            else                
+                svg_string = '<g transform="translate(0, 20)">'+legend+"</g>";
             svg_string = '<svg version="1.1" xmlns="http://www.w3.org/2000/svg">'+svg_string+'</svg>';
-            legends.push({'name': all_legends[i].name, 'svg':svg_string});
-         }
+            if (all_legends[i].name)
+                legends.push({'name': all_legends[i].name, 'svg':svg_string});
+            else
+                legends.push({'name': 'Legend', 'svg':svg_string});
+
+        }
         query = {"legends": legends, "tree":tree_svg};
         d3.select(".tree-download").append("a")
             .attr("class", "btn btn-info btn-dplace-download")

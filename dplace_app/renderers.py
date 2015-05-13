@@ -126,9 +126,9 @@ class ZipRenderer(renderers.BaseRenderer):
             return ''
         s = StringIO()
         zf = zipfile.ZipFile(s, "w")
-        if 'files' in data:     
+        if 'files' in data:  
             for l in data['files']:      
-                zf.writestr(str(l['name'])+'.svg', str(l['svg_string']))
+                zf.writestr(l['name']+'.svg', str(l['svg_string']))
         if 'tree' in data:
             zf.writestr('tree.svg', str(data['tree']))
         zf.close()

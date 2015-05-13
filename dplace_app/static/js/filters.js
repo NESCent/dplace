@@ -12,7 +12,8 @@ angular.module('dplaceFilters', [])
         return function(dict) {
             items = []
             for (var key in dict) {
-                items = items.concat(dict[key]);
+                if (key != 'NumClassifications')
+                    items = items.concat(dict[key]);
             }
             return items;
         }

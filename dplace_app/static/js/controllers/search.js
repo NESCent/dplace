@@ -77,8 +77,10 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties, 
                                 if (language_family in $scope.searchModel.results.classifications) {
                                     if ($scope.searchModel.results.classifications[language_family].indexOf(toAdd[0]) == -1)
                                         $scope.searchModel.results.classifications[language_family] = $scope.searchModel.results.classifications[language_family].concat(toAdd);
-                                } else {
+                                        $scope.searchModel.results.classifications['NumClassifications'] += 1;
+                               } else {
                                     $scope.searchModel.results.classifications[language_family] = toAdd;
+                                    $scope.searchModel.results.classifications['NumClassifications'] = 1;
                                 }
                             }
                         }
@@ -87,7 +89,6 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties, 
             });
         
         }
-                console.log($scope.searchModel.results);
 
         if (!$scope.searchModel.query.variable_codes) return;
         
