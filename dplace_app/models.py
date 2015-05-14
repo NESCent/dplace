@@ -52,7 +52,6 @@ class Society(models.Model):
     objects = models.GeoManager()
     focal_year = models.CharField('Focal Year', null=True, blank=True, max_length=100)
     references = models.TextField('References', null=True)
-    society_links = models.ManyToManyField('Society', null=True, blank=True)
 
     def get_environmental_data(self):
         """Returns environmental data for the given society"""
