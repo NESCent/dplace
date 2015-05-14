@@ -203,7 +203,7 @@ angular.module('languagePhylogenyDirective', [])
                             .text(function(d) { return d.name; });
                 });
                 
-                //APPEND LINE HERE
+                //Time Scale
                 line_svg= d3.select('language-phylogeny').append("svg:svg")
                     .attr("style", "margin-left:100px;");
                 line_svg.append("svg:line")
@@ -215,7 +215,9 @@ angular.module('languagePhylogenyDirective', [])
                 line_svg.append("svg:text")
                     .attr("dy", "20")
                     .attr("dx", function() {
-                        return (pixelScale - 63)/2;
+                        text_pos = (pixelScale - 63) / 2;
+                        if (text_pos < 0) return 0;
+                        else return text_pos;
                     })
                     .text("100 years");
                     

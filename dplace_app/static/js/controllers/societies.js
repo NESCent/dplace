@@ -41,6 +41,10 @@ function SocietiesCtrl($scope, searchModelService, LanguageClass, ZipTest) {
          tree_svg = tree_svg.concat("</svg>");
         
         var legends = d3.selectAll('.tree-legend');
+        if ($scope.results.classifications) {
+            legends = legends.concat(d3.selectAll('.tree-legend-langs'));
+        }
+        
         html_legends = [legends.length];
         all_legends = [];
         for (var i = 0; i < legends.length; i++) {
