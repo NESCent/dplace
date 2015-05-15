@@ -21,6 +21,8 @@ router.register(r'language_classifications', api_views.LanguageClassificationVie
 router.register(r'languages', api_views.LanguageViewSet)
 router.register(r'language_trees', api_views.LanguageTreeViewSet)
 router.register(r'geographic_regions', api_views.GeographicRegionViewSet)
+router.register(r'sources', api_views.SourceViewSet)
+
 
 # Wire up our API using automatic URL routing.
 # Additionally, we include login URLs for the browseable API.

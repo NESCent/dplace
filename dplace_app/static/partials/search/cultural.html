@@ -18,6 +18,17 @@
         <div class="panel panel-default" ng-repeat="trait in traits">
             <div class="panel-heading">
                 <div class="row">
+                    <div class="form-group col-xs-4">
+                        <select
+                            ng-model="trait.selectedSource"
+                            class="form-control"
+                            ng-options='source as (source.author + " ("+source.year+")") for source in sources'
+                            >
+                            <option value="">Select a Source</option>
+                        </select>
+                     </div>
+                 </div>
+                <div class="row" ng-show="trait.selectedSource">
                     <div class="form-group col-xs-6">
                         <select
                                 ng-model="trait.selectedCategory"

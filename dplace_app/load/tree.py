@@ -17,14 +17,14 @@ def get_language(taxon_name):
         try:
             language = Language.objects.get(name=taxon_name)
         except ObjectDoesNotExist:
-            print "Warning: Language %s not found" % (taxon_name)
+            raise ValueError("Warning: Language %s not found" % (taxon_name))
         except MultipleObjectsReturned:
-            print "Error: multiple languages returned for %s" % (taxon_name)
+            raise ValueError("Error: multiple languages returned for %s" % (taxon_name))
     except MultipleObjectsReturned:
-        print "Error: multiple languages returned for %s" % (taxon_name)
+        raise ValueError("Error: multiple languages returned for %s" % (taxon_name))
     return language
 
-def load_tree(file_name):
+def load_tree(file_name, verbose=False):
     # make a tree if not exists. Use the name of the tree
     tree_name = basename(file_name)
     with open(file_name,'r') as f:
@@ -36,14 +36,26 @@ def load_tree(file_name):
     reader = NexusReader(file_name)
     #Remove '[&R]' from newick string
     newick = re.sub(r'\[.*?\]', '', reader.trees.trees[0])
-    print "Formatting newick string %s" % (newick)
+    
     try:
         newick = newick[newick.index('=')+1:]
     except ValueError:
         newick = newick
+        
+    if verbose:
+        print "Formatting newick string %s" % (newick)
+    
     tree.newick_string = str(newick)
     for taxon_name in reader.trees.taxa:
-        language = get_language(taxon_name)
-        if language is not None:
+        language = None
+        try:
+            language = get_language(taxon_name)
+        except ValueError:
+            print("load_tree: Error with taxon - `%s`" % taxon_name)
+            
+        if language:
             tree.languages.add(language)
-            tree.save()
+    tree.save()
+
+
+load_glotto_tree = load_tree

@@ -12,7 +12,7 @@ class VariableCodeDescriptionSerializer(serializers.ModelSerializer):
 class VariableDescriptionSerializer(serializers.ModelSerializer):
     class Meta:
         model = VariableDescription
-        fields = ('id', 'label', 'name', 'codebook_info', 'data_type')
+        fields = ('id', 'label', 'name', 'codebook_info', 'data_type', 'source')
 
 class VariableCategorySerializer(serializers.ModelSerializer):
     class Meta:
@@ -76,7 +76,10 @@ class LanguageClassificationSerializer(serializers.ModelSerializer):
     language = LanguageSerializer(source='language')
     class Meta:
         model = LanguageClassification
-
+class SourceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Source
+        
 # Societies
 class SocietySerializer(gis_serializers.GeoModelSerializer):
     iso_code = serializers.CharField(source='iso_code.iso_code')
@@ -92,8 +95,8 @@ class GeographicRegionSerializer(gis_serializers.GeoModelSerializer):
         fields = ('id','level_2_re','count','region_nam','continent','tdwg_code')
 
 class LanguageTreeSerializer(serializers.ModelSerializer):
-    languages = LanguageSerializer(source='languages', many=True)
-    class Meta:
+   languages = LanguageSerializer(source='languages', many=True)   
+   class Meta:
         model = LanguageTree
         fields = ('id','name','languages', 'newick_string')
 
@@ -147,6 +150,7 @@ class SocietyResultSet(object):
         self.environmental_variables = set()
         self.languages = set()
         self.geographic_regions = set()
+        self.language_trees = set()
 
     def _get_society_result(self,society):
         if society.id not in self._society_results.keys():
@@ -168,7 +172,10 @@ class SocietyResultSet(object):
     def add_geographic_region(self,society,geographic_region):
         self.geographic_regions.add(geographic_region)
         self._get_society_result(society).add_geographic_region(geographic_region)
-
+   
+    def add_language_tree(self,language_tree):
+        self.language_trees.add(language_tree)
+    
     def finalize(self,criteria):
         self.societies = [x for x in self._society_results.values() if x.includes_criteria(criteria)]
 
@@ -198,3 +205,6 @@ class SocietyResultSetSerializer(serializers.Serializer):
     languages = LanguageSerializer(many=True)
     # Geographic Regions - does not map to a more specific value
     geographic_regions = GeographicRegionSerializer(many=True)
+    #language trees for this society result set
+    language_trees = LanguageTreeSerializer(many=True)
+

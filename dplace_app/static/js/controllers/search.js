@@ -7,7 +7,7 @@
  * @param FindSocieties
  * @constructor
  */
-function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties, TreesFromLanguages) {
+function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties, LanguageClass, TreesFromLanguages) {
     $scope.setActive('search');
     $scope.searchModel = searchModelService.getModel();
     $scope.selectedButton = $scope.searchModel.selectedButton;
@@ -41,75 +41,105 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties, 
         $scope.searchButton.text = 'Search';
     };
     
-    //this function is needed for the coloring of markers
-    //it converts the coded_value into the bin's code
-    //it also constructs var_bins, which is needed for display of legends
-    //NEEDS FURTHER WORK
-    $scope.assignBins = function(variable_codes) {
-        var_bins = {};
-        for (var i = 0; i < variable_codes.length; i++) {
-            if (variable_codes[i].bf_id) {
-                if (variable_codes[i].bf_id in var_bins)
-                    var_bins[variable_codes[i].bf_id] = var_bins[variable_codes[i].bf_id].concat([variable_codes[i]]);
-                else 
-                    var_bins[variable_codes[i].bf_id] = [variable_codes[i]];
-            } else if (variable_codes[i].variable in var_bins)
-                var_bins[variable_codes[i].variable] = var_bins[variable_codes[i].variable].concat([variable_codes[i]]);
-            else
-                var_bins[variable_codes[i].variable] = [variable_codes[i]];
-        }
-        
-        if ($scope.searchModel.results.variable_descriptions) {
-            for (var i = 0; i < $scope.searchModel.results.variable_descriptions.length; i++){
-                if ($scope.searchModel.results.variable_descriptions[i].data_type == 'CONTINUOUS') 
-                    var_bins[$scope.searchModel.results.variable_descriptions[i].id].name = $scope.searchModel.results.variable_descriptions[i].name;
-                if (var_bins[$scope.searchModel.results.variable_descriptions[i].id].name) continue;
-                else var_bins[$scope.searchModel.results.variable_descriptions[i].id].name = $scope.searchModel.results.variable_descriptions[i].name;
-            }
-        }
-        $scope.searchModel.results.code_ids = var_bins;
-        
-        for (var i = 0; i < $scope.searchModel.results.societies.length; i++) {
-            for (var v = 0; v < $scope.searchModel.results.societies[i].variable_coded_values.length; v++) {
-                variable = $scope.searchModel.results.societies[i].variable_coded_values[v].variable;
-                bins = var_bins[variable];
-                for (var b = 0; b < bins.length; b++) {
-                    try {
-                        if (parseFloat($scope.searchModel.results.societies[i].variable_coded_values[v].coded_value) < bins[b].max) {
-                            $scope.searchModel.results.societies[i].variable_coded_values[v]['bf_code'] = ""+bins[b].code;
-                            break;
-                        }                        
-                        
-                    } catch (err) {
-                        break;
-                    }
-                }
-            }
-        }
-    }
-    
     $scope.assignColors = function() {
         if ($scope.searchModel.query.variable_codes) $scope.assignBins($scope.searchModel.query.variable_codes);
         var colorMap = colorMapService.generateColorMap($scope.searchModel.getSocieties(), $scope.searchModel.query);
+    };
+    //calculates the range for environmental variables
+    //needed for coloring of markers
+    $scope.calculateRange = function(results) {
+        societies = results.societies;
+        for (var i = 0; i < results.environmental_variables.length; i++) {
+            var extractedValues = societies.map(function(society) { 
+                for (var j = 0; j < society.environmental_values.length; j++) {
+                    if (society.environmental_values[j].variable == results.environmental_variables[i].id)
+                        return society.environmental_values[j].value;
+                }
+            });
+            var min_value = Math.min.apply(null, extractedValues);
+            var max_value = Math.max.apply(null, extractedValues);
+            var range = max_value - min_value;
+            results.environmental_variables[i]['range'] = range;
+        }
+        return results;
+    };
+    
+    //calculates number of codes selected for each variable and saves to coded_value
+    //needed for coloring of markers
+    $scope.getCodeIDs = function() {
+        $scope.searchModel.results.code_ids = {};
+        if ($scope.searchModel.query.language_classifications && !$scope.searchModel.query.variable_codes && !$scope.searchModel.query.environmental_filters) {
+            $scope.searchModel.results.classifications = [];
+            LanguageClass.query().$promise.then(function(result) {
+                for (var i = 0; i < $scope.searchModel.results.societies.length; i++) {
+                    for (var j = 0; j < $scope.searchModel.results.societies[i].languages.length; j++) {
+                        classification = $scope.searchModel.query.language_classifications.filter(function(l) { return l.language.id == $scope.searchModel.results.societies[i].languages[j].id; });
+                        if (classification.length > 0) {
+                            toAdd = result.filter(function(l) { return l.id == classification[0].class_subfamily; });
+                            if (toAdd[0] && $scope.searchModel.results.classifications.indexOf(toAdd[0]) == -1)
+                                $scope.searchModel.results.classifications = $scope.searchModel.results.classifications.concat(toAdd); 
+                        }
+                    }
+                }
+            });
+        
+        }
+        if (!$scope.searchModel.query.variable_codes) return;
+
+        for (var i = 0; i < $scope.searchModel.query.variable_codes.length; i++) {
+            if ($scope.searchModel.query.variable_codes[i].bf_id) {
+                if ($scope.searchModel.query.variable_codes[i].bf_id in $scope.searchModel.results.code_ids) 
+                    $scope.searchModel.results.code_ids[$scope.searchModel.query.variable_codes[i].bf_id] = $scope.searchModel.results.code_ids[$scope.searchModel.query.variable_codes[i].bf_id].concat([$scope.searchModel.query.variable_codes[i]]);
+                else {
+                    $scope.searchModel.results.code_ids[$scope.searchModel.query.variable_codes[i].bf_id] = [$scope.searchModel.query.variable_codes[i]];
+                }
+                if (!$scope.searchModel.results.code_ids[$scope.searchModel.query.variable_codes[i].bf_id].absolute_min) {
+                    $scope.abs_min = $scope.searchModel.query.variable_codes[i].absolute_min;
+                    $scope.abs_max = $scope.searchModel.query.variable_codes[i].absolute_max;
+                    $scope.searchModel.results.code_ids[$scope.searchModel.query.variable_codes[i].bf_id].min = $scope.searchModel.query.variable_codes[i].absolute_min;
+                    $scope.searchModel.results.code_ids[$scope.searchModel.query.variable_codes[i].bf_id].max = $scope.searchModel.query.variable_codes[i].absolute_max;
+                }
+                continue;
+            }
+            if ($scope.searchModel.query.variable_codes[i].variable in $scope.searchModel.results.code_ids) {
+                $scope.searchModel.results.code_ids[$scope.searchModel.query.variable_codes[i].variable] = $scope.searchModel.results.code_ids[$scope.searchModel.query.variable_codes[i].variable].concat([$scope.searchModel.query.variable_codes[i]]);
+            } else {
+                $scope.searchModel.results.code_ids[$scope.searchModel.query.variable_codes[i].variable] = [$scope.searchModel.query.variable_codes[i]];
+            }
+        }
+
+        for (var i = 0; i < $scope.searchModel.results.variable_descriptions.length; i++) {
+            if ($scope.searchModel.results.code_ids[$scope.searchModel.results.variable_descriptions[i].id].name) continue;
+            else $scope.searchModel.results.code_ids[$scope.searchModel.results.variable_descriptions[i].id].name = $scope.searchModel.results.variable_descriptions[i].name;
+        }
+    }
+    
+    //need to do this - move code from directive
+    $scope.assignColors = function() {
+        results = $scope.searchModel.getResults();
+        results = $scope.calculateRange(results);
+        console.log(results);
+        var colorMap = colorMapService.generateColorMap(results);
         $scope.searchModel.getSocieties().forEach(function(container) {
             container.society.style = {'background-color' : colorMap[container.society.id] };
         });
     };
 
+    //not used at the moment
     function searchForLanguageTrees() {
         var languageIDs = $scope.searchModel.getSocieties().filter(function (container) {
             return container.society.language != null;
         }).map(function (container) {
             return container.society.language.id;
         });
-        $scope.searchModel.results.languageTrees = TreesFromLanguages.find({language_ids: languageIDs}, addTreesToSocieties);
+        $scope.searchModel.results.language_trees = TreesFromLanguages.find({language_ids: languageIDs}, addTreesToSocieties);
     }
     
     function addTreesToSocieties() {
         $scope.searchModel.getSocieties().forEach(function (container) {
             var language = container.society.language;
             if(language != null) {
-                container.society.trees = $scope.searchModel.results.languageTrees.filter(function (tree) {
+                container.society.trees = $scope.searchModel.results.language_trees.filter(function (tree) {
                     return tree.languages.some(function (item) {
                         return angular.equals(language, item);
                     });
@@ -134,8 +164,9 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties, 
 	
     var searchCompletedCallback = function() {
         $scope.enableSearchButton();
+        $scope.getCodeIDs();
         $scope.assignColors();
-        searchForLanguageTrees();
+        addTreesToSocieties();
         $scope.switchToResults();
     };
 

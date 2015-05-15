@@ -1,16 +1,16 @@
-function CulturalCtrl($scope, searchModelService, Variable, CodeDescription, BfContinuousVariable) {
+function CulturalCtrl($scope, searchModelService, Variable, CodeDescription, BfContinuousVariable, Source) {
    var linkModel = function() {
         // Model/state lives in searchModelService
         $scope.traits = [searchModelService.getModel().getCulturalTraits()];
-
+        $scope.sources = Source.query();
     };
     $scope.$on('searchModelReset', linkModel); // When model is reset, update our model
     linkModel();
-	
+
     // triggered by the view when a category is changed
     $scope.categoryChanged = function(trait) {
-        trait.indexVariables = Variable.query({index_categories: trait.selectedCategory.id});
-        trait.nicheVariables = Variable.query({niche_categories: trait.selectedCategory.id});
+        trait.indexVariables = Variable.query({index_categories: trait.selectedCategory.id, source: trait.selectedSource.id});
+        trait.nicheVariables = Variable.query({niche_categories: trait.selectedCategory.id, source: trait.selectedSource.id});
 		trait.codes = [];
         trait.selectedCode = "";
     };
@@ -18,9 +18,10 @@ function CulturalCtrl($scope, searchModelService, Variable, CodeDescription, BfC
     // triggered by the view when a trait is changed in the picker
     $scope.traitChanged = function(trait) {
         trait.selectedCode = "";
-        if (trait.selectedVariable.data_type == 'CONTINUOUS') 
+        if (trait.selectedVariable.data_type == 'CONTINUOUS') {
             trait.codes = BfContinuousVariable.query({query: {bf_id: trait.selectedVariable.id}});
-        else
+            console.log(trait.codes);
+        } else
             trait.codes = CodeDescription.query({variable: trait.selectedVariable.id });
     };
 
@@ -72,7 +73,6 @@ function CulturalCtrl($scope, searchModelService, Variable, CodeDescription, BfC
             var selected = trait.selected.filter(function(code){ return code.isSelected; });
             codes = codes.concat(selected);
         });
-        console.log(codes);
         $scope.updateSearchQuery({ variable_codes: codes });
         $scope.searchSocieties();
     };

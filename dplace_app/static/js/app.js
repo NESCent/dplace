@@ -15,6 +15,10 @@ function dplaceRouter($routeProvider) {
             templateUrl: '/static/partials/about.html',
             controller: 'AboutCtrl'
         })
+        .when('/source_info', {
+            templateUrl:'/static/partials/source_info.html',
+            controller:'SourceInfoCtrl'
+        })
         .otherwise({
 	        redirectTo: '/about'
 	});
