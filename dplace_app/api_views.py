@@ -9,7 +9,7 @@ from rest_framework.permissions import *
 from rest_framework.views import Request, Response
 from rest_framework.renderers import JSONRenderer
 from filters import *
-from renderers import DPLACECsvRenderer
+from renderers import *
 
 # Resource routes
 class VariableDescriptionViewSet(viewsets.ReadOnlyModelViewSet):
@@ -295,4 +295,23 @@ def csv_download(request):
     filename = "dplace-societies-%s.csv" % datetime.datetime.now().strftime("%Y-%m-%d")
     response['Content-Disposition']  = 'attachment; filename="%s"' % filename
     return response
+    
+@api_view(['GET'])
+@permission_classes((AllowAny,))
+@renderer_classes((ZipRenderer,))
+def zip_legends(request):
+    import datetime
+    query_string = request.QUERY_PARAMS['query']
+    result_set = json.loads(query_string)
+    to_download = ZipResultSet()
+    if 'tree' in result_set:
+        to_download.add_tree(str(result_set['tree']))
+    if 'legends' in result_set:
+        for l in result_set['legends']:
+            to_download.add_legend(Legend( l['svg'], l['name']))
+    response = Response(ZipResultSetSerializer(to_download).data)
+    filename = "dplace-trees-%s.zip" % datetime.datetime.now().strftime("%Y-%m-%d")
+    response['Content-Disposition'] = 'attachment; filename="%s"' % filename
+    return response
+    
     
