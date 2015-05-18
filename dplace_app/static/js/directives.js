@@ -132,7 +132,7 @@ angular.module('languagePhylogenyDirective', [])
                                                     if (society.bf_cont_var) {
                                                         min = scope.results.code_ids[society.variable_coded_values[i].variable].min;
                                                         max = scope.results.code_ids[society.variable_coded_values[i].variable].max;
-                                                        var lum = (value-min)/(max-min) * 100;
+                                                        var lum = (value-min)/(max-min) * 95;
                                                         return 'hsl(0, 65%,'+lum+'%)';
                                                     }                                               
                                                     hue = value * 240 / scope.results.code_ids[society.variable_coded_values[i].variable].length;
@@ -417,33 +417,36 @@ angular.module('dplaceMapDirective', [])
                             .node().parentNode.innerHTML;
                         map_svg = map_svg.substring(0, map_svg.indexOf("<div")); //remove zoom in/out buttons from map
                         //construct legend for download
-                        var legend = d3.select(".legend-for-download");
                         if (scope.results.code_ids && scope.chosen) {
-                            for (var i = 0; i < scope.results.code_ids[scope.chosen.id].length; i++) {
-                                g = legend.append("svg:g")
-                                    .attr("transform", function() {
-                                        return 'translate(0,'+i*25+')';
-                                    });
-                                g.append("svg:circle")
-                                    .attr("cx", "10")
-                                    .attr("cy", "10")
-                                    .attr("r", "4.5")
-                                    .attr("stroke", "#000")
-                                    .attr("stroke-width", "0.5")
-                                    .attr("fill", function() {
-                                        if (scope.results.code_ids[scope.chosen.id][i].description.indexOf("Missing data") != -1)
-                                            return 'hsl(0, 0%, 100%)';
-                                        var value = scope.results.code_ids[scope.chosen.id][i].code;
-                                        var hue = value * 240 / scope.results.code_ids[scope.chosen.id].length;
-                                        return 'hsl('+hue+',100%,50%)';
-                                    });
-                                g.append("svg:text")
-                                    .attr("x", "20")
-                                    .attr("y", "15")
-                                    .text(scope.results.code_ids[scope.chosen.id][i].description);
+                            if (scope.chosen.data_type == 'CONTINUOUS') {
+                                var legend_svg = "<g transform='translate(0,350)'>"+d3.select(".bf-cont-gradient").node().innerHTML+"</g>"; 
+                            } else {
+                                var legend = d3.select(".legend-for-download");
+                                for (var i = 0; i < scope.results.code_ids[scope.chosen.id].length; i++) {
+                                    g = legend.append("svg:g")
+                                        .attr("transform", function() {
+                                            return 'translate(0,'+i*25+')';
+                                        });
+                                    g.append("svg:circle")
+                                        .attr("cx", "10")
+                                        .attr("cy", "10")
+                                        .attr("r", "4.5")
+                                        .attr("stroke", "#000")
+                                        .attr("stroke-width", "0.5")
+                                        .attr("fill", function() {
+                                            if (scope.results.code_ids[scope.chosen.id][i].description.indexOf("Missing data") != -1)
+                                                return 'hsl(0, 0%, 100%)';
+                                            var value = scope.results.code_ids[scope.chosen.id][i].code;
+                                            var hue = value * 240 / scope.results.code_ids[scope.chosen.id].length;
+                                            return 'hsl('+hue+',100%,50%)';
+                                        });
+                                    g.append("svg:text")
+                                        .attr("x", "20")
+                                        .attr("y", "15")
+                                        .text(scope.results.code_ids[scope.chosen.id][i].description);
+                                }
+                                var legend_svg = "<g transform='translate(0,350)'>"+legend.node().innerHTML+"</g>";
                             }
-                            var legend_svg = "<g transform='translate(0,350)'>"+legend.node().innerHTML+"</g>";
-                            
                             var map_svg = map_svg.substring(0, map_svg.indexOf("</svg>"));
                             map_svg = map_svg.concat(legend_svg+"</svg>");
                             //generate download
