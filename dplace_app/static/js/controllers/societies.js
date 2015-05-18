@@ -1,9 +1,14 @@
 function SocietiesCtrl($scope, searchModelService, LanguageClass) {
     $scope.results = searchModelService.getModel().getResults();
-    $scope.query = searchModelService.getModel().getQuery(); 
-    $scope.variables = [];
-    console.log($scope.results);
+    $scope.query = searchModelService.getModel().getQuery();
     console.log($scope.query);
+    console.log($scope.results);
+    $scope.variables = [];
+    $scope.buttons = [
+        {value:'phylogeny', name:'Phylogenies'},
+        {value:'glottolog', name:'Glottolog Trees'},
+    ];
+    
     if ($scope.results.variable_descriptions) {
         $scope.variables = $scope.variables.concat($scope.results.variable_descriptions);
     }
@@ -16,19 +21,31 @@ function SocietiesCtrl($scope, searchModelService, LanguageClass) {
         var max_value = Math.max.apply(null, extractedValues);
         $scope.range = max_value - min_value;
     }
-
+    for (var key in $scope.results.code_ids) {
+        $scope.results.code_ids[key]['svgSize'] = $scope.results.code_ids[key].length * 25;
+    }
+    
     $scope.setActive('societies');
 
     $scope.resizeMap = function() {
         $scope.$broadcast('mapTabActivated');
     };
     
-    $scope.treeSelected = function() {
-        $scope.$broadcast('treeSelected', {tree: $scope.results.selectedTree});
-        d3.select(".tree-legend-DL").html('');
-        $scope.treeDownload();
+    $scope.buttonChanged = function(buttonVal) {
+        d3.select('language-phylogeny').html('');
+        if (buttonVal.indexOf('phylogeny') != -1) {
+            $scope.trees = $scope.results.language_trees.phylogenies;
+        } else {
+            $scope.trees = $scope.results.language_trees.glotto_trees;
+        }
     };
     
+    $scope.treeSelected = function() {
+        $scope.$broadcast('treeSelected', {tree: $scope.results.selectedTree});
+        d3.select(".tree-download").html('');
+        $scope.treeDownload();
+    };
+
     $scope.treeDownload = function() {
         var tree_svg = d3.select(".phylogeny")
             .attr("version", 1.1)
@@ -36,15 +53,50 @@ function SocietiesCtrl($scope, searchModelService, LanguageClass) {
             .node().parentNode.innerHTML;
          tree_svg = tree_svg.substring(tree_svg.indexOf("<svg xml"));
          tree_svg = tree_svg.substring(0, tree_svg.indexOf("</svg>"));
-        var imgsrc = 'data:image/svg:xml;base64,' + window.btoa(unescape(encodeURIComponent(tree_svg)));
+         tree_svg = tree_svg.concat("</svg>");
+        
+        var legends = d3.selectAll('.tree-legend');
+        if ($scope.results.classifications) {
+            legends = legends.concat(d3.selectAll('.tree-legend-langs'));
+        }
+        
+        html_legends = [legends.length];
+        all_legends = [];
+        for (var i = 0; i < legends.length; i++) {
+            for (var j = 0; j < legends[i].length; j++) {
+                all_legends.push(legends[i][j]);
+            }
+        }
+        count = 0;
+        for (var key in $scope.results.code_ids) {          
+            all_legends[count].name = $scope.results.code_ids[key].name;
+            count++;
+        }
+        legends = [];
+        for (var i = 0; i < all_legends.length; i++) {
+            legend = all_legends[i].innerHTML;
+            html_legends[i] = legend;
+            if (all_legends[i].name)
+                svg_string = '<g transform="translate(0, 20)"><text>'+all_legends[i].name+'</text>'+legend+"</g>";
+            else                
+                svg_string = '<g transform="translate(0, 20)">'+legend+"</g>";
+            svg_string = '<svg version="1.1" xmlns="http://www.w3.org/2000/svg">'+svg_string+'</svg>';
+            if (all_legends[i].name)
+                legends.push({'name': all_legends[i].name, 'svg':svg_string});
+            else
+                legends.push({'name': 'Legend', 'svg':svg_string});
+
+        }
+        query = {"legends": legends, "tree":tree_svg};
         d3.select(".tree-download").append("a")
             .attr("class", "btn btn-info btn-dplace-download")
-            .attr("download", "tree.svg")
-            .attr("href", imgsrc)
-            .html("Download Phylogeny");
+            .attr("download", "legend.svg")
+            .attr("href", "/api/v1/zip_legends?query="+encodeURIComponent(JSON.stringify(query)))
+            .html("Download this phylogeny");
     };
     
     $scope.changeMap = function(chosenVariable) {
+        console.log(chosenVariable);
         chosenVariableId = chosenVariable.id;
         d3.select(".legend-for-download").html('');
     }

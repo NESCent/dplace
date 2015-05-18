@@ -20,7 +20,6 @@ function CulturalCtrl($scope, searchModelService, Variable, CodeDescription, BfC
         trait.selectedCode = "";
         if (trait.selectedVariable.data_type == 'CONTINUOUS') {
             trait.codes = BfContinuousVariable.query({query: {bf_id: trait.selectedVariable.id}});
-            console.log(trait.codes);
         } else
             trait.codes = CodeDescription.query({variable: trait.selectedVariable.id });
     };

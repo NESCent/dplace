@@ -7,7 +7,7 @@
  * @param FindSocieties
  * @constructor
  */
-function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties, LanguageClass, TreesFromLanguages, Variable) {
+function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties, LanguageClass, TreesFromLanguages) {
     $scope.setActive('search');
     $scope.searchModel = searchModelService.getModel();
     $scope.selectedButton = $scope.searchModel.selectedButton;
@@ -41,10 +41,6 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties, 
         $scope.searchButton.text = 'Search';
     };
     
-    $scope.assignColors = function() {
-        if ($scope.searchModel.query.variable_codes) $scope.assignBins($scope.searchModel.query.variable_codes);
-        var colorMap = colorMapService.generateColorMap($scope.searchModel.getSocieties(), $scope.searchModel.query);
-    };
     //calculates the range for environmental variables
     //needed for coloring of markers
     $scope.calculateRange = function(results) {
@@ -69,23 +65,33 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties, 
     $scope.getCodeIDs = function() {
         $scope.searchModel.results.code_ids = {};
         if ($scope.searchModel.query.language_classifications && !$scope.searchModel.query.variable_codes && !$scope.searchModel.query.environmental_filters) {
-            $scope.searchModel.results.classifications = [];
+            $scope.searchModel.results.classifications = {};
             LanguageClass.query().$promise.then(function(result) {
                 for (var i = 0; i < $scope.searchModel.results.societies.length; i++) {
                     for (var j = 0; j < $scope.searchModel.results.societies[i].languages.length; j++) {
+                        language_family = $scope.searchModel.results.societies[i].languages[j].language_family.name;
                         classification = $scope.searchModel.query.language_classifications.filter(function(l) { return l.language.id == $scope.searchModel.results.societies[i].languages[j].id; });
                         if (classification.length > 0) {
                             toAdd = result.filter(function(l) { return l.id == classification[0].class_subfamily; });
-                            if (toAdd[0] && $scope.searchModel.results.classifications.indexOf(toAdd[0]) == -1)
-                                $scope.searchModel.results.classifications = $scope.searchModel.results.classifications.concat(toAdd); 
+                            if (toAdd[0]){
+                                if (language_family in $scope.searchModel.results.classifications) {
+                                    if ($scope.searchModel.results.classifications[language_family].indexOf(toAdd[0]) == -1)
+                                        $scope.searchModel.results.classifications[language_family] = $scope.searchModel.results.classifications[language_family].concat(toAdd);
+                                        $scope.searchModel.results.classifications['NumClassifications'] += 1;
+                               } else {
+                                    $scope.searchModel.results.classifications[language_family] = toAdd;
+                                    $scope.searchModel.results.classifications['NumClassifications'] = 1;
+                                }
+                            }
                         }
                     }
                 }
             });
         
         }
-        if (!$scope.searchModel.query.variable_codes) return;
 
+        if (!$scope.searchModel.query.variable_codes) return;
+        
         for (var i = 0; i < $scope.searchModel.query.variable_codes.length; i++) {
             if ($scope.searchModel.query.variable_codes[i].bf_id) {
                 if ($scope.searchModel.query.variable_codes[i].bf_id in $scope.searchModel.results.code_ids) 
@@ -107,14 +113,13 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties, 
                 $scope.searchModel.results.code_ids[$scope.searchModel.query.variable_codes[i].variable] = [$scope.searchModel.query.variable_codes[i]];
             }
         }
-
+        
         for (var i = 0; i < $scope.searchModel.results.variable_descriptions.length; i++) {
             if ($scope.searchModel.results.code_ids[$scope.searchModel.results.variable_descriptions[i].id].name) continue;
             else $scope.searchModel.results.code_ids[$scope.searchModel.results.variable_descriptions[i].id].name = $scope.searchModel.results.variable_descriptions[i].name;
         }
     }
-    
-    //need to do this - move code from directive
+
     $scope.assignColors = function() {
         results = $scope.searchModel.getResults();
         results = $scope.calculateRange(results);
@@ -150,6 +155,12 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties, 
     }
     
     function addTreesToSocieties() {
+        $scope.searchModel.results.language_trees.phylogenies = [];
+        $scope.searchModel.results.language_trees.glotto_trees = [];
+        $scope.searchModel.results.language_trees.forEach(function(tree) {
+            if (tree.name.indexOf("glotto") != -1) $scope.searchModel.results.language_trees.glotto_trees.push(tree);
+            else $scope.searchModel.results.language_trees.phylogenies.push(tree);
+        });
         $scope.searchModel.getSocieties().forEach(function (container) {
             var language = container.society.language;
             if(language != null) {
