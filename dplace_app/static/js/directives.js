@@ -86,7 +86,6 @@ angular.module('languagePhylogenyDirective', [])
                 var pixelScale = (w / timeScaleYears) * 100;
                 
                 var links = tree.links(nodes);
-                console.log(nodes);
                 var link = vis.selectAll("path.link")
                     .data(links)
                     .enter().append("svg:path")
@@ -127,15 +126,15 @@ angular.module('languagePhylogenyDirective', [])
                                                 .attr("transform", "translate("+translate+", 0)")
                                                 .attr("fill", function(n) {
                                                     if (society.variable_coded_values[i].code_description && society.variable_coded_values[i].code_description.description.indexOf("Missing data") != -1) {
-                                                        return 'hsl(360, 100%, 100%)';
+                                                       return 'hsl(360, 100%, 100%)';
                                                     }
                                                     value = society.variable_coded_values[i].coded_value;
-                                                    
-                                                    //NEED TO DO THIS
-                                                    /*if (society.bf_cont_var) {
+                                                    if (society.bf_cont_var) {
+                                                        min = scope.results.code_ids[society.variable_coded_values[i].variable].min;
+                                                        max = scope.results.code_ids[society.variable_coded_values[i].variable].max;
                                                         var lum = (value-min)/(max-min) * 100;
-                                                        return 'hsl(0, 65%,'+lum+'%)'; //RED hue - can be changed
-                                                    }*/                                                        
+                                                        return 'hsl(0, 65%,'+lum+'%)';
+                                                    }                                               
                                                     hue = value * 240 / scope.results.code_ids[society.variable_coded_values[i].variable].length;
                                                     return 'hsl('+hue+',100%, 50%)';
                                                 })
