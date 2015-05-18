@@ -166,6 +166,7 @@ angular.module('languagePhylogenyDirective', [])
                                         return 'hsl('+hue+',100%, 50%)';
                                     }
                                 });
+                                
                         }
                         
                     });
@@ -177,6 +178,8 @@ angular.module('languagePhylogenyDirective', [])
                     });
                     //append the circles
                     if (society.environmental_values.length > 0) {
+                        var society_name = society.society.name + " (" + society.society.iso_code + ")";
+                        var hover_text_value = society.environmental_values[0].value.toFixed(4);
                         selected.append("svg:circle")
                             .attr("r", 4.5)
                             .attr("stroke", "#000")
@@ -186,7 +189,18 @@ angular.module('languagePhylogenyDirective', [])
                                 value = society.environmental_values[0].value; //only 1 environmental value at a time so we can do this
                                 hue = value * 240 / scope.range;
                                 return 'hsl('+hue+',100%, 50%)';
-                            });
+                            })
+                            .on("mouseover", function() { 
+                                 d3.select("body").append("div")
+                                    .attr("class", "tooltip")
+                                    .html("<b>"+society_name+":</b><br>"+hover_text_value)
+                                    .style("left", (d3.event.pageX + 10)+"px")
+                                    .style("top", (d3.event.pageY + 5)+"px")
+                                    .style("opacity", .9);
+                              })
+                            .on("mouseout", function() {
+                                d3.select(".tooltip").remove();
+                            }); 
                     } 
                     
                     //lastly, append the text
