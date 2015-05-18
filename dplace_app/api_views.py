@@ -171,17 +171,12 @@ def result_set_from_query_dict(query_dict):
 
     if 'variable_codes' in query_dict:
         criteria.append(SEARCH_VARIABLES)
-        f = open('tes.txt', 'w')
         for x in query_dict['variable_codes']:
             if 'bf_id' in x:
                 values = VariableCodedValue.objects.filter(variable__id=x['bf_id'])
                 if 'min' in x:
                     min = x['min']
                     max = x['max']
-                    f.write(str(min))
-                    f.write("//")
-                    f.write(str(max))
-                    f.write("..")
                     values = values.exclude(coded_value='NA')
                     values = values.filter(coded_value__gt=min).filter(coded_value__lt=max)
                 else: #NA selected
@@ -322,7 +317,9 @@ def bin_bfcont_data(request):
                 'description': str(min) + ' - ' + str(max),
                 'min': min_bin,
                 'max': min_bin + bin_size,
-                'bf_id': query_dict['bf_id']
+                'bf_id': query_dict['bf_id'],
+                'absolute_min': min_value,
+                'absolute_max': max_value,
             })
             min_bin = min_bin + bin_size + 1
     else:
