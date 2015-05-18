@@ -158,16 +158,25 @@
                                         <text x="20" y="15">{{c.description}}</text>
                                     </g>
                                 </svg>
-                                <svg class="bf-cont-gradient" height="250" height="30">
+                                <svg class="bf-cont-gradient" height="80" height="30">
                                     <defs>
-                                        <linearGradient id="grad2" x1="0%" y1="0%" x2="100%" y2="0%">
+                                        <linearGradient id="g{{code.CID}}" x1="0%" y1="0%" x2="100%" y2="0%">
                                             <stop offset="0%" style="stop-color:hsl(0, 65%, 95%);stop-opacity:1" />
                                             <stop offset="100%" style="stop-color:hsl(0, 65%, 50%);stop-opacity:1" />
                                         </linearGradient>
                                     </defs>
-                                    <rect x="10" fill="url(#grad2)" height="30" width="200" />
-                                    <text x="0" y="45">{{code.min}}</text>
-                                    <text x="200" y="45">{{code.max}}</text>
+                                    <circle
+                                            cx="10"
+                                            cy="10"
+                                            r="4.5"
+                                            fill="hsl(360, 100%, 100%)"
+                                            stroke="#000"
+                                            stroke-width="0.5"
+                                            />
+                                        <text x="20" y="15">Missing Data</text>
+                                    <rect x="10" y="25" fill="url(#g{{code.CID}})" height="30" width="200" />
+                                    <text x="0" y="70">{{code.min}}</text>
+                                    <text x="200" y="70">{{code.max}}</text>
                                 </svg>
                                 
                               </div>

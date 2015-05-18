@@ -73,14 +73,7 @@ function SocietiesCtrl($scope, searchModelService, LanguageClass, ZipTest) {
                 all_legends.push(legends[i][j]);
             }
         }
-       
-      
-        count = 0;
-        for (var key in $scope.results.code_ids) {
-            if ($scope.results.code_ids[key].length == 0) {all_legends = all_legends.splice(count, 1); continue; }
-            count++;
-        }
-        
+
         count = 0;
         for (var key in $scope.results.code_ids) {
             all_legends[count].name = $scope.results.code_ids[key].name;
