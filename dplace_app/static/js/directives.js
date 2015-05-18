@@ -40,7 +40,7 @@ angular.module('languagePhylogenyDirective', [])
                 translate = 20;
                 if (scope.query.variable_codes) {
                     for (var key in scope.results.code_ids) {
-                        if (scope.results.code_ids[key].length > 0) {
+                        if (scope.results.code_ids[key].length > 0 || scope.results.code_ids[key].bf_var) {
                             labels.append("svg:text")
                                 .attr("dx", w+15+translate)
                                 .attr("dy", 15)

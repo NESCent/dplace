@@ -93,7 +93,7 @@
                </tr>
                 <tr ng-show="results.chosenVariable.data_type == 'CONTINUOUS'">
                     <td>
-                        <svg class="bf-cont-gradient" height="250", height="30">
+                        <svg class="bf-cont-gradient" height="250" height="30">
                             <defs>
                                 <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="0%">
                                     <stop offset="0%" style="stop-color:hsl(0, 65%, 95%);stop-opacity:1" />
@@ -155,10 +155,21 @@
                                                 stroke="#000"
                                                 stroke-width="0.5"
                                                 />
-                                        
                                         <text x="20" y="15">{{c.description}}</text>
                                     </g>
                                 </svg>
+                                <svg class="bf-cont-gradient" height="250" height="30">
+                                    <defs>
+                                        <linearGradient id="grad2" x1="0%" y1="0%" x2="100%" y2="0%">
+                                            <stop offset="0%" style="stop-color:hsl(0, 65%, 95%);stop-opacity:1" />
+                                            <stop offset="100%" style="stop-color:hsl(0, 65%, 50%);stop-opacity:1" />
+                                        </linearGradient>
+                                    </defs>
+                                    <rect x="10" fill="url(#grad2)" height="30" width="200" />
+                                    <text x="0" y="45">{{code.min}}</text>
+                                    <text x="200" y="45">{{code.max}}</text>
+                                </svg>
+                                
                               </div>
                         </td>
                     </tr>

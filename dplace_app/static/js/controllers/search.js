@@ -94,10 +94,8 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties, 
 
         for (var i = 0; i < $scope.searchModel.query.variable_codes.length; i++) {
             if ($scope.searchModel.query.variable_codes[i].bf_id) {
-                if ($scope.searchModel.query.variable_codes[i].bf_id in $scope.searchModel.results.code_ids) 
-                    $scope.searchModel.results.code_ids[$scope.searchModel.query.variable_codes[i].bf_id] = $scope.searchModel.results.code_ids[$scope.searchModel.query.variable_codes[i].bf_id].concat([$scope.searchModel.query.variable_codes[i]]);
-                else {
-                    $scope.searchModel.results.code_ids[$scope.searchModel.query.variable_codes[i].bf_id] = [$scope.searchModel.query.variable_codes[i]];
+                if (!($scope.searchModel.query.variable_codes[i].bf_id in $scope.searchModel.results.code_ids)) {
+                    $scope.searchModel.results.code_ids[$scope.searchModel.query.variable_codes[i].bf_id] = [];
                 }
                 if (!$scope.searchModel.results.code_ids[$scope.searchModel.query.variable_codes[i].bf_id].absolute_min) {
                     $scope.abs_min = $scope.searchModel.query.variable_codes[i].absolute_min;
@@ -105,7 +103,6 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties, 
                     $scope.searchModel.results.code_ids[$scope.searchModel.query.variable_codes[i].bf_id].min = $scope.searchModel.query.variable_codes[i].absolute_min;
                     $scope.searchModel.results.code_ids[$scope.searchModel.query.variable_codes[i].bf_id].max = $scope.searchModel.query.variable_codes[i].absolute_max;
                     $scope.searchModel.results.code_ids[$scope.searchModel.query.variable_codes[i].bf_id].bf_var = true;
-
                 }
                 continue;
             }
