@@ -7,7 +7,7 @@
  * @param FindSocieties
  * @constructor
  */
-function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties, LanguageClass, TreesFromLanguages) {
+function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties, LanguageClass, TreesFromLanguages, Variable) {
     $scope.setActive('search');
     $scope.searchModel = searchModelService.getModel();
     $scope.selectedButton = $scope.searchModel.selectedButton;
@@ -118,7 +118,21 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties, 
     $scope.assignColors = function() {
         results = $scope.searchModel.getResults();
         results = $scope.calculateRange(results);
-        console.log(results);
+        bf_codes = [];
+        if ($scope.searchModel.query.variable_codes) {
+            for (var i = 0; i < $scope.searchModel.query.variable_codes.length; i++) {
+                if ($scope.searchModel.query.variable_codes[i].bf_id)
+                    bf_codes.push($scope.searchModel.query.variable_codes[i].bf_id);
+            }
+        }
+        
+        //needed for coloring of markers
+        for (var i = 0; i < results.societies.length; i++) {
+            for (var j = 0; j < results.societies[i].variable_coded_values.length; j++) {
+                if (bf_codes.indexOf(results.societies[i].variable_coded_values[j].variable) != -1)
+                    results.societies[i]['bf_cont_var'] = true;
+            }
+        }
         var colorMap = colorMapService.generateColorMap(results);
         $scope.searchModel.getSocieties().forEach(function(container) {
             container.society.style = {'background-color' : colorMap[container.society.id] };

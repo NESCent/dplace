@@ -116,17 +116,26 @@ angular.module('languagePhylogenyDirective', [])
                                 for (var i = 0; i < society.variable_coded_values.length; i++) {
                                     if (society.variable_coded_values[i].variable == key) {
                                             var society_name = society.society.name + " (" + society.society.iso_code + ")";
-                                            var hover_text_value = society.variable_coded_values[i].code_description.description;
+                                            if (society.bf_cont_var)
+                                                var hover_text_value = society.variable_coded_values[i].coded_value;
+                                            else
+                                                var hover_text_value = society.variable_coded_values[i].code_description.description;
                                             selected.append("svg:circle")
                                                 .attr("r", 4.5)
                                                 .attr("stroke", "#000")
                                                 .attr("stroke-width", "0.5")
                                                 .attr("transform", "translate("+translate+", 0)")
                                                 .attr("fill", function(n) {
-                                                    if (society.variable_coded_values[i].code_description.description.indexOf("Missing data") != -1) {
+                                                    if (society.variable_coded_values[i].code_description && society.variable_coded_values[i].code_description.description.indexOf("Missing data") != -1) {
                                                         return 'hsl(360, 100%, 100%)';
                                                     }
                                                     value = society.variable_coded_values[i].coded_value;
+                                                    
+                                                    //NEED TO DO THIS
+                                                    /*if (society.bf_cont_var) {
+                                                        var lum = (value-min)/(max-min) * 100;
+                                                        return 'hsl(0, 65%,'+lum+'%)'; //RED hue - can be changed
+                                                    }*/                                                        
                                                     hue = value * 240 / scope.results.code_ids[society.variable_coded_values[i].variable].length;
                                                     return 'hsl('+hue+',100%, 50%)';
                                                 })
