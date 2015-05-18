@@ -1,4 +1,4 @@
-function SocietiesCtrl($scope, searchModelService, LanguageClass) {
+function SocietiesCtrl($scope, searchModelService, LanguageClass, ZipTest) {
     $scope.results = searchModelService.getModel().getResults();
     $scope.query = searchModelService.getModel().getQuery();
     console.log($scope.query);
@@ -96,7 +96,6 @@ function SocietiesCtrl($scope, searchModelService, LanguageClass) {
     };
     
     $scope.changeMap = function(chosenVariable) {
-        console.log(chosenVariable);
         chosenVariableId = chosenVariable.id;
         d3.select(".legend-for-download").html('');
     }

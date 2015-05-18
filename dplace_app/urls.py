@@ -40,4 +40,6 @@ urlpatterns = patterns('dplace_app.views',
     url(r'^api/v1/min_and_max', api_views.get_min_and_max, name="min_and_max"),
     url(r'^api/v1/bf_cont_variable', api_views.bin_bfcont_data, name="bf_cont_variable"),
     url(r'^api/v1/csv_download', api_views.csv_download, name='csv_download'),
+    url(r'^api/v1/zip', api_views.zip_legends, name='zip_legends'),
+
 )

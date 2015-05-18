@@ -91,7 +91,7 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties, 
         }
 
         if (!$scope.searchModel.query.variable_codes) return;
-        
+
         for (var i = 0; i < $scope.searchModel.query.variable_codes.length; i++) {
             if ($scope.searchModel.query.variable_codes[i].bf_id) {
                 if ($scope.searchModel.query.variable_codes[i].bf_id in $scope.searchModel.results.code_ids) 
@@ -104,6 +104,8 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties, 
                     $scope.abs_max = $scope.searchModel.query.variable_codes[i].absolute_max;
                     $scope.searchModel.results.code_ids[$scope.searchModel.query.variable_codes[i].bf_id].min = $scope.searchModel.query.variable_codes[i].absolute_min;
                     $scope.searchModel.results.code_ids[$scope.searchModel.query.variable_codes[i].bf_id].max = $scope.searchModel.query.variable_codes[i].absolute_max;
+                    $scope.searchModel.results.code_ids[$scope.searchModel.query.variable_codes[i].bf_id].bf_var = true;
+
                 }
                 continue;
             }

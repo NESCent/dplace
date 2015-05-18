@@ -1,4 +1,23 @@
 angular.module('dplaceFilters', [])
+    .filter('transformG', function() {
+        return function(index) {
+            if (index == 0) return 'translate(0,10)'
+            else {
+                j = (index * 25) + 10;
+                return 'translate(0,'+j+')';
+            }
+        }
+    })    
+    .filter('joinDictItems', function() {
+        return function(dict) {
+            items = []
+            for (var key in dict) {
+                if (key != 'NumClassifications')
+                    items = items.concat(dict[key]);
+            }
+            return items;
+        }
+    })
     .filter('colorNode', function() {
         return function(value, codes) {
             var missingData = false;
