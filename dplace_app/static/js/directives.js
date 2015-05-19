@@ -414,7 +414,13 @@ angular.module('dplaceMapDirective', [])
                         map_svg = map_svg.substring(0, map_svg.indexOf("<div")); //remove zoom in/out buttons from map
                         //construct legend for download
                         var legend = d3.select(".legend-for-download");
-                        if (scope.results.code_ids && scope.chosen) {
+                        var legend_svg = "";
+                        if (scope.chosen) {
+                            if (scope.results.environmental_variables.length > 0 && scope.chosen.id == scope.results.environmental_variables[0].id) {
+                                //if the chosen map is an environmental variable
+                                    legend_svg = "<g transform='translate(0,350)'>"+d3.select(".envLegend").node().innerHTML+"</g>";
+                            }
+                            else if (scope.results.code_ids) {
                             for (var i = 0; i < scope.results.code_ids[scope.chosen.id].length; i++) {
                                 g = legend.append("svg:g")
                                     .attr("transform", function() {
@@ -438,8 +444,8 @@ angular.module('dplaceMapDirective', [])
                                     .attr("y", "15")
                                     .text(scope.results.code_ids[scope.chosen.id][i].description);
                             }
-                            var legend_svg = "<g transform='translate(0,350)'>"+legend.node().innerHTML+"</g>";
-                            
+                            legend_svg = "<g transform='translate(0,350)'>"+legend.node().innerHTML+"</g>";
+                            }
                             var map_svg = map_svg.substring(0, map_svg.indexOf("</svg>"));
                             map_svg = map_svg.concat(legend_svg+"</svg>");
                             //generate download
@@ -450,7 +456,7 @@ angular.module('dplaceMapDirective', [])
                                 .attr("style", "padding-bottom:20px")
                                 .append("a")
                                 .attr("class", "btn btn-info btn-dplace-download")
-                                .attr("download", scope.chosen.name+"map.svg")
+                                .attr("download", scope.chosen.name+" map.svg")
                                 .attr("href", imgsrc)
                                 .html("Download Map");
                         }
