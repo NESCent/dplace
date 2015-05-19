@@ -13,6 +13,8 @@ function SocietiesCtrl($scope, searchModelService, LanguageClass, ZipTest) {
         var extractedValues = $scope.results.societies.map(function(society) { return society.environmental_values[0].value; } );
         var min_value = Math.min.apply(null, extractedValues);
         var max_value = Math.max.apply(null, extractedValues);
+        $scope.results.code_ids[$scope.results.environmental_variables[0].id].min = min_value.toFixed(4);
+        $scope.results.code_ids[$scope.results.environmental_variables[0].id].max = max_value.toFixed(4);
         $scope.range = max_value - min_value;
     }
     for (var key in $scope.results.code_ids) {
