@@ -97,7 +97,8 @@
                             <defs>
                                 <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="0%">
                                     <stop offset="0%" style="stop-color:hsl(0, 65%, 95%);stop-opacity:1" />
-                                    <stop offset="100%" style="stop-color:hsl(0, 65%, 50%);stop-opacity:1" />
+                                    <stop offset="50%" style="stop-color:hsl(0, 65%, 50%);stop-opacity:1" />
+                                    <stop offset="100%" style="stop-color:hsl(0, 65%, 0%);stop-opacity:1" />
                                 </linearGradient>
                             </defs>
                             <rect x="10" fill="url(#grad1)" height="30" width="200" />
@@ -145,7 +146,7 @@
                     <tr>
                         <td class="hiddenRow">
                             <div class="accordion-body collapse" id="{{code.CID}}">
-                                <svg ng-show="!code.bf_var" height="{{code.svgSize}}" class="tree-legend">
+                                <svg ng-show="!code.bf_var" height="{{code.svgSize}}" class="tree-legend" ng-class="bf{{code.bf_var}}">
                                     <g ng-repeat="c in code" transform="{{$index|transformG}}">
                                         <circle
                                                 cx="10"
@@ -158,11 +159,12 @@
                                         <text x="20" y="15">{{c.description}}</text>
                                     </g>
                                 </svg>
-                                <svg class="bf-cont-gradient" height="80" height="30">
+                                <svg ng-show="code.bf_var" class="bf-cont-gradient" height="80" height="30">
                                     <defs>
                                         <linearGradient id="g{{code.CID}}" x1="0%" y1="0%" x2="100%" y2="0%">
                                             <stop offset="0%" style="stop-color:hsl(0, 65%, 95%);stop-opacity:1" />
-                                            <stop offset="100%" style="stop-color:hsl(0, 65%, 50%);stop-opacity:1" />
+                                            <stop offset="50%" style="stop-color:hsl(0, 65%, 50%);stop-opacity:1" />
+                                            <stop offset="100%" style="stop-color:hsl(0, 65%, 0%);stop-opacity:1" />
                                         </linearGradient>
                                     </defs>
                                     <circle

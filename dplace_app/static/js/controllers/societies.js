@@ -22,7 +22,7 @@ function SocietiesCtrl($scope, searchModelService, LanguageClass, ZipTest) {
         $scope.range = max_value - min_value;
     }
     for (var key in $scope.results.code_ids) {
-        $scope.results.code_ids[key]['svgSize'] = $scope.results.code_ids[key].length * 25;
+        $scope.results.code_ids[key]['svgSize'] = $scope.results.code_ids[key].length * 27;
     }
     
     $scope.setActive('societies');
@@ -57,7 +57,7 @@ function SocietiesCtrl($scope, searchModelService, LanguageClass, ZipTest) {
          var legends = [];
          var all_legends = [];
 
-        legends = legends.concat(d3.selectAll('.tree-legend'));
+        legends = legends.concat(d3.selectAll('.bffalse'));
         if ($scope.results.classifications) {
             legends = legends.concat(d3.selectAll('.tree-legend-langs'));
         }
