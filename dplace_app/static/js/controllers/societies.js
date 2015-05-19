@@ -85,9 +85,9 @@ function SocietiesCtrl($scope, searchModelService, LanguageClass, ZipTest) {
             legend = all_legends[i].innerHTML;
             html_legends[i] = legend;
             if (all_legends[i].name)
-                svg_string = '<g transform="translate(0, 20)"><text>'+all_legends[i].name+'</text>'+legend+"</g>";
+                svg_string = '<g transform="translate(5, 20)"><text>'+all_legends[i].name+'</text><g transform="translate(0,20)">'+legend+"</g></g>";
             else                
-                svg_string = '<g transform="translate(0, 20)">'+legend+"</g>";
+                svg_string = '<g transform="translate(5, 20)">'+legend+"</g>";
             svg_string = '<svg version="1.1" xmlns="http://www.w3.org/2000/svg">'+svg_string+'</svg>';
             if (all_legends[i].name)
                 legends.push({'name': all_legends[i].name, 'svg':svg_string});
