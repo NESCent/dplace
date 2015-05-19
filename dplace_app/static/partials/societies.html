@@ -123,7 +123,7 @@
 
             <div id="legend" ng-show="results.selectedTree">
                 <table ng-repeat="(id, code) in results.code_ids">
-                    <tr data-toggle="collapse" data-target="#{{code.CID}}" class="accordion-toggle" style="cursor:pointer;"><th colspan="2">{{code.CID}}: {{code.name}}</th></tr>
+                    <tr ng-show="code.length > 0" data-toggle="collapse" data-target="#{{code.CID}}" class="accordion-toggle" style="cursor:pointer;"><th colspan="2">{{code.CID}}: {{code.name}}</th></tr>
                     <tr>
                         <td class="hiddenRow">
                             <div class="accordion-body collapse" id="{{code.CID}}">

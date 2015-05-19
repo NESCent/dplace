@@ -144,7 +144,8 @@ angular.module('languagePhylogenyDirective', [])
                                 }
                             }
                         });
-                        translate += 20;
+                        if (scope.results.code_ids[key].length > 0)
+                            translate += 20;
                     }
                 } else if (scope.query.language_classifications && !scope.query.environmental_filters) {
                     //get lang classification
