@@ -1,16 +1,16 @@
-function CulturalCtrl($scope, searchModelService, Variable, CodeDescription) {
+function CulturalCtrl($scope, searchModelService, Variable, CodeDescription, Source) {
    var linkModel = function() {
         // Model/state lives in searchModelService
         $scope.traits = [searchModelService.getModel().getCulturalTraits()];
-
+        $scope.sources = Source.query();
     };
     $scope.$on('searchModelReset', linkModel); // When model is reset, update our model
     linkModel();
-	
+
     // triggered by the view when a category is changed
     $scope.categoryChanged = function(trait) {
-        trait.indexVariables = Variable.query({index_categories: trait.selectedCategory.id});
-        trait.nicheVariables = Variable.query({niche_categories: trait.selectedCategory.id});
+        trait.indexVariables = Variable.query({index_categories: trait.selectedCategory.id, source: trait.selectedSource.id});
+        trait.nicheVariables = Variable.query({niche_categories: trait.selectedCategory.id, source: trait.selectedSource.id});
 		trait.codes = [];
         trait.selectedCode = "";
     };

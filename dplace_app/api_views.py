@@ -9,12 +9,12 @@ from rest_framework.permissions import *
 from rest_framework.views import Request, Response
 from rest_framework.renderers import JSONRenderer
 from filters import *
-from renderers import DPLACECsvRenderer
+from renderers import *
 
 # Resource routes
 class VariableDescriptionViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = VariableDescriptionSerializer
-    filter_fields = ('label', 'name', 'index_categories', 'niche_categories',)
+    filter_fields = ('label', 'name', 'index_categories', 'niche_categories', 'source')
     queryset = VariableDescription.objects.all()
     # Override retrieve to use the detail serializer, which includes categories
     def retrieve(self, request, *args, **kwargs):
@@ -100,7 +100,58 @@ class LanguageTreeViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = LanguageTreeSerializer
     filter_fields = ('name',)
     queryset = LanguageTree.objects.all()
+
+#not sure if we need to keep this code since it isn't used at the moment
+#but could come in handy in the future
+def get_language_trees_from_query_dict(query_dict):
+    if 'language_ids' in query_dict:
+        language_ids = [int(x) for x in query_dict['language_ids']]
+        trees = LanguageTree.objects.filter(languages__pk__in=language_ids).distinct()
+    else:
+        trees = None
+    return trees
     
+#not used at the moment; not sure if needs to be kept
+@api_view(['POST'])
+@permission_classes((AllowAny,))
+def trees_from_languages(request):
+    from ete2 import Tree
+    trees = get_language_trees_from_query_dict(request.DATA)
+    if 'language_ids' in request.DATA:
+        languages = request.DATA['language_ids']
+        for t in trees:
+            langs_in_tree = [str(l.iso_code.iso_code) for l in t.languages.all() if l.id in languages] 
+            newick = Tree(t.newick_string)
+            #only works if tips use isocodes
+            try:
+                newick.prune(langs_in_tree, preserve_branch_length=True)
+            except ValueError as e:
+                print e
+                print t.name
+                continue
+            t.newick_string = newick.write(format=5)
+    return Response(LanguageTreeSerializer(trees, many=True).data,)
+  
+#returns trees that contain the societies from the SocietyResultSet  
+def trees_from_languages_array(language_ids):
+    from ete2 import Tree
+    trees = LanguageTree.objects.filter(languages__pk__in=language_ids).distinct()
+    for t in trees:
+        langs_in_tree = [str(l.iso_code.iso_code) for l in t.languages.all() if l.id in language_ids]
+        newick = Tree(t.newick_string)
+        try:
+            newick.prune(langs_in_tree, preserve_branch_length=True)
+        except:
+            continue
+        t.newick_string = newick.write(format=5)
+    return trees
+
+class SourceViewSet(viewsets.ReadOnlyModelViewSet):
+    serializer_class = SourceSerializer
+    filter_fields = ('author',)
+    queryset = Source.objects.all()
+
+
 def result_set_from_query_dict(query_dict):
     result_set = SocietyResultSet()
     # Criteria keeps track of what types of data were searched on, so that we can
@@ -161,6 +212,15 @@ def result_set_from_query_dict(query_dict):
                 result_set.add_geographic_region(society, region)
     # Filter the results to those that matched all criteria
     result_set.finalize(criteria)
+    
+    #search for language trees
+    language_ids = []
+    for s in result_set.societies:
+        if s.society.language:
+            language_ids.append(s.society.language.id)
+    trees = trees_from_languages_array(language_ids)
+    for t in trees:
+        result_set.add_language_tree(t)
     return result_set
 
 # search/filter APIs
@@ -182,31 +242,6 @@ class GeographicRegionViewSet(viewsets.ReadOnlyModelViewSet):
     model = GeographicRegion
     filter_class = GeographicRegionFilter
 
-def get_language_trees_from_query_dict(query_dict):
-    if 'language_ids' in query_dict:
-        language_ids = [int(x) for x in query_dict['language_ids']]
-        trees = LanguageTree.objects.filter(languages__pk__in=language_ids).distinct()
-    else:
-        trees = None
-    return trees
-    
-@api_view(['POST'])
-@permission_classes((AllowAny,))
-def trees_from_languages(request):
-    from ete2 import Tree
-    trees = get_language_trees_from_query_dict(request.DATA)
-    if 'language_ids' in request.DATA:
-        languages = request.DATA['language_ids']
-        for t in trees:
-            langs_in_tree = [str(l.iso_code.iso_code) for l in t.languages.all() if l.id in languages] 
-            newick = Tree(t.newick_string)
-            #only works if tips use isocodes
-            try:
-                newick.prune(langs_in_tree, preserve_branch_length=True)
-            except:
-                continue
-            t.newick_string = newick.write(format=5)
-    return Response(LanguageTreeSerializer(trees, many=True).data,)
     
 @api_view(['GET'])
 @permission_classes((AllowAny,))
@@ -248,24 +283,6 @@ def newick_tree(key):
 
 @api_view(['GET'])
 @permission_classes((AllowAny,))
-def get_newick_trees(request):
-    from ete2 import Tree
-    trees = get_language_trees_from_query_dict(request.DATA)
-    if 'language_ids' in request.DATA:
-        languages = request.DATA['language_ids']
-        for t in trees:
-            langs_in_tree = [str(l.iso_code.iso_code) for l in t.languages.all() if l.id in languages] 
-            newick = Tree(t.newick_string)
-            #only works if tips use isocodes
-            try:
-                newick.prune(langs_in_tree, preserve_branch_length=True)
-            except:
-                continue
-            t.newick_string = newick.write(format=5)
-    return Response(LanguageTreeSerializer(trees, many=True).data,)
-
-@api_view(['GET'])
-@permission_classes((AllowAny,))
 @renderer_classes((DPLACECsvRenderer,))
 def csv_download(request):
     import datetime
@@ -278,4 +295,23 @@ def csv_download(request):
     filename = "dplace-societies-%s.csv" % datetime.datetime.now().strftime("%Y-%m-%d")
     response['Content-Disposition']  = 'attachment; filename="%s"' % filename
     return response
+    
+@api_view(['GET'])
+@permission_classes((AllowAny,))
+@renderer_classes((ZipRenderer,))
+def zip_legends(request):
+    import datetime
+    query_string = request.QUERY_PARAMS['query']
+    result_set = json.loads(query_string)
+    to_download = ZipResultSet()
+    if 'tree' in result_set:
+        to_download.add_tree(str(result_set['tree']))
+    if 'legends' in result_set:
+        for l in result_set['legends']:
+            to_download.add_legend(Legend( l['svg'], l['name']))
+    response = Response(ZipResultSetSerializer(to_download).data)
+    filename = "dplace-trees-%s.zip" % datetime.datetime.now().strftime("%Y-%m-%d")
+    response['Content-Disposition'] = 'attachment; filename="%s"' % filename
+    return response
+    
     

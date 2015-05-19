@@ -32,7 +32,7 @@
                             {{ society_result.variable_coded_values | formatVariableCodeValues:variable.id }}
                         </td>
                         <td ng-repeat="environmental in results.environmental_variables">
-                            {{ society_result.environmental_values | formatEnvironmentalValues }}
+                            {{ society_result.environmental_values | formatEnvironmentalValues:environmental.name }}
                         </td>
                         <td ng-show="results.languages">
                             {{ society_result.languages | formatLanguage}}
@@ -45,7 +45,56 @@
             </div>
         </tab>
         <tab heading="Map" select="visible=true" deselect="visible=false">
-            <dplace-map societies="results.societies" map-div-id="result-map" visible="visible" query="query"></dplace-map>
+            <div class="row">
+                <h4 ng-show="variables.length > 0">Choose a variable:</h4>
+                <select 
+                    ng-model="results.chosenVariable"
+                    class="form-control"
+                    ng-options="variable.name for variable in variables"
+                    ng-init="results.chosenVariable=variables[0]"
+                    ng-change="changeMap(results.chosenVariable)"
+                    ng-show="variables.length > 0"
+                 >
+                 </select>
+             </div>
+            <dplace-map results="results" map-div-id="result-map" visible="visible" query="query" chosen="results.chosenVariable"></dplace-map>
+            <table id="mapLegend" style="position:absolute; margin-top:-270px; margin-left:750px; margin-right:10px;">
+                <tr class="download-links">
+                </tr>
+                <tr ng-repeat="code in results.code_ids[results.chosenVariable.id]">
+                    <td>
+                        <svg height="20" width="20">
+                            <circle
+                                    cx="10"
+                                    cy="10"
+                                    r="4.5"
+                                    fill="{{code.code|colorNode:results.code_ids[results.chosenVariable.id]}}"
+                                    stroke="#000"
+                                    stroke-width="0.5"
+                                    />
+                            </svg>
+                    </td>
+                    <td>{{code.description}}</td>
+                </tr>
+                <tr ng-repeat="code in results.classifications|joinDictItems">
+                    <td>
+                        <svg height="20" width="20">
+                            <circle
+                                    cx="10"
+                                    cy="10"
+                                    r="4.5"
+                                    fill="{{code.id|colorNode:(results.classifications|joinDictItems)}}"
+                                    stroke="#000"
+                                    stroke-width="0.5"
+                                    />
+                            </svg>
+                    </td>
+                    <td>{{code.name}}</td>
+                </tr>
+            </table>
+            
+            <svg class="legend-for-download" style="visibility:hidden;">
+            </svg>
         </tab>
         <tab heading="Tree">
             <div class="container">
@@ -70,45 +119,57 @@
                 >
                 <option value="">Select a Tree</option>
             </select>
+            <div class="tree-download"></div>
+
             <div id="legend" ng-show="results.selectedTree">
-                <table ng-repeat="(id, code) in code_ids">
-                    <tr><th colspan="2">{{code.CID}}: {{code.name}}</th></tr>
-                    <tr ng-repeat="c in code">
-                        <td>
-                            <svg height="20" width="20">
-                                <circle
-                                    cx="10"
-                                    cy="10"
-                                    r="4.5"
-                                    fill="{{c.code|colorNode:code}}"
-                                    stroke="#000"
-                                    stroke-width="0.5"
-                                />
-                           </svg>
+                <table ng-repeat="(id, code) in results.code_ids">
+                    <tr data-toggle="collapse" data-target="#{{code.CID}}" class="accordion-toggle" style="cursor:pointer;"><th colspan="2">{{code.CID}}: {{code.name}}</th></tr>
+                    <tr>
+                        <td class="hiddenRow">
+                            <div class="accordion-body collapse" id="{{code.CID}}">
+                                <svg height="{{code.svgSize}}" class="tree-legend">
+                                    <g ng-repeat="c in code" transform="{{$index|transformG}}">
+                                        <circle
+                                                cx="10"
+                                                cy="10"
+                                                r="4.5"
+                                                fill="{{c.code|colorNode:code}}"
+                                                stroke="#000"
+                                                stroke-width="0.5"
+                                                />
+                                        
+                                        <text x="20" y="15">{{c.description}}</text>
+                                    </g>
+                                </svg>
+                              </div>
                         </td>
-                        <td>{{c.description}}</td>
                     </tr>
                 </table>
+
                 <table ng-repeat="environmental in results.environmental_variables">
                     <tr><th>E1: {{environmental.name}}</th></tr>
                 </table>
-                <table>
-                    <tr ng-repeat="class in classifications">
-                    <td>
-                        <svg height="20" width="20">
-                            <circle
-                                cx="10"
-                                cy="10"
-                                r="4.5"
-                                fill="{{class.id|colorNode:classifications}}" //need to figure out how to put right length
-                                stroke="#000"
-                                stroke-width="0.5"
-                            />
-                        </svg>
-                    </td>
-                    <td>
-                        {{class.name}}
-                    </td>
+                <table ng-show="results.classifications">
+                    <tr style="cursor:pointer;"><th colspan="2">Language Classifications</th></tr>
+                    <tr>
+                        <td class="">
+                            <div id="{{classification}}">
+                                <svg height="100" class="tree-legend-langs">
+                                    <g ng-repeat="classification in results.classifications|joinDictItems" transform="{{$index|transformG}}">
+                                        <circle
+                                                cx="10"
+                                                cy="10"
+                                                r="4.5"
+                                                fill="{{classification.id|colorNode:(results.classifications|joinDictItems)}}"
+                                                stroke="#000"
+                                                stroke-width="0.5"
+                                                />
+                                        
+                                        <text x="20" y="15">{{classification.name}}</text>
+                                    </g>
+                                </svg>
+                              </div>
+                        </td>
                     </tr>
                 </table>
             </div>

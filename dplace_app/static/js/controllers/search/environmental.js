@@ -17,8 +17,10 @@ function EnvironmentalCtrl($scope, searchModelService, EnvironmentalVariable, En
         return filters;
     };
     
+    
     $scope.categoryChanged = function(category) {
         $scope.environmentalData.variables = EnvironmentalVariable.query({category: category.id});    
+        $scope.environmentalData.selectedVariable = '';
     };
 
     $scope.variableChanged = function(variable) {
@@ -29,17 +31,13 @@ function EnvironmentalCtrl($scope, searchModelService, EnvironmentalVariable, En
         }
         $scope.environmentalData.vals[0] = '';
         $scope.environmentalData.vals[1] = '';
-        
+        $scope.EnvironmentalForm.$setPristine();
         if ($scope.environmentalData.selectedFilter.operator == 'all') {
-            values = EnvironmentalValue.query({variable: $scope.environmentalData.selectedVariable.id});
-            min_value = 0, max_value = 0;
+            $scope.filterChanged();
+            values = MinAndMax.query({query: {environmental_id: $scope.environmentalData.selectedVariable.id}});
             values.$promise.then(function(result) {
-                for (var i = 0; i < result.length; i++) {
-                    if (result[i].value < min_value) min_value = result[i].value;
-                    else if (result[i].value > max_value) max_value = result[i].value;
-                }
-            $scope.environmentalData.vals[0] = min_value;
-            $scope.environmentalData.vals[1] = max_value;
+                $scope.environmentalData.vals[0] = result.min;
+                $scope.environmentalData.vals[1] = result.max;
             });
         }
     };
@@ -48,10 +46,15 @@ function EnvironmentalCtrl($scope, searchModelService, EnvironmentalVariable, En
         if ($scope.environmentalData.selectedFilter.operator != 'all') return;
         else {
             values = MinAndMax.query({query: {environmental_id: $scope.environmentalData.selectedVariable.id}});
-            
             values.$promise.then(function(result) {
-                $scope.environmentalData.vals[0] = result.min;
-                $scope.environmentalData.vals[1] = result.max;
+            if ($scope.environmentalData.selectedVariable.name.indexOf('Richness') != -1 || $scope.environmentalData.selectedVariable.name == 'Elevation' || $scope.environmentalData.selectedVariable.name =='Slope') {
+                $scope.environmentalData.vals[0] = result.min.toFixed(2);
+                $scope.environmentalData.vals[1] = result.max.toFixed(2);
+            } else {
+            
+                $scope.environmentalData.vals[0] = result.min.toFixed(4);
+                $scope.environmentalData.vals[1] = result.max.toFixed(4);
+            }
             });
         }
     };
@@ -61,5 +64,6 @@ function EnvironmentalCtrl($scope, searchModelService, EnvironmentalVariable, En
         var filters = getSelectedFilters();
         $scope.updateSearchQuery({ environmental_filters: filters });
         $scope.searchSocieties();
+
     };
 }

@@ -18,6 +18,20 @@ angular.module('dplaceServices', ['ngResource'])
                 }
             });
     })
+    .factory('Source', function ($resource) {
+        return $resource (
+            '/api/v1/sources/:id',
+            {page_size: 1000}, {
+                query: {
+                    method: 'GET',
+                    isArray: true,
+                    transformResponse: function(data, headers) {
+                        return JSON.parse(data).results;
+                    }
+                }
+            }
+        )
+    })
     .factory('LanguageClassification', function ($resource) {
         return $resource(
             '/api/v1/language_classifications/:id',
@@ -65,6 +79,10 @@ angular.module('dplaceServices', ['ngResource'])
                     method: 'GET',
                     isArray: true,
                     transformResponse: function(data, headers) {
+                        if (!JSON.parse(data).results) {
+                            return [JSON.parse(data)];
+                        }
+                        
                         return JSON.parse(data).results;
                     }
                 }
@@ -144,6 +162,19 @@ angular.module('dplaceServices', ['ngResource'])
                 }
             });
     })
+    .factory('ZipTest', function($resource) {
+        return $resource(
+            '/api/v1/zip_legends',
+            {}, {
+                 
+                query: {
+                    method: 'GET',
+                    isArray:false,
+                }
+            }
+        )
+    })
+    //not used at the moment
     .factory('TreesFromLanguages', function($resource) {
         return $resource(
             '/api/v1/trees_from_languages',

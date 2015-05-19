@@ -4,6 +4,45 @@ from django.contrib.gis.geos import Point
 from django.core.exceptions import ObjectDoesNotExist
 from dplace_app.models import *
 
+ISOCODE_UPDATE = {}
+ISOCODE_UPDATE['mld'] = 'oru'
+ISOCODE_UPDATE['ggr'] = 'gtu'
+ISOCODE_UPDATE['djl'] = 'dze'
+ISOCODE_UPDATE['gbc'] = 'wrk'
+ISOCODE_UPDATE['mnt'] = 'xyk'
+ISOCODE_UPDATE['mwd'] = 'dmw'
+ISOCODE_UPDATE['nbx'] = 'ekc'
+ISOCODE_UPDATE['baz'] = 'tvu'
+ISOCODE_UPDATE['noo'] = 'nuk'
+ISOCODE_UPDATE['gio'] = 'giq'  # or gir, giw
+ISOCODE_UPDATE['nbf'] = 'nxq'
+ISOCODE_UPDATE['tkk'] = 'twm'
+ISOCODE_UPDATE['daf'] = 'dnj'
+ISOCODE_UPDATE['acc'] = 'acr'
+ISOCODE_UPDATE['ixi'] = 'ixl'
+ISOCODE_UPDATE['lcq'] = 'ppr'  # ppr in version 17, back to lcq in 18. Whee!
+ISOCODE_UPDATE['bjq'] = 'bzc'
+ISOCODE_UPDATE['kdv'] = 'zkd'
+ISOCODE_UPDATE['kpp'] = 'jkp'
+ISOCODE_UPDATE['agp'] = 'prf'
+ISOCODE_UPDATE['sul'] = 'sgd'
+ISOCODE_UPDATE['stc'] = 'ntu'
+ISOCODE_UPDATE['rmr'] = 'rmq'
+ISOCODE_UPDATE['wit'] = 'wnw'
+ISOCODE_UPDATE['vlr'] = 'vra'
+ISOCODE_UPDATE['unp'] = 'wro'
+ISOCODE_UPDATE['wiw'] = 'wgu'
+ISOCODE_UPDATE['yen'] = 'ynq'
+ISOCODE_UPDATE['wgw'] = 'wgb'
+
+ISOCODE_IGNORE = [
+    'mja',  # Spurious
+    'aay',  # Spurious
+    'pie',  # Extinct
+]
+
+
+
 def get_value(dict,possible_keys):
     '''
     Get a value from a dictionary, searching the possible keys in order
@@ -32,7 +71,12 @@ def load_isocode(iso_dict):
 
 def load_iso_lat_long(iso_dict):
     code = get_isocode(iso_dict)
+    code = ISOCODE_UPDATE.get(code, code)
+    if code in ISOCODE_IGNORE:
+        print "Skipped ISO Code %s -- ignored" % code
+    
     found_code = None
+    
     try:
         found_code = ISOCode.objects.get(iso_code=code)
     except ObjectDoesNotExist:

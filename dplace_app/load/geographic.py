@@ -15,7 +15,7 @@ geographicregion_mapping = {
     'geom' : 'MULTIPOLYGON',
 }
 
-def load_regions(shapefile=None,verbose=True):
+def load_regions(shapefile=None,verbose=False):
     lm = LayerMapping(GeographicRegion, shapefile, geographicregion_mapping,
                       transform=False, encoding='iso-8859-1')
     lm.save(strict=True, verbose=verbose)

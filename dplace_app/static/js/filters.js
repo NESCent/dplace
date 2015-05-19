@@ -1,8 +1,40 @@
 angular.module('dplaceFilters', [])
+    .filter('transformG', function() {
+        return function(index) {
+            if (index == 0) return 'translate(0,10)'
+            else {
+                j = (index * 25) + 10;
+                return 'translate(0,'+j+')';
+            }
+        }
+    })    
+    .filter('joinDictItems', function() {
+        return function(dict) {
+            items = []
+            for (var key in dict) {
+                if (key != 'NumClassifications')
+                    items = items.concat(dict[key]);
+            }
+            return items;
+        }
+    })
     .filter('colorNode', function() {
         return function(value, codes) {
-            var hue = value * 240 / codes.length;
+            var missingData = false;
+            var missingDataValue;
+            for (var i = 0; i < codes.length; i++) {
+                if (codes[i].description && codes[i].description.indexOf("Missing data") != -1) {
+                    missingData = true;
+                    missingDataValue = codes[i].code;
+                    break;
+                }
+            }
+            if (missingData && value == missingDataValue) return 'hsl(0, 0%, 100%)';
+            else {
+               var hue = value * 240 / codes.length;
+            }
             return 'hsl('+hue+',100%, 50%)';
+            
         }
     })
     .filter('formatVariableCodeValues', function() {
@@ -14,10 +46,14 @@ angular.module('dplaceFilters', [])
         };
     })
     .filter('formatEnvironmentalValues', function () {
-        return function(values) {
+        return function(values, environmental_name) {
             return values.map( function(environmental_value) {
                 // Should include the variable
-                return environmental_value.value;
+                console.log(environmental_value);
+                if ((environmental_name.indexOf('Richness') != -1) || (environmental_name == 'Elevation') || (environmental_name == 'Slope'))
+                    return environmental_value.value.toFixed(2);
+                else 
+                    return environmental_value.value.toFixed(4);
             }).join(',');
         };
     })
