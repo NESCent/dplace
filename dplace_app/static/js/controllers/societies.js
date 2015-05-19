@@ -1,8 +1,6 @@
 function SocietiesCtrl($scope, searchModelService, LanguageClass) {
     $scope.results = searchModelService.getModel().getResults();
-    console.log($scope.results);
     $scope.query = searchModelService.getModel().getQuery();
-        console.log($scope.query);
 
     if ($scope.query.variable_codes) {
         $scope.code_ids = {};
@@ -13,6 +11,7 @@ function SocietiesCtrl($scope, searchModelService, LanguageClass) {
                 $scope.code_ids[$scope.query.variable_codes[i].variable] = [$scope.query.variable_codes[i]];
             }
         }
+    }
         
         if ($scope.results.variable_descriptions) {
             for (var i = 0; i < $scope.results.variable_descriptions.length; i++){
@@ -21,6 +20,15 @@ function SocietiesCtrl($scope, searchModelService, LanguageClass) {
             
             }
         }
+    $scope.query = searchModelService.getModel().getQuery();
+    $scope.variables = [];
+    $scope.buttons = [
+        {value:'phylogeny', name:'Phylogenies'},
+        {value:'glottolog', name:'Glottolog Trees'},
+    ];
+    
+    if ($scope.results.variable_descriptions) {
+        $scope.variables = $scope.variables.concat($scope.results.variable_descriptions);
     }
         
     if ($scope.query.environmental_filters) {
@@ -51,6 +59,15 @@ function SocietiesCtrl($scope, searchModelService, LanguageClass) {
 
     $scope.resizeMap = function() {
         $scope.$broadcast('mapTabActivated');
+    };
+    
+    $scope.buttonChanged = function(buttonVal) {
+        d3.select('language-phylogeny').html('');
+        if (buttonVal.indexOf('phylogeny') != -1) {
+            $scope.trees = $scope.results.language_trees.phylogenies;
+        } else {
+            $scope.trees = $scope.results.language_trees.glotto_trees;
+        }
     };
     
     $scope.treeSelected = function() {

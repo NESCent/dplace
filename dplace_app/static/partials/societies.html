@@ -1,7 +1,7 @@
 <div class="container results">
     <div class="row">
         <span>
-            <p class="pull-left lead">Societies<span ng-show="results.societies.length">({{ results.societies.length }})</span></p>
+            <p class="pull-left lead">Societies<span ng-show="results.societies.length"> ({{ results.societies.length }})</span></p>
         </span>
     </div>
     <tabset>
@@ -48,15 +48,27 @@
             <dplace-map societies="results.societies" map-div-id="result-map" visible="visible" query="query"></dplace-map>
         </tab>
         <tab heading="Tree">
-            <h4> Phylogenies </h4>
+            <div class="container">
+                <div class="row text-center">
+                    <div class="btn-group">
+                        <button ng-repeat="button in buttons"
+                                type="button" class="btn btn-lg btn-default btn-dplace-search"
+                                ng-model="results.selectedButton"
+                                ng-click="buttonChanged(button.value)"
+                                btn-radio="button"
+                                >{{ button.name }}</button>
+                    </div>
+                </div>
+            </div>
+            <div ng-show="results.selectedButton">
             <select
                 ng-model="results.selectedTree"
                 class="form-control"
                 style="width:100%"
                 ng-change="treeSelected()"
-                ng-options="tree.name for tree in results.languageTrees"
+                ng-options="tree.name for tree in trees"
                 >
-                <option value="">Select a Phylogeny</option>
+                <option value="">Select a Tree</option>
             </select>
             <div id="legend" ng-show="results.selectedTree">
                 <table ng-repeat="(id, code) in code_ids">
@@ -101,6 +113,7 @@
                 </table>
             </div>
             <language-phylogeny></language-phylogeny>
+            </div>
         </tab>
         <tab heading="Download" select="generateDownloadLinks()">
             <div class="row">
