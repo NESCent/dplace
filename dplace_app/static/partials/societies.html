@@ -102,8 +102,8 @@
                                 </linearGradient>
                             </defs>
                             <rect x="10" fill="url(#grad1)" height="30" width="200" />
-                            <text x="0" y="45">{{results.code_ids[results.chosenVariable.id].min}} {{units}}</text>
-                            <text x="200" y="45">{{results.code_ids[results.chosenVariable.id].max}} {{units}}</text>
+                            <text x="0" y="45">{{results.code_ids[results.chosenVariable.id].min}} {{results.code_ids[results.chosenVariable.id].units}}</text>
+                            <text x="200" y="45">{{results.code_ids[results.chosenVariable.id].max}} {{results.code_ids[results.chosenVariable.id].units}}</text>
                         </svg>
                     </td>
                 </tr>
@@ -177,8 +177,8 @@
                                             />
                                         <text x="20" y="15">Missing Data</text>
                                     <rect x="10" y="25" fill="url(#g{{code.CID}})" height="30" width="200" />
-                                    <text x="0" y="70">{{code.min}}</text>
-                                    <text x="200" y="70">{{code.max}}</text>
+                                    <text x="0" y="70">{{code.min}} {{code.units}}</text>
+                                    <text x="200" y="70">{{code.max}} {{code.units}}</text>
                                 </svg>
                                 
                               </div>

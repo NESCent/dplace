@@ -9,9 +9,6 @@ function SocietiesCtrl($scope, searchModelService, LanguageClass, ZipTest) {
         {value:'glottolog', name:'Glottolog Trees'},
     ];
     
-    if ($scope.results.chosenVariable)
-            $scope.units = $scope.results.chosenVariable.name.substring($scope.results.chosenVariable.name.indexOf('(')+1, $scope.results.chosenVariable.name.indexOf(')'));
-
     if ($scope.results.variable_descriptions) {
         $scope.variables = $scope.variables.concat($scope.results.variable_descriptions);
     }
@@ -108,13 +105,6 @@ function SocietiesCtrl($scope, searchModelService, LanguageClass, ZipTest) {
     
     $scope.changeMap = function(chosenVariable) {
         chosenVariableId = chosenVariable.id;
-        
-        //need to do this for initialized map
-        if (chosenVariable.name.indexOf('(') != -1) {
-            console.log(chosenVariable);
-            $scope.units = chosenVariable.name.substring(chosenVariable.name.indexOf('(')+1, chosenVariable.name.indexOf(')'));
-        
-        }
         d3.select(".legend-for-download").html('');
     }
 
