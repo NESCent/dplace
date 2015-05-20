@@ -20,6 +20,6 @@ function dplaceRouter($routeProvider) {
             controller:'SourceInfoCtrl'
         })
         .otherwise({
-	        redirectTo: '/about'
+	        redirectTo: '/search'
 	});
 }
