@@ -7,14 +7,86 @@ angular.module('languagePhylogenyDirective', [])
                 
                 var newick = Newick.parse(langTree.newick_string);
                 var rightAngleDiagonal = function() {
-                    function diagonal(diagonalPath) {
-                        var source = diagonalPath.source,
-                            target = diagonalPath.target,
-                            pathData = [source, {x: target.x, y: source.y}, target].map(function(d) { return [d.y, d.x]; });
-                        return "M" + pathData[0] + ' ' + pathData[1] + ' ' + pathData[2];
+                    var projection = function(d) { return [d.y, d.x]; }
+    
+                    var path = function(pathData) {
+                     return "M" + pathData[0] + ' ' + pathData[1] + " " + pathData[2];
                     }
+                    
+                    function diagonal(diagonalPath, i) {
+                      var source = diagonalPath.source,
+                          target = diagonalPath.target,
+                          midpointX = (source.x + target.x) / 2,
+                          midpointY = (source.y + target.y) / 2,
+                          pathData = [source, {x: target.x, y: source.y}, target];
+                      pathData = pathData.map(projection);
+                      return path(pathData)
+                    }
+                    
+                    diagonal.projection = function(x) {
+                      if (!arguments.length) return projection;
+                      projection = x;
+                      return diagonal;
+                    };
+                    
+                    diagonal.path = function(x) {
+                      if (!arguments.length) return path;
+                      path = x;
+                      return diagonal;
+                    };
+                    
                     return diagonal;
                 }
+                
+                  var radialRightAngleDiagonal = function() {
+                    return rightAngleDiagonal()
+                      .path(function(pathData) {
+                        var src = pathData[0],
+                            mid = pathData[1],
+                            dst = pathData[2],
+                            radius = Math.sqrt(src[0]*src[0] + src[1]*src[1]),
+                            srcAngle = coordinateToAngle(src, radius),
+                            midAngle = coordinateToAngle(mid, radius),
+                            clockwise = Math.abs(midAngle - srcAngle) > Math.PI ? midAngle <= srcAngle : midAngle > srcAngle,
+                            rotation = 0,
+                            largeArc = 0,
+                            sweep = clockwise ? 0 : 1;
+                        return 'M' + src + ' ' +
+                          "A" + [radius,radius] + ' ' + rotation + ' ' + largeArc+','+sweep + ' ' + mid +
+                          'L' + dst;
+                      })
+                      .projection(function(d) {
+                        var r = d.y, a = (d.x - 90) / 180 * Math.PI;
+                        return [r * Math.cos(a), r * Math.sin(a)];
+                      })
+                  }
+                  
+                  // Convert XY and radius to angle of a circle centered at 0,0
+              var coordinateToAngle = function(coord, radius) {
+                var wholeAngle = 2 * Math.PI,
+                    quarterAngle = wholeAngle / 4
+                
+                var coordQuad = coord[0] >= 0 ? (coord[1] >= 0 ? 1 : 2) : (coord[1] >= 0 ? 4 : 3),
+                    coordBaseAngle = Math.abs(Math.asin(coord[1] / radius))
+                
+                // Since this is just based on the angle of the right triangle formed
+                // by the coordinate and the origin, each quad will have different 
+                // offsets
+                switch (coordQuad) {
+                  case 1:
+                    coordAngle = quarterAngle - coordBaseAngle
+                    break
+                  case 2:
+                    coordAngle = quarterAngle + coordBaseAngle
+                    break
+                  case 3:
+                    coordAngle = 2*quarterAngle + quarterAngle - coordBaseAngle
+                    break
+                  case 4:
+                    coordAngle = 3*quarterAngle + coordBaseAngle
+                }
+                return coordAngle
+              }
                 
                 var w = 700;
                 var tree = d3.layout.cluster().children(function(node) { return node.branchset; });
@@ -22,7 +94,7 @@ angular.module('languagePhylogenyDirective', [])
                 var h = nodes.length * 9; //height depends on # of nodes
                 
                 tree = d3.layout.cluster()
-                    .size([h, w])
+                    .size([360, (w/2)-100])
                     .sort(function comparator(a, b) { return d3.ascending(a.length, b.length); })
                     .children(function(node) { return node.branchset; })
                     .separation(function separation(a, b) { return 8; });
@@ -60,12 +132,12 @@ angular.module('languagePhylogenyDirective', [])
                     
                 var vis = d3.select("language-phylogeny").append("svg:svg")
                     .attr("width", w+300)
-                    .attr("height", h+30)
+                    .attr("height", w)//h+30)
                     .attr("class", "phylogeny")
                     .append("svg:g")
-                    .attr("transform", "translate(5, 5)");
+                    .attr("transform", "translate("+w/2+','+w/2+')');
                     
-                var diagonal = rightAngleDiagonal();
+                var diagonal = radialRightAngleDiagonal();
                 
                 nodes.forEach(function(node) {
                     node.rootDist = (node.parent ? node.parent.rootDist : 0) + (node.length || 0);
@@ -73,7 +145,7 @@ angular.module('languagePhylogenyDirective', [])
                 var rootDists = nodes.map(function(n) { return n.rootDist; });
                 var yscale = d3.scale.linear()
                     .domain([0, d3.max(rootDists)])
-                    .range([0, w]);
+                    .range([0, w/2]);
                 var leafDistFromRoot = 0;
                 nodes.forEach(function(node) {
                     if (node.rootDist > leafDistFromRoot)
@@ -123,7 +195,7 @@ angular.module('languagePhylogenyDirective', [])
                                                 .attr("r", 4.5)
                                                 .attr("stroke", "#000")
                                                 .attr("stroke-width", "0.5")
-                                                .attr("transform", "translate("+translate+", 0)")
+                                               // .attr("transform", "translate("+translate+", 0)")
                                                 .attr("fill", function(n) {
                                                     if (society.variable_coded_values[i].code_description && society.variable_coded_values[i].code_description.description.indexOf("Missing data") != -1) {
                                                        return 'hsl(360, 100%, 100%)';
