@@ -3,6 +3,11 @@ function ColorMapService() {
         var hue = index * 240 / count;
         return 'hsl(' + hue + ',100%,50%)';
     }
+    
+    function mapColorMonochrome(min, max, value) {
+        var lum = (value-min)/(max-min) * 95;
+        return 'hsl(0, 65%,'+lum+'%)'; //RED hue - can be changed
+    }
 
     this.generateColorMap = function(results) {
         var colors = {};
@@ -20,10 +25,12 @@ function ColorMapService() {
                 }
             
             for (var j = 0; j < society.variable_coded_values.length; j++) {
-                //if missing data, color should be white
-                if (society.variable_coded_values[j].code_description.description.indexOf("Missing data") != -1)
+                if (society.variable_coded_values[j].code_description && (society.variable_coded_values[j].code_description.description.indexOf("Missing data") != -1))
                     colors[society.society.id] = 'hsl(0, 0%, 100%)';
-                else {
+                else if (society.bf_cont_var) {
+                    var color = mapColorMonochrome(results.code_ids[society.variable_coded_values[j].variable].min, results.code_ids[society.variable_coded_values[j].variable].max, society.variable_coded_values[j].coded_value);
+                    colors[society.society.id] = color;
+                } else {
                     var color = mapColor(society.variable_coded_values[j].coded_value, results.code_ids[society.variable_coded_values[j].variable].length);
                     colors[society.society.id] = color;
                 }

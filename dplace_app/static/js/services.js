@@ -53,6 +53,9 @@ angular.module('dplaceServices', ['ngResource'])
                     method: 'GET',
                     isArray: true,
                     transformResponse: function(data, headers) {
+                        if (!JSON.parse(data).results) {
+                            return [JSON.parse(data)];
+                        }
                         return JSON.parse(data).results;
                     }
                 }
@@ -109,6 +112,20 @@ angular.module('dplaceServices', ['ngResource'])
                 query: {
                     method: 'GET',
                     isArray:false
+                }
+            }
+        )
+    })
+    .factory('BfContinuousVariable', function($resource) {
+        return $resource(
+            '/api/v1/bf_cont_variable',
+            {}, {
+                query: {
+                    method: 'GET',
+                    isArray:true,
+                    transformResponse: function(data, headers) {
+                        return JSON.parse(data);
+                    }
                 }
             }
         )
