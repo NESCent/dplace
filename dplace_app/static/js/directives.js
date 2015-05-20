@@ -123,7 +123,7 @@ angular.module('languagePhylogenyDirective', [])
                         .attr("y2", dotted[d].y)
                         .attr("stroke-width", "2")
                         .attr("stroke", "#ccc")
-                        .attr("stroke-dasharray", "(5,3)");
+                        .attr("stroke-dasharray", "8, 5");
  
                 }
                 
