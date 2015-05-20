@@ -91,9 +91,21 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties, 
         }
 
         if (!$scope.searchModel.query.variable_codes) return;
-        
-        
+
         for (var i = 0; i < $scope.searchModel.query.variable_codes.length; i++) {
+            if ($scope.searchModel.query.variable_codes[i].bf_id) {
+                if (!($scope.searchModel.query.variable_codes[i].bf_id in $scope.searchModel.results.code_ids)) {
+                    $scope.searchModel.results.code_ids[$scope.searchModel.query.variable_codes[i].bf_id] = [];
+                }
+                if (!$scope.searchModel.results.code_ids[$scope.searchModel.query.variable_codes[i].bf_id].absolute_min) {
+                    $scope.abs_min = $scope.searchModel.query.variable_codes[i].absolute_min;
+                    $scope.abs_max = $scope.searchModel.query.variable_codes[i].absolute_max;
+                    $scope.searchModel.results.code_ids[$scope.searchModel.query.variable_codes[i].bf_id].min = $scope.searchModel.query.variable_codes[i].absolute_min;
+                    $scope.searchModel.results.code_ids[$scope.searchModel.query.variable_codes[i].bf_id].max = $scope.searchModel.query.variable_codes[i].absolute_max;
+                    $scope.searchModel.results.code_ids[$scope.searchModel.query.variable_codes[i].bf_id].bf_var = true;
+                }
+                continue;
+            }
             if ($scope.searchModel.query.variable_codes[i].variable in $scope.searchModel.results.code_ids) {
                 $scope.searchModel.results.code_ids[$scope.searchModel.query.variable_codes[i].variable] = $scope.searchModel.results.code_ids[$scope.searchModel.query.variable_codes[i].variable].concat([$scope.searchModel.query.variable_codes[i]]);
             } else {
@@ -110,7 +122,22 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties, 
     $scope.assignColors = function() {
         results = $scope.searchModel.getResults();
         results = $scope.calculateRange(results);
-        var colorMap = colorMapService.generateColorMap($scope.searchModel.results);
+        bf_codes = [];
+        if ($scope.searchModel.query.variable_codes) {
+            for (var i = 0; i < $scope.searchModel.query.variable_codes.length; i++) {
+                if ($scope.searchModel.query.variable_codes[i].bf_id)
+                    bf_codes.push($scope.searchModel.query.variable_codes[i].bf_id);
+            }
+        }
+        
+        //needed for coloring of markers
+        for (var i = 0; i < results.societies.length; i++) {
+            for (var j = 0; j < results.societies[i].variable_coded_values.length; j++) {
+                if (bf_codes.indexOf(results.societies[i].variable_coded_values[j].variable) != -1)
+                    results.societies[i]['bf_cont_var'] = true;
+            }
+        }
+        var colorMap = colorMapService.generateColorMap(results);
         $scope.searchModel.getSocieties().forEach(function(container) {
             container.society.style = {'background-color' : colorMap[container.society.id] };
         });
@@ -127,6 +154,12 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties, 
     }
     
     function addTreesToSocieties() {
+        $scope.searchModel.results.language_trees.phylogenies = [];
+        $scope.searchModel.results.language_trees.glotto_trees = [];
+        $scope.searchModel.results.language_trees.forEach(function(tree) {
+            if (tree.name.indexOf("glotto") != -1) $scope.searchModel.results.language_trees.glotto_trees.push(tree);
+            else $scope.searchModel.results.language_trees.phylogenies.push(tree);
+        });
         $scope.searchModel.getSocieties().forEach(function (container) {
             var language = container.society.language;
             if(language != null) {
