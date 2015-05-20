@@ -71,7 +71,6 @@ angular.module('languagePhylogenyDirective', [])
                     node.rootDist = (node.parent ? node.parent.rootDist : 0) + (node.length || 0);
                 });
                 var rootDists = nodes.map(function(n) { return n.rootDist; });
-                console.log(rootDists);
                 var yscale = d3.scale.linear()
                     .domain([0, d3.max(rootDists)])
                     .range([0, w]);
@@ -89,8 +88,7 @@ angular.module('languagePhylogenyDirective', [])
                 var timeScaleYears = leafDistFromRoot * 100; //convert to years
                 var pixelScale = (w / timeScaleYears) * 100;
                 
-                console.log(longest_y);
-                
+                var dotted = [];
                 var links = tree.links(nodes);
                 var link = vis.selectAll("path.link")
                     .data(links)
@@ -109,9 +107,25 @@ angular.module('languagePhylogenyDirective', [])
                     })
                     .attr("transform", function(d) { 
                         if (langTree.name.indexOf("glotto") != -1) {
-                            if (d.y < longest_y) return "translate(" + longest_y + ", " + d.x + ")";
+                            
+                            if (d.y < longest_y) {
+                                if (!d.children) dotted.push({'x': d.y, 'y': d.x});
+                                return "translate(" + longest_y + ", " + d.x + ")";
+                            }
                         }
                         return "translate(" + d.y + ", "+ d.x + ")"; });
+                
+                for (var d = 0; d < dotted.length; d++) {
+                    vis.append("svg:line")
+                        .attr("x1", dotted[d].x+10)
+                        .attr("x2", longest_y-10)
+                        .attr("y1", dotted[d].y)
+                        .attr("y2", dotted[d].y)
+                        .attr("stroke-width", "2")
+                        .attr("stroke", "#ccc")
+                        .attr("stroke-dasharray", "(5,3)");
+ 
+                }
                 
                 //appends markers
                 translate = 0;
