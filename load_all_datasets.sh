@@ -42,6 +42,9 @@ python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/ea_langs+isocodes.c
 echo "Loading Binford Societies"
 python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/binford_langs+isocodes.csv" bf_soc
 
+echo "Loading Binford Harmonized Societies"
+python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/binford_harm.csv" bf_harm
+
 echo "Loading Environmental Data"
 python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/EcologicalData.DBASE.07Mar14.csv" "env_vars"
 python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/EcologicalData.DBASE.07Mar14.csv" "env_vals"
