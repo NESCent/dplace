@@ -33,7 +33,7 @@ For information on installing PostGIS, see the [GeoDjango documentation](https:/
 
 If you plan to do development, you should fork the GitHub repo first, and work with that.
 
-`git clone git@github.com:NESCent/dplace.git` (or your fork)
+`git clone git@github.com:D-PLACE/dplace.git` (or your fork)
 
 ### Python Dependencies
 
@@ -136,4 +136,4 @@ Though Django supports placing the `STATIC_ROOT` anywhere on the server (Templat
 
 ## Contributing
 
-For code changes, please fork the repository and submit a pull request. For bugs or feature requests, please create a [GitHub issue](https://github.com/NESCent/dplace/issues).
+For code changes, please fork the repository and submit a pull request. For bugs or feature requests, please create a [GitHub issue](https://github.com/D-PLACE/dplace/issues).
