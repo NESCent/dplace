@@ -4,6 +4,10 @@
 # CSV files are in a private Bitbucket repository under the NESCent organization
 # Should be run after activating virtualenv
 
+# Make sure that the console accepts UTF-8 (which is the default on MacOSX but NOT on any other
+# UNIX systems since the debug info can contain non-ASCII characters)
+export LC_ALL="en_US.UTF-8"
+
 BASEDIR=$(dirname $0)
 
 REPO_SRC="git@bitbucket.org:nescent/dplace-datasets.git"
