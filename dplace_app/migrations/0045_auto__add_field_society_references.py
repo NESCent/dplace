@@ -146,6 +146,7 @@ class Migration(SchemaMigration):
         u'dplace_app.variabledescription': {
             'Meta': {'ordering': "('label',)", 'object_name': 'VariableDescription'},
             'codebook_info': ('django.db.models.fields.CharField', [], {'default': "'None'", 'max_length': '500'}),
+            'data_type': ('django.db.models.fields.CharField', [], {'max_length': '200', 'null': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'index_categories': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'index_variables'", 'symmetrical': 'False', 'to': u"orm['dplace_app.VariableCategory']"}),
             'label': ('django.db.models.fields.CharField', [], {'max_length': '25', 'db_index': 'True'}),

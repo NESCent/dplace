@@ -102,6 +102,7 @@ class Migration(SchemaMigration):
         u'dplace_app.society': {
             'Meta': {'object_name': 'Society'},
             'ext_id': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '10'}),
+            'focal_year': ('django.db.models.fields.CharField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'iso_code': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'societies'", 'null': 'True', 'to': u"orm['dplace_app.ISOCode']"}),
             'language': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'societies'", 'null': 'True', 'to': u"orm['dplace_app.Language']"}),
