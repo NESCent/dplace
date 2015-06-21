@@ -1,0 +1,186 @@
+<mockup version="1.0" skin="sketch" fontFace="Balsamiq Sans" measuredW="909" measuredH="1579" mockupW="720" mockupH="1523">
+  <controls>
+    <control controlID="0" controlTypeID="com.balsamiq.mockups::RoundButton" x="658" y="71" w="172" h="32" measuredW="32" measuredH="32" zOrder="0" locked="false" isInGroup="-1">
+      <controlProperties>
+        <borderColor>13421772</borderColor>
+        <color>13421772</color>
+        <shape>rectangle</shape>
+        <text>Navigation</text>
+      </controlProperties>
+    </control>
+    <control controlID="1" controlTypeID="com.balsamiq.mockups::Label" x="196" y="56" w="-1" h="-1" measuredW="85" measuredH="28" zOrder="1" locked="false" isInGroup="-1">
+      <controlProperties>
+        <size>20</size>
+        <text>D-PLACE</text>
+      </controlProperties>
+    </control>
+    <control controlID="2" controlTypeID="com.balsamiq.mockups::HRule" x="189" y="115" w="647" h="-1" measuredW="100" measuredH="10" zOrder="2" locked="false" isInGroup="-1"/>
+    <control controlID="3" controlTypeID="com.balsamiq.mockups::Label" x="189" y="134" w="-1" h="-1" measuredW="57" measuredH="26" zOrder="3" locked="false" isInGroup="-1">
+      <controlProperties>
+        <size>18</size>
+        <text>Search</text>
+      </controlProperties>
+    </control>
+    <control controlID="4" controlTypeID="com.balsamiq.mockups::Label" x="189" y="188" w="-1" h="-1" measuredW="128" measuredH="24" zOrder="4" locked="false" isInGroup="-1">
+      <controlProperties>
+        <size>16</size>
+        <text>1.%20Enter%20language</text>
+      </controlProperties>
+    </control>
+    <control controlID="6" controlTypeID="com.balsamiq.mockups::TextInput" x="203" y="227" w="202" h="-1" measuredW="91" measuredH="27" zOrder="5" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Austronesian</text>
+      </controlProperties>
+    </control>
+    <control controlID="7" controlTypeID="com.balsamiq.mockups::Icon" x="420" y="228" w="-1" h="-1" measuredW="24" measuredH="24" zOrder="6" locked="false" isInGroup="-1">
+      <controlProperties>
+        <icon>CircledPlusIcon%7Csmall</icon>
+      </controlProperties>
+    </control>
+    <control controlID="8" controlTypeID="com.balsamiq.mockups::Label" x="189" y="319" w="-1" h="-1" measuredW="117" measuredH="24" zOrder="7" locked="false" isInGroup="-1">
+      <controlProperties>
+        <size>16</size>
+        <text>2.%20Enter%20society</text>
+      </controlProperties>
+    </control>
+    <control controlID="9" controlTypeID="com.balsamiq.mockups::TextInput" x="203" y="358" w="202" h="-1" measuredW="55" measuredH="27" zOrder="8" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Arbore</text>
+      </controlProperties>
+    </control>
+    <control controlID="10" controlTypeID="com.balsamiq.mockups::Icon" x="420" y="359" w="-1" h="-1" measuredW="24" measuredH="24" zOrder="9" locked="false" isInGroup="-1">
+      <controlProperties>
+        <icon>CircledPlusIcon%7Csmall</icon>
+      </controlProperties>
+    </control>
+    <control controlID="11" controlTypeID="com.balsamiq.mockups::Label" x="189" y="483" w="-1" h="-1" measuredW="106" measuredH="24" zOrder="10" locked="false" isInGroup="-1">
+      <controlProperties>
+        <size>16</size>
+        <text>3.%20Choose%20trait</text>
+      </controlProperties>
+    </control>
+    <control controlID="13" controlTypeID="com.balsamiq.mockups::Icon" x="420" y="523" w="-1" h="-1" measuredW="24" measuredH="24" zOrder="11" locked="false" isInGroup="-1">
+      <controlProperties>
+        <icon>CircledPlusIcon%7Csmall</icon>
+      </controlProperties>
+    </control>
+    <control controlID="14" controlTypeID="com.balsamiq.mockups::ComboBox" x="203" y="523" w="202" h="-1" measuredW="45" measuredH="24" zOrder="12" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>All</text>
+      </controlProperties>
+    </control>
+    <control controlID="30" controlTypeID="com.balsamiq.mockups::StickyNote" x="611" y="230" w="298" h="117" measuredW="109" measuredH="123" zOrder="20" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>The%20language%20and%20society%20fields%20can%20use%20autocomplete.</text>
+      </controlProperties>
+    </control>
+    <control controlID="32" controlTypeID="com.balsamiq.mockups::Paragraph" x="196" y="86" w="353" h="25" measuredW="200" measuredH="80" zOrder="21" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Database%20of%20Peoples%2C%20Languages%2C%20and%20Cultural%20Evolution</text>
+      </controlProperties>
+    </control>
+    <control controlID="34" controlTypeID="com.balsamiq.mockups::Label" x="189" y="596" w="-1" h="-1" measuredW="187" measuredH="24" zOrder="22" locked="false" isInGroup="-1">
+      <controlProperties>
+        <size>16</size>
+        <text>4.%20Choose%20ecological%20data</text>
+      </controlProperties>
+    </control>
+    <control controlID="35" controlTypeID="com.balsamiq.mockups::Icon" x="420" y="636" w="-1" h="-1" measuredW="24" measuredH="24" zOrder="23" locked="false" isInGroup="-1">
+      <controlProperties>
+        <icon>CircledPlusIcon%7Csmall</icon>
+      </controlProperties>
+    </control>
+    <control controlID="36" controlTypeID="com.balsamiq.mockups::ComboBox" x="203" y="636" w="202" h="-1" measuredW="45" measuredH="24" zOrder="24" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>All</text>
+      </controlProperties>
+    </control>
+    <control controlID="37" controlTypeID="com.balsamiq.mockups::Label" x="189" y="714" w="-1" h="-1" measuredW="132" measuredH="24" zOrder="13" locked="false" isInGroup="-1">
+      <controlProperties>
+        <size>16</size>
+        <text>5.%20Choose%20dataset</text>
+      </controlProperties>
+    </control>
+    <control controlID="38" controlTypeID="com.balsamiq.mockups::Icon" x="420" y="754" w="-1" h="-1" measuredW="24" measuredH="24" zOrder="14" locked="false" isInGroup="-1">
+      <controlProperties>
+        <icon>CircledPlusIcon%7Csmall</icon>
+      </controlProperties>
+    </control>
+    <control controlID="39" controlTypeID="com.balsamiq.mockups::ComboBox" x="203" y="754" w="202" h="-1" measuredW="71" measuredH="24" zOrder="15" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Binford</text>
+      </controlProperties>
+    </control>
+    <control controlID="40" controlTypeID="com.balsamiq.mockups::Label" x="190" y="841" w="-1" h="-1" measuredW="239" measuredH="24" zOrder="16" locked="false" isInGroup="-1">
+      <controlProperties>
+        <size>16</size>
+        <text>6.%20Choose%20date%20of%20data%20collection</text>
+      </controlProperties>
+    </control>
+    <control controlID="41" controlTypeID="com.balsamiq.mockups::Icon" x="421" y="888" w="-1" h="-1" measuredW="24" measuredH="24" zOrder="17" locked="false" isInGroup="-1">
+      <controlProperties>
+        <icon>CircledPlusIcon%7Csmall</icon>
+      </controlProperties>
+    </control>
+    <control controlID="42" controlTypeID="com.balsamiq.mockups::ComboBox" x="204" y="888" w="202" h="-1" measuredW="112" measuredH="24" zOrder="18" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>October%202013</text>
+      </controlProperties>
+    </control>
+    <control controlID="47" controlTypeID="__group__" x="189" y="1472" w="647" h="107" measuredW="647" measuredH="107" zOrder="19" locked="false" isInGroup="-1">
+      <groupChildrenDescriptors>
+        <control controlID="0" controlTypeID="com.balsamiq.mockups::RoundButton" x="263" y="75" w="106" h="32" measuredW="32" measuredH="32" zOrder="0" locked="false" isInGroup="47">
+          <controlProperties>
+            <borderColor>13421772</borderColor>
+            <color>13421772</color>
+            <shape>rectangle</shape>
+            <text>Footer</text>
+          </controlProperties>
+        </control>
+        <control controlID="1" controlTypeID="com.balsamiq.mockups::HRule" x="0" y="50" w="647" h="-1" measuredW="100" measuredH="10" zOrder="1" locked="false" isInGroup="47"/>
+        <control controlID="2" controlTypeID="com.balsamiq.mockups::Button" x="7" y="0" w="-1" h="-1" measuredW="66" measuredH="27" zOrder="2" locked="false" isInGroup="47">
+          <controlProperties>
+            <size>14</size>
+            <text>Search</text>
+          </controlProperties>
+        </control>
+        <control controlID="3" controlTypeID="com.balsamiq.mockups::Link" x="99" y="4" w="-1" h="-1" measuredW="36" measuredH="19" zOrder="3" locked="false" isInGroup="47">
+          <controlProperties>
+            <text>Reset</text>
+          </controlProperties>
+        </control>
+      </groupChildrenDescriptors>
+    </control>
+    <control controlID="48" controlTypeID="com.balsamiq.mockups::Label" x="189" y="957" w="-1" h="-1" measuredW="203" measuredH="24" zOrder="25" locked="false" isInGroup="-1">
+      <controlProperties>
+        <size>16</size>
+        <text>7.%20Choose%20geographic%20region</text>
+      </controlProperties>
+    </control>
+    <control controlID="51" controlTypeID="com.balsamiq.mockups::Image" x="203" y="996" w="521" h="437" measuredW="908" measuredH="914" zOrder="26" locked="false" isInGroup="-1">
+      <controlProperties>
+        <src>%24ACCOUNT/assets/map_gavin.png</src>
+      </controlProperties>
+    </control>
+    <control controlID="52" controlTypeID="com.balsamiq.mockups::TextInput" x="203" y="404" w="202" h="-1" measuredW="41" measuredH="27" zOrder="27" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Turu</text>
+      </controlProperties>
+    </control>
+    <control controlID="53" controlTypeID="com.balsamiq.mockups::Icon" x="420" y="405" w="-1" h="-1" measuredW="24" measuredH="24" zOrder="28" locked="false" isInGroup="-1">
+      <controlProperties>
+        <icon>CircledPlusIcon%7Csmall</icon>
+      </controlProperties>
+    </control>
+    <control controlID="54" controlTypeID="com.balsamiq.mockups::Icon" x="451" y="359" w="-1" h="-1" measuredW="24" measuredH="24" zOrder="29" locked="false" isInGroup="-1">
+      <controlProperties>
+        <icon>CircledMinusIcon%7Csmall</icon>
+      </controlProperties>
+    </control>
+    <control controlID="55" controlTypeID="com.balsamiq.mockups::Icon" x="451" y="405" w="-1" h="-1" measuredW="24" measuredH="24" zOrder="30" locked="false" isInGroup="-1">
+      <controlProperties>
+        <icon>CircledMinusIcon%7Csmall</icon>
+      </controlProperties>
+    </control>
+  </controls>
+</mockup>
