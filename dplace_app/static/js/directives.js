@@ -3,16 +3,12 @@ angular.module('languagePhylogenyDirective', [])
         function link(scope, element, attrs) {
             var constructTree = function(langTree) {
                 d3.select("language-phylogeny").html('');
-               
-                
                 var newick = Newick.parse(langTree.newick_string);
                 var rightAngleDiagonal = function() {
                     var projection = function(d) { return [d.y, d.x]; }
-    
                     var path = function(pathData) {
                      return "M" + pathData[0] + ' ' + pathData[1] + " " + pathData[2];
                     }
-                    
                     function diagonal(diagonalPath, i) {
                       var source = diagonalPath.source,
                           target = diagonalPath.target,
@@ -22,19 +18,16 @@ angular.module('languagePhylogenyDirective', [])
                       pathData = pathData.map(projection);
                       return path(pathData)
                     }
-                    
                     diagonal.projection = function(x) {
                       if (!arguments.length) return projection;
                       projection = x;
                       return diagonal;
                     };
-                    
                     diagonal.path = function(x) {
                       if (!arguments.length) return path;
                       path = x;
                       return diagonal;
                     };
-                    
                     return diagonal;
                 }
                 
@@ -94,7 +87,7 @@ angular.module('languagePhylogenyDirective', [])
                 var h = nodes.length * 9; //height depends on # of nodes
                 
                 tree = d3.layout.cluster()
-                    .size([360, (w/2)-100])
+                    .size([360, (w/2)-100]) //this doesnt work if theres a function
                     .sort(function comparator(a, b) { return d3.ascending(a.length, b.length); })
                     .children(function(node) { return node.branchset; })
                     .separation(function separation(a, b) { return 8; });
@@ -104,7 +97,7 @@ angular.module('languagePhylogenyDirective', [])
                     .text(langTree.name);
                     
                 var labels = d3.select("language-phylogeny").append("svg:svg")
-                        .attr("width", w+300)
+                        .attr("width", w)
                         .attr("height", 15)
                         .attr("id", "varLabels")
                         .attr("transform", "translate(-40, 0)");
@@ -113,10 +106,10 @@ angular.module('languagePhylogenyDirective', [])
                 if (scope.query.variable_codes) {
                     for (var key in scope.results.code_ids) {
                         if (scope.results.code_ids[key].length > 0 || scope.results.code_ids[key].bf_var) {
-                            labels.append("svg:text")
-                                .attr("dx", w+15+translate)
-                                .attr("dy", 15)
-                                .text("C"+keysWritten);
+                           // labels.append("svg:text")
+                             //   .attr("dx", w+15+translate)
+                               // .attr("dy", 15)
+                                //.text("C"+keysWritten);
                             scope.results.code_ids[key].CID = "C"+keysWritten;
                             keysWritten++;
                             translate += 20;    
@@ -132,13 +125,21 @@ angular.module('languagePhylogenyDirective', [])
                     
                 var vis = d3.select("language-phylogeny").append("svg:svg")
                     .attr("width", w+300)
-                    .attr("height", w)//h+30)
+                    .attr("height", w+200)//h+30)
                     .attr("class", "phylogeny")
                     .append("svg:g")
-                    .attr("transform", "translate("+w/2+','+w/2+')');
+                    .attr("transform", function() {
+                        //if (langTree.name.indexOf("glotto") != -1) return "translate(2,0)";
+                        num = (w/2);//+50;
+                        return "translate("+num+','+num+')';
+                    });
                     
-                var diagonal = radialRightAngleDiagonal();
-                
+                if (langTree.name.indexOf("glotto") == -1) {
+                    var diagonal = radialRightAngleDiagonal();
+                } else {
+                    var diagonal = rightAngleDiagonal();
+                }
+               // var diagonal = radialRightAngleDiagonal();
                 nodes.forEach(function(node) {
                     node.rootDist = (node.parent ? node.parent.rootDist : 0) + (node.length || 0);
                 });
@@ -173,7 +174,8 @@ angular.module('languagePhylogenyDirective', [])
                         if (n.children) return "inner-node";
                         else return "leaf-node";
                     })
-                    .attr("transform", function(d) { return "translate(" + d.y + ", "+ d.x + ")"; });
+                    .attr("transform", function(d) { return "rotate(" + (d.x - 90) + ")translate(" + d.y + ")"; });
+                    //.attr("transform", function(d) { return "translate(" + d.y + ", "+ d.x + ")"; });
                 
                 translate = 0;
                 if (scope.query.variable_codes) {
@@ -195,7 +197,7 @@ angular.module('languagePhylogenyDirective', [])
                                                 .attr("r", 4.5)
                                                 .attr("stroke", "#000")
                                                 .attr("stroke-width", "0.5")
-                                               // .attr("transform", "translate("+translate+", 0)")
+                                                .attr("transform", "translate("+translate+", 0)")
                                                 .attr("fill", function(n) {
                                                     if (society.variable_coded_values[i].code_description && society.variable_coded_values[i].code_description.description.indexOf("Missing data") != -1) {
                                                        return 'hsl(360, 100%, 100%)';
@@ -226,7 +228,7 @@ angular.module('languagePhylogenyDirective', [])
                             }
                         });
                         if (scope.results.code_ids[key].length > 0)
-                            translate += 20;
+                            translate += 15;
                     }
                 } else if (scope.query.language_classifications && !scope.query.environmental_filters) {
                     //get lang classification
@@ -280,7 +282,7 @@ angular.module('languagePhylogenyDirective', [])
                                 else return translate;
                             })                           
                             .attr("dy", 4)
-                            .attr("font-size", "14px")
+                            .attr("font-size", "12px")
                             .attr("font-family", "Arial")
                             .text(function(d) { return d.name; });
                 });
