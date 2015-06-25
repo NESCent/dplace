@@ -1,61 +1,57 @@
 angular.module('languagePhylogenyDirective', [])
     .directive('languagePhylogeny', function() {
         function link(scope, element, attrs) {
-            var constructTree = function(langTree) {
-                d3.select("language-phylogeny").html('');
-                var newick = Newick.parse(langTree.newick_string);
-                var rightAngleDiagonal = function() {
-                    var projection = function(d) { return [d.y, d.x]; }
-                    var path = function(pathData) {
-                     return "M" + pathData[0] + ' ' + pathData[1] + " " + pathData[2];
-                    }
-                    function diagonal(diagonalPath, i) {
-                      var source = diagonalPath.source,
-                          target = diagonalPath.target,
-                          midpointX = (source.x + target.x) / 2,
-                          midpointY = (source.y + target.y) / 2,
-                          pathData = [source, {x: target.x, y: source.y}, target];
-                      pathData = pathData.map(projection);
-                      return path(pathData)
-                    }
-                    diagonal.projection = function(x) {
-                      if (!arguments.length) return projection;
-                      projection = x;
-                      return diagonal;
-                    };
-                    diagonal.path = function(x) {
-                      if (!arguments.length) return path;
-                      path = x;
-                      return diagonal;
-                    };
-                    return diagonal;
+            var rightAngleDiagonal = function() {
+                var projection = function(d) { return [d.y, d.x]; }
+                var path = function(pathData) {
+                 return "M" + pathData[0] + ' ' + pathData[1] + " " + pathData[2];
                 }
-                
-                  var radialRightAngleDiagonal = function() {
-                    return rightAngleDiagonal()
-                      .path(function(pathData) {
-                        var src = pathData[0],
-                            mid = pathData[1],
-                            dst = pathData[2],
-                            radius = Math.sqrt(src[0]*src[0] + src[1]*src[1]),
-                            srcAngle = coordinateToAngle(src, radius),
-                            midAngle = coordinateToAngle(mid, radius),
-                            clockwise = Math.abs(midAngle - srcAngle) > Math.PI ? midAngle <= srcAngle : midAngle > srcAngle,
-                            rotation = 0,
-                            largeArc = 0,
-                            sweep = clockwise ? 0 : 1;
-                        return 'M' + src + ' ' +
-                          "A" + [radius,radius] + ' ' + rotation + ' ' + largeArc+','+sweep + ' ' + mid +
-                          'L' + dst;
-                      })
-                      .projection(function(d) {
-                        var r = d.y, a = (d.x - 90) / 180 * Math.PI;
-                        return [r * Math.cos(a), r * Math.sin(a)];
-                      })
-                  }
-                  
-                  // Convert XY and radius to angle of a circle centered at 0,0
-              var coordinateToAngle = function(coord, radius) {
+                function diagonal(diagonalPath, i) {
+                  var source = diagonalPath.source,
+                      target = diagonalPath.target,
+                      midpointX = (source.x + target.x) / 2,
+                      midpointY = (source.y + target.y) / 2,
+                      pathData = [source, {x: target.x, y: source.y}, target];
+                  pathData = pathData.map(projection);
+                  return path(pathData)
+                }
+                diagonal.projection = function(x) {
+                  if (!arguments.length) return projection;
+                  projection = x;
+                  return diagonal;
+                };
+                diagonal.path = function(x) {
+                  if (!arguments.length) return path;
+                  path = x;
+                  return diagonal;
+                };
+                return diagonal;
+            }
+                    
+            var radialRightAngleDiagonal = function() {
+                return rightAngleDiagonal()
+                  .path(function(pathData) {
+                    var src = pathData[0],
+                        mid = pathData[1],
+                        dst = pathData[2],
+                        radius = Math.sqrt(src[0]*src[0] + src[1]*src[1]),
+                        srcAngle = coordinateToAngle(src, radius),
+                        midAngle = coordinateToAngle(mid, radius),
+                        clockwise = Math.abs(midAngle - srcAngle) > Math.PI ? midAngle <= srcAngle : midAngle > srcAngle,
+                        rotation = 0,
+                        largeArc = 0,
+                        sweep = clockwise ? 0 : 1;
+                    return 'M' + src + ' ' +
+                      "A" + [radius,radius] + ' ' + rotation + ' ' + largeArc+','+sweep + ' ' + mid +
+                      'L' + dst;
+                  })
+                  .projection(function(d) {
+                    var r = d.y, a = (d.x - 90) / 180 * Math.PI;
+                    return [r * Math.cos(a), r * Math.sin(a)];
+                  })
+            }
+            // Convert XY and radius to angle of a circle centered at 0,0
+            var coordinateToAngle = function(coord, radius) {
                 var wholeAngle = 2 * Math.PI,
                     quarterAngle = wholeAngle / 4
                 
@@ -79,10 +75,36 @@ angular.module('languagePhylogenyDirective', [])
                     coordAngle = 3*quarterAngle + coordBaseAngle
                 }
                 return coordAngle
-              }
-                
+            }
+            
+            function circularTree(w) {
+                var tree = d3.layout.cluster()
+                    .size([360, (w/2)-100])
+                    .sort(function comparator(a, b) { return d3.ascending(a.length, b.length); })
+                    .children(function(node) { return node.branchset; })
+                    .separation(function separation(a, b) { return 8; });
+                return tree;
+            }
+            
+            function phyloTree(w, newick) {
+                var tree = d3.layout.cluster()
+                    .children(function(node) { return node.branchset; });
+                var nodes = tree(newick);
+                var h = nodes.length * 9;
+                tree = d3.layout.cluster()
+                    .size([h, w])
+                    .sort(function comparator(a, b) { return d3.ascending(a.length, b.length); })
+                    .children(function(node) { return node.branchset; })
+                    .separation(function separation(a, b) { return 8; });
+                return tree;
+            }
+
+            var constructTree = function(langTree) {   
+                d3.select("language-phylogeny").html('');
+                var newick = Newick.parse(langTree.newick_string);
+
                 var w = 700;
-                var tree = d3.layout.cluster().children(function(node) { return node.branchset; });
+               /* var tree = d3.layout.cluster().children(function(node) { return node.branchset; });
                 var nodes = tree(newick);
                 var h = nodes.length * 9; //height depends on # of nodes
                 
@@ -91,6 +113,10 @@ angular.module('languagePhylogenyDirective', [])
                     .sort(function comparator(a, b) { return d3.ascending(a.length, b.length); })
                     .children(function(node) { return node.branchset; })
                     .separation(function separation(a, b) { return 8; });
+                nodes = tree(newick);*/
+                if (langTree.name.indexOf("glotto") == -1) {console.log(langTree.name); var tree = circularTree(w);}
+                else
+                    var tree = phyloTree(w, newick);
                 nodes = tree(newick);
                 
                 d3.select("language-phylogeny").append("h4")
@@ -129,17 +155,13 @@ angular.module('languagePhylogenyDirective', [])
                     .attr("class", "phylogeny")
                     .append("svg:g")
                     .attr("transform", function() {
-                        //if (langTree.name.indexOf("glotto") != -1) return "translate(2,0)";
+                        if (langTree.name.indexOf("glotto") != -1) return "translate(2,0)";
                         num = (w/2);//+50;
                         return "translate("+num+','+num+')';
                     });
                     
-                if (langTree.name.indexOf("glotto") == -1) {
-                    var diagonal = radialRightAngleDiagonal();
-                } else {
-                    var diagonal = rightAngleDiagonal();
-                }
-               // var diagonal = radialRightAngleDiagonal();
+                if (langTree.name.indexOf("glotto") == -1) var diagonal = radialRightAngleDiagonal();
+                else var diagonal = rightAngleDiagonal();        
                 nodes.forEach(function(node) {
                     node.rootDist = (node.parent ? node.parent.rootDist : 0) + (node.length || 0);
                 });
@@ -174,8 +196,10 @@ angular.module('languagePhylogenyDirective', [])
                         if (n.children) return "inner-node";
                         else return "leaf-node";
                     })
-                    .attr("transform", function(d) { return "rotate(" + (d.x - 90) + ")translate(" + d.y + ")"; });
-                    //.attr("transform", function(d) { return "translate(" + d.y + ", "+ d.x + ")"; });
+                    .attr("transform", function(d) { 
+                        if (langTree.name.indexOf("glotto") == -1) return "rotate(" + (d.x - 90) + ")translate(" + d.y + ")";
+                        else return "translate(" + d.y + "," + d.x + ")";
+                     });
                 
                 translate = 0;
                 if (scope.query.variable_codes) {
