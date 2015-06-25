@@ -57,6 +57,7 @@ function SocietiesCtrl($scope, searchModelService, LanguageClass, ZipTest) {
          var all_legends = [];
 
         legends = legends.concat(d3.selectAll('.bffalse'));
+        console.log(legends);
         if ($scope.results.classifications) {
             legends = legends.concat(d3.selectAll('.tree-legend-langs'));
         }
@@ -72,7 +73,7 @@ function SocietiesCtrl($scope, searchModelService, LanguageClass, ZipTest) {
                 all_legends.push(legends[i][j]);
             }
         }
-
+        console.log(all_legends);
         count = 0;
         for (var key in $scope.results.code_ids) {
             all_legends[count].name = $scope.results.code_ids[key].name;

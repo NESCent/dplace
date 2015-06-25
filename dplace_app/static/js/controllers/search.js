@@ -115,7 +115,10 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties, 
         
         for (var i = 0; i < $scope.searchModel.results.variable_descriptions.length; i++) {
             if ($scope.searchModel.results.code_ids[$scope.searchModel.results.variable_descriptions[i].id].name) continue;
-            else $scope.searchModel.results.code_ids[$scope.searchModel.results.variable_descriptions[i].id].name = $scope.searchModel.results.variable_descriptions[i].name;
+            else {
+                $scope.searchModel.results.code_ids[$scope.searchModel.results.variable_descriptions[i].id].name = $scope.searchModel.results.variable_descriptions[i].name;
+                $scope.searchModel.results.code_ids[$scope.searchModel.results.variable_descriptions[i].id].bf_var = false;
+            }
         }
     }
 
