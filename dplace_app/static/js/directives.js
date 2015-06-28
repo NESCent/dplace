@@ -80,7 +80,9 @@ angular.module('languagePhylogenyDirective', [])
             function circularTree(w) {
                 var tree = d3.layout.cluster()
                     .size([360, (w/2)-100])
-                    .sort(function comparator(a, b) { return d3.ascending(a.length, b.length); })
+                    .sort(function(node) { return node.children ? node.children.length : -1; })
+
+                    //.sort(function comparator(a, b) { return d3.ascending(a.length, b.length); })
                     .children(function(node) { return node.branchset; })
                     .separation(function separation(a, b) { return 8; });
                 return tree;
@@ -160,15 +162,21 @@ angular.module('languagePhylogenyDirective', [])
                         return "translate("+num+','+num+')';
                     });
                     
-                if (langTree.name.indexOf("glotto") == -1) var diagonal = radialRightAngleDiagonal();
-                else var diagonal = rightAngleDiagonal();        
+                if (langTree.name.indexOf("glotto") == -1) {
+                    var diagonal = radialRightAngleDiagonal();
+                } else {
+                    var diagonal = rightAngleDiagonal();    
+                }
                 nodes.forEach(function(node) {
                     node.rootDist = (node.parent ? node.parent.rootDist : 0) + (node.length || 0);
                 });
                 var rootDists = nodes.map(function(n) { return n.rootDist; });
+               
+                
                 var yscale = d3.scale.linear()
                     .domain([0, d3.max(rootDists)])
-                    .range([0, w/2]);
+                    .range([0, w]);
+                    
                 var leafDistFromRoot = 0;
                 nodes.forEach(function(node) {
                     if (node.rootDist > leafDistFromRoot)
@@ -188,7 +196,10 @@ angular.module('languagePhylogenyDirective', [])
                     .attr("d", diagonal)
                     .attr("fill", "none")
                     .attr("stroke", "#ccc")
-                    .attr("stroke-width", "4px");
+                    .attr("stroke-width", function() {
+                        if (langTree.name.indexOf("global") != -1) return "0.5px";
+                        else return "3.5px";
+                    });
                 var node = vis.selectAll("g.node")
                     .data(nodes)
                     .enter().append("svg:g")
@@ -197,8 +208,9 @@ angular.module('languagePhylogenyDirective', [])
                         else return "leaf-node";
                     })
                     .attr("transform", function(d) { 
-                        if (langTree.name.indexOf("glotto") == -1) return "rotate(" + (d.x - 90) + ")translate(" + d.y + ")";
-                        else return "translate(" + d.y + "," + d.x + ")";
+                        if (langTree.name.indexOf("glotto") == -1) {
+                            return "rotate(" + (d.x - 90) + ")translate(" + d.y + ")";
+                        } else return "translate(" + d.y + "," + d.x + ")";
                      });
                 
                 translate = 0;
