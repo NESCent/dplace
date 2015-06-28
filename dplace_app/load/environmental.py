@@ -147,6 +147,7 @@ def create_environmental_variables():
             obj.category = env_category
             obj.codebook_info = var_dict['description']
             obj.save()
+            print obj
         else:
             EnvironmentalVariable.objects.get_or_create(name=var_dict['name'],units=var_dict['units']) 
     

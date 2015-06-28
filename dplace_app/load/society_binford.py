@@ -12,8 +12,24 @@ from environmental import iso_from_code
 from society_ea import clean_category
 from sources import get_source
 
+def load_bf_harm(society_dict):
+    ext_id = society_dict['Binford_ID']
+    found_societies = Society.objects.filter(ext_id=ext_id)
+    if len(found_societies) > 0:
+        society = found_societies.first()
+        society.focal_year = society_dict['Binford_FocalYear']
+        society.references = society_dict['Binford_references']
+        try:
+            society.save()
+        except BaseException as e:
+            print "Exception saving society: %s" % e.message
+            return None
+        return society
+    return found_societies.first()
+
 def _unicode_damnit(var):
     return var.decode('latin1').encode('utf8')
+
 
 def load_bf_society(society_dict):
     ext_id = society_dict['ID']

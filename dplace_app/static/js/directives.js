@@ -178,16 +178,20 @@ angular.module('languagePhylogenyDirective', [])
                     .range([0, w]);
                     
                 var leafDistFromRoot = 0;
+                var longest_y = 0;
                 nodes.forEach(function(node) {
                     if (node.rootDist > leafDistFromRoot)
                         leafDistFromRoot = node.rootDist;
                     node.y = yscale(node.rootDist);
+                    if (node.y > longest_y)
+                        longest_y = node.y;
                 });
                 
                 //calculate time scale
                 var timeScaleYears = leafDistFromRoot * 100; //convert to years
                 var pixelScale = (w / timeScaleYears) * 100;
                 
+                var dotted = [];
                 var links = tree.links(nodes);
                 var link = vis.selectAll("path.link")
                     .data(links)
@@ -208,11 +212,33 @@ angular.module('languagePhylogenyDirective', [])
                         else return "leaf-node";
                     })
                     .attr("transform", function(d) { 
-                        if (langTree.name.indexOf("glotto") == -1) {
+                        /*if (langTree.name.indexOf("glotto") == -1) {
                             return "rotate(" + (d.x - 90) + ")translate(" + d.y + ")";
                         } else return "translate(" + d.y + "," + d.x + ")";
-                     });
+                     });*/
+
+                        if (langTree.name.indexOf("glotto") != -1) {
+                            
+                            if (d.y < longest_y) {
+                                if (!d.children) dotted.push({'x': d.y, 'y': d.x});
+                                return "translate(" + longest_y + ", " + d.x + ")";
+                            }
+                        }
+                        return "translate(" + d.y + ", "+ d.x + ")"; });
                 
+                for (var d = 0; d < dotted.length; d++) {
+                    vis.append("svg:line")
+                        .attr("x1", dotted[d].x+10)
+                        .attr("x2", longest_y-10)
+                        .attr("y1", dotted[d].y)
+                        .attr("y2", dotted[d].y)
+                        .attr("stroke-width", "2")
+                        .attr("stroke", "#ccc")
+                        .attr("stroke-dasharray", "8, 5");
+ 
+                }
+                
+                //appends markers
                 translate = 0;
                 if (scope.query.variable_codes) {
                     for (var key in scope.results.code_ids) {
@@ -324,23 +350,24 @@ angular.module('languagePhylogenyDirective', [])
                 });
                 
                 //Time Scale
-                line_svg= d3.select('language-phylogeny').append("svg:svg")
-                    .attr("style", "margin-left:100px;");
-                line_svg.append("svg:line")
-                    .attr("x1", "0")
-                    .attr("y1", "0")
-                    .attr("x2", pixelScale)
-                    .attr("y2", "0")
-                    .attr("style", "stroke:#ccc;stroke-width:7;");
-                line_svg.append("svg:text")
-                    .attr("dy", "20")
-                    .attr("dx", function() {
-                        text_pos = (pixelScale - 63) / 2;
-                        if (text_pos < 0) return 0;
-                        else return text_pos;
-                    })
-                    .text("100 years");
-                    
+                if (langTree.name.indexOf("glotto") == -1) {
+                    line_svg= d3.select('language-phylogeny').append("svg:svg")
+                        .attr("style", "margin-left:100px;");
+                    line_svg.append("svg:line")
+                        .attr("x1", "0")
+                        .attr("y1", "0")
+                        .attr("x2", pixelScale)
+                        .attr("y2", "0")
+                        .attr("style", "stroke:#ccc;stroke-width:7;");
+                    line_svg.append("svg:text")
+                        .attr("dy", "20")
+                        .attr("dx", function() {
+                            text_pos = (pixelScale - 63) / 2;
+                            if (text_pos < 0) return 0;
+                            else return text_pos;
+                        })
+                        .text("100 years");
+                }
                 
                 phyloWidth = d3.select("language-phylogeny").select("g").node().getBBox().width;
                 d3.select("#legend")

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.contrib.gis.db import models
+from collections import defaultdict
 
 UNIT_CHOICES = (
     ('mm','mm'),
@@ -49,19 +50,35 @@ class Society(models.Model):
     iso_code = models.ForeignKey('ISOCode', null=True, related_name="societies")
     language = models.ForeignKey('Language', null=True, related_name="societies")
     objects = models.GeoManager()
+    focal_year = models.CharField('Focal Year', null=True, blank=True, max_length=100)
+    references = models.TextField('References', null=True)
+
+    def get_environmental_data(self):
+        """Returns environmental data for the given society"""
+        valueDict = defaultdict(list)
+        environmentals = self.environmentals.all()
+        for environmental in environmentals:
+            for value in environmental.values.order_by('variable__name').all():
+                valueDict[str(value.variable.category)].append({
+                    'name': value.variable.name,
+                    'value': value.value
+                })
+        return valueDict
 
     def get_cultural_trait_data(self):
         """Returns the Ethnographic Atlas data for the given society"""
-        values = []
+        valueDict = defaultdict(list)
         qset = self.variablecodedvalue_set.select_related('code').select_related('variable')
         for value in qset.order_by('variable__label').all():
-            values.append({
-                'label': value.variable.label,
-                'name': value.variable.name,
-                'code': value.coded_value,
-                'description': value.get_description(),
-            })
-        return values
+            categories = value.variable.index_categories.all()
+            for c in categories:
+                valueDict[str(c)].append({
+                    'label': value.variable.label,
+                    'name': value.variable.name,
+                    'code':value.coded_value,
+                    'description':value.get_description(),
+                })
+        return valueDict
 
     def __unicode__(self):
         return "%s - %s (%s)" % (self.ext_id, self.name, self.source)

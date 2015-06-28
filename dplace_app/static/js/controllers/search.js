@@ -118,9 +118,9 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties, 
             else {
                 $scope.searchModel.results.code_ids[$scope.searchModel.results.variable_descriptions[i].id].name = $scope.searchModel.results.variable_descriptions[i].name;
                 $scope.searchModel.results.code_ids[$scope.searchModel.results.variable_descriptions[i].id].bf_var = false;
+                $scope.searchModel.results.code_ids[$scope.searchModel.results.variable_descriptions[i].id].units = $scope.searchModel.results.variable_descriptions[i].name.substring($scope.searchModel.results.variable_descriptions[i].name.indexOf('(')+1, $scope.searchModel.results.variable_descriptions[i].name.indexOf(')'));
             }
         }
-    }
 
     $scope.assignColors = function() {
         results = $scope.searchModel.getResults();
