@@ -190,7 +190,7 @@ angular.module('languagePhylogenyDirective', [])
                 
                 if (langTree.name.indexOf("global") == -1) {
                     var labels = d3.select("language-phylogeny").append("svg:svg")
-                            .attr("width", w)
+                            .attr("width", w+300)
                             .attr("height", 15)
                             .attr("id", "varLabels")
                             .attr("transform", "translate(-40, 0)");
@@ -232,7 +232,7 @@ angular.module('languagePhylogenyDirective', [])
                         .call(d3.behavior.zoom().on("zoom", redraw))
                         .attr("class", "phylogeny")
                         .append("svg:g")
-                        .attr("transform", "translate("+(w/2)+','+(w/2)+')');
+                        .attr("transform", "translate(400,400)");
                 }
                 function redraw() {
                 vis.attr("transform",

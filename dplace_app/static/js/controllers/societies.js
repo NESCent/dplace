@@ -22,8 +22,6 @@ function SocietiesCtrl($scope, searchModelService, LanguageClass, ZipTest) {
     for (var key in $scope.results.code_ids) {
         $scope.results.code_ids[key]['svgSize'] = $scope.results.code_ids[key].length * 27;
     }
-        console.log($scope.results);
-
     $scope.setActive('societies');
 
     $scope.resizeMap = function() {
