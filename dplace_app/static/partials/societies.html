@@ -151,8 +151,7 @@
                 <option value="">Select a Tree</option>
             </select>
             <div class="tree-download"></div>
-
-            <div id="legend" ng-show="results.selectedTree">
+            <div id="legend" ng-show="results.selectedTree && !globalTree">
                 <table ng-repeat="(id, code) in results.code_ids">
                     <tr ng-show="code.length > 0" data-toggle="collapse" data-target="#{{code.CID}}" class="accordion-toggle" style="cursor:pointer;"><th colspan="2">{{code.CID}}: {{code.name}}</th></tr>
                     <tr>
@@ -225,7 +224,20 @@
                     </tr>
                 </table>
             </div>
-            <language-phylogeny></language-phylogeny>
+                <div ng-show="globalTree && variables.length > 0">
+                <h5>Choose a variable:</h4>
+                <select 
+                    ng-model="results.chosenTVariable"
+                    class="form-control"
+                    ng-options="variable.name for variable in variables"
+                    ng-init="results.chosenTVariable=variables[0]"
+                    style="width:auto;"
+                 >
+                 </select>
+             </div>
+            <language-phylogeny>
+            <h4>{{results.selectedTree.name}}</h4>
+            </language-phylogeny>
             </div>
         </tab>
         <tab heading="Download" select="generateDownloadLinks()">

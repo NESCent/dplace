@@ -32,6 +32,7 @@ function SocietiesCtrl($scope, searchModelService, LanguageClass, ZipTest) {
     
     $scope.buttonChanged = function(buttonVal) {
         d3.select('language-phylogeny').html('');
+        $scope.globalTree = false;
         if (buttonVal.indexOf('phylogeny') != -1) {
             $scope.trees = $scope.results.language_trees.phylogenies;
         } else {
@@ -42,9 +43,14 @@ function SocietiesCtrl($scope, searchModelService, LanguageClass, ZipTest) {
     $scope.treeSelected = function() {
         $scope.$broadcast('treeSelected', {tree: $scope.results.selectedTree});
         d3.select(".tree-download").html('');
-        $scope.treeDownload();
+        if ($scope.results.selectedTree.name.indexOf("global") == -1) {
+            $scope.globalTree = false;
+            $scope.treeDownload();
+        } else {
+            $scope.globalTree = true;
+        }
     };
-
+    
     $scope.treeDownload = function() {
         var tree_svg = d3.select(".phylogeny")
             .attr("version", 1.1)
@@ -57,7 +63,6 @@ function SocietiesCtrl($scope, searchModelService, LanguageClass, ZipTest) {
          var all_legends = [];
 
         legends = legends.concat(d3.selectAll('.bffalse'));
-        console.log(legends);
         if ($scope.results.classifications) {
             legends = legends.concat(d3.selectAll('.tree-legend-langs'));
         }
