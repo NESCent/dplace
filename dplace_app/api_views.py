@@ -231,6 +231,8 @@ def result_set_from_query_dict(query_dict):
             language_ids.append(s.society.language.id)
     trees = trees_from_languages_array(language_ids)
     for t in trees:
+        if 'language_classifications' in query_dict and 'global' in t.name:
+            continue
         result_set.add_language_tree(t)
     return result_set
 
