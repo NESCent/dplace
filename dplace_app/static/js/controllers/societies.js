@@ -6,7 +6,7 @@ function SocietiesCtrl($scope, searchModelService, LanguageClass, ZipTest) {
         {value:'phylogeny', name:'Phylogenies'},
         {value:'glottolog', name:'Glottolog Trees'},
     ];
-
+    console.log($scope.results);
     if ($scope.results.variable_descriptions) {
         $scope.variables = $scope.variables.concat($scope.results.variable_descriptions);
     }
@@ -47,6 +47,11 @@ function SocietiesCtrl($scope, searchModelService, LanguageClass, ZipTest) {
         } else {
             $scope.globalTree = true;
         }
+    };
+    
+    $scope.showOrHide = function(chosenVarId, id) {
+        if (chosenVarId == id) return false;
+        else return true;
     };
     
     $scope.treeDownload = function() {
