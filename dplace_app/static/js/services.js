@@ -55,8 +55,8 @@ angular.module('dplaceServices', ['ngResource'])
                     transformResponse: function(data, headers) {
                         if (!JSON.parse(data).results) {
                             return [JSON.parse(data)];
-                        }
-                        return JSON.parse(data).results;
+                        }                            
+                            return JSON.parse(data).results;
                     }
                 }
             });
@@ -112,6 +112,17 @@ angular.module('dplaceServices', ['ngResource'])
                 query: {
                     method: 'GET',
                     isArray:false
+                }
+            }
+        )
+    })
+    .factory('getCategories', function($resource) {
+        return $resource(
+            '/api/v1/get_categories',
+            {}, {
+                query: {
+                    method: 'GET',
+                    isArray:true
                 }
             }
         )
