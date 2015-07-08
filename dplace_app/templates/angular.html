@@ -11,6 +11,7 @@
     <script type="text/javascript" src="{% static "js/controllers/app.js" %}"></script>
     <script type="text/javascript" src="{% static "js/controllers/search.js" %}"></script>
     <script type="text/javascript" src="{% static "js/controllers/societies.js" %}"></script>
+    <script type="text/javascript" src="{% static "js/controllers/home.js" %}"></script>
     <script type="text/javascript" src="{% static "js/controllers/about.js" %}"></script>
     <script type="text/javascript" src="{% static "js/controllers/source_info.js" %}"></script>
     <script type="text/javascript" src="{% static "js/controllers/search/cultural.js" %}"></script>
@@ -46,5 +47,28 @@
         <ng-include src="'/static/partials/navbar.html'"></ng-include>
 		<div ng-view></div>
 	</div>
+	<div class="footer">
+		<p>
+			<center>
+				<table>
+					<tr>
+						<td align="left" style="padding-right:1cm">
+							<a target="_bank" href="http://shh.mpg.de/en" title="Max Planck Institute for the Science of Human Historiy, Jena/Germany"><img width="80" src="/static/minerva.png" /></a>
+						</td>
+						<td align="left"><br>
+							<a target="_bank" href="http://nescent.org" title="National Evolutionary Synthesis Center, Durham,NC/USA"><img width="240" src="/static/nescent.png" /></a>
+						</td>
+						<td align="middle" style="padding-right:1cm;padding-left:1cm"><a target="_bank" rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0;width:100px" src="/static/cclogo.png" /></a>
+							<br />This work is licensed under a<br /><a target="_bank" rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.
+						</td>
+						<td align="right"><a target="_bank" href="https://github.com/D-PLACE/dplace">
+							<img height="25" src="/static/GitHub_Logo.png" /></a>
+						</td>
+					</tr>
+				</table>
+			</center>
+		</p>
+	</div>
 {% endverbatim %}
 {% endblock %}
+

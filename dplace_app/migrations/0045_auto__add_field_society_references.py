@@ -8,15 +8,15 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding field 'VariableDescription.data_type'
-        db.add_column(u'dplace_app_variabledescription', 'data_type',
-                      self.gf('django.db.models.fields.CharField')(max_length=200, null=True),
+        # Adding field 'Society.references'
+        db.add_column(u'dplace_app_society', 'references',
+                      self.gf('django.db.models.fields.TextField')(null=True),
                       keep_default=False)
 
 
     def backwards(self, orm):
-        # Deleting field 'VariableDescription.data_type'
-        db.delete_column(u'dplace_app_variabledescription', 'data_type')
+        # Deleting field 'Society.references'
+        db.delete_column(u'dplace_app_society', 'references')
 
 
     models = {
@@ -102,11 +102,13 @@ class Migration(SchemaMigration):
         u'dplace_app.society': {
             'Meta': {'object_name': 'Society'},
             'ext_id': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '10'}),
+            'focal_year': ('django.db.models.fields.CharField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'iso_code': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'societies'", 'null': 'True', 'to': u"orm['dplace_app.ISOCode']"}),
             'language': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'societies'", 'null': 'True', 'to': u"orm['dplace_app.Language']"}),
             'location': ('django.contrib.gis.db.models.fields.PointField', [], {'null': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '200', 'db_index': 'True'}),
+            'references': ('django.db.models.fields.TextField', [], {'null': 'True'}),
             'source': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['dplace_app.Source']", 'null': 'True'})
         },
         u'dplace_app.source': {

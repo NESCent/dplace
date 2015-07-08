@@ -8,15 +8,15 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding field 'Society.references'
-        db.add_column(u'dplace_app_society', 'references',
-                      self.gf('django.db.models.fields.TextField')(null=True),
+        # Adding field 'VariableDescription.data_type'
+        db.add_column(u'dplace_app_variabledescription', 'data_type',
+                      self.gf('django.db.models.fields.CharField')(max_length=200, null=True),
                       keep_default=False)
 
 
     def backwards(self, orm):
-        # Deleting field 'Society.references'
-        db.delete_column(u'dplace_app_society', 'references')
+        # Deleting field 'VariableDescription.data_type'
+        db.delete_column(u'dplace_app_variabledescription', 'data_type')
 
 
     models = {
@@ -108,7 +108,6 @@ class Migration(SchemaMigration):
             'language': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'societies'", 'null': 'True', 'to': u"orm['dplace_app.Language']"}),
             'location': ('django.contrib.gis.db.models.fields.PointField', [], {'null': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '200', 'db_index': 'True'}),
-            'references': ('django.db.models.fields.TextField', [], {'null': 'True'}),
             'source': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['dplace_app.Source']", 'null': 'True'})
         },
         u'dplace_app.source': {
@@ -146,6 +145,7 @@ class Migration(SchemaMigration):
         u'dplace_app.variabledescription': {
             'Meta': {'ordering': "('label',)", 'object_name': 'VariableDescription'},
             'codebook_info': ('django.db.models.fields.CharField', [], {'default': "'None'", 'max_length': '500'}),
+            'data_type': ('django.db.models.fields.CharField', [], {'max_length': '200', 'null': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'index_categories': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'index_variables'", 'symmetrical': 'False', 'to': u"orm['dplace_app.VariableCategory']"}),
             'label': ('django.db.models.fields.CharField', [], {'max_length': '25', 'db_index': 'True'}),
