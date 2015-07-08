@@ -153,11 +153,11 @@
             <div class="tree-download"></div>
             <div id="legend" ng-show="results.selectedTree">
                 <table ng-repeat="(id, code) in results.code_ids">
-                    <tr ng-show="!globalTree && code.length > 0" data-toggle="collapse" data-target="#{{code.CID}}" class="accordion-toggle" style="cursor:pointer;"><th colspan="2">{{code.CID}}: {{code.name}}</th></tr>
+                    <tr ng-show="!globalTree" data-toggle="collapse" data-target="#{{code.CID}}" class="accordion-toggle" style="cursor:pointer;"><th colspan="2">{{code.CID}}: {{code.name}}</th></tr>
                     <tr>
                         <td class="hiddenRow">
                             <div ng-class="{'accordion-body collapse':!globalTree}" ng-hide="showOrHide(results.chosenTVariable.id, id)" id="{{code.CID}}">
-                                <svg ng-show="!code.bf_var" height="{{code.svgSize}}" class="tree-legend bf{{code.bf_var}}">
+                                <svg ng-show="!code.bf_var" height="{{code.svgSize}}" width="600" class="tree-legend bf{{code.bf_var}}">
                                     <g ng-repeat="c in code" transform="{{$index|transformG}}">
                                         <circle
                                                 cx="10"

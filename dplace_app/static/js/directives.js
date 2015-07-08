@@ -99,6 +99,7 @@ angular.module('languagePhylogenyDirective', [])
                     .sort(function comparator(a, b) { return d3.ascending(a.length, b.length); })
                     .children(function(node) { return node.branchset; })
                     .separation(function separation(a, b) { return 8; });
+                console.log(tree.size());
                 return tree;
             }
             var addMarkers = function(results, variable, node, global, translate) {
@@ -181,10 +182,24 @@ angular.module('languagePhylogenyDirective', [])
                     var w = 900;
                 else  var w = 700;
 
-                if (langTree.name.indexOf("global") != -1) 
-                    var tree = circularTree(w);
-                else
-                    var tree = phyloTree(w, newick);
+                if (langTree.name.indexOf("global") != -1)  {
+                    var tree = d3.layout.cluster()
+                    .size([360, (w/2)-100])
+                    .sort(function(node) { return node.children ? node.children.length : -1; })
+                    .children(function(node) { return node.branchset; })
+                    .separation(function separation(a, b) { return 8; });
+                }
+                else {
+                    var tree = d3.layout.cluster()
+                        .children(function(node) { return node.branchset; });
+                    var nodes = tree(newick);
+                    var h = nodes.length * 9;
+                    tree = d3.layout.cluster()
+                        .size([h, w])
+                        .sort(function comparator(a, b) { return d3.ascending(a.length, b.length); })
+                        .children(function(node) { return node.branchset; })
+                        .separation(function separation(a, b) { return 8; });
+                }
                 nodes = tree(newick);
                 
                 
@@ -219,7 +234,7 @@ angular.module('languagePhylogenyDirective', [])
                 if (langTree.name.indexOf("global") == -1) {
                     var vis = d3.select("language-phylogeny").append("svg:svg")
                         .attr("width", w+300)
-                        .attr("height", w+300)
+                        .attr("height", h+50)
                         .attr("class", "phylogeny")
                         .append("svg:g")
                         .attr("transform", "translate(2,0)");
@@ -329,8 +344,7 @@ angular.module('languagePhylogenyDirective', [])
                     if (langTree.name.indexOf("global") == -1) {
                         for (var key in scope.results.code_ids) {
                             addMarkers(scope.results, key, node, false, translate);
-                            if (scope.results.code_ids[key].length > 0)
-                                translate += 15; //fix translate - not incrementing properly
+                            translate += 15; 
                         }
                     }
                 }
@@ -386,7 +400,7 @@ angular.module('languagePhylogenyDirective', [])
                 });
                 
                 //Time Scale
-                if (langTree.name.indexOf("glotto") == -1) {
+                if (langTree.name.indexOf("glotto") == -1 && langTree.name.indexOf("global") == -1) {
                     line_svg= d3.select('language-phylogeny').append("svg:svg")
                         .attr("style", "margin-left:100px;");
                     line_svg.append("svg:line")

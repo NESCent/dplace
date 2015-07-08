@@ -50,6 +50,8 @@ function SocietiesCtrl($scope, searchModelService, LanguageClass, ZipTest) {
     };
     
     $scope.showOrHide = function(chosenVarId, id) {
+        if (!$scope.globalTree) return false;
+        
         if (chosenVarId == id) return false;
         else return true;
     };
