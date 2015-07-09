@@ -82,29 +82,40 @@ angular.module('languagePhylogenyDirective', [])
                     var selected = node.filter(function(d) {
                         return d.name == society.society.iso_code;
                     });
-                    if (global) selected.select("circle").remove();  
-                    //if the marker is an environmental variable
-                    if (society.environmental_values.length > 0 && society.environmental_values[0].variable == variable) {
-                            selected.append("svg:circle")
-                                .attr("r", function() {
-                                    if (global) return 1.5;
-                                    else return 4.5;
-                                })
-                                .attr("stroke", "#000")
-                                .attr("stroke-width", "0.5")
-                                .attr("transform", "translate("+translate+", 0)")
-                                .attr("fill", function(n) {
-                                    value = society.environmental_values[0].value; //only 1 environmental value at a time so we can do this
-                                    hue = value * 240 / scope.range;
-                                    return 'hsl('+hue+',100%, 50%)';
-                                });
-                        return;
-                    }
+                    if (global) selected.select("circle").remove(); 
+                    var society_name = society.society.name + " (" + society.society.iso_code + ")";
                     
-                    if (society.variable_coded_values.length > 0) {
+                    //if the marker is an environmental variable
+                    if (society.environmental_values.length > 0 && society.environmental_values[0].variable == variable)  { 
+                            var hover_text_value = society.environmental_values[0].value;
+                                selected.append("svg:circle")
+                                    .attr("r", function() {
+                                        if (global) return 1.5;
+                                        else return 4.5;
+                                    })
+                                    .attr("stroke", "#000")
+                                    .attr("stroke-width", "0.5")
+                                    .attr("transform", "translate("+translate+", 0)")
+                                    .attr("fill", function(n) {
+                                        value = society.environmental_values[0].value; //only 1 environmental value at a time so we can do this
+                                        hue = value * 240 / scope.range;
+                                        return 'hsl('+hue+',100%, 50%)';
+                                    })
+                                    .on("mouseover", function() { 
+                                                     d3.select("body").append("div")
+                                                        .attr("class", "tooltip")
+                                                        .html("<b>"+society_name+":</b><br>"+hover_text_value)
+                                                        .style("left", (d3.event.pageX + 10)+"px")
+                                                        .style("top", (d3.event.pageY + 5)+"px")
+                                                        .style("opacity", .9);
+                                    })
+                                    .on("mouseout", function() {
+                                        d3.select(".tooltip").remove();
+                                    });
+                            return;
+                        } else if (society.variable_coded_values.length > 0) {
                         for (var i = 0; i < society.variable_coded_values.length; i++) {
                             if (society.variable_coded_values[i].variable == variable) {
-                                var society_name = society.society.name + " (" + society.society.iso_code + ")";;
                                 if (society.bf_cont_var)
                                     var hover_text_value = society.variable_coded_values[i].coded_value + ' '+ scope.results.code_ids[society.variable_coded_values[i].variable].units;
                                 else
@@ -317,8 +328,10 @@ angular.module('languagePhylogenyDirective', [])
                 if (scope.query.variable_codes) {
                     if (langTree.name.indexOf("global") == -1) {
                         for (var key in scope.results.code_ids) {
-                            addMarkers(scope.results, key, node, false, translate);
-                            translate += 15; 
+                            if (!(scope.query.environmental_filters && key==scope.query.environmental_filters[0].id)) {
+                                addMarkers(scope.results, key, node, false, translate);
+                                translate += 20; 
+                            }
                         }
                     }
                 }
