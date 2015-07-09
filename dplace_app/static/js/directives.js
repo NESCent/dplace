@@ -76,34 +76,8 @@ angular.module('languagePhylogenyDirective', [])
                 }
                 return coordAngle
             }
-            
-            function circularTree(w) {
-                var tree = d3.layout.cluster()
-                    .size([360, (w/2)-100])
-                    .sort(function(node) { return node.children ? node.children.length : -1; })
 
-                    //.sort(function comparator(a, b) { return d3.ascending(a.length, b.length); })
-                    .children(function(node) { return node.branchset; })
-                    .separation(function separation(a, b) { return 8; });
-                return tree;
-            }
-            
-            
-            function phyloTree(w, newick) {
-                var tree = d3.layout.cluster()
-                    .children(function(node) { return node.branchset; });
-                var nodes = tree(newick);
-                var h = nodes.length * 9;
-                tree = d3.layout.cluster()
-                    .size([h, w])
-                    .sort(function comparator(a, b) { return d3.ascending(a.length, b.length); })
-                    .children(function(node) { return node.branchset; })
-                    .separation(function separation(a, b) { return 8; });
-                console.log(tree.size());
-                return tree;
-            }
-            var addMarkers = function(results, variable, node, global, translate) {
-                
+            var addMarkers = function(results, variable, node, global, translate) { 
                 scope.results.societies.forEach(function(society) {
                     var selected = node.filter(function(d) {
                         return d.name == society.society.iso_code;
@@ -132,7 +106,7 @@ angular.module('languagePhylogenyDirective', [])
                             if (society.variable_coded_values[i].variable == variable) {
                                 var society_name = society.society.name + " (" + society.society.iso_code + ")";;
                                 if (society.bf_cont_var)
-                                    var hover_text_value = society.variable_coded_values[i].coded_value;
+                                    var hover_text_value = society.variable_coded_values[i].coded_value + ' '+ scope.results.code_ids[society.variable_coded_values[i].variable].units;
                                 else
                                     var hover_text_value = society.variable_coded_values[i].code_description.description;
                                     selected.append("svg:circle")
