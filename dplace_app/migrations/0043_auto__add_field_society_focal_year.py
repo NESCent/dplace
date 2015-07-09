@@ -8,15 +8,15 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding field 'VariableDescription.data_type'
-        db.add_column(u'dplace_app_variabledescription', 'data_type',
-                      self.gf('django.db.models.fields.CharField')(max_length=200, null=True),
+        # Adding field 'Society.focal_year'
+        db.add_column(u'dplace_app_society', 'focal_year',
+                      self.gf('django.db.models.fields.CharField')(max_length=100, null=True, blank=True),
                       keep_default=False)
 
 
     def backwards(self, orm):
-        # Deleting field 'VariableDescription.data_type'
-        db.delete_column(u'dplace_app_variabledescription', 'data_type')
+        # Deleting field 'Society.focal_year'
+        db.delete_column(u'dplace_app_society', 'focal_year')
 
 
     models = {
@@ -102,6 +102,7 @@ class Migration(SchemaMigration):
         u'dplace_app.society': {
             'Meta': {'object_name': 'Society'},
             'ext_id': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '10'}),
+            'focal_year': ('django.db.models.fields.CharField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'iso_code': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'societies'", 'null': 'True', 'to': u"orm['dplace_app.ISOCode']"}),
             'language': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'societies'", 'null': 'True', 'to': u"orm['dplace_app.Language']"}),
@@ -144,7 +145,6 @@ class Migration(SchemaMigration):
         u'dplace_app.variabledescription': {
             'Meta': {'ordering': "('label',)", 'object_name': 'VariableDescription'},
             'codebook_info': ('django.db.models.fields.CharField', [], {'default': "'None'", 'max_length': '500'}),
-            'data_type': ('django.db.models.fields.CharField', [], {'max_length': '200', 'null': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'index_categories': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'index_variables'", 'symmetrical': 'False', 'to': u"orm['dplace_app.VariableCategory']"}),
             'label': ('django.db.models.fields.CharField', [], {'max_length': '25', 'db_index': 'True'}),
