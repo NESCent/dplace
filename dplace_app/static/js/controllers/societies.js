@@ -43,7 +43,7 @@ function SocietiesCtrl($scope, searchModelService, LanguageClass, ZipTest) {
         d3.select(".tree-download").html('');
         if ($scope.results.selectedTree.name.indexOf("global") == -1) {
             $scope.globalTree = false;
-            $scope.treeDownload();
+           // $scope.treeDownload();
         } else {
             $scope.globalTree = true;
         }
@@ -86,8 +86,12 @@ function SocietiesCtrl($scope, searchModelService, LanguageClass, ZipTest) {
         console.log(all_legends);
         count = 0;
         for (var key in $scope.results.code_ids) {
-            all_legends[count].name = $scope.results.code_ids[key].name;
-            count++;
+            try {
+                all_legends[count].name = $scope.results.code_ids[key].name;
+                count++;
+            } catch (err) {
+                break;
+            }
         }
         
         legends = [];
