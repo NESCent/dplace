@@ -1,6 +1,15 @@
 function ColorMapService() {
+
+    //blue to red gradient - check when to use this (for now code is unused)
+    //also need to update gradient in legend
+    function tempColor(index, count) {
+        hue = 25 + 240 * (25 - index) / count;
+        return 'hsl(' + hue + ',100%,50%)';
+    }
+
+    //normal gradient
     function mapColor(index, count) {
-        var hue = index * 240 / count;
+        hue = 240 * index / count;
         return 'hsl(' + hue + ',100%,50%)';
     }
     
