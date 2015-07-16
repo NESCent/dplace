@@ -12,8 +12,24 @@ from environmental import iso_from_code
 from society_ea import clean_category
 from sources import get_source
 
+def load_bf_harm(society_dict):
+    ext_id = society_dict['Binford_ID']
+    found_societies = Society.objects.filter(ext_id=ext_id)
+    if len(found_societies) > 0:
+        society = found_societies.first()
+        society.focal_year = society_dict['Binford_FocalYear']
+        society.references = society_dict['Binford_references']
+        try:
+            society.save()
+        except BaseException as e:
+            print "Exception saving society: %s" % e.message
+            return None
+        return society
+    return found_societies.first()
+
 def _unicode_damnit(var):
     return var.decode('latin1').encode('utf8')
+
 
 def load_bf_society(society_dict):
     ext_id = society_dict['ID']
@@ -64,19 +80,23 @@ def load_bf_var(var_dict):
     Variables are loaded form binford_variable_names+categories.csv for simplicity,
     but there is more detailed information in bf_codebook.csv
     """
-    label = var_dict['Field name'].strip()
-    name = _unicode_damnit(var_dict['Variable name'].strip())
-    source = get_source("Binford")
-    try:
-        var = VariableDescription.objects.get(label=label, name=name, source=source)
-    except ObjectDoesNotExist:
-        var = VariableDescription.objects.create(
-            label=label,
-            name=name,
-            source=source,
-            codebook_info=_unicode_damnit(var_dict['Detailed description']).strip()
-        )
-        var.save()
+    label = var_dict['Field Name'].strip()
+    name = var_dict['Variable name'].strip()
+    description = var_dict['Detailed description'].strip()
+    data_type = var_dict['DataType'].strip()
+    
+    found_variables = VariableDescription.objects.filter(label=label)
+    if len(found_variables) == 0: #creating a new variable isn't working at the moment
+        print name
+        return None
+    else:
+        variable = found_variables.first()
+        print variable
+        variable.data_type = data_type
+        try:
+            variable.save()
+        except BaseException as e:
+            print e
     
     index_categories = [clean_category(x) for x in var_dict['IndexCategory'].split(',')]
     # Currently max 1 niche category

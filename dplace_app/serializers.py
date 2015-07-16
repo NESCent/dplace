@@ -12,7 +12,7 @@ class VariableCodeDescriptionSerializer(serializers.ModelSerializer):
 class VariableDescriptionSerializer(serializers.ModelSerializer):
     class Meta:
         model = VariableDescription
-        fields = ('id', 'label', 'name', 'codebook_info', 'source')
+        fields = ('id', 'label', 'name', 'codebook_info', 'data_type', 'source')
 
 class VariableCategorySerializer(serializers.ModelSerializer):
     class Meta:
@@ -24,7 +24,7 @@ class VariableDescriptionDetailSerializer(serializers.ModelSerializer):
     niche_categories = VariableCategorySerializer(many=True)
     class Meta:
         model = VariableDescription
-        fields = ('id', 'label', 'name', 'index_categories', 'niche_categories',)
+        fields = ('id', 'label', 'name', 'index_categories', 'niche_categories')
 
 class VariableCategoryDetailSerializer(serializers.ModelSerializer):
     # Use a Primary key related field or just get the variable
@@ -86,7 +86,7 @@ class SocietySerializer(gis_serializers.GeoModelSerializer):
     language = LanguageSerializer(source='language')
     class Meta:
         model = Society
-        fields = ('id', 'ext_id', 'name', 'location', 'iso_code', 'language', 'source')
+        fields = ('id', 'ext_id', 'name', 'location', 'iso_code', 'language', 'references','focal_year','source',)
 
 # Geographic Regions
 class GeographicRegionSerializer(gis_serializers.GeoModelSerializer):

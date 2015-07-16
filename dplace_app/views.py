@@ -1,15 +1,18 @@
 from __builtin__ import dict
 from django.http import Http404
 from django.shortcuts import render, get_object_or_404
-from dplace_app.models import Society, Language
+from dplace_app.models import Society, Language, LanguageClassification
 
 def view_society(request, society_id):
     society = get_object_or_404(Society, pk=society_id)
-    environmentals = society.environmentals.all()
+    environmentals = society.get_environmental_data()
     cultural_traits = society.get_cultural_trait_data()
+    if society.language:
+        language_classification = LanguageClassification.objects.filter(language=society.language)
     return render(request,'society.html', {'society': society,
-                                           'environmentals': environmentals,
-                                           'cultural_traits': cultural_traits})
+                                            'language_classification':language_classification,
+                                           'environmentals': dict(environmentals),
+                                           'cultural_traits': dict(cultural_traits)})
 
 def view_language(request, language_id):
     language = get_object_or_404(Language, pk=language_id)

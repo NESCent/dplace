@@ -39,8 +39,9 @@ angular.module('dplaceFilters', [])
     })
     .filter('formatVariableCodeValues', function() {
         return function(values, variable_id) {
-            return values.map( function(code_value) {
-                if (variable_id == code_value.code_description.variable) return code_value.code_description.description;
+            return values.map( function(code_value) {   
+                if (code_value.code_description && (variable_id == code_value.code_description.variable)) return code_value.code_description.description;
+                else if (variable_id == code_value.variable) return code_value.coded_value;
                 else return ''
             }).join('');
         };

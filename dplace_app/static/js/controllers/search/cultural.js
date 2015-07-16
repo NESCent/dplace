@@ -1,4 +1,4 @@
-function CulturalCtrl($scope, searchModelService, Variable, CodeDescription, Source) {
+function CulturalCtrl($scope, searchModelService, Variable, CodeDescription, BfContinuousVariable, Source) {
    var linkModel = function() {
         // Model/state lives in searchModelService
         $scope.traits = [searchModelService.getModel().getCulturalTraits()];
@@ -18,7 +18,10 @@ function CulturalCtrl($scope, searchModelService, Variable, CodeDescription, Sou
     // triggered by the view when a trait is changed in the picker
     $scope.traitChanged = function(trait) {
         trait.selectedCode = "";
-        trait.codes = CodeDescription.query({variable: trait.selectedVariable.id });
+        if (trait.selectedVariable.data_type == 'CONTINUOUS') {
+            trait.codes = BfContinuousVariable.query({query: {bf_id: trait.selectedVariable.id}});
+        } else
+            trait.codes = CodeDescription.query({variable: trait.selectedVariable.id });
     };
 
     // used before searching to extract the codes from the search selection
@@ -69,7 +72,6 @@ function CulturalCtrl($scope, searchModelService, Variable, CodeDescription, Sou
             var selected = trait.selected.filter(function(code){ return code.isSelected; });
             codes = codes.concat(selected);
         });
-
         $scope.updateSearchQuery({ variable_codes: codes });
         $scope.searchSocieties();
     };

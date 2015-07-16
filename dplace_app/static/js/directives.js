@@ -40,7 +40,7 @@ angular.module('languagePhylogenyDirective', [])
                 translate = 20;
                 if (scope.query.variable_codes) {
                     for (var key in scope.results.code_ids) {
-                        if (scope.results.code_ids[key].length > 0) {
+                        if (scope.results.code_ids[key].length > 0 || scope.results.code_ids[key].bf_var) {
                             labels.append("svg:text")
                                 .attr("dx", w+15+translate)
                                 .attr("dy", 15)
@@ -75,16 +75,20 @@ angular.module('languagePhylogenyDirective', [])
                     .domain([0, d3.max(rootDists)])
                     .range([0, w]);
                 var leafDistFromRoot = 0;
+                var longest_y = 0;
                 nodes.forEach(function(node) {
                     if (node.rootDist > leafDistFromRoot)
                         leafDistFromRoot = node.rootDist;
                     node.y = yscale(node.rootDist);
+                    if (node.y > longest_y)
+                        longest_y = node.y;
                 });
                 
                 //calculate time scale
                 var timeScaleYears = leafDistFromRoot * 100; //convert to years
                 var pixelScale = (w / timeScaleYears) * 100;
                 
+                var dotted = [];
                 var links = tree.links(nodes);
                 var link = vis.selectAll("path.link")
                     .data(links)
@@ -101,8 +105,29 @@ angular.module('languagePhylogenyDirective', [])
                         if (n.children) return "inner-node";
                         else return "leaf-node";
                     })
-                    .attr("transform", function(d) { return "translate(" + d.y + ", "+ d.x + ")"; });
+                    .attr("transform", function(d) { 
+                        if (langTree.name.indexOf("glotto") != -1) {
+                            
+                            if (d.y < longest_y) {
+                                if (!d.children) dotted.push({'x': d.y, 'y': d.x});
+                                return "translate(" + longest_y + ", " + d.x + ")";
+                            }
+                        }
+                        return "translate(" + d.y + ", "+ d.x + ")"; });
                 
+                for (var d = 0; d < dotted.length; d++) {
+                    vis.append("svg:line")
+                        .attr("x1", dotted[d].x+10)
+                        .attr("x2", longest_y-10)
+                        .attr("y1", dotted[d].y)
+                        .attr("y2", dotted[d].y)
+                        .attr("stroke-width", "2")
+                        .attr("stroke", "#ccc")
+                        .attr("stroke-dasharray", "8, 5");
+ 
+                }
+                
+                //appends markers
                 translate = 0;
                 if (scope.query.variable_codes) {
                     for (var key in scope.results.code_ids) {
@@ -115,17 +140,26 @@ angular.module('languagePhylogenyDirective', [])
                                 for (var i = 0; i < society.variable_coded_values.length; i++) {
                                     if (society.variable_coded_values[i].variable == key) {
                                             var society_name = society.society.name + " (" + society.society.iso_code + ")";
-                                            var hover_text_value = society.variable_coded_values[i].code_description.description;
+                                            if (society.bf_cont_var)
+                                                var hover_text_value = society.variable_coded_values[i].coded_value;
+                                            else
+                                                var hover_text_value = society.variable_coded_values[i].code_description.description;
                                             selected.append("svg:circle")
                                                 .attr("r", 4.5)
                                                 .attr("stroke", "#000")
                                                 .attr("stroke-width", "0.5")
                                                 .attr("transform", "translate("+translate+", 0)")
                                                 .attr("fill", function(n) {
-                                                    if (society.variable_coded_values[i].code_description.description.indexOf("Missing data") != -1) {
-                                                        return 'hsl(360, 100%, 100%)';
+                                                    if (society.variable_coded_values[i].code_description && society.variable_coded_values[i].code_description.description.indexOf("Missing data") != -1) {
+                                                       return 'hsl(360, 100%, 100%)';
                                                     }
                                                     value = society.variable_coded_values[i].coded_value;
+                                                    if (society.bf_cont_var) {
+                                                        min = scope.results.code_ids[society.variable_coded_values[i].variable].min;
+                                                        max = scope.results.code_ids[society.variable_coded_values[i].variable].max;
+                                                        var lum = (value-min)/(max-min) * 95;
+                                                        return 'hsl(0, 65%,'+lum+'%)';
+                                                    }                                               
                                                     hue = value * 240 / scope.results.code_ids[society.variable_coded_values[i].variable].length;
                                                     return 'hsl('+hue+',100%, 50%)';
                                                 })
@@ -218,23 +252,24 @@ angular.module('languagePhylogenyDirective', [])
                 });
                 
                 //Time Scale
-                line_svg= d3.select('language-phylogeny').append("svg:svg")
-                    .attr("style", "margin-left:100px;");
-                line_svg.append("svg:line")
-                    .attr("x1", "0")
-                    .attr("y1", "0")
-                    .attr("x2", pixelScale)
-                    .attr("y2", "0")
-                    .attr("style", "stroke:#ccc;stroke-width:7;");
-                line_svg.append("svg:text")
-                    .attr("dy", "20")
-                    .attr("dx", function() {
-                        text_pos = (pixelScale - 63) / 2;
-                        if (text_pos < 0) return 0;
-                        else return text_pos;
-                    })
-                    .text("100 years");
-                    
+                if (langTree.name.indexOf("glotto") == -1) {
+                    line_svg= d3.select('language-phylogeny').append("svg:svg")
+                        .attr("style", "margin-left:100px;");
+                    line_svg.append("svg:line")
+                        .attr("x1", "0")
+                        .attr("y1", "0")
+                        .attr("x2", pixelScale)
+                        .attr("y2", "0")
+                        .attr("style", "stroke:#ccc;stroke-width:7;");
+                    line_svg.append("svg:text")
+                        .attr("dy", "20")
+                        .attr("dx", function() {
+                            text_pos = (pixelScale - 63) / 2;
+                            if (text_pos < 0) return 0;
+                            else return text_pos;
+                        })
+                        .text("100 years");
+                }
                 
                 phyloWidth = d3.select("language-phylogeny").select("g").node().getBBox().width;
                 d3.select("#legend")
@@ -357,11 +392,20 @@ angular.module('dplaceMapDirective', [])
                         if (scope.results.variable_descriptions.indexOf(scope.chosen) != -1) {
                             societyResult.variable_coded_values.forEach(function(coded_value) {
                                 if (coded_value.variable == scope.chosen.id) {
-                                    results.societies.push({
-                                        'variable_coded_values':[coded_value],
-                                        'environmental_values': [],
-                                        'society':society,
-                                    });
+                                    if (scope.chosen.data_type == 'CONTINUOUS') {
+                                        results.societies.push({
+                                            'variable_coded_values':[coded_value],
+                                            'environmental_values': [],
+                                            'society':society,
+                                            'bf_cont_var':true,
+                                        });
+                                    } else {
+                                        results.societies.push({
+                                            'variable_coded_values':[coded_value],
+                                            'environmental_values': [],
+                                            'society':society,
+                                        });
+                                    }
                                 }
                             });
                         }
@@ -413,38 +457,35 @@ angular.module('dplaceMapDirective', [])
                             .node().parentNode.innerHTML;
                         map_svg = map_svg.substring(0, map_svg.indexOf("<div")); //remove zoom in/out buttons from map
                         //construct legend for download
-                        var legend = d3.select(".legend-for-download");
-                        var legend_svg = "";
-                        if (scope.chosen) {
-                            if (scope.results.environmental_variables.length > 0 && scope.chosen.id == scope.results.environmental_variables[0].id) {
-                                //if the chosen map is an environmental variable
-                                    legend_svg = "<g transform='translate(0,350)'>"+d3.select(".envLegend").node().innerHTML+"</g>";
-                            }
-                            else if (scope.results.code_ids) {
-                            for (var i = 0; i < scope.results.code_ids[scope.chosen.id].length; i++) {
-                                g = legend.append("svg:g")
-                                    .attr("transform", function() {
-                                        return 'translate(0,'+i*25+')';
-                                    });
-                                g.append("svg:circle")
-                                    .attr("cx", "10")
-                                    .attr("cy", "10")
-                                    .attr("r", "4.5")
-                                    .attr("stroke", "#000")
-                                    .attr("stroke-width", "0.5")
-                                    .attr("fill", function() {
-                                        if (scope.results.code_ids[scope.chosen.id][i].description.indexOf("Missing data") != -1)
-                                            return 'hsl(0, 0%, 100%)';
-                                        var value = scope.results.code_ids[scope.chosen.id][i].code;
-                                        var hue = value * 240 / scope.results.code_ids[scope.chosen.id].length;
-                                        return 'hsl('+hue+',100%,50%)';
-                                    });
-                                g.append("svg:text")
-                                    .attr("x", "20")
-                                    .attr("y", "15")
-                                    .text(scope.results.code_ids[scope.chosen.id][i].description);
-                            }
-                            legend_svg = "<g transform='translate(0,350)'>"+legend.node().innerHTML+"</g>";
+                        if (scope.results.code_ids && scope.chosen) {
+                            if (scope.chosen.data_type == 'CONTINUOUS') {
+                                var legend_svg = "<g transform='translate(0,350)'>"+d3.select(".bf-cont-gradient").node().innerHTML+"</g>"; 
+                            } else {
+                                var legend = d3.select(".legend-for-download");
+                                for (var i = 0; i < scope.results.code_ids[scope.chosen.id].length; i++) {
+                                    g = legend.append("svg:g")
+                                        .attr("transform", function() {
+                                            return 'translate(0,'+i*25+')';
+                                        });
+                                    g.append("svg:circle")
+                                        .attr("cx", "10")
+                                        .attr("cy", "10")
+                                        .attr("r", "4.5")
+                                        .attr("stroke", "#000")
+                                        .attr("stroke-width", "0.5")
+                                        .attr("fill", function() {
+                                            if (scope.results.code_ids[scope.chosen.id][i].description.indexOf("Missing data") != -1)
+                                                return 'hsl(0, 0%, 100%)';
+                                            var value = scope.results.code_ids[scope.chosen.id][i].code;
+                                            var hue = value * 240 / scope.results.code_ids[scope.chosen.id].length;
+                                            return 'hsl('+hue+',100%,50%)';
+                                        });
+                                    g.append("svg:text")
+                                        .attr("x", "20")
+                                        .attr("y", "15")
+                                        .text(scope.results.code_ids[scope.chosen.id][i].description);
+                                }
+                                var legend_svg = "<g transform='translate(0,350)'>"+legend.node().innerHTML+"</g>";
                             }
                             var map_svg = map_svg.substring(0, map_svg.indexOf("</svg>"));
                             map_svg = map_svg.concat(legend_svg+"</svg>");

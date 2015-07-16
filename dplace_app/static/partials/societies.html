@@ -61,7 +61,7 @@
             <table id="mapLegend" style="position:absolute; margin-top:-270px; margin-left:750px; margin-right:10px;">
                 <tr class="download-links">
                 </tr>
-                <tr ng-repeat="code in results.code_ids[results.chosenVariable.id]">
+                <tr ng-show="results.chosenVariable.data_type !== 'CONTINUOUS'" ng-repeat="code in results.code_ids[results.chosenVariable.id]">
                     <td>
                         <svg height="20" width="20">
                             <circle
@@ -100,6 +100,37 @@
                       </svg>
                     </td>
                 </tr>
+                <tr ng-show="results.chosenVariable.data_type == 'CONTINUOUS'">
+                    <td>
+                        <svg height="20" width="20">
+                            <circle
+                                    cx="10"
+                                    cy="10"
+                                    r="4.5"
+                                    fill="hsl(360, 100%, 100%)"
+                                    stroke="#000"
+                                    stroke-width="0.5"
+                                    />
+                            </svg>
+                        </td>
+                    <td>Missing Data</td>
+               </tr>
+                <tr ng-show="results.chosenVariable.data_type == 'CONTINUOUS'">
+                    <td>
+                        <svg class="bf-cont-gradient" height="250" height="30">
+                            <defs>
+                                <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" style="stop-color:hsl(0, 65%, 95%);stop-opacity:1" />
+                                    <stop offset="50%" style="stop-color:hsl(0, 65%, 50%);stop-opacity:1" />
+                                    <stop offset="100%" style="stop-color:hsl(0, 65%, 0%);stop-opacity:1" />
+                                </linearGradient>
+                            </defs>
+                            <rect x="10" fill="url(#grad1)" height="30" width="200" />
+                            <text x="0" y="45">{{results.code_ids[results.chosenVariable.id].min}} {{results.code_ids[results.chosenVariable.id].units}}</text>
+                            <text x="200" y="45">{{results.code_ids[results.chosenVariable.id].max}} {{results.code_ids[results.chosenVariable.id].units}}</text>
+                        </svg>
+                    </td>
+                </tr>
                 <tr ng-repeat="code in results.classifications|joinDictItems">
                     <td>
                         <svg height="20" width="20">
@@ -116,7 +147,6 @@
                     <td>{{code.name}}</td>
                 </tr>
             </table>
-            
             <svg class="legend-for-download" style="visibility:hidden;">
             </svg>
         </tab>
@@ -139,7 +169,7 @@
                     <tr>
                         <td class="hiddenRow">
                             <div class="accordion-body collapse" id="{{code.CID}}">
-                                <svg height="{{code.svgSize}}" class="tree-legend">
+                                <svg ng-show="!code.bf_var" height="{{code.svgSize}}" class="tree-legend" ng-class="bf{{code.bf_var}}">
                                     <g ng-repeat="c in code" transform="{{$index|transformG}}">
                                         <circle
                                                 cx="10"
@@ -149,10 +179,31 @@
                                                 stroke="#000"
                                                 stroke-width="0.5"
                                                 />
-                                        
                                         <text x="20" y="15">{{c.description}}</text>
                                     </g>
                                 </svg>
+                                <svg ng-show="code.bf_var" class="bf-cont-gradient" height="80" height="30">
+                                    <defs>
+                                        <linearGradient id="g{{code.CID}}" x1="0%" y1="0%" x2="100%" y2="0%">
+                                            <stop offset="0%" style="stop-color:hsl(0, 65%, 95%);stop-opacity:1" />
+                                            <stop offset="50%" style="stop-color:hsl(0, 65%, 50%);stop-opacity:1" />
+                                            <stop offset="100%" style="stop-color:hsl(0, 65%, 0%);stop-opacity:1" />
+                                        </linearGradient>
+                                    </defs>
+                                    <circle
+                                            cx="10"
+                                            cy="10"
+                                            r="4.5"
+                                            fill="hsl(360, 100%, 100%)"
+                                            stroke="#000"
+                                            stroke-width="0.5"
+                                            />
+                                        <text x="20" y="15">Missing Data</text>
+                                    <rect x="10" y="25" fill="url(#g{{code.CID}})" height="30" width="200" />
+                                    <text x="0" y="70">{{code.min}} {{code.units}}</text>
+                                    <text x="200" y="70">{{code.max}} {{code.units}}</text>
+                                </svg>
+                                
                               </div>
                         </td>
                     </tr>
