@@ -28,7 +28,7 @@ function ColorMapService() {
                     });
                    
                     if (variable.length > 0) {
-                        var color = mapColor(society.environmental_values[0].value, variable[0].range);
+                        var color = tempColor(society.environmental_values[0].value, variable[0].range);
                         colors[society.society.id] = color;
                     }    
                 }

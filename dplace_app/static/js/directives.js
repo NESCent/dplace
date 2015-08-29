@@ -445,6 +445,11 @@ angular.module('dplaceMapDirective', [])
                         else scope.map.removeMarkers([societyIds[i]]);
                     }
                     
+                   if (scope.chosen.name.indexOf("Temp") != -1) {
+                    d3.select("#envVar").attr("fill", "url(#envGrad1)");
+                   }
+                   else d3.select("#envVar").attr("fill", "url(#envGrad)");
+                    
                 };
                 
                 //constructs download link for map
