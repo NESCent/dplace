@@ -1,4 +1,35 @@
 <div class="container results">
+<!-- NEED A BETTER WAY TO DO THIS -->
+ <svg height="0" width="0">
+   <defs>
+        <linearGradient id="envGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" style="stop-color:hsl(359,100%,50%);stop-opacity:0.7" />
+            <stop offset="10%" style="stop-color:hsl(334,100%,50%);stop-opacity:0.7" />
+            <stop offset="20%" style="stop-color:hsl(288,100%,50%);stop-opacity:0.7" />
+            <stop offset="30%" style="stop-color:hsl(252,100%,50%);stop-opacity:0.7" />
+            <stop offset="40%" style="stop-color:hsl(216,100%,50%);stop-opacity:0.7" />
+            <stop offset="50%" style="stop-color:hsl(180,100%,50%);stop-opacity:0.7" />
+            <stop offset="60%" style="stop-color:hsl(144,100%,50%);stop-opacity:0.7" />
+            <stop offset="70%" style="stop-color:hsl(108,100%,50%);stop-opacity:0.7" />
+            <stop offset="80%" style="stop-color:hsl(72,100%,50%);stop-opacity:0.7" />
+            <stop offset="90%" style="stop-color:hsl(36,100%,50%);stop-opacity:0.7" />
+            <stop offset="100%" style="stop-color:hsl(0,100%,50%);stop-opacity:1" />
+        </linearGradient>
+    </defs>
+
+    <defs>
+        <linearGradient id="envGrad1" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" style="stop-color:hsl(252,100%,50%);stop-opacity:0.7" />
+            <stop offset="12.5%" style="stop-color:hsl(216,100%,50%);stop-opacity:0.7" />
+            <stop offset="25%" style="stop-color:hsl(180,100%,50%);stop-opacity:0.7" />
+            <stop offset="37.5%" style="stop-color:hsl(144,100%,50%);stop-opacity:0.7" />
+            <stop offset="50%" style="stop-color:hsl(108,100%,50%);stop-opacity:0.7" />
+            <stop offset="62.5%" style="stop-color:hsl(72,100%,50%);stop-opacity:0.7" />
+            <stop offset="75%" style="stop-color:hsl(36,100%,50%);stop-opacity:0.7" />
+            <stop offset="100%" style="stop-color:hsl(0,100%,50%);stop-opacity:1" />
+        </linearGradient>
+    </defs>
+</svg>
     <div class="row">
         <span>
             <p class="pull-left lead">Societies<span ng-show="results.societies.length">({{ results.societies.length }})</span></p>
@@ -79,36 +110,8 @@
                 <tr ng-show="results.chosenVariable==results.environmental_variables[0]">
                     <td>
                         <svg height="50" width="400" class="envLegend">
-                            <defs>
-                                <linearGradient id="envGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                                    <stop offset="0%" style="stop-color:hsl(359,100%,50%);stop-opacity:0.7" />
-                                    <stop offset="10%" style="stop-color:hsl(334,100%,50%);stop-opacity:0.7" />
-                                    <stop offset="20%" style="stop-color:hsl(288,100%,50%);stop-opacity:0.7" />
-                                    <stop offset="30%" style="stop-color:hsl(252,100%,50%);stop-opacity:0.7" />
-                                    <stop offset="40%" style="stop-color:hsl(216,100%,50%);stop-opacity:0.7" />
-                                    <stop offset="50%" style="stop-color:hsl(180,100%,50%);stop-opacity:0.7" />
-                                    <stop offset="60%" style="stop-color:hsl(144,100%,50%);stop-opacity:0.7" />
-                                    <stop offset="70%" style="stop-color:hsl(108,100%,50%);stop-opacity:0.7" />
-                                    <stop offset="80%" style="stop-color:hsl(72,100%,50%);stop-opacity:0.7" />
-                                    <stop offset="90%" style="stop-color:hsl(36,100%,50%);stop-opacity:0.7" />
-                                    <stop offset="100%" style="stop-color:hsl(0,100%,50%);stop-opacity:1" />
-                                </linearGradient>
-                            </defs>
-                            
-                            <defs>
-                                <linearGradient id="envGrad1" x1="0%" y1="0%" x2="100%" y2="0%">
-                                    <stop offset="0%" style="stop-color:hsl(252,100%,50%);stop-opacity:0.7" />
-                                    <stop offset="12.5%" style="stop-color:hsl(216,100%,50%);stop-opacity:0.7" />
-                                    <stop offset="25%" style="stop-color:hsl(180,100%,50%);stop-opacity:0.7" />
-                                    <stop offset="37.5%" style="stop-color:hsl(144,100%,50%);stop-opacity:0.7" />
-                                    <stop offset="50%" style="stop-color:hsl(108,100%,50%);stop-opacity:0.7" />
-                                    <stop offset="62.5%" style="stop-color:hsl(72,100%,50%);stop-opacity:0.7" />
-                                    <stop offset="75%" style="stop-color:hsl(36,100%,50%);stop-opacity:0.7" />
-                                    <stop offset="100%" style="stop-color:hsl(0,100%,50%);stop-opacity:1" />
-                                </linearGradient>
-                            </defs>
-                            
-                            <rect id="envVar" height="30" width="300" x="20" />
+                           
+                            <rect class="envVar" height="30" width="300" x="20" />
                             <text x="0" y="45">{{results.code_ids[results.chosenVariable.id].min}}</text>
                             <text x="300" y="45">{{results.code_ids[results.chosenVariable.id].max}}</text>
                       </svg>
@@ -224,7 +227,16 @@
                 </table>
 
                 <table ng-repeat="environmental in results.environmental_variables">
-                    <tr><th>E1: {{environmental.name}}</th></tr>
+                    <tr data-toggle="collapse" data-target="#E1" class="accordion-toggle" style="cursor:pointer;"><th>E1: {{environmental.name}}</th></tr>
+                    <tr><td class="hiddenRow">
+                    <div class="accordion-body collapse" id="E1">
+                        <svg height="50" width="400" class="envLegend">
+                            <rect class="envVar" height="30" width="300" x="20" />
+                            <text x="0" y="45">{{results.code_ids[results.chosenVariable.id].min}}</text>
+                            <text x="300" y="45">{{results.code_ids[results.chosenVariable.id].max}}</text>
+                            </td></tr>
+                      </svg>
+                      </div>
                 </table>
                 <table ng-show="results.classifications">
                     <tr style="cursor:pointer;"><th colspan="2">Language Classifications</th></tr>

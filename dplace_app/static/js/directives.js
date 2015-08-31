@@ -446,9 +446,9 @@ angular.module('dplaceMapDirective', [])
                     }
                     
                    if (scope.chosen.name.indexOf("Temp") != -1) {
-                    d3.select("#envVar").attr("fill", "url(#envGrad1)");
+                    d3.selectAll(".envVar").attr("fill", "url(#envGrad1)");
                    }
-                   else d3.select("#envVar").attr("fill", "url(#envGrad)");
+                   else d3.selectAll(".envVar").attr("fill", "url(#envGrad)");
                     
                 };
                 
