@@ -1,15 +1,14 @@
 function ColorMapService() {
 
-    //blue to red gradient - check when to use this (for now code is unused)
-    //also need to update gradient in legend
-    function tempColor(index, count) {
-        hue = 25 + 240 * (25 - index) / count;
-        return 'hsl(' + hue + ',100%,50%)';
+    //blue to red gradient for environmental variables
+    function tempColor(index, count, min, max ) {
+        hue = 240 - (((index - min) / (max - min)) * 240);
+        return 'hsl('+hue+',100%, 50%)';
     }
 
     //normal gradient
     function mapColor(index, count) {
-        hue = 240 * index / count;
+        hue = 240 -  (index / count)*240;
         return 'hsl(' + hue + ',100%,50%)';
     }
     
@@ -26,9 +25,8 @@ function ColorMapService() {
                     variable = results.environmental_variables.filter(function(env_var) {
                         return env_var.id == society.environmental_values[j].variable;
                     });
-                   
                     if (variable.length > 0) {
-                        var color = tempColor(society.environmental_values[0].value, variable[0].range);
+                        var color = tempColor(society.environmental_values[0].value, results.environmental_variables[0].range, results.code_ids[results.environmental_variables[0].id].min, results.code_ids[results.environmental_variables[0].id].max);
                         colors[society.society.id] = color;
                     }    
                 }
