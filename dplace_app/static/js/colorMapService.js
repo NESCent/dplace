@@ -2,7 +2,8 @@ function ColorMapService() {
 
     //blue to red gradient for environmental variables
     function tempColor(index, count, min, max ) {
-        hue = 240 - (((index - min) / (max - min)) * 240);
+        hue1 = 240 - (((index - min) / (max - min)) * 240);
+        hue = (hue1 - 240);
         return 'hsl('+hue+',100%, 50%)';
     }
 
@@ -26,7 +27,7 @@ function ColorMapService() {
                         return env_var.id == society.environmental_values[j].variable;
                     });
                     if (variable.length > 0) {
-                        var color = tempColor(society.environmental_values[0].value, results.environmental_variables[0].range, results.code_ids[results.environmental_variables[0].id].min, results.code_ids[results.environmental_variables[0].id].max);
+                        var color = tempColor(society.environmental_values[0].value, results.environmental_variables[0].range, results.environmental_variables[0].min, results.environmental_variables[0].max);
                         colors[society.society.id] = color;
                     }    
                 }
