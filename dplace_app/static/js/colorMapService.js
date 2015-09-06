@@ -1,9 +1,16 @@
 function ColorMapService() {
 
     //blue to red gradient for environmental variables
-    function tempColor(index, count, min, max ) {
-        hue1 = 240 - (((index - min) / (max - min)) * 240);
-        hue = (hue1 - 240);
+    function tempColor(index, min, max, id ) {
+    if (id == 34 || id == 36) {
+        hue = 30 + (((index - min) / (max - min)) * 88);
+    } else if (id == 27){
+        color = mapColorMonochrome(min, max, index, 252);
+        return color;
+    }
+    else {
+    hue = 240 - (((index - min) / (max - min))*240);
+    }
         return 'hsl('+hue+',100%, 50%)';
     }
 
@@ -13,9 +20,10 @@ function ColorMapService() {
         return 'hsl(' + hue + ',100%,50%)';
     }
     
-    function mapColorMonochrome(min, max, value) {
-        var lum = (value-min)/(max-min) * 95;
-        return 'hsl(0, 65%,'+lum+'%)'; //RED hue - can be changed
+    function mapColorMonochrome(min, max, value, color) {
+        var lum = (((value-min)/(max-min))) * 95;
+        lum = 100 - lum;
+        return 'hsl('+color+', 65%,'+lum+'%)'; //RED hue - can be changed
     }
 
     this.generateColorMap = function(results) {
@@ -27,7 +35,7 @@ function ColorMapService() {
                         return env_var.id == society.environmental_values[j].variable;
                     });
                     if (variable.length > 0) {
-                        var color = tempColor(society.environmental_values[0].value, results.environmental_variables[0].range, results.environmental_variables[0].min, results.environmental_variables[0].max);
+                        var color = tempColor(society.environmental_values[0].value,  results.environmental_variables[0].min, results.environmental_variables[0].max, results.environmental_variables[0].id);
                         colors[society.society.id] = color;
                     }    
                 }
@@ -36,7 +44,7 @@ function ColorMapService() {
                 if (society.variable_coded_values[j].code_description && (society.variable_coded_values[j].code_description.description.indexOf("Missing data") != -1))
                     colors[society.society.id] = 'hsl(0, 0%, 100%)';
                 else if (society.bf_cont_var) {
-                    var color = mapColorMonochrome(results.code_ids[society.variable_coded_values[j].variable].min, results.code_ids[society.variable_coded_values[j].variable].max, society.variable_coded_values[j].coded_value);
+                    var color = mapColorMonochrome(results.code_ids[society.variable_coded_values[j].variable].min, results.code_ids[society.variable_coded_values[j].variable].max, society.variable_coded_values[j].coded_value, 0);
                     colors[society.society.id] = color;
                 } else {
                     var color = mapColor(society.variable_coded_values[j].coded_value, results.code_ids[society.variable_coded_values[j].variable].length);
