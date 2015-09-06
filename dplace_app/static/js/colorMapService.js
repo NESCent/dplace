@@ -23,7 +23,7 @@ function ColorMapService() {
     function mapColorMonochrome(min, max, value, color) {
         var lum = (((value-min)/(max-min))) * 95;
         lum = 100 - lum;
-        return 'hsl('+color+', 65%,'+lum+'%)'; //RED hue - can be changed
+        return 'hsl('+color+', 65%,'+lum+'%)'; 
     }
 
     this.generateColorMap = function(results) {
