@@ -56,8 +56,8 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties, 
             var max_value = Math.max.apply(null, extractedValues);
             var range = max_value - min_value;
             results.environmental_variables[i]['range'] = range;
-            results.environmental_variables[i]['min'] = Math.round(min_value*10000)/10000;
-            results.environmental_variables[i]['max'] = Math.round(max_value*10000)/10000;
+            $scope.searchModel.results.environmental_variables[i]['min'] = Math.round(min_value*10000)/10000;
+            $scope.searchModel.results.environmental_variables[i]['max'] = Math.round(max_value*10000)/10000;
         }
         return results;
     };
@@ -142,7 +142,6 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties, 
             }
         }
         var colorMap = colorMapService.generateColorMap(results);
-        console.log(colorMap);
         $scope.searchModel.getSocieties().forEach(function(container) {
             container.society.style = {'background-color' : colorMap[container.society.id] };
         });

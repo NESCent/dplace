@@ -205,7 +205,6 @@ angular.module('languagePhylogenyDirective', [])
                         
                     });
                 }
-                
                 scope.results.societies.forEach(function(society) {
                     var selected = node.filter(function(d) {
                         return d.name == society.society.iso_code;
@@ -221,7 +220,13 @@ angular.module('languagePhylogenyDirective', [])
                             .attr("transform", "translate("+translate+", 0)")
                             .attr("fill", function(n) {
                                 value = society.environmental_values[0].value; //only 1 environmental value at a time so we can do this
-                                hue = value * 240 / scope.range;
+                                min = scope.results.environmental_variables[0].min;
+                                max = scope.results.environmental_variables[0].max;
+                                if (society.environmental_values[0].variable == 34 || society.environmental_values[0].variable == 36) {
+                                    hue = 30 + (((value - min) / (max - min))*88)
+                                } else {
+                                    hue = 240 - (((value-min)/(max-min))*240);
+                                }
                                 return 'hsl('+hue+',100%, 50%)';
                             })
                             .on("mouseover", function() { 
@@ -367,7 +372,7 @@ angular.module('dplaceMapDirective', [])
                     },
                     regionsSelectable: true
                 }).vectorMap('get','mapObject');
-
+                
                 scope.addMarkers = function() {
                     scope.map.removeAllMarkers();
                     if(!scope.results) {
@@ -545,6 +550,14 @@ angular.module('dplaceMapDirective', [])
                                 .html("Download Map: " + lang_family);
                         }
                 };
+                
+                scope.mapLegend = function() {
+                    if (scope.chosen.id == 34 || scope.chosen.id == 36) {
+                        d3.selectAll(".envVar").attr("fill", "url(#earthy)");
+                    } else {
+                        d3.selectAll(".envVar").attr("fill", "url(#temp)");
+                    }
+                };
 
                 if(attrs.results) {
                     // Update markers when societies change
@@ -555,7 +568,9 @@ angular.module('dplaceMapDirective', [])
                 if (attrs.chosen) {
                     scope.$watchCollection('chosen', function(oldvalue, newvalue) {
                         scope.addMarkers(); 
+                        scope.mapLegend();
                         scope.mapLink();
+                        
                     });
                 }
                 
