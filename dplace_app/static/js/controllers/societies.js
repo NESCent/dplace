@@ -15,7 +15,7 @@ function SocietiesCtrl($scope, searchModelService, LanguageClass, ZipTest) {
         
     if ($scope.query.environmental_filters) {
         $scope.variables = $scope.variables.concat($scope.results.environmental_variables);
-        $scope.results.code_ids[$scope.results.environmental_variables[0].id] = [];
+        //$scope.results.code_ids[$scope.results.environmental_variables[0].id] = [];
     }
     
     for (var key in $scope.results.code_ids) {
