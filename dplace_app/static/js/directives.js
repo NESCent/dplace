@@ -558,7 +558,11 @@ angular.module('dplaceMapDirective', [])
                 scope.mapLegend = function() {
                     if (scope.chosen.id == 34 || scope.chosen.id == 36) {
                         d3.selectAll(".envVar").attr("fill", "url(#earthy)");
-                    } else {
+                    } else if (scope.chosen.id == 27) {
+                        d3.selectAll(".envVar").attr("fill", "url(#blue)");
+                    }
+                    
+                    else {
                         d3.selectAll(".envVar").attr("fill", "url(#temp)");
                     }
                 };
