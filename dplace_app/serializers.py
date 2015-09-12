@@ -221,6 +221,7 @@ class ZipResultSet(object):
     def __init__(self):
         self.files = set()
         self.tree = None
+        self.name = None
         
     def add_legend(self,legend):
         self.files.add(legend)
@@ -231,5 +232,6 @@ class ZipResultSet(object):
 class ZipResultSetSerializer (serializers.Serializer):
     files = LegendSerializer(many=True)
     tree = serializers.CharField()
+    name = serializers.CharField()
 
 

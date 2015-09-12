@@ -369,6 +369,8 @@ def zip_legends(request):
     query_string = request.QUERY_PARAMS['query']
     result_set = json.loads(query_string)
     to_download = ZipResultSet()
+    if 'name' in result_set:
+        to_download.name = str(result_set['name'])
     if 'tree' in result_set:
         to_download.add_tree(str(result_set['tree']))
     if 'legends' in result_set:

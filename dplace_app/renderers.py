@@ -132,6 +132,9 @@ class ZipRenderer(renderers.BaseRenderer):
             for l in data['files']:      
                 zf.writestr(l['name']+'.svg', str(l['svg_string']))
         if 'tree' in data:
-            zf.writestr('tree.svg', str(data['tree']))
+            if 'name' in data:
+                zf.writestr(str(data['name']), str(data['tree']))
+            else:
+                zf.writestr('tree.svg', str(data['tree']))
         zf.close()
         return s.getvalue()
