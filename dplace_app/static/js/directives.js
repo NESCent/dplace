@@ -186,43 +186,41 @@ angular.module('languagePhylogenyDirective', [])
                         .separation(function separation(a, b) { return 8; });
                 }
                 nodes = tree(newick);
-                
-                
-                if (langTree.name.indexOf("global") == -1) {
-                    var labels = d3.select("language-phylogeny").append("svg:svg")
-                            .attr("width", w+300)
-                            .attr("height", 15)
-                            .attr("id", "varLabels")
-                            .attr("transform", "translate(-40, 0)");
-                    keysWritten = 1;
-                    translate = 20;
-                    if (scope.query.variable_codes) {
-                        for (var key in scope.results.code_ids) {
-                            if (scope.results.code_ids[key].length > 0 || scope.results.code_ids[key].bf_var) {
-                                labels.append("svg:text")
-                                    .attr("dx", w+15+translate)
-                                    .attr("dy", 15)
-                                    .text("C"+keysWritten);
-                                scope.results.code_ids[key].CID = "C"+keysWritten;
-                                keysWritten++;
-                                translate += 20;    
-                            }
-                        }
-                    }                     
-                    if (scope.query.environmental_filters) {     
-                            labels.append("svg:text")
-                            .attr("dx", w+15+translate)
-                            .attr("dy", 15)
-                            .text("E1");
-                    }
-                }
+
                 if (langTree.name.indexOf("global") == -1) {
                     var vis = d3.select("language-phylogeny").append("svg:svg")
                         .attr("width", w+300)
                         .attr("height", h+50)
                         .attr("class", "phylogeny")
                         .append("svg:g")
-                        .attr("transform", "translate(2,0)");
+                        .attr("transform", "translate(2,5)");
+                    keysWritten = 1;
+                    translate = 0;
+                    if (scope.query.variable_codes) {
+                        for (var key in scope.results.code_ids) {
+                            if (scope.results.code_ids[key].length > 0 || scope.results.code_ids[key].bf_var) {
+                            vis.append("svg:text")
+                                .attr("dx", w+translate-9)
+                                .attr("dy", 10)
+                                .text("C"+keysWritten);
+                            scope.results.code_ids[key].CID = "C"+keysWritten;
+                            keysWritten++;
+                            translate += 20;
+                            
+                            }
+                        }
+                    }
+                    
+                    if (scope.query.environmental_filters) {
+                        vis.append("svg:text")
+                            .attr("dx", w+translate-9)
+                            .attr("dy", 10)
+                            .text("E1");
+                    }
+                    
+                    
+                    vis = vis.append("svg:g")
+                        .attr("transform", "translate(0, 15)");
                     
                 } else {
                     var vis = d3.select("language-phylogeny").append("svg:svg")
@@ -413,7 +411,7 @@ angular.module('languagePhylogenyDirective', [])
 
             scope.$on('treeSelected', function(event, args) {
                 constructTree(args.tree);
-                var pos = $("#varLabels").offset();
+               /* var pos = $("#varLabels").offset();
                 $(window).scroll(function() {
                     if ($(window).scrollTop() > 100)
                         $("#legend").stop().animate({"marginTop":($(window).scrollTop() - 100) + "px"}, "slow");
@@ -421,7 +419,7 @@ angular.module('languagePhylogenyDirective', [])
                         d3.select("#varLabels").attr('class', 'var-labels-fixed');
                     else if ($(window).scrollTop() < pos.top)
                         d3.select("#varLabels").classed('var-labels-fixed', false);
-                });
+                });*/
             });
             
 

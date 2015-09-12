@@ -47,6 +47,7 @@ function SocietiesCtrl($scope, searchModelService, LanguageClass, ZipTest) {
         } else {
             $scope.globalTree = true;
         }
+        $scope.treeDownload();
     };
     
     $scope.showOrHide = function(chosenVarId, id) {
@@ -64,52 +65,33 @@ function SocietiesCtrl($scope, searchModelService, LanguageClass, ZipTest) {
          tree_svg = tree_svg.substring(tree_svg.indexOf("<svg xml"));
          tree_svg = tree_svg.substring(0, tree_svg.indexOf("</svg>"));
          tree_svg = tree_svg.concat("</svg>");
-         var legends = [];
-         var all_legends = [];
-
-        legends = legends.concat(d3.selectAll('.bffalse'));
-        if ($scope.results.classifications) {
-            legends = legends.concat(d3.selectAll('.tree-legend-langs'));
-        }
-        for (var key in $scope.results.code_ids){
-            if ($scope.results.code_ids[key].bf_var)
-                all_legends.push(d3.select('.bf-cont-gradient').node());
-        }
-        
-        html_legends = [legends.length];
-        
-        for (var i = 0; i < legends.length; i++) {
-            for (var j = 0; j < legends[i].length; j++) {
-                all_legends.push(legends[i][j]);
-            }
-        }
-        console.log(all_legends);
-        count = 0;
-        for (var key in $scope.results.code_ids) {
-            try {
-                all_legends[count].name = $scope.results.code_ids[key].name;
-                count++;
-            } catch (err) {
-                break;
-            }
-        }
-        
+         var all_legends = {};
         legends = [];
-        for (var i = 0; i < all_legends.length; i++) {
-            legend = all_legends[i].innerHTML;
-            html_legends[i] = legend;
-            if (all_legends[i].name)
-                svg_string = '<g transform="translate(5, 20)"><text>'+all_legends[i].name+'</text><g transform="translate(0,20)">'+legend+"</g></g>";
-            else                
-                svg_string = '<g transform="translate(5, 20)">'+legend+"</g>";
-            svg_string = '<svg version="1.1" xmlns="http://www.w3.org/2000/svg">'+svg_string+'</svg>';
-            if (all_legends[i].name)
-                legends.push({'name': all_legends[i].name, 'svg':svg_string});
-            else
-                legends.push({'name': 'Legend', 'svg':svg_string});
-
+        
+        if ($scope.results.classifications) {
+            item = d3.select('.tree-legend-langs');
+            svg_string = '<svg version="1.1" xmlns="http://www.w3.org/2000/svg">' + item.node().innerHTML + '</svg>';
+            legends.push({'name': 'Language Classifications', 'svg': svg_string});
+        } else {
+             d3.selectAll(".legends").each( function(){
+                    item = d3.select(this);
+                    if (item.attr("var-id")) {
+                       if (item.attr("class").indexOf("hide") == -1)
+                        all_legends[item.attr("var-id")] = item;
+                    }
+                });
+                
+            for (var key in $scope.results.code_ids) {
+                    item = all_legends[key];
+                    name = $scope.results.code_ids[key].name;
+                    svg_string = item.node().innerHTML;
+                    svg_string = '<svg version="1.1" xmlns="http://www.w3.org/2000/svg">' + svg_string + '</svg>';
+                    legends.push({'name': name, 'svg': svg_string});
+                    
+            }
         }
-        query = {"legends": legends, "tree":tree_svg};
+        
+        query = {"legends": legends, "tree": tree_svg, "name": $scope.results.selectedTree.name+'.svg'};
         d3.select(".tree-download").append("a")
             .attr("class", "btn btn-info btn-dplace-download")
             .attr("download", "legend.svg")
