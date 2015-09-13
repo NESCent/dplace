@@ -16,12 +16,12 @@ function ColorMapService() {
 
     //normal gradient
     function mapColor(index, count) {
-        hue = 240 -  (index / count)*240;
+        hue = (index / count)*240;
         return 'hsl(' + hue + ',100%,50%)';
     }
     
     function mapColorMonochrome(min, max, value, color) {
-        var lum = (((value-min)/(max-min))) * 95;
+        var lum = (((value-min)/(max-min))) * 78;
         lum = 100 - lum;
         return 'hsl('+color+', 65%,'+lum+'%)'; 
     }

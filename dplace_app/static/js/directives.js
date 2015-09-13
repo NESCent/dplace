@@ -157,7 +157,7 @@ angular.module('languagePhylogenyDirective', [])
                                                     if (society.bf_cont_var) {
                                                         min = scope.results.code_ids[society.variable_coded_values[i].variable].min;
                                                         max = scope.results.code_ids[society.variable_coded_values[i].variable].max;
-                                                        var lum = (value-min)/(max-min) * 95;
+                                                        var lum =  100 - ((value-min)/(max-min) * 78);
                                                         return 'hsl(0, 65%,'+lum+'%)';
                                                     }                                               
                                                     hue = value * 240 / scope.results.code_ids[society.variable_coded_values[i].variable].length;
@@ -178,9 +178,7 @@ angular.module('languagePhylogenyDirective', [])
                                 }
                             }
                         });
-                        
-                        if (scope.results.code_ids[key].length > 0)
-                            translate += 20;
+                        translate += 20;
                     }
                 } else if (scope.query.language_classifications && !scope.query.environmental_filters) {
                     //get lang classification
