@@ -116,9 +116,10 @@ angular.module('languagePhylogenyDirective', [])
                         } else if (society.variable_coded_values.length > 0) {
                         for (var i = 0; i < society.variable_coded_values.length; i++) {
                             if (society.variable_coded_values[i].variable == variable) {
-                                if (society.bf_cont_var)
-                                    var hover_text_value = society.variable_coded_values[i].coded_value + ' '+ scope.results.code_ids[society.variable_coded_values[i].variable].units;
-                                else
+                                if (society.bf_cont_var) {
+                                    if (/[a-z]/i.test(society.variable_coded_values[i].coded_value)) var hover_text_value = society.variable_coded_values[i].coded_value;
+                                    else var hover_text_value = society.variable_coded_values[i].coded_value + ' '+ scope.results.code_ids[society.variable_coded_values[i].variable].units;
+                                } else
                                     var hover_text_value = society.variable_coded_values[i].code_description.description;
                                     selected.append("svg:circle")
                                         .attr("r", function() {
@@ -362,18 +363,23 @@ angular.module('languagePhylogenyDirective', [])
                     });
                 }
                 }
+                
                 scope.results.societies.forEach(function(society) {
                     var selected = node.filter(function(d) {
                         return d.name == society.society.iso_code;
                     });
+                    
                     //lastly, append the text
-                        selected.append("svg:text") 
+                         var text = selected.select("text");
+                         if (text[0][0]) {
+                            text.html(society.society.name);
+                    } else {  selected.append("svg:text") 
                             .attr("dx", function(n) {
                                 if (langTree.name.indexOf("global") != -1) return 5;
                                 if (scope.query.environmental_filters && scope.query.variable_codes) return translate+20;
                                 else if (scope.query.environmental_filters) return translate+10;
                                 else if (scope.query.language_classifications) return translate+10;
-                                else return translate;
+                                else return translate-5;
                             })                           
                             .attr("dy", function() { if (langTree.name.indexOf("global") == -1) return 4; else return 1; })
                             .attr("font-size", function() {
@@ -381,7 +387,8 @@ angular.module('languagePhylogenyDirective', [])
                                 else return "3px";
                             })
                             .attr("font-family", "Arial")
-                            .text(function(d) { return d.name; });
+                            .text(function(d) { return society.society.name; }); 
+                            }
                 });
                 
                 //Time Scale
