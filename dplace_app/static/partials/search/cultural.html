@@ -22,6 +22,7 @@
                         <select
                             ng-model="trait.selectedSource"
                             class="form-control"
+                            ng-change="sourceChanged(trait)"
                             ng-options='source as (source.author + " ("+source.year+")") for source in sources'
                             >
                             <option value="">Select a Source</option>
@@ -35,7 +36,8 @@
                                 class="form-control"
                                 style="width:100%"
                                 ng-change="categoryChanged(trait)"
-                                ng-options="category.name for category in trait.categories"
+                                ng-show="source_categories.length > 0"
+                                ng-options="category.name for category in source_categories"
                                 >
                             <option value="">Select a Category</option>
                         </select>

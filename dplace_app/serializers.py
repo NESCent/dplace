@@ -12,7 +12,7 @@ class VariableCodeDescriptionSerializer(serializers.ModelSerializer):
 class VariableDescriptionSerializer(serializers.ModelSerializer):
     class Meta:
         model = VariableDescription
-        fields = ('id', 'label', 'name', 'codebook_info', 'data_type', 'source')
+        fields = ('id', 'label', 'name', 'codebook_info', 'data_type', 'source', 'index_categories')
 
 class VariableCategorySerializer(serializers.ModelSerializer):
     class Meta:

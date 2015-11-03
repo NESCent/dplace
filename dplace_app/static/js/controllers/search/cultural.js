@@ -1,4 +1,4 @@
-function CulturalCtrl($scope, searchModelService, Variable, CodeDescription, BfContinuousVariable, Source) {
+function CulturalCtrl($scope, searchModelService, Variable, CodeDescription, BfContinuousVariable, Source, getCategories) {
    var linkModel = function() {
         // Model/state lives in searchModelService
         $scope.traits = [searchModelService.getModel().getCulturalTraits()];
@@ -6,6 +6,12 @@ function CulturalCtrl($scope, searchModelService, Variable, CodeDescription, BfC
     };
     $scope.$on('searchModelReset', linkModel); // When model is reset, update our model
     linkModel();
+    
+    //triggered by the view when a source is changed
+    $scope.sourceChanged = function(trait) {
+        $scope.source_categories = [];
+        $scope.source_categories = getCategories.query({query: {source: trait.selectedSource.id}});
+    };
 
     // triggered by the view when a category is changed
     $scope.categoryChanged = function(trait) {

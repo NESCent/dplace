@@ -100,7 +100,7 @@ class LanguageTreeViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = LanguageTreeSerializer
     filter_fields = ('name',)
     queryset = LanguageTree.objects.all()
-
+    
 #not sure if we need to keep this code since it isn't used at the moment
 #but could come in handy in the future
 def get_language_trees_from_query_dict(query_dict):
@@ -248,6 +248,26 @@ def find_societies(request):
     result_set = result_set_from_query_dict(request.DATA)
     return Response(SocietyResultSetSerializer(result_set).data)
 
+@api_view(['GET'])
+@permission_classes((AllowAny,))
+def get_categories(request):
+    """
+    Filters categories for sources, as some categories are empty for some sources
+    """
+    query_string = request.QUERY_PARAMS['query']
+    query_dict = json.loads(query_string)
+    categories = VariableCategory.objects.all()
+    source_categories = []
+    if 'source' in query_dict:
+        source = Source.objects.filter(id=query_dict['source'])
+        variables = VariableDescription.objects.filter(source=source)
+        for c in categories:
+            if variables.filter(index_categories=c.id):
+                source_categories.append(c)     
+        return Response(VariableCategorySerializer(source_categories, many=True).data)
+    else:
+        return Response(VariableCategorySerializer(categories, many=True).data)
+    
 class GeographicRegionViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = GeographicRegionSerializer
     model = GeographicRegion
