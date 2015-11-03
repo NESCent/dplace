@@ -311,6 +311,12 @@ angular.module('dplaceMapDirective', [])
                             attribute: 'fill'
                         }]
                     },
+                    markerStyle: {
+                        initial: {
+                            "r": 2.7,
+                            "stroke-width":0.5
+                        }
+                    },
                     regionStyle: {
                       initial: {
                         fill: '#C0C6C6',
