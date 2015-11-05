@@ -1,6 +1,7 @@
 from rest_framework import renderers
 import csv
 from six import StringIO, text_type
+from models import *
 
 class DPLACECSVResults(object):
     def __init__(self,data):
@@ -50,7 +51,10 @@ class DPLACECSVResults(object):
             # Merge in society data
             society = item['society']
             row['Society name'] = society['name']
-            row['Society source'] = society['source']
+            try:
+                row['Society source'] = str(Source.objects.filter(id=society['source'])[0])#society['source']
+            except:
+                row ['Society source'] = society['source']
             row['Longitude'] = "" if society['location'] is None else society['location']['coordinates'][0]
             row['Latitude'] = "" if society['location'] is None else society['location']['coordinates'][1]
             row['ISO code'] = society['iso_code']
@@ -72,7 +76,10 @@ class DPLACECSVResults(object):
                 field_names = self.field_map['variable_descriptions'][variable_id]
                 row[field_names['code']] = cultural_trait_value['coded_value']
                 if 'code_description' in cultural_trait_value:
-                    row[field_names['description']] = cultural_trait_value['code_description']['description']
+                    try:
+                        row[field_names['description']] = cultural_trait_value['code_description']['description']
+                    except:
+                        break
             # environmental
             environmental_values = item['environmental_values']
             for environmental_value in environmental_values:
@@ -108,6 +115,8 @@ class DPLACECsvRenderer(renderers.BaseRenderer):
 
         csv_buffer = StringIO()
         csv_writer = csv.DictWriter(csv_buffer, results.field_names)
+        cite_writer = csv.writer(csv_buffer)
+        cite_writer.writerow(['To cite D-PLACE: CITATION GOES HERE']) #add in 'How to cite' here
         csv_writer.writeheader()
         for row in results.rows:
             csv_writer.writerow(encode_rowdict(row))
