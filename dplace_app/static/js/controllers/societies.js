@@ -43,11 +43,10 @@ function SocietiesCtrl($scope, searchModelService, LanguageClass, ZipTest) {
         d3.select(".tree-download").html('');
         if ($scope.results.selectedTree.name.indexOf("global") == -1) {
             $scope.globalTree = false;
-           // $scope.treeDownload();
+            $scope.treeDownload();
         } else {
             $scope.globalTree = true;
         }
-        $scope.treeDownload();
     };
     
     $scope.showOrHide = function(chosenVarId, id) {
