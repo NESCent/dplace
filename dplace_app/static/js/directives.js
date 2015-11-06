@@ -117,8 +117,8 @@ angular.module('languagePhylogenyDirective', [])
                         for (var i = 0; i < society.variable_coded_values.length; i++) {
                             if (society.variable_coded_values[i].variable == variable) {
                                 if (society.bf_cont_var) {
-                                    if (/[a-z]/i.test(society.variable_coded_values[i].coded_value)) var hover_text_value = society.variable_coded_values[i].coded_value;
-                                    else var hover_text_value = society.variable_coded_values[i].coded_value + ' '+ scope.results.code_ids[society.variable_coded_values[i].variable].units;
+                                    var hover_text_value = society.variable_coded_values[i].coded_value;
+                                    if (scope.results.code_ids[society.variable_coded_values[i].variable].units) hover_text_value += ' ' + scope.results.code_ids[society.variable_coded_values[i].variable].units;
                                 } else
                                     var hover_text_value = society.variable_coded_values[i].code_description.description;
                                     selected.append("svg:circle")

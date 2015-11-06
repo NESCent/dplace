@@ -119,7 +119,8 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties, 
                 $scope.searchModel.results.code_ids[$scope.searchModel.results.variable_descriptions[i].id].name = $scope.searchModel.results.variable_descriptions[i].name;
                 if (!($scope.searchModel.results.code_ids[$scope.searchModel.results.variable_descriptions[i].id].bf_var)) 
                     $scope.searchModel.results.code_ids[$scope.searchModel.results.variable_descriptions[i].id].bf_var = false;
-                $scope.searchModel.results.code_ids[$scope.searchModel.results.variable_descriptions[i].id].units = $scope.searchModel.results.variable_descriptions[i].name.substring($scope.searchModel.results.variable_descriptions[i].name.indexOf('(')+1, $scope.searchModel.results.variable_descriptions[i].name.indexOf(')'));
+                if ($scope.searchModel.results.variable_descriptions[i].data_type=='CONTINUOUS')
+                    $scope.searchModel.results.code_ids[$scope.searchModel.results.variable_descriptions[i].id].units = $scope.searchModel.results.variable_descriptions[i].name.substring($scope.searchModel.results.variable_descriptions[i].name.indexOf('(')+1, $scope.searchModel.results.variable_descriptions[i].name.indexOf(')'));
             }
          }
     }
