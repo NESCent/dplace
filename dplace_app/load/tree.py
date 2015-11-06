@@ -36,7 +36,6 @@ def load_tree(file_name, verbose=False):
     reader = NexusReader(file_name)
     #Remove '[&R]' from newick string
     newick = re.sub(r'\[.*?\]', '', reader.trees.trees[0])
-    
     try:
         newick = newick[newick.index('=')+1:]
     except ValueError:
@@ -44,7 +43,7 @@ def load_tree(file_name, verbose=False):
         
     if verbose:
         print "Formatting newick string %s" % (newick)
-    
+        
     tree.newick_string = str(newick)
     for taxon_name in reader.trees.taxa:
         language = None
@@ -56,6 +55,5 @@ def load_tree(file_name, verbose=False):
         if language:
             tree.languages.add(language)
     tree.save()
-
 
 load_glotto_tree = load_tree

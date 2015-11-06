@@ -209,27 +209,29 @@ class SocietyResultSetSerializer(serializers.Serializer):
     language_trees = LanguageTreeSerializer(many=True)
     
 class Legend(object):
-    def __init__(self, svg_string, name):
-        self.svg_string = svg_string
+    def __init__(self, name, svg):
         self.name = name
-    
+        self.svg = svg
+        
 class LegendSerializer(serializers.Serializer):
-    svg_string = serializers.CharField()
     name = serializers.CharField()
-
+    svg = serializers.CharField()
+    
 class ZipResultSet(object):
     def __init__(self):
-        self.files = set()
         self.tree = None
-        
-    def add_legend(self,legend):
-        self.files.add(legend)
-    
+        self.name = None
+        self.legends = set()
+
     def add_tree(self,tree):
         self.tree = tree
+    
+    def add_legend(self, legend):
+        self.legends.add(legend)
 
 class ZipResultSetSerializer (serializers.Serializer):
-    files = LegendSerializer(many=True)
     tree = serializers.CharField()
+    name = serializers.CharField()
+    legends = LegendSerializer(many=True)
 
 

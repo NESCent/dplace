@@ -231,6 +231,8 @@ def result_set_from_query_dict(query_dict):
             language_ids.append(s.society.language.id)
     trees = trees_from_languages_array(language_ids)
     for t in trees:
+        if 'language_classifications' in query_dict and 'global' in t.name:
+            continue
         result_set.add_language_tree(t)
     return result_set
 
@@ -387,11 +389,14 @@ def zip_legends(request):
     query_string = request.QUERY_PARAMS['query']
     result_set = json.loads(query_string)
     to_download = ZipResultSet()
+    if 'name' in result_set:
+        to_download.name = str(result_set['name'])
     if 'tree' in result_set:
         to_download.add_tree(str(result_set['tree']))
     if 'legends' in result_set:
         for l in result_set['legends']:
-            to_download.add_legend(Legend( l['svg'], l['name']))
+            legend = Legend(l['name'], l['svg'])
+            to_download.add_legend(legend)
     response = Response(ZipResultSetSerializer(to_download).data)
     filename = "dplace-trees-%s.zip" % datetime.datetime.now().strftime("%Y-%m-%d")
     response['Content-Disposition'] = 'attachment; filename="%s"' % filename

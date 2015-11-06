@@ -1,85 +1,263 @@
 angular.module('languagePhylogenyDirective', [])
     .directive('languagePhylogeny', function() {
         function link(scope, element, attrs) {
-            var constructTree = function(langTree) {
-                d3.select("language-phylogeny").html('');
-               
-                
-                var newick = Newick.parse(langTree.newick_string);
-                var rightAngleDiagonal = function() {
-                    function diagonal(diagonalPath) {
-                        var source = diagonalPath.source,
-                            target = diagonalPath.target,
-                            pathData = [source, {x: target.x, y: source.y}, target].map(function(d) { return [d.y, d.x]; });
-                        return "M" + pathData[0] + ' ' + pathData[1] + ' ' + pathData[2];
-                    }
-                    return diagonal;
+            var rightAngleDiagonal = function() {
+                var projection = function(d) { return [d.y, d.x]; }
+                var path = function(pathData) {
+                 return "M" + pathData[0] + ' ' + pathData[1] + " " + pathData[2];
                 }
+                function diagonal(diagonalPath, i) {
+                  var source = diagonalPath.source,
+                      target = diagonalPath.target,
+                      midpointX = (source.x + target.x) / 2,
+                      midpointY = (source.y + target.y) / 2,
+                      pathData = [source, {x: target.x, y: source.y}, target];
+                  pathData = pathData.map(projection);
+                  return path(pathData)
+                }
+                diagonal.projection = function(x) {
+                  if (!arguments.length) return projection;
+                  projection = x;
+                  return diagonal;
+                };
+                diagonal.path = function(x) {
+                  if (!arguments.length) return path;
+                  path = x;
+                  return diagonal;
+                };
+                return diagonal;
+            }
+                    
+            var radialRightAngleDiagonal = function() {
+                return rightAngleDiagonal()
+                  .path(function(pathData) {
+                    var src = pathData[0],
+                        mid = pathData[1],
+                        dst = pathData[2],
+                        radius = Math.sqrt(src[0]*src[0] + src[1]*src[1]),
+                        srcAngle = coordinateToAngle(src, radius),
+                        midAngle = coordinateToAngle(mid, radius),
+                        clockwise = Math.abs(midAngle - srcAngle) > Math.PI ? midAngle <= srcAngle : midAngle > srcAngle,
+                        rotation = 0,
+                        largeArc = 0,
+                        sweep = clockwise ? 0 : 1;
+                    return 'M' + src + ' ' +
+                      "A" + [radius,radius] + ' ' + rotation + ' ' + largeArc+','+sweep + ' ' + mid +
+                      'L' + dst;
+                  })
+                  .projection(function(d) {
+                    var r = d.y, a = (d.x - 90) / 180 * Math.PI;
+                    return [r * Math.cos(a), r * Math.sin(a)];
+                  })
+            }
+            // Convert XY and radius to angle of a circle centered at 0,0
+            var coordinateToAngle = function(coord, radius) {
+                var wholeAngle = 2 * Math.PI,
+                    quarterAngle = wholeAngle / 4
                 
-                var w = 700;
-                var tree = d3.layout.cluster().children(function(node) { return node.branchset; });
-                var nodes = tree(newick);
-                var h = nodes.length * 9; //height depends on # of nodes
+                var coordQuad = coord[0] >= 0 ? (coord[1] >= 0 ? 1 : 2) : (coord[1] >= 0 ? 4 : 3),
+                    coordBaseAngle = Math.abs(Math.asin(coord[1] / radius))
                 
-                tree = d3.layout.cluster()
-                    .size([h, w])
-                    .sort(function comparator(a, b) { return d3.ascending(a.length, b.length); })
+                // Since this is just based on the angle of the right triangle formed
+                // by the coordinate and the origin, each quad will have different 
+                // offsets
+                switch (coordQuad) {
+                  case 1:
+                    coordAngle = quarterAngle - coordBaseAngle
+                    break
+                  case 2:
+                    coordAngle = quarterAngle + coordBaseAngle
+                    break
+                  case 3:
+                    coordAngle = 2*quarterAngle + quarterAngle - coordBaseAngle
+                    break
+                  case 4:
+                    coordAngle = 3*quarterAngle + coordBaseAngle
+                }
+                return coordAngle
+            }
+
+            var addMarkers = function(results, variable, node, global, translate) { 
+                scope.results.societies.forEach(function(society) {
+                    var selected = node.filter(function(d) {
+                        return d.name == society.society.iso_code;
+                    });
+                    if (global) selected.select("circle").remove(); 
+                    var society_name = society.society.name + " (" + society.society.iso_code + ")";
+                    
+                    //if the marker is an environmental variable
+                    if (society.environmental_values.length > 0 && society.environmental_values[0].variable == variable)  { 
+                            var hover_text_value = society.environmental_values[0].value;
+                                selected.append("svg:circle")
+                                    .attr("r", function() {
+                                        if (global) return 1.5;
+                                        else return 4.5;
+                                    })
+                                    .attr("stroke", "#000")
+                                    .attr("stroke-width", "0.5")
+                                    .attr("transform", "translate("+translate+", 0)")
+                                    .attr("fill", function(n) {
+                                        value = society.environmental_values[0].value; //only 1 environmental value at a time so we can do this
+                                        hue = value * 240 / scope.range;
+                                        return 'hsl('+hue+',100%, 50%)';
+                                    })
+                                    .on("mouseover", function() { 
+                                                     d3.select("body").append("div")
+                                                        .attr("class", "tooltip")
+                                                        .html("<b>"+society_name+":</b><br>"+hover_text_value)
+                                                        .style("left", (d3.event.pageX + 10)+"px")
+                                                        .style("top", (d3.event.pageY + 5)+"px")
+                                                        .style("opacity", .9);
+                                    })
+                                    .on("mouseout", function() {
+                                        d3.select(".tooltip").remove();
+                                    });
+                            return;
+                        } else if (society.variable_coded_values.length > 0) {
+                        for (var i = 0; i < society.variable_coded_values.length; i++) {
+                            if (society.variable_coded_values[i].variable == variable) {
+                                if (society.bf_cont_var) {
+                                    var hover_text_value = society.variable_coded_values[i].coded_value;
+                                    if (scope.results.code_ids[society.variable_coded_values[i].variable].units) hover_text_value += ' ' + scope.results.code_ids[society.variable_coded_values[i].variable].units;
+                                } else
+                                    var hover_text_value = society.variable_coded_values[i].code_description.description;
+                                    selected.append("svg:circle")
+                                        .attr("r", function() {
+                                            if (global) return 1.5;
+                                            else return 4.5;
+                                        })
+                                        .attr("stroke", "#000")
+                                        .attr("stroke-width", "0.5")
+                                        .attr("transform", "translate("+translate+", 0)")
+                                        .attr("fill", function(n) {
+                                            if (society.variable_coded_values[i].code_description && society.variable_coded_values[i].code_description.description.indexOf("Missing data") != -1) {
+                                                   return 'hsl(360, 100%, 100%)';
+                                                }
+                                                value = society.variable_coded_values[i].coded_value;
+                                                if (society.bf_cont_var) {
+                                                    min = scope.results.code_ids[society.variable_coded_values[i].variable].min;
+                                                    max = scope.results.code_ids[society.variable_coded_values[i].variable].max;
+                                                    var lum = (value-min)/(max-min) * 95;
+                                                    return 'hsl(0, 65%,'+lum+'%)';
+                                                }                                               
+                                                hue = value * 240 / scope.results.code_ids[society.variable_coded_values[i].variable].length;
+                                                return 'hsl('+hue+',100%, 50%)';
+                                        })
+                                        .on("mouseover", function() { 
+                                                 d3.select("body").append("div")
+                                                    .attr("class", "tooltip")
+                                                    .html("<b>"+society_name+":</b><br>"+hover_text_value)
+                                                    .style("left", (d3.event.pageX + 10)+"px")
+                                                    .style("top", (d3.event.pageY + 5)+"px")
+                                                    .style("opacity", .9);
+                                        })
+                                        .on("mouseout", function() {
+                                            d3.select(".tooltip").remove();
+                                        }); 
+                                }
+                            }
+                        }
+                });
+            };
+            
+            var constructTree = function(langTree) {   
+                d3.select("language-phylogeny").html('');
+                var newick = Newick.parse(langTree.newick_string);
+
+                if (langTree.name.indexOf("global") != -1)
+                    var w = 900;
+                else  var w = 700;
+
+                if (langTree.name.indexOf("global") != -1)  {
+                    var tree = d3.layout.cluster()
+                    .size([360, (w/2)-100])
+                    .sort(function(node) { return node.children ? node.children.length : -1; })
                     .children(function(node) { return node.branchset; })
                     .separation(function separation(a, b) { return 8; });
+                }
+                else {
+                    var tree = d3.layout.cluster()
+                        .children(function(node) { return node.branchset; });
+                    var nodes = tree(newick);
+                    var h = nodes.length * 9;
+                    tree = d3.layout.cluster()
+                        .size([h, w])
+                        .sort(function comparator(a, b) { return d3.ascending(a.length, b.length); })
+                        .children(function(node) { return node.branchset; })
+                        .separation(function separation(a, b) { return 8; });
+                }
                 nodes = tree(newick);
-                
-                d3.select("language-phylogeny").append("h4")
-                    .text(langTree.name);
-                    
-                var labels = d3.select("language-phylogeny").append("svg:svg")
+
+                if (langTree.name.indexOf("global") == -1) {
+                    var vis = d3.select("language-phylogeny").append("svg:svg")
                         .attr("width", w+300)
-                        .attr("height", 15)
-                        .attr("id", "varLabels")
-                        .attr("transform", "translate(-40, 0)");
-                keysWritten = 1;
-                translate = 20;
-                if (scope.query.variable_codes) {
-                    for (var key in scope.results.code_ids) {
-                        if (scope.results.code_ids[key].length > 0 || scope.results.code_ids[key].bf_var) {
-                            labels.append("svg:text")
-                                .attr("dx", w+15+translate)
-                                .attr("dy", 15)
+                        .attr("height", h+50)
+                        .attr("class", "phylogeny")
+                        .append("svg:g")
+                        .attr("transform", "translate(2,5)");
+                    keysWritten = 1;
+                    translate = 0;
+                    if (scope.query.variable_codes) {
+                        for (var key in scope.results.code_ids) {
+                            if (scope.results.code_ids[key].length > 0 || scope.results.code_ids[key].bf_var) {
+                            vis.append("svg:text")
+                                .attr("dx", w+translate-9)
+                                .attr("dy", 10)
                                 .text("C"+keysWritten);
                             scope.results.code_ids[key].CID = "C"+keysWritten;
                             keysWritten++;
-                            translate += 20;    
+                            translate += 20;
+                            
+                            }
                         }
                     }
-                }                     
-                if (scope.query.environmental_filters) {     
-                        labels.append("svg:text")
-                        .attr("dx", w+15+translate)
-                        .attr("dy", 15)
-                        .text("E1");
+                    
+                    if (scope.query.environmental_filters) {
+                        vis.append("svg:text")
+                            .attr("dx", w+translate-9)
+                            .attr("dy", 10)
+                            .text("E1");
+                    }
+                    
+                    
+                    vis = vis.append("svg:g")
+                        .attr("transform", "translate(0, 15)");
+                    
+                } else {
+                    var vis = d3.select("language-phylogeny").append("svg:svg")
+                        .attr("width", w)
+                        .attr("height", w)
+                        .attr("pointer-events", "all")
+                        .call(d3.behavior.zoom().on("zoom", redraw))
+                        .attr("class", "phylogeny")
+                        .append("svg:g")
+                        .attr("transform", "translate(400,400)");
                 }
-                    
-                var vis = d3.select("language-phylogeny").append("svg:svg")
-                    .attr("width", w+300)
-                    .attr("height", h+30)
-                    .attr("class", "phylogeny")
-                    .append("svg:g")
-                    .attr("transform", "translate(5, 5)");
-                    
-                var diagonal = rightAngleDiagonal();
-                
+                function redraw() {
+                vis.attr("transform",
+                    "translate(" + d3.event.translate + ")" + "scale(" + d3.event.scale + ")");
+                }   
+
+                if (langTree.name.indexOf("global") != -1) {
+                    var diagonal = radialRightAngleDiagonal();
+                } else {
+                    var diagonal = rightAngleDiagonal();    
+                }
                 nodes.forEach(function(node) {
                     node.rootDist = (node.parent ? node.parent.rootDist : 0) + (node.length || 0);
                 });
-                var rootDists = nodes.map(function(n) { return n.rootDist; });
+                var rootDists = nodes.map(function(n) { return (n.rootDist); });
                 var yscale = d3.scale.linear()
                     .domain([0, d3.max(rootDists)])
                     .range([0, w]);
+
                 var leafDistFromRoot = 0;
                 var longest_y = 0;
-                nodes.forEach(function(node) {
+               nodes.forEach(function(node) {
                     if (node.rootDist > leafDistFromRoot)
                         leafDistFromRoot = node.rootDist;
-                    node.y = yscale(node.rootDist);
+                    if (langTree.name.indexOf("global") == -1)
+                        node.y = yscale(node.rootDist);
                     if (node.y > longest_y)
                         longest_y = node.y;
                 });
@@ -97,7 +275,10 @@ angular.module('languagePhylogenyDirective', [])
                     .attr("d", diagonal)
                     .attr("fill", "none")
                     .attr("stroke", "#ccc")
-                    .attr("stroke-width", "4px");
+                    .attr("stroke-width", function() {
+                        if (langTree.name.indexOf("global") != -1) return "0.5px";
+                        else return "3.5px";
+                    });
                 var node = vis.selectAll("g.node")
                     .data(nodes)
                     .enter().append("svg:g")
@@ -106,81 +287,58 @@ angular.module('languagePhylogenyDirective', [])
                         else return "leaf-node";
                     })
                     .attr("transform", function(d) { 
-                        if (langTree.name.indexOf("glotto") != -1) {
-                            
-                            if (d.y < longest_y) {
-                                if (!d.children) dotted.push({'x': d.y, 'y': d.x});
+                        if ((langTree.name.indexOf("global") != -1) || (langTree.name.indexOf("glotto") != -1)) {
+                           if (!d.children) {
+                            if (langTree.name.indexOf("global") != -1)
+                                return "rotate("+(d.x-90)+")translate("+d.y+")";
+                            else if (langTree.name.indexOf("glotto") !=  -1) {
+                                dotted.push({'x':d.y, 'y':d.x})
                                 return "translate(" + longest_y + ", " + d.x + ")";
+                            }  
+                           }
+                           return "translate(" + d.y + ", "+ d.x + ")";
+                        }
+                        else return "translate(" + d.y + ", "+ d.x + ")";
+                         });
+                
+                if (langTree.name.indexOf("glotto") != -1) {
+                    for (var d = 0; d < dotted.length; d++) {
+                        vis.append("svg:line")
+                            .attr("x1", dotted[d].x+10)
+                            .attr("x2", longest_y-10)
+                            .attr("y1", dotted[d].y)
+                            .attr("y2", dotted[d].y)
+                            .attr("stroke-width", "2")
+                            .attr("stroke", "#ccc")
+                            .attr("stroke-dasharray", "8, 5");
+                    }
+                }                
+                //CODE FOR MARKERS ---
+                translate = 0;
+                //changes markers for global tree
+                if (langTree.name.indexOf("global") != -1) {
+                    scope.$watch('results.chosenTVariable', function(oldValue, newvalue) {
+                        chosen_var_id = scope.results.chosenTVariable.id;
+                        addMarkers(scope.results, chosen_var_id, node, true, translate);
+                    });
+                } 
+                else {
+                //markers for non-global trees
+                if (scope.query.variable_codes) {
+                    if (langTree.name.indexOf("global") == -1) {
+                        for (var key in scope.results.code_ids) {
+                            if (!(scope.query.environmental_filters && key==scope.query.environmental_filters[0].id)) {
+                                addMarkers(scope.results, key, node, false, translate);
+                                translate += 20; 
                             }
                         }
-                        return "translate(" + d.y + ", "+ d.x + ")"; });
-                
-                for (var d = 0; d < dotted.length; d++) {
-                    vis.append("svg:line")
-                        .attr("x1", dotted[d].x+10)
-                        .attr("x2", longest_y-10)
-                        .attr("y1", dotted[d].y)
-                        .attr("y2", dotted[d].y)
-                        .attr("stroke-width", "2")
-                        .attr("stroke", "#ccc")
-                        .attr("stroke-dasharray", "8, 5");
- 
+                    }
+                }
+                if (scope.query.environmental_filters) {
+                    addMarkers(scope.results, scope.query.environmental_filters[0].id, node, false, translate);
                 }
                 
-                //appends markers
-                translate = 0;
-                if (scope.query.variable_codes) {
-                    for (var key in scope.results.code_ids) {
-                        scope.results.societies.forEach(function(society) {
-                            var selected = node.filter(function(d) {
-                                return d.name == society.society.iso_code;
-                            });
-                            
-                            if (society.variable_coded_values.length > 0) {
-                                for (var i = 0; i < society.variable_coded_values.length; i++) {
-                                    if (society.variable_coded_values[i].variable == key) {
-                                            var society_name = society.society.name + " (" + society.society.iso_code + ")";
-                                            if (society.bf_cont_var)
-                                                var hover_text_value = society.variable_coded_values[i].coded_value;
-                                            else
-                                                var hover_text_value = society.variable_coded_values[i].code_description.description;
-                                            selected.append("svg:circle")
-                                                .attr("r", 4.5)
-                                                .attr("stroke", "#000")
-                                                .attr("stroke-width", "0.5")
-                                                .attr("transform", "translate("+translate+", 0)")
-                                                .attr("fill", function(n) {
-                                                    if (society.variable_coded_values[i].code_description && society.variable_coded_values[i].code_description.description.indexOf("Missing data") != -1) {
-                                                       return 'hsl(360, 100%, 100%)';
-                                                    }
-                                                    value = society.variable_coded_values[i].coded_value;
-                                                    if (society.bf_cont_var) {
-                                                        min = scope.results.code_ids[society.variable_coded_values[i].variable].min;
-                                                        max = scope.results.code_ids[society.variable_coded_values[i].variable].max;
-                                                        var lum = (value-min)/(max-min) * 95;
-                                                        return 'hsl(0, 65%,'+lum+'%)';
-                                                    }                                               
-                                                    hue = value * 240 / scope.results.code_ids[society.variable_coded_values[i].variable].length;
-                                                    return 'hsl('+hue+',100%, 50%)';
-                                                })
-                                                .on("mouseover", function() { 
-                                                     d3.select("body").append("div")
-                                                        .attr("class", "tooltip")
-                                                        .html("<b>"+society_name+":</b><br>"+hover_text_value)
-                                                        .style("left", (d3.event.pageX + 10)+"px")
-                                                        .style("top", (d3.event.pageY + 5)+"px")
-                                                        .style("opacity", .9);
-                                                  })
-                                                  .on("mouseout", function() {
-                                                      d3.select(".tooltip").remove();
-                                                }); 
-                                    } 
-                                }
-                            }
-                        });
-                        translate += 20;
-                    }
-                } else if (scope.query.language_classifications && !scope.query.environmental_filters) {
+                else if (scope.query.language_classifications && !scope.query.environmental_filters) {
                     //get lang classification
                     scope.results.societies.forEach(function(society) {
                         var selected = node.filter(function(d) {
@@ -204,41 +362,37 @@ angular.module('languagePhylogenyDirective', [])
                         
                     });
                 }
+                }
                 
                 scope.results.societies.forEach(function(society) {
                     var selected = node.filter(function(d) {
                         return d.name == society.society.iso_code;
                     });
-                    //append the circles
-                    if (society.environmental_values.length > 0) {
-                        selected.append("svg:circle")
-                            .attr("r", 4.5)
-                            .attr("stroke", "#000")
-                            .attr("stroke-width", "0.5")
-                            .attr("transform", "translate("+translate+", 0)")
-                            .attr("fill", function(n) {
-                                value = society.environmental_values[0].value; //only 1 environmental value at a time so we can do this
-                                hue = value * 240 / scope.range;
-                                return 'hsl('+hue+',100%, 50%)';
-                            });
-                    } 
                     
                     //lastly, append the text
-                        selected.append("svg:text") 
+                         var text = selected.select("text");
+                         if (text[0][0]) {
+                            text.html(society.society.name);
+                    } else {  selected.append("svg:text") 
                             .attr("dx", function(n) {
+                                if (langTree.name.indexOf("global") != -1) return 5;
                                 if (scope.query.environmental_filters && scope.query.variable_codes) return translate+20;
                                 else if (scope.query.environmental_filters) return translate+10;
                                 else if (scope.query.language_classifications) return translate+10;
-                                else return translate;
+                                else return translate-5;
                             })                           
-                            .attr("dy", 4)
-                            .attr("font-size", "14px")
+                            .attr("dy", function() { if (langTree.name.indexOf("global") == -1) return 4; else return 1; })
+                            .attr("font-size", function() {
+                                if (langTree.name.indexOf("global") == -1) return "12px";
+                                else return "3px";
+                            })
                             .attr("font-family", "Arial")
-                            .text(function(d) { return d.name; });
+                            .text(function(d) { return society.society.name; }); 
+                            }
                 });
                 
                 //Time Scale
-                if (langTree.name.indexOf("glotto") == -1) {
+                if (langTree.name.indexOf("glotto") == -1 && langTree.name.indexOf("global") == -1) {
                     line_svg= d3.select('language-phylogeny').append("svg:svg")
                         .attr("style", "margin-left:100px;");
                     line_svg.append("svg:line")
@@ -264,7 +418,7 @@ angular.module('languagePhylogenyDirective', [])
 
             scope.$on('treeSelected', function(event, args) {
                 constructTree(args.tree);
-                var pos = $("#varLabels").offset();
+               /* var pos = $("#varLabels").offset();
                 $(window).scroll(function() {
                     if ($(window).scrollTop() > 100)
                         $("#legend").stop().animate({"marginTop":($(window).scrollTop() - 100) + "px"}, "slow");
@@ -272,8 +426,10 @@ angular.module('languagePhylogenyDirective', [])
                         d3.select("#varLabels").attr('class', 'var-labels-fixed');
                     else if ($(window).scrollTop() < pos.top)
                         d3.select("#varLabels").classed('var-labels-fixed', false);
-                });
+                });*/
             });
+            
+
         }
 
         return {

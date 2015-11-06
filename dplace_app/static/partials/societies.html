@@ -1,7 +1,7 @@
 <div class="container results">
     <div class="row">
         <span>
-            <p class="pull-left lead">Societies<span ng-show="results.societies.length">({{ results.societies.length }})</span></p>
+            <p class="pull-left lead">Societies<span ng-show="results.societies.length"> ({{ results.societies.length }})</span></p>
         </span>
     </div>
     <tabset>
@@ -128,25 +128,36 @@
             </svg>
         </tab>
         <tab heading="Tree">
-            <h4> Phylogenies </h4>
+            <div class="container">
+                <div class="row text-center">
+                    <div class="btn-group">
+                        <button ng-repeat="button in buttons"
+                                type="button" class="btn btn-lg btn-default btn-dplace-search"
+                                ng-model="results.selectedButton"
+                                ng-click="buttonChanged(button.value)"
+                                btn-radio="button"
+                                >{{ button.name }}</button>
+                    </div>
+                </div>
+            </div>
+            <div ng-show="results.selectedButton">
             <select
                 ng-model="results.selectedTree"
                 class="form-control"
                 style="width:100%"
                 ng-change="treeSelected()"
-                ng-options="tree.name for tree in results.language_trees"
+                ng-options="tree.name for tree in trees"
                 >
-                <option value="">Select a Phylogeny</option>
+                <option value="">Select a Tree</option>
             </select>
             <div class="tree-download"></div>
-
             <div id="legend" ng-show="results.selectedTree">
                 <table ng-repeat="(id, code) in results.code_ids">
-                    <tr data-toggle="collapse" data-target="#{{code.CID}}" class="accordion-toggle" style="cursor:pointer;"><th colspan="2">{{code.CID}}: {{code.name}}</th></tr>
+                    <tr ng-show="!globalTree" data-toggle="collapse" data-target="#{{code.CID}}" class="accordion-toggle legends" style="cursor:pointer;"><th>{{code.CID}}: {{code.name}}</th></tr>
                     <tr>
                         <td class="hiddenRow">
-                            <div class="accordion-body collapse" id="{{code.CID}}">
-                                <svg ng-show="!code.bf_var" height="{{code.svgSize}}" class="tree-legend" ng-class="bf{{code.bf_var}}">
+                            <div ng-class="{'accordion-body collapse':!globalTree}" ng-hide="showOrHide(results.chosenTVariable.id, id)" id="{{code.CID}}">
+                                <svg ng-show="!code.bf_var" height="{{code.svgSize}}" width="600" class="tree-legend bf{{code.bf_var}} legends" var-id="{{id}}">
                                     <g ng-repeat="c in code" transform="{{$index|transformG}}">
                                         <circle
                                                 cx="10"
@@ -159,7 +170,7 @@
                                         <text x="20" y="15">{{c.description}}</text>
                                     </g>
                                 </svg>
-                                <svg ng-show="code.bf_var" class="bf-cont-gradient" height="80" height="30">
+                                <svg ng-show="code.bf_var" class="bf-cont-gradient legends" height="80" height="30" var-id="{{id}}">
                                     <defs>
                                         <linearGradient id="g{{code.CID}}" x1="0%" y1="0%" x2="100%" y2="0%">
                                             <stop offset="0%" style="stop-color:hsl(0, 65%, 95%);stop-opacity:1" />
@@ -193,8 +204,8 @@
                     <tr style="cursor:pointer;"><th colspan="2">Language Classifications</th></tr>
                     <tr>
                         <td class="">
-                            <div id="{{classification}}">
-                                <svg height="100" class="tree-legend-langs">
+                            <div>
+                                <svg height="100" class="tree-legend-langs legends">
                                     <g ng-repeat="classification in results.classifications|joinDictItems" transform="{{$index|transformG}}">
                                         <circle
                                                 cx="10"
@@ -213,7 +224,22 @@
                     </tr>
                 </table>
             </div>
-            <language-phylogeny></language-phylogeny>
+                <div ng-show="globalTree && variables.length > 0">
+                <h5>Choose a variable:</h4>
+                <select 
+                    ng-model="results.chosenTVariable"
+                    class="form-control"
+                    ng-options="variable.name for variable in variables"
+                    ng-init="results.chosenTVariable=variables[0]"
+                    style="width:auto;"
+                 >
+                 </select>  
+                 Double click the tree or scroll to zoom.
+             </div>
+            <language-phylogeny>
+            <h4>{{results.selectedTree.name}}</h4>
+            </language-phylogeny>
+            </div>
         </tab>
         <tab heading="Download" select="generateDownloadLinks()">
             <div class="row">
