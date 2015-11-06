@@ -85,8 +85,7 @@ function SocietiesCtrl($scope, searchModelService, LanguageClass, ZipTest) {
                     name = $scope.results.code_ids[key].name;
                     svg_string = item.node().innerHTML;
                     svg_string = '<svg version="1.1" xmlns="http://www.w3.org/2000/svg">' + svg_string + '</svg>';
-                    legends.push({'name': name, 'svg': svg_string});
-                    
+                    legends.push({'name': name+'-legend.svg', 'svg': svg_string});    
             }
         }
         

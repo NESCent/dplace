@@ -395,7 +395,8 @@ def zip_legends(request):
         to_download.add_tree(str(result_set['tree']))
     if 'legends' in result_set:
         for l in result_set['legends']:
-            to_download.add_legend(Legend( l['svg'], l['name']))
+            legend = Legend(l['name'], l['svg'])
+            to_download.add_legend(legend)
     response = Response(ZipResultSetSerializer(to_download).data)
     filename = "dplace-trees-%s.zip" % datetime.datetime.now().strftime("%Y-%m-%d")
     response['Content-Disposition'] = 'attachment; filename="%s"' % filename
