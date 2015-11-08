@@ -98,7 +98,17 @@ angular.module('languagePhylogenyDirective', [])
                                     .attr("transform", "translate("+translate+", 0)")
                                     .attr("fill", function(n) {
                                         value = society.environmental_values[0].value; //only 1 environmental value at a time so we can do this
-                                        hue = value * 240 / scope.range;
+                                        min = scope.results.environmental_variables[0].min;
+                                        max = scope.results.environmental_variables[0].max;
+                                        if (society.environmental_values[0].variable == 34 || society.environmental_values[0].variable == 36) {
+                                            hue = 30 + (((value - min) / (max - min))*88)
+                                        }  else if (society.environmental_values[0].variable == 27) {
+                                            lum = 100 - (((value - min) / (max - min))*95);
+                                            return 'hsl(252,65%,'+lum+'%)';
+                                        }
+                                        else {
+                                            hue = 240 - (((value-min)/(max-min))*240);
+                                        }
                                         return 'hsl('+hue+',100%, 50%)';
                                     })
                                     .on("mouseover", function() { 
