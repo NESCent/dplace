@@ -87,7 +87,7 @@ angular.module('languagePhylogenyDirective', [])
                     
                     //if the marker is an environmental variable
                     if (society.environmental_values.length > 0 && society.environmental_values[0].variable == variable)  { 
-                            var hover_text_value = society.environmental_values[0].value;
+                            var hover_text_value = society.environmental_values[0].value + ' ' + results.environmental_variables[0].units;
                                 selected.append("svg:circle")
                                     .attr("r", function() {
                                         if (global) return 1.5;
