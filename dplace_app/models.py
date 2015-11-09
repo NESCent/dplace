@@ -19,6 +19,7 @@ CLASS_LEVELS = (
 CLASSIFICATION_SCHEMES = (
     ('E', 'Ethnologue17',),
     ('R', 'Ethnologue17-Revised',),
+    ('G', 'Glottolog',), #CHECK THIS
     #... any others as they become available. I can see a time in
     # the not too distant future when we'll get better ones.
 )
@@ -40,7 +41,9 @@ class ISOCode(models.Model):
     
     class Meta:
         verbose_name = "ISO Code"
-
+        
+class GlottoCode(models.Model):
+    glotto_code = models.CharField('Glotto Code', db_index=True, max_length=10)
 
 class Society(models.Model):
     ext_id = models.CharField('External ID', unique=True, max_length=10)
@@ -296,8 +299,6 @@ class Source(models.Model):
             ('year','author')
         )
 
-
-
 class LanguageClass(models.Model):
     # max length 37
     name = models.CharField(max_length=50, db_index=True)
@@ -346,6 +347,7 @@ class LanguageClassification(models.Model):
 class Language(models.Model):
     name = models.CharField(max_length=50, db_index=True)
     iso_code = models.ForeignKey('ISOCode', related_name="languages", unique=True)
+    #add glottocode field
     
     def __unicode__(self):
         return "Language: %s, ISO Code %s" % (self.name, self.iso_code.iso_code)

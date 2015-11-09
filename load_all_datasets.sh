@@ -36,6 +36,9 @@ python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/Revised_Ethnologue_
 echo "Loading ISO Code Lat/Long"
 python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/iso_lat_long.csv" iso_lat_long
 
+echo "Loading Glottolog Languages"
+python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/glottolog_mapping.csv" glotto
+
 echo "Loading Languages from Ethnologue"
 python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/Revised_Ethnologue_families-Feb_10_2014-17th_Ed-ISO693-3-current.csv" langs
 python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/Revised_Ethnologue_families-Feb_10_2014-17th_Ed_Missing_ISO_codes.csv" langs
