@@ -22,15 +22,17 @@ except ImportError:
     raise ImportError("please install the ete2 library")
 
 IS_ISOCODE = re.compile(r"""'.* <\w{4}\d{4}><(\w{3})>'$""")
-
+IS_GLOTTOCODE = re.compile(r"""'.* <(\w{4}\d{4})><\w{3}>'$""")
 
 def clean_tree(tree):
-    """Removes taxa with no ISO-639 codes"""
+    """Previously, removed taxa with no ISO-639 codes.
+    Now renames taxa to Glottocodes."""
     to_keep = []
     for leaf in tree.iter_leaves():
-        iso = IS_ISOCODE.findall(leaf.name)
-        if len(iso) == 1:
-            leaf.name = iso[0]  # rename to ISO code
+        #iso = IS_ISOCODE.findall(leaf.name)
+        glotto = IS_GLOTTOCODE.findall(leaf.name)
+        if len(glotto) == 1:
+            leaf.name = glotto[0]  # rename to glotto code
             to_keep.append(leaf.name)
     
     if len(to_keep) <= 3:  # not worth keeping.
