@@ -207,7 +207,6 @@ angular.module('languagePhylogenyDirective', [])
                             scope.results.code_ids[key].CID = "C"+keysWritten;
                             keysWritten++;
                             translate += 20;
-                            
                             }
                         }
                     }
@@ -363,7 +362,7 @@ angular.module('languagePhylogenyDirective', [])
                     });
                 }
                 }
-                
+                console.log(scope.query);
                 scope.results.societies.forEach(function(society) {
                     var selected = node.filter(function(d) {
                         return d.name == society.society.iso_code;
@@ -373,14 +372,16 @@ angular.module('languagePhylogenyDirective', [])
                          var text = selected.select("text");
                          if (text[0][0]) {
                             text.html(society.society.name);
-                    } else {  selected.append("svg:text") 
-                            .attr("dx", function(n) {
-                                if (langTree.name.indexOf("global") != -1) return 5;
-                                if (scope.query.environmental_filters && scope.query.variable_codes) return translate+20;
-                                else if (scope.query.environmental_filters) return translate+10;
-                                else if (scope.query.language_classifications) return translate+10;
-                                else return translate-5;
-                            })                           
+                        } else {  
+                            selected.append("svg:text") 
+                                .attr("dx", function(n) {
+                                    if (langTree.name.indexOf("global") != -1) return 5;
+                                    if (scope.query.environmental_filters && scope.query.variable_codes) return translate+20;
+                                    else if (scope.query.variable_codes) return translate-5;
+                                    else if (scope.query.environmental_filters) return translate+10;
+                                    else if (scope.query.language_classifications) return translate+10;
+                                    else return translate+5;
+                                })                           
                             .attr("dy", function() { if (langTree.name.indexOf("global") == -1) return 4; else return 1; })
                             .attr("font-size", function() {
                                 if (langTree.name.indexOf("global") == -1) return "12px";
