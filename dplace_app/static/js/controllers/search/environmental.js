@@ -47,14 +47,9 @@ function EnvironmentalCtrl($scope, searchModelService, EnvironmentalVariable, En
         else {
             values = MinAndMax.query({query: {environmental_id: $scope.environmentalData.selectedVariable.id}});
             values.$promise.then(function(result) {
-            if ($scope.environmentalData.selectedVariable.name.indexOf('Richness') != -1 || $scope.environmentalData.selectedVariable.name == 'Elevation' || $scope.environmentalData.selectedVariable.name =='Slope') {
-                $scope.environmentalData.vals[0] = result.min.toFixed(2);
-                $scope.environmentalData.vals[1] = result.max.toFixed(2);
-            } else {
+                $scope.environmentalData.vals[0] = result.min;
+                $scope.environmentalData.vals[1] = result.max;
             
-                $scope.environmentalData.vals[0] = result.min.toFixed(4);
-                $scope.environmentalData.vals[1] = result.max.toFixed(4);
-            }
             });
         }
     };
