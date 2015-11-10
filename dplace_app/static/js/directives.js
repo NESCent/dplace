@@ -302,9 +302,10 @@ angular.module('languagePhylogenyDirective', [])
                 
                 if (langTree.name.indexOf("glotto") != -1) {
                     for (var d = 0; d < dotted.length; d++) {
+                        if (dotted[d].x == longest_y) continue;
                         vis.append("svg:line")
-                            .attr("x1", dotted[d].x+10)
-                            .attr("x2", longest_y-10)
+                            .attr("x1", dotted[d].x+5)
+                            .attr("x2", longest_y-5)
                             .attr("y1", dotted[d].y)
                             .attr("y2", dotted[d].y)
                             .attr("stroke-width", "2")
