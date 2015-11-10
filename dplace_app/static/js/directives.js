@@ -187,8 +187,20 @@ angular.module('languagePhylogenyDirective', [])
                         .separation(function separation(a, b) { return 8; });
                 }
                 nodes = tree(newick);
-
+                
+                //WRITE C1, C2, E1, etc LABELS
                 if (langTree.name.indexOf("global") == -1) {
+                    var labels = d3.select("language-phylogeny").append("svg:svg")
+                        .attr("width", w+300)
+                        .attr("height", 18)
+                        .attr("id", "varLabels")
+                        .attr("transform", "translate(-7,0)")
+                        .attr("style", "visibility:hidden;");
+                    labels.append("svg:rect")
+                        .attr("width", "100%")
+                        .attr("height", "100%")
+                        .attr("fill", "white")
+                        .attr("fill-opacity", "0.8");
                     var vis = d3.select("language-phylogeny").append("svg:svg")
                         .attr("width", w+300)
                         .attr("height", h+50)
@@ -204,6 +216,10 @@ angular.module('languagePhylogenyDirective', [])
                                 .attr("dx", w+translate-9)
                                 .attr("dy", 10)
                                 .text("C"+keysWritten);
+                            labels.append("svg:text")
+                                .attr("dx", w+translate)
+                                .attr("dy", 15)
+                                .text("C"+keysWritten);
                             scope.results.code_ids[key].CID = "C"+keysWritten;
                             keysWritten++;
                             translate += 20;
@@ -216,9 +232,13 @@ angular.module('languagePhylogenyDirective', [])
                             .attr("dx", w+translate-9)
                             .attr("dy", 10)
                             .text("E1");
+                         labels.append("svg:text")
+                            .attr("dx", w+translate)
+                            .attr("dy", 15)
+                            .text("E1");
                     }
                     
-                    
+                    //---------------------------------------//
                     vis = vis.append("svg:g")
                         .attr("transform", "translate(0, 15)");
                     
@@ -420,15 +440,20 @@ angular.module('languagePhylogenyDirective', [])
 
             scope.$on('treeSelected', function(event, args) {
                 constructTree(args.tree);
-               /* var pos = $("#varLabels").offset();
+                var pos = $("#varLabels").offset();
                 $(window).scroll(function() {
-                    if ($(window).scrollTop() > 100)
-                        $("#legend").stop().animate({"marginTop":($(window).scrollTop() - 100) + "px"}, "slow");
-                    if ($(window).scrollTop() > (pos.top - 20) && $("#varLabels").css('position') == 'static') 
-                        d3.select("#varLabels").attr('class', 'var-labels-fixed');
-                    else if ($(window).scrollTop() < pos.top)
-                        d3.select("#varLabels").classed('var-labels-fixed', false);
-                });*/
+                    //if ($(window).scrollTop() > 100)
+                       // $("#legend").stop().animate({"marginTop":($(window).scrollTop() - 100) + "px"}, "slow");
+                    if ($(window).scrollTop() > (pos.top - 20) && $("#varLabels").css('position') == 'static') {
+                        d3.select("#varLabels")
+                            .attr('class', 'var-labels-fixed')
+                            .style("visibility", "visible");
+                   } else if ($(window).scrollTop() < pos.top) {
+                        d3.select("#varLabels")
+                            .classed('var-labels-fixed', false)
+                            .style("visibility", "hidden");
+                    }
+                });
             });
             
 
