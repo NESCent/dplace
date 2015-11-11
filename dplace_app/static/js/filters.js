@@ -47,12 +47,8 @@ angular.module('dplaceFilters', [])
         };
     })
     .filter('formatEnvironmentalValues', function () {
-        return function(values, environmental_name) {
+        return function(values) {
             return values.map( function(environmental_value) {
-                // Should include the variable
-                if ((environmental_name.indexOf('Richness') != -1) || (environmental_name == 'Elevation') || (environmental_name == 'Slope'))
-                    return environmental_value.value.toFixed(2);
-                else 
                     return environmental_value.value.toFixed(4);
             }).join(',');
         };

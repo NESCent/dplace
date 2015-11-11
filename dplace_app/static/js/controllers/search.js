@@ -56,6 +56,8 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties, 
             var max_value = Math.max.apply(null, extractedValues);
             var range = max_value - min_value;
             results.environmental_variables[i]['range'] = range;
+            $scope.searchModel.results.environmental_variables[i]['min'] = Math.round(min_value*10000)/10000;
+            $scope.searchModel.results.environmental_variables[i]['max'] = Math.round(max_value*10000)/10000;
         }
         return results;
     };
@@ -98,8 +100,6 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties, 
                     $scope.searchModel.results.code_ids[$scope.searchModel.query.variable_codes[i].bf_id] = [];
                 }
                 if (!$scope.searchModel.results.code_ids[$scope.searchModel.query.variable_codes[i].bf_id].absolute_min) {
-                    $scope.abs_min = $scope.searchModel.query.variable_codes[i].absolute_min;
-                    $scope.abs_max = $scope.searchModel.query.variable_codes[i].absolute_max;
                     $scope.searchModel.results.code_ids[$scope.searchModel.query.variable_codes[i].bf_id].min = $scope.searchModel.query.variable_codes[i].absolute_min;
                     $scope.searchModel.results.code_ids[$scope.searchModel.query.variable_codes[i].bf_id].max = $scope.searchModel.query.variable_codes[i].absolute_max;
                     $scope.searchModel.results.code_ids[$scope.searchModel.query.variable_codes[i].bf_id].bf_var = true;
@@ -126,6 +126,7 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties, 
     }
     $scope.assignColors = function() {
         results = $scope.searchModel.getResults();
+        
         results = $scope.calculateRange(results);
         bf_codes = [];
         if ($scope.searchModel.query.variable_codes) {

@@ -294,7 +294,7 @@ def get_min_and_max(request):
     else:
         min_value = None
         max_value = None
-    return Response({'min': min_value, 'max': max_value})
+    return Response({'min': format(min_value, '.4f'), 'max': format(max_value, '.4f')})
     
 @api_view(['GET'])
 @permission_classes((AllowAny,))
