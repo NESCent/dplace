@@ -55,6 +55,11 @@ class ISOCodeViewSet(viewsets.ReadOnlyModelViewSet):
     filter_fields = ('iso_code',)
     queryset = ISOCode.objects.all()
     
+class GlottoCodeViewSet(viewsets.ReadOnlyModelViewSet):
+    serializer_class = GlottoCodeSerializer
+    filter_fields = ('glotto_code',)
+    queryset = GlottoCode.objects.all()
+    
 class EnvironmentalCategoryViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = EnvironmentalCategorySerializer
     filter_fields = ('name',)

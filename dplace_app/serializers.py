@@ -44,6 +44,11 @@ class VariableCodedValueSerializer(serializers.ModelSerializer):
 class ISOCodeSerializer(gis_serializers.GeoModelSerializer):
     class Meta:
         model = ISOCode
+        
+# Glotto Codes
+class GlottoCodeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = GlottoCode
 
 # Environmental Data
 class EnvironmentalCategorySerializer(serializers.ModelSerializer):

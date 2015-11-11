@@ -46,7 +46,7 @@ class GlottoCode(models.Model):
     glotto_code = models.CharField('Glotto Code', db_index=True, max_length=10)
     
     def __unicode__(self):
-        return "%s" % glotto_code
+        return "%s" % self.glotto_code
     
 
 class Society(models.Model):
@@ -349,9 +349,10 @@ class LanguageClassification(models.Model):
 
 
 class Language(models.Model):
-    name = models.CharField(max_length=50, db_index=True)
-    iso_code = models.ForeignKey('ISOCode', related_name="languages", unique=True)
-    glotto_code = models.ForeignKey('GlottoCode', blank=True, null=True)
+    name = models.CharField(max_length=200, db_index=True)
+    #needs to be null=True because some glottolog languages do not have isocodes
+    iso_code = models.ForeignKey('ISOCode', null=True) 
+    glotto_code = models.ForeignKey('GlottoCode', null=True, blank=True, unique=True)
     
     def __unicode__(self):
         return "Language: %s, ISO Code %s" % (self.name, self.iso_code.iso_code)
