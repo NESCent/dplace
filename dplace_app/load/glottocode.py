@@ -10,14 +10,29 @@ def load_glottocode(dict_row):
     """
     iso_code = dict_row['iso_693-3']
     glotto_code = dict_row['id']
-   # name = dict_row['name']
+    name = dict_row['name']
    # level = dict_row['level']
    # parent_id = dict_row['parent_id']
-    try:
-        language = Language.objects.get(iso_code__iso_code=iso_code)
-        glotto, created = GlottoCode.objects.get_or_create(glotto_code=glotto_code)
-        if glotto:
-            language.glotto_code = glotto
-            language.save()
-    except ObjectDoesNotExist:
-        return 
+    glotto, created = GlottoCode.objects.get_or_create(glotto_code=glotto_code)
+    
+    if not iso_code:
+        language, created = Language.objects.get_or_create(name=name, glotto_code=glotto)
+        if created:
+            print "Created language %s, glottocode %s" % (name, glotto)
+        language.save()
+    else:
+        try:
+            language = Language.objects.get(iso_code__iso_code=iso_code)
+            if glotto:
+                language.glotto_code = glotto
+                language.save()
+        except ObjectDoesNotExist:
+            print "No language found for ISO Code %s" % iso_code
+            
+        try:
+            society = Society.objects.get(iso_code__iso_code=iso_code)
+            if glotto:
+                society.glotto_code = glotto
+                society.save()
+        except ObjectDoesNotExist:
+            print "No society found for ISO Code %s" % iso_code

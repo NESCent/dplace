@@ -15,7 +15,7 @@ LOAD_BY_ROW=('iso', 'env_vals',
              'langs', 'iso_lat_long',
              'ea_soc', 'ea_vars', 'ea_vals',
              'bf_soc', 'bf_vars', 'bf_vals',
-             'bf_harm', 'glotto')
+             'bf_harm', 'glotto', 'ea_soc_xd_id')
 
 def run(file_name=None, mode=None):
     if mode == 'geo':
@@ -38,6 +38,8 @@ def run(file_name=None, mode=None):
                         load_iso_lat_long(dict_row)
                     elif mode == 'ea_soc':
                         load_ea_society(dict_row)
+                    elif mode == 'ea_soc_xd_id':
+                        ea_soc_to_xd_id(dict_row)
                     elif mode == 'env_vals':
                         load_environmental(dict_row)
                     elif mode == 'ea_vars':
