@@ -51,10 +51,12 @@ class GlottoCode(models.Model):
 
 class Society(models.Model):
     ext_id = models.CharField('External ID', unique=True, max_length=10)
+    xd_id = models.CharField('Cross ID', default=None, null=True, max_length=10)
     name = models.CharField('Name', db_index=True, max_length=200)
     location = models.PointField('Location',null=True)
     source = models.ForeignKey('Source', null=True)
     iso_code = models.ForeignKey('ISOCode', null=True, related_name="societies")
+    glotto_code = models.ForeignKey('GlottoCode', null=True, default=None, related_name="societies")
     language = models.ForeignKey('Language', null=True, related_name="societies")
     objects = models.GeoManager()
     focal_year = models.CharField('Focal Year', null=True, blank=True, max_length=100)
@@ -352,10 +354,11 @@ class Language(models.Model):
     name = models.CharField(max_length=200, db_index=True)
     #needs to be null=True because some glottolog languages do not have isocodes
     iso_code = models.ForeignKey('ISOCode', null=True) 
+    #glottocode is now primary key
     glotto_code = models.ForeignKey('GlottoCode', null=True, blank=True, unique=True)
     
     def __unicode__(self):
-        return "Language: %s, ISO Code %s" % (self.name, self.iso_code.iso_code)
+        return "Language: %s, ISO Code %s, Glotto Code %s" % (self.name, self.iso_code.iso_code, self.glotto_code.glotto_code)
         
     class Meta:
         verbose_name = "Language"
