@@ -80,10 +80,10 @@ angular.module('languagePhylogenyDirective', [])
             var addMarkers = function(results, variable, node, global, translate) { 
                 scope.results.societies.forEach(function(society) {
                     var selected = node.filter(function(d) {
-                        return d.name == society.society.iso_code;
+                        return d.name == society.society.iso_code || d.name == society.society.glotto_code;
                     });
                     if (global) selected.select("circle").remove(); 
-                    var society_name = society.society.name + " (" + society.society.iso_code + ")";
+                    var society_name = society.society.name + " (" + society.society.iso_code + ")"; //change this to glottocode?
                     
                     //if the marker is an environmental variable
                     if (society.environmental_values.length > 0 && society.environmental_values[0].variable == variable)  { 
@@ -173,7 +173,6 @@ angular.module('languagePhylogenyDirective', [])
             var constructTree = function(langTree) {   
                 d3.select("language-phylogeny").html('');
                 var newick = Newick.parse(langTree.newick_string);
-
                 if (langTree.name.indexOf("global") != -1)
                     var w = 900;
                 else  var w = 700;
@@ -397,7 +396,10 @@ angular.module('languagePhylogenyDirective', [])
                 console.log(scope.query);
                 scope.results.societies.forEach(function(society) {
                     var selected = node.filter(function(d) {
-                        return d.name == society.society.iso_code;
+                        if (langTree.name.indexOf("glotto") == -1)
+                            return d.name == society.society.iso_code;
+                        else
+                            return d.name == society.society.glotto_code;
                     });
                     
                     //lastly, append the text
@@ -420,7 +422,9 @@ angular.module('languagePhylogenyDirective', [])
                                 else return "3px";
                             })
                             .attr("font-family", "Arial")
-                            .text(function(d) { return society.society.name; }); 
+                            .text(function(d) { 
+                                return society.society.name; 
+                            }); 
                             }
                 });
                 

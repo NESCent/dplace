@@ -11,6 +11,17 @@ from environmental import iso_from_code
 from sources import get_source
 # TODO: figure out how to deal with focal year.
 
+def ea_soc_to_xd_id(dict_row):
+    soc_id = dict_row['soc_id']
+    xd_id = dict_row['xd_id']
+    try:
+        society = Society.objects.get(ext_id=soc_id)
+        society.xd_id = xd_id
+        society.save()
+    except ObjectDoesNotExist:
+        "Warning: Unable to find society %s" % soc_id
+        return
+
 def load_ea_society(society_dict):
     ext_id = society_dict['ID']
     source = get_source('EA')

@@ -36,12 +36,21 @@ python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/Revised_Ethnologue_
 echo "Loading ISO Code Lat/Long"
 python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/iso_lat_long.csv" iso_lat_long
 
+echo "Loading Glottolog Languages"
+python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/glottolog_mapping.csv" glotto
+
 echo "Loading Languages from Ethnologue"
 python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/Revised_Ethnologue_families-Feb_10_2014-17th_Ed-ISO693-3-current.csv" langs
 python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/Revised_Ethnologue_families-Feb_10_2014-17th_Ed_Missing_ISO_codes.csv" langs
 
 echo "Loading EA Societies"
 python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/ea_langs+isocodes.csv" ea_soc
+
+echo Loading EA Society and XD ID links
+python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/EA_soc_id_to_xd_id_10Nov2015.csv" ea_soc_xd_id
+
+echo Linking Societies to Glottocodes
+python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/xd_id_to_language_9Nov2015.csv" xd_lang
 
 echo "Loading Binford Societies"
 python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/binford_langs+isocodes.csv" bf_soc
