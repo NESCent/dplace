@@ -28,11 +28,21 @@ def load_glottocode(dict_row):
                 language.save()
         except ObjectDoesNotExist:
             print "No language found for ISO Code %s" % iso_code
+            return
             
-        try:
-            society = Society.objects.get(iso_code__iso_code=iso_code)
-            if glotto:
-                society.glotto_code = glotto
-                society.save()
-        except ObjectDoesNotExist:
-            print "No society found for ISO Code %s" % iso_code
+def xd_to_language(dict_row):
+    """
+    Reads file xd_id_to_language.csv
+    """
+    
+    xd_id = dict_row['xd_id']
+    glottocode = dict_row['glottocode']
+    
+    glotto, created = GlottoCode.objects.get_or_create(glotto_code=glottocode)
+    
+    try:
+        society = Society.objects.get(xd_id=xd_id)
+        society.glotto_code = glotto
+        society.save()
+    except:
+        print "No society found for xd_id %s glottocode %s" % (xd_id, glottocode)
