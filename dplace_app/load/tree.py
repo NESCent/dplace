@@ -8,16 +8,23 @@ from dplace_app.models import LanguageTree, Language, ISOCode
 __author__ = 'dan'
 
 def get_language(taxon_name):
-    # taxon name may be an iso code or a language name
+    # taxon name may be an iso code, language name, or glotto code
     language = None
     try:
         language = Language.objects.get(iso_code__iso_code=taxon_name)
     except ObjectDoesNotExist:
-        # Not found by ISO Code, try by name
+        # Not found by ISO Code, try by glotto code
         try:
-            language = Language.objects.get(name=taxon_name)
+            language = Language.objects.get(glotto_code__glotto_code=taxon_name)
         except ObjectDoesNotExist:
-            raise ValueError("Warning: Language %s not found" % (taxon_name))
+            # Not found by Glotto Code either, try by name
+            try:
+                language = Language.objects.get(name=taxon_name)
+            except ObjectDoesNotExist:
+                #No language found at all
+                raise ValueError("Warning: Language %s not found" % (taxon_name))
+            except MultipleObjectsReturned:
+                raise ValueError("Error: multiple languages returned for %s" % (taxon_name))
         except MultipleObjectsReturned:
             raise ValueError("Error: multiple languages returned for %s" % (taxon_name))
     except MultipleObjectsReturned:
@@ -46,6 +53,8 @@ def load_tree(file_name, verbose=False):
         
     tree.newick_string = str(newick)
     for taxon_name in reader.trees.taxa:
+        if taxon_name is '1':
+            continue
         language = None
         try:
             language = get_language(taxon_name)
