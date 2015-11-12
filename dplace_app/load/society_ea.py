@@ -172,6 +172,31 @@ def row_is_skip(row):
         return False
     else:
         return True
+        
+#----------------------------------NEW CODE FOR GETTING EA CODE DESCRIPTIONS, NOV 7 2015--------------------------------------------#
+DATASET_COLUMN          = 0
+ID_COLUMN               = 1
+CODE_COLUMN             = 2
+DESCRIPTION_COLUMN      = 4   
+def load_codes(csvfile=None):
+    csv_reader = csv.reader(csvfile)
+    for row in csv_reader:
+        dataset = row[DATASET_COLUMN].strip()
+        if dataset=='Dataset': #skip header
+            continue
+        code = row[CODE_COLUMN].strip()
+        id = row[ID_COLUMN].strip()
+        description = row[DESCRIPTION_COLUMN].strip()
+        if dataset=='EA':
+            ea_label = eavar_number_to_label(id)
+            variable = VariableDescription.objects.get(label=ea_label)
+            if variable:
+                code_description, created = VariableCodeDescription.objects.get_or_create(variable=variable, code=code)
+                description = description.decode("windows-1252").replace(u"\u2019", "'") #replace Windows smart apostrophe
+                code_description.description = description
+                code_description.save()
+            else:
+                "Missing variable in database: %s" % ea_label
 
 def load_ea_codes(csvfile=None):
     number = None
@@ -218,6 +243,69 @@ def load_ea_codes(csvfile=None):
 
 
 _EA_VAL_CACHE, _EA_VCD_CACHE = {}, {}
+#soooooooooooooooooooooooooo slow 
+#need to read in references
+def load_ea_stacked(val_row):
+    def get_variable(number):
+            label = eavar_number_to_label(number)
+            if label not in _EA_VAL_CACHE:
+                try:
+                    _EA_VAL_CACHE[label] = VariableDescription.objects.get(label=label)
+                except ObjectDoesNotExist:
+                    _EA_VAL_CACHE[label] = None
+            return _EA_VAL_CACHE[label]
+        
+    def get_description(variable, value):
+        key = (variable, value)
+        if key not in _EA_VCD_CACHE:
+            try:
+                # Check for Code description if it exists.
+                _EA_VCD_CACHE[key] = VariableCodeDescription.objects.get(variable=variable,code=value)
+            except ObjectDoesNotExist:
+                _EA_VCD_CACHE[key] = None
+        return _EA_VCD_CACHE[key]
+
+    if not 'soc_id' in val_row and not 'ID' in val_row:
+        return
+    if 'soc_id' in val_row:
+        ext_id = val_row['soc_id'].strip()
+    else:
+        ext_id = val_row['ID'].strip()
+    source = get_source("EA")
+    # find the existing society
+    
+    if ext_id == "":
+        assert all([val_row[cell] == "" for cell in val_row])
+        return
+        
+    try:
+        society = Society.objects.get(ext_id=ext_id)
+    except ObjectDoesNotExist:
+        print "Attempting to load EA values for %s but did not find an existing Society object" % ext_id
+        return
+    
+    variable = get_variable(val_row['VarID'])
+    value = val_row['Code']
+    comment = val_row['Comment']
+
+    if variable is None:
+        print "Could not find variable %s for society %s" % (val_row['VarID'], society)
+        return
+
+    code = get_description(variable, value)
+    
+    v, created = VariableCodedValue.objects.get_or_create(
+        variable=variable,
+        society=society,
+        source=source,
+        coded_value=value,
+        code=code,
+    )
+    if created:
+        print "Getting data for Society %s Variable ID %s" % (ext_id, val_row['VarID'])
+
+    v.save()
+    
 def load_ea_val(val_row):
     # So sloooow.
     def get_variable(number):
