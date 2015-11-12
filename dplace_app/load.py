@@ -3,6 +3,7 @@ import csv
 import sys
 from django.db import transaction
 from load.isocode import *
+from load.glottocode import *
 from load.environmental import *
 from load.language import *
 from load.society_ea import *
@@ -14,7 +15,8 @@ LOAD_BY_ROW=('iso', 'env_vals',
              'langs', 'iso_lat_long',
              'ea_soc', 'ea_vars', 'ea_vals',
              'bf_soc', 'bf_vars', 'bf_vals',
-             'bf_harm')
+             'bf_harm', 'glotto', 'ea_soc_xd_id',
+             'xd_lang')
 
 def run(file_name=None, mode=None):
     if mode == 'geo':
@@ -31,10 +33,16 @@ def run(file_name=None, mode=None):
                 for dict_row in csv_reader:
                     if mode == 'iso':
                         load_isocode(dict_row)
+                    elif mode == 'glotto':
+                        load_glottocode(dict_row)
                     elif mode == 'iso_lat_long':
                         load_iso_lat_long(dict_row)
                     elif mode == 'ea_soc':
                         load_ea_society(dict_row)
+                    elif mode == 'ea_soc_xd_id':
+                        ea_soc_to_xd_id(dict_row)
+                    elif mode == 'xd_lang':
+                        xd_to_language(dict_row)
                     elif mode == 'env_vals':
                         load_environmental(dict_row)
                     elif mode == 'ea_vars':

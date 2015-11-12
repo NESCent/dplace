@@ -55,6 +55,11 @@ class ISOCodeViewSet(viewsets.ReadOnlyModelViewSet):
     filter_fields = ('iso_code',)
     queryset = ISOCode.objects.all()
     
+class GlottoCodeViewSet(viewsets.ReadOnlyModelViewSet):
+    serializer_class = GlottoCodeSerializer
+    filter_fields = ('glotto_code',)
+    queryset = GlottoCode.objects.all()
+    
 class EnvironmentalCategoryViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = EnvironmentalCategorySerializer
     filter_fields = ('name',)
@@ -137,7 +142,10 @@ def trees_from_languages_array(language_ids):
     from ete2 import Tree
     trees = LanguageTree.objects.filter(languages__pk__in=language_ids).distinct()
     for t in trees:
-        langs_in_tree = [str(l.iso_code.iso_code) for l in t.languages.all() if l.id in language_ids]
+        if 'glotto' in t.name:
+            langs_in_tree = [str(l.glotto_code.glotto_code) for l in t.languages.all() if l.id in language_ids]
+        else:
+            langs_in_tree = [str(l.iso_code.iso_code) for l in t.languages.all() if l.id in language_ids]
         newick = Tree(t.newick_string)
         try:
             newick.prune(langs_in_tree, preserve_branch_length=True)

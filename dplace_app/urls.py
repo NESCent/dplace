@@ -16,6 +16,7 @@ router.register(r'environmental_variables', api_views.EnvironmentalVariableViewS
 router.register(r'environmentals', api_views.EnvironmentalViewSet)
 router.register(r'environmental_values', api_views.EnvironmentalValueViewSet)
 router.register(r'isocodes', api_views.ISOCodeViewSet)
+router.register(r'glottocodes', api_views.GlottoCodeViewSet)
 router.register(r'language_classes', api_views.LanguageClassViewSet)
 router.register(r'language_classifications', api_views.LanguageClassificationViewSet)
 router.register(r'languages', api_views.LanguageViewSet)
