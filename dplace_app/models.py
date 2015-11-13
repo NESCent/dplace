@@ -176,7 +176,7 @@ class VariableDescription(models.Model):
     source = models.ForeignKey('Source', null=True)
     index_categories = models.ManyToManyField('VariableCategory', related_name='index_variables')
     niche_categories = models.ManyToManyField('VariableCategory', related_name='niche_variables')
-    codebook_info = models.CharField(max_length=500, default='None')
+    codebook_info = models.TextField(default='None')
     data_type = models.CharField(max_length=200, null=True)
     
     def coded_societies(self):
