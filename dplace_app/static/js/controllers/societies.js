@@ -36,6 +36,7 @@ function SocietiesCtrl($scope, searchModelService, LanguageClass, ZipTest) {
     };
     
     $scope.treeSelected = function() {
+        console.log($scope.results.selectedTree);
         $scope.$broadcast('treeSelected', {tree: $scope.results.selectedTree});
         d3.select(".tree-download").html('');
         if ($scope.results.selectedTree.name.indexOf("global") == -1) {
@@ -46,12 +47,34 @@ function SocietiesCtrl($scope, searchModelService, LanguageClass, ZipTest) {
         }
     };
     
+    $scope.clicked = function(trees) {
+        console.log($scope.isActive);
+        tree_to_display = trees[0].name; //if there is more than one tree, just display the first one
+        $scope.isActive = true; //switch to tree tab
+        if (tree_to_display.indexOf("global") != -1) { //display global tree
+            $scope.results.selectedButton = $scope.buttons[0];
+            $scope.buttonChanged($scope.results.selectedButton.value);
+            tree = $scope.trees.filter(function(t) {
+                return t.name == tree_to_display;
+            });
+            if (tree.length > 0) {
+                $scope.results.selectedTree = tree[0];
+                $scope.treeSelected();
+            }
+        }
+    }
+    
     $scope.showOrHide = function(chosenVarId, id) {
         if (!$scope.globalTree) return false;
         
         if (chosenVarId == id) return false;
         else return true;
     };
+    
+    $scope.setInactive = function() {
+        console.log("Setting inactive");
+        $scope.isActive = false;
+    }
     
     $scope.treeDownload = function() {
         var tree_svg = d3.select(".phylogeny")
@@ -100,6 +123,7 @@ function SocietiesCtrl($scope, searchModelService, LanguageClass, ZipTest) {
     }
 
     $scope.generateDownloadLinks = function() {
+        $scope.isActive = false;
         // queryObject is the in-memory JS object representing the chosen search options
         var queryObject = searchModelService.getModel().getQuery();
         // the CSV download endpoint is a GET URL, so we must send the query object as a string.

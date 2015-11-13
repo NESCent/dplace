@@ -448,9 +448,10 @@ angular.module('languagePhylogenyDirective', [])
                         .text("100 years");
                 }
                 
-                phyloWidth = d3.select("language-phylogeny").select("g").node().getBBox().width;
-                d3.select("#legend")
-                    .attr("style", "width:"+($(window).width()-phyloWidth-100)+"px; position:absolute; right:5px; z-index:1; margin-top:10px;");
+                //THROWING ERROR
+                //phyloWidth = d3.select("language-phylogeny").select("g").node().getBBox().width;
+                //d3.select("#legend")
+                //    .attr("style", "width:"+($(window).width()-phyloWidth-100)+"px; position:absolute; right:5px; z-index:1; margin-top:10px;");
             };
 
             scope.$on('treeSelected', function(event, args) {
