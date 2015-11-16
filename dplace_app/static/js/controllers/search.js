@@ -163,8 +163,13 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties, 
         $scope.searchModel.results.language_trees.phylogenies = [];
         $scope.searchModel.results.language_trees.glotto_trees = [];
         $scope.searchModel.results.language_trees.forEach(function(tree) {
-            if (tree.name.indexOf("glotto") != -1) $scope.searchModel.results.language_trees.glotto_trees.push(tree);
-            else $scope.searchModel.results.language_trees.phylogenies.push(tree);
+            if (tree.name.indexOf("global") != -1) $scope.searchModel.results.language_trees.global_tree = tree;
+            else if (tree.name.indexOf("glotto") != -1) {
+                $scope.searchModel.results.language_trees.glotto_trees.push(tree);
+            }
+            else {
+                $scope.searchModel.results.language_trees.phylogenies.push(tree);
+            }
         });
         $scope.searchModel.getSocieties().forEach(function (container) {
             var language = container.society.language;
