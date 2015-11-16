@@ -113,14 +113,14 @@ angular.module('languagePhylogenyDirective', [])
                                     })
                                     .on("mouseover", function() { 
                                                      d3.select("body").append("div")
-                                                        .attr("class", "tooltip")
+                                                        .attr("class", "tree-tooltip")
                                                         .html("<b>"+society_name+":</b><br>"+hover_text_value)
                                                         .style("left", (d3.event.pageX + 10)+"px")
                                                         .style("top", (d3.event.pageY + 5)+"px")
                                                         .style("opacity", .9);
                                     })
                                     .on("mouseout", function() {
-                                        d3.select(".tooltip").remove();
+                                        d3.select(".tree-tooltip").remove();
                                     });
                             return;
                         } else if (society.variable_coded_values.length > 0) {

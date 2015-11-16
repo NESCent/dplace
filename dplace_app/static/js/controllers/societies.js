@@ -3,8 +3,9 @@ function SocietiesCtrl($scope, searchModelService, LanguageClass, ZipTest) {
     $scope.query = searchModelService.getModel().getQuery();
     $scope.variables = [];
     $scope.buttons = [
-        {value:'phylogeny', name:'Phylogenies'},
-        {value:'glottolog', name:'Glottolog Trees'},
+        {value:'phylogeny', name:'Phylogenies', description: "Trees derived from discrete data using phylogenetic methods (branch lengths informative)"},
+        {value:'glottolog', name:'Glottolog Trees', description: "Trees derived Glotolog language family taxonomies (branch lengths uninformative)"},
+        {value:'global', name:'Global Tree', description: "A global language supertree composed from language family taxonomies in Glottolog (branch lengths uninformative)"},
     ];
     
     $scope.tabs = [
@@ -36,6 +37,11 @@ function SocietiesCtrl($scope, searchModelService, LanguageClass, ZipTest) {
     $scope.buttonChanged = function(buttonVal) {
         d3.select('language-phylogeny').html('');
         $scope.globalTree = false;
+        if (buttonVal.indexOf("global") != -1) {
+            $scope.globalTree = true;
+            $scope.results.selectedTree = $scope.results.language_trees.global_tree;
+            $scope.treeSelected();
+        }
         if (buttonVal.indexOf('phylogeny') != -1) {
             $scope.trees = $scope.results.language_trees.phylogenies;
         } else {
@@ -83,7 +89,10 @@ function SocietiesCtrl($scope, searchModelService, LanguageClass, ZipTest) {
             tree_to_display = trees[i].name;
         }
         
-        if (tree_to_display.indexOf("glotto") == -1) 
+        if (tree_to_display.indexOf("global") != -1) {
+            $scope.results.selectedButton = $scope.buttons[2];
+        }
+       else if (tree_to_display.indexOf("glotto") == -1) 
             $scope.results.selectedButton = $scope.buttons[0];
         else 
             $scope.results.selectedButton = $scope.buttons[1];
