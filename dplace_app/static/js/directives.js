@@ -574,56 +574,61 @@ angular.module('dplaceMapDirective', [])
                     var results = {};
                     results.societies = [];
                     results.environmental_variables = scope.results.environmental_variables;
+                    results.geographic_regions = scope.results.geographic_regions;
                     results.code_ids = scope.results.code_ids;
                     scope.results.societies.forEach(function(societyResult) {
                         var society = societyResult.society;
                         // Add a marker for each point
                         var marker = {latLng: [society.location.coordinates[1], society.location.coordinates[0]], name: society.name}
-                        scope.map.addMarker(society.id, marker);
-                        if (scope.results.variable_descriptions.indexOf(scope.chosen) != -1) {
-                            societyResult.variable_coded_values.forEach(function(coded_value) {
-                                if (coded_value.variable == scope.chosen.id) {
-                                    if (scope.chosen.data_type == 'CONTINUOUS') {
+                        scope.map.addMarker(society.id, marker); 
+                         if (!scope.chosen) {
+                            results = scope.results;
+                        } else {
+                            if (scope.results.variable_descriptions.indexOf(scope.chosen) != -1) {
+                                societyResult.variable_coded_values.forEach(function(coded_value) {
+                                    if (coded_value.variable == scope.chosen.id) {
+                                        if (scope.chosen.data_type == 'CONTINUOUS') {
+                                            results.societies.push({
+                                                'variable_coded_values':[coded_value],
+                                                'environmental_values': [],
+                                                'society':society,
+                                                'bf_cont_var':true,
+                                            });
+                                        } else {
+                                            results.societies.push({
+                                                'variable_coded_values':[coded_value],
+                                                'environmental_values': [],
+                                                'society':society,
+                                            });
+                                        }
+                                    }
+                                });
+                            }
+                            else if (scope.results.environmental_variables.indexOf(scope.chosen) != -1) {
+                                societyResult.environmental_values.forEach(function(coded_value) {
+                                    if (coded_value.variable == scope.chosen.id) {
                                         results.societies.push({
-                                            'variable_coded_values':[coded_value],
-                                            'environmental_values': [],
-                                            'society':society,
-                                            'bf_cont_var':true,
-                                        });
-                                    } else {
-                                        results.societies.push({
-                                            'variable_coded_values':[coded_value],
-                                            'environmental_values': [],
+                                            'environmental_values': [coded_value],
+                                            'variable_coded_values':[],
                                             'society':society,
                                         });
                                     }
-                                }
-                            });
-                        }
-                        else if (scope.results.environmental_variables.indexOf(scope.chosen) != -1) {
-                            societyResult.environmental_values.forEach(function(coded_value) {
-                                if (coded_value.variable == scope.chosen.id) {
-                                    results.societies.push({
-                                        'environmental_values': [coded_value],
-                                        'variable_coded_values':[],
-                                        'society':society,
-                                    });
-                                }
-                            });
-                        } 
-                        else {
-                            societyResult.languages.forEach(function(language) {
-                                var classification = scope.query.language_classifications.filter(function(l) { return l.language.id == language.id });
-                                if (classification.length > 0) {
-                                    results.societies.push({
-                                    'society': society,
-                                        'language_family': classification[0].class_subfamily,
-                                        'num_classifications': scope.results.classifications['NumClassifications'],
-                                        'environmental_values': [],
-                                        'variable_coded_values': [],
-                                    });
-                                }
-                            });
+                                });
+                            } 
+                            else {
+                                societyResult.languages.forEach(function(language) {
+                                    var classification = scope.query.language_classifications.filter(function(l) { return l.language.id == language.id });
+                                    if (classification.length > 0) {
+                                        results.societies.push({
+                                        'society': society,
+                                            'language_family': classification[0].class_subfamily,
+                                            'num_classifications': scope.results.classifications['NumClassifications'],
+                                            'environmental_values': [],
+                                            'variable_coded_values': [],
+                                        });
+                                    }
+                                });
+                            }
                         }
                     });
 
@@ -741,6 +746,7 @@ angular.module('dplaceMapDirective', [])
                 };
                 
                 scope.mapLegend = function() {
+                    if (!scope.chosen) return;
                     if (scope.chosen.id == 34 || scope.chosen.id == 36) {
                         d3.selectAll(".envVar").attr("fill", "url(#earthy)");
                     } else if (scope.chosen.id == 27) {

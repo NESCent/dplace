@@ -29,7 +29,7 @@
                     </td>
                     <td>{{code.description}}</td>
                 </tr>
-                <tr ng-show="results.chosenVariable==results.environmental_variables[0]">
+                <tr ng-show="(results.chosenVariable && (results.chosenVariable==results.environmental_variables[0]))">
                     <td>
                         <svg height="50" width="400" class="envLegend">
                             <rect class="envVar" height="30" width="300" x="20" />
