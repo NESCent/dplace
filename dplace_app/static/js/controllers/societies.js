@@ -52,6 +52,15 @@ function SocietiesCtrl($scope, searchModelService, LanguageClass, ZipTest) {
         } else {
             $scope.globalTree = true;
         }
+        
+        //for environmental legend
+        if ($scope.results.environmental_variables[0].id == 34 || $scope.results.environmental_variables[0].id == 36) 
+            d3.selectAll(".envVar").attr("fill", "url(#earthy)");
+        else if ($scope.results.environmental_variables[0].id == 27)
+            d3.selectAll(".envVar").attr("fill", "url(#blue)");
+        else 
+            d3.selectAll(".envVar").attr("fill", "url(#temp)");
+        
     };
     
     $scope.showOrHide = function(chosenVarId, id) {
