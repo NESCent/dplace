@@ -3,7 +3,7 @@
  * Created by dan on 7/30/14.
  */
 
-function SearchModel(VariableCategory, GeographicRegion, EnvironmentalCategory, LanguageClass) {
+function SearchModel(VariableCategory, GeographicRegion, EnvironmentalCategory, LanguageClass, Source) {
     this.reset = function() {
         this.results = {}; // Populated after search is run
         this.params = {}; // state for individual controllers
@@ -11,7 +11,7 @@ function SearchModel(VariableCategory, GeographicRegion, EnvironmentalCategory, 
         this.results.societies = [];
         this.results.languageTrees = [];
         this.selected = [];
-        this.params.culturalTraits = new CulturalTraitModel(VariableCategory);
+        this.params.culturalTraits = new CulturalTraitModel(VariableCategory, Source);
         this.params.geographicRegions = new GeographicRegionModel(GeographicRegion);
         this.params.environmentalData = new EnvironmentalDataModel(EnvironmentalCategory);
         this.params.languageClassifications = new LanguageClassificationModel(LanguageClass)
@@ -21,6 +21,7 @@ function SearchModel(VariableCategory, GeographicRegion, EnvironmentalCategory, 
     this.getCulturalTraits = function() {
         return this.params.culturalTraits;
     };
+    
     this.getGeographicRegions = function() {
         return this.params.geographicRegions;
     };
@@ -53,8 +54,9 @@ function SearchModel(VariableCategory, GeographicRegion, EnvironmentalCategory, 
 
 // Cultural trait search
 // Depends on VariableCategory for initial load. Somewhat messy, requires entire model to know about that API
-function CulturalTraitModel(VariableCategory) {
+function CulturalTraitModel(VariableCategory, Source) {
     this.categories = VariableCategory.query(); // these objects get annotated with variables
+    this.sources = Source.query();
     this.selected = [];
     this.selectedCategory = null;
     this.selectedVariable = null;
