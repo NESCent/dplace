@@ -60,7 +60,7 @@ function SocietiesCtrl($scope, searchModelService, LanguageClass, ZipTest) {
         }
         
         //for environmental legend
-        if ($scope.results.environmental_variables) {
+        if ($scope.results.environmental_variables.length > 0) {
             if ($scope.results.environmental_variables[0].id == 34 || $scope.results.environmental_variables[0].id == 36) 
                 d3.selectAll(".envVar").attr("fill", "url(#earthy)");
             else if ($scope.results.environmental_variables[0].id == 27)
