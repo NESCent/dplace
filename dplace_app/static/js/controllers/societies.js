@@ -3,9 +3,18 @@ function SocietiesCtrl($scope, searchModelService, LanguageClass, ZipTest) {
     $scope.query = searchModelService.getModel().getQuery();
     $scope.variables = [];
     $scope.buttons = [
-        {value:'phylogeny', name:'Phylogenies'},
-        {value:'glottolog', name:'Glottolog Trees'},
+        {value:'phylogeny', name:'Phylogenies', description: "Trees derived from discrete data using phylogenetic methods (branch lengths informative)"},
+        {value:'glottolog', name:'Glottolog Trees', description: "Trees derived Glotolog language family taxonomies (branch lengths uninformative)"},
+        {value:'global', name:'Global Tree', description: "A global language supertree composed from language family taxonomies in Glottolog (branch lengths uninformative)"},
     ];
+    
+    $scope.tabs = [
+        { title: "Table", content: "table", active: true},
+        { title: "Map", content: "map", active: false},
+        { title: "Tree", content: "tree", active: false},
+        { title: "Download", content: "download", active: false},
+    ];
+    
     console.log($scope.results);
     if ($scope.results.variable_descriptions) {
         $scope.variables = $scope.variables.concat($scope.results.variable_descriptions);
@@ -28,6 +37,11 @@ function SocietiesCtrl($scope, searchModelService, LanguageClass, ZipTest) {
     $scope.buttonChanged = function(buttonVal) {
         d3.select('language-phylogeny').html('');
         $scope.globalTree = false;
+        if (buttonVal.indexOf("global") != -1) {
+            $scope.globalTree = true;
+            $scope.results.selectedTree = $scope.results.language_trees.global_tree;
+            $scope.treeSelected();
+        }
         if (buttonVal.indexOf('phylogeny') != -1) {
             $scope.trees = $scope.results.language_trees.phylogenies;
         } else {
@@ -46,12 +60,14 @@ function SocietiesCtrl($scope, searchModelService, LanguageClass, ZipTest) {
         }
         
         //for environmental legend
-        if ($scope.results.environmental_variables[0].id == 34 || $scope.results.environmental_variables[0].id == 36) 
-            d3.selectAll(".envVar").attr("fill", "url(#earthy)");
-        else if ($scope.results.environmental_variables[0].id == 27)
-            d3.selectAll(".envVar").attr("fill", "url(#blue)");
-        else 
-            d3.selectAll(".envVar").attr("fill", "url(#temp)");
+        if ($scope.results.environmental_variables) {
+            if ($scope.results.environmental_variables[0].id == 34 || $scope.results.environmental_variables[0].id == 36) 
+                d3.selectAll(".envVar").attr("fill", "url(#earthy)");
+            else if ($scope.results.environmental_variables[0].id == 27)
+                d3.selectAll(".envVar").attr("fill", "url(#blue)");
+            else 
+                d3.selectAll(".envVar").attr("fill", "url(#temp)");
+        }
         
     };
     
@@ -61,6 +77,37 @@ function SocietiesCtrl($scope, searchModelService, LanguageClass, ZipTest) {
         if (chosenVarId == id) return false;
         else return true;
     };
+    
+    $scope.clicked = function(trees) {
+        if (trees.length == 1) {
+            tree_to_display = trees[0].name;
+        } else {
+            var i = 0;
+            while (trees[i].name.indexOf("global") != -1) {
+                i++;
+            }
+            tree_to_display = trees[i].name;
+        }
+        
+        if (tree_to_display.indexOf("global") != -1) {
+            $scope.results.selectedButton = $scope.buttons[2];
+        }
+       else if (tree_to_display.indexOf("glotto") == -1) 
+            $scope.results.selectedButton = $scope.buttons[0];
+        else 
+            $scope.results.selectedButton = $scope.buttons[1];
+            
+        $scope.buttonChanged($scope.results.selectedButton.value);
+        tree = $scope.trees.filter(function(t) {
+            return t.name == tree_to_display;
+        });
+
+        if (tree.length > 0) {
+            $scope.results.selectedTree = tree[0];
+            $scope.treeSelected();
+        }
+        $scope.tabs[2].active = true;
+    }
     
     $scope.treeDownload = function() {
         var tree_svg = d3.select(".phylogeny")
@@ -116,4 +163,7 @@ function SocietiesCtrl($scope, searchModelService, LanguageClass, ZipTest) {
         // format (csv/svg/etc) should be an argument, and change the endpoint to /api/v1/download
         $scope.csvDownloadLink = "/api/v1/csv_download?query=" + queryString;
     };
+    
+    $scope.generateDownloadLinks();
+    
 }
