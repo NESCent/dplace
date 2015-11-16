@@ -30,15 +30,23 @@ function ColorMapService() {
         var colors = {};
         for (var i = 0; i < results.societies.length; i++) {
             var society = results.societies[i];
-                for (var j = 0; j < society.environmental_values.length; j++) {
-                    variable = results.environmental_variables.filter(function(env_var) {
-                        return env_var.id == society.environmental_values[j].variable;
-                    });
-                    if (variable.length > 0) {
-                        var color = tempColor(society.environmental_values[0].value,  results.environmental_variables[0].min, results.environmental_variables[0].max, results.environmental_variables[0].id);
-                        colors[society.society.id] = color;
-                    }    
+            
+            if (society.geographic_regions) {
+                for (var j = 0; j < society.geographic_regions.length; j++) {
+                    var color = mapColor(society.geographic_regions[0].tdwg_code, results.geographic_regions.length);
+                    colors[society.society.id] = color;
                 }
+            }
+                
+            for (var j = 0; j < society.environmental_values.length; j++) {
+                variable = results.environmental_variables.filter(function(env_var) {
+                    return env_var.id == society.environmental_values[j].variable;
+                });
+                if (variable.length > 0) {
+                    var color = tempColor(society.environmental_values[0].value,  results.environmental_variables[0].min, results.environmental_variables[0].max, results.environmental_variables[0].id);
+                    colors[society.society.id] = color;
+                }    
+            }
             
             for (var j = 0; j < society.variable_coded_values.length; j++) {
                 if (society.variable_coded_values[j].code_description && (society.variable_coded_values[j].code_description.description.indexOf("Missing data") != -1))
