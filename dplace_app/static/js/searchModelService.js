@@ -8,4 +8,17 @@ function SearchModelService(VariableCategory, GeographicRegion, EnvironmentalCat
     this.getModel = function() {
         return this.model;
     }
+    
+    
+    this.doSearch = function() {
+        searchModel = this.getModel();
+        searchParams = searchModel.params;
+        
+        for (var propertyName in searchParams) {
+            console.log(propertyName);
+        }
+        
+    }
+
+    
 }

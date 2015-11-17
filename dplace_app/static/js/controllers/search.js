@@ -148,16 +148,6 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties, 
             container.society.style = {'background-color' : colorMap[container.society.id] };
         });
     };
-
-    //not used at the moment
-    function searchForLanguageTrees() {
-        var languageIDs = $scope.searchModel.getSocieties().filter(function (container) {
-            return container.society.language != null;
-        }).map(function (container) {
-            return container.society.language.id;
-        });
-        $scope.searchModel.results.language_trees = TreesFromLanguages.find({language_ids: languageIDs}, addTreesToSocieties);
-    }
     
     function addTreesToSocieties() {
         $scope.searchModel.results.language_trees.phylogenies = [];
@@ -185,12 +175,6 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties, 
         });
     }
 
-    // This method merges the current searchQuery object with the incoming searchQuery
-    $scope.updateSearchQuery = function(searchQuery) {
-        for(var propertyName in searchQuery) {
-            $scope.searchModel.query[propertyName] = searchQuery[propertyName];
-        }
-    };
 
     var errorCallBack = function() {
 	$scope.errors = "Invalid input.";
@@ -202,15 +186,74 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties, 
         $scope.getCodeIDs();
         $scope.assignColors();
         addTreesToSocieties();
+        $scope.searchModel.results.searched = true;
         $scope.switchToResults();
     };
 
+        // This method merges the current searchQuery object with the incoming searchQuery
+    $scope.updateSearchQuery = function(searchQuery) {
+        for(var propertyName in searchQuery) {
+            $scope.searchModel.query[propertyName] = searchQuery[propertyName];
+        }
+    };
+    
     $scope.searchSocieties = function() {
         $scope.disableSearchButton();
         var query = $scope.searchModel.query;
         $scope.searchModel.results = FindSocieties.find(query, searchCompletedCallback, errorCallBack);
     };
 
+    $scope.search = function() {
+        searchModel = searchModelService.getModel();
+        searchParams = searchModel.params;    
+        searchQuery = {};
+        for (var propertyName in searchParams) {
+            //get selected cultural traits/codes
+            if (propertyName == 'culturalTraits') {
+                var codes = searchParams[propertyName].selected.filter(function(code){ return code.isSelected; });
+                if (codes.length > 0)
+                    searchQuery['variable_codes'] = codes;
+            }
+            //get selected regions
+            if (propertyName == 'geographicRegions') {
+                var selectedRegions = searchParams[propertyName].selectedRegions;          
+                selectedRegions.forEach(function (selectedRegion) {
+                    var regionId = null;
+                    searchParams[propertyName].allRegions.forEach(function(region) {
+                        if (region.tdwg_code == selectedRegion.code)
+                            selectedRegion.id = region.id;
+                    });
+                
+                
+                });
+                if (selectedRegions.length > 0)
+                    searchQuery['geographic_regions'] = selectedRegions;
+            }
+            //get selected environmental variable and search parameters
+            if (propertyName == 'environmentalData') {
+                if (searchParams[propertyName].selectedVariable) {
+                    var selected_id = searchParams[propertyName].selectedVariable.id;
+                    var selected_operator = searchParams[propertyName].selectedFilter.operator;
+                    var selected_params = searchParams[propertyName].vals;
+                    var filters = [{
+                        id: selected_id,
+                        operator: selected_operator,
+                        params: selected_params
+                    }];
+                    searchQuery['environmental_filters'] = filters;
+                }
+            }
+            //get selected languages
+            if (propertyName == 'languageClassifications') { 
+                var classifications = searchParams[propertyName].selected.filter(function(classification){ return classification.isSelected; });
+                if (classifications.length > 0)
+                    searchQuery['language_classifications'] = classifications;
+           }
+        }
+        $scope.updateSearchQuery(searchQuery);
+        $scope.searchSocieties();
+    };
+    
     // resets this object state and the search query.
     $scope.resetSearch = function() {
 		$scope.errors = "";
