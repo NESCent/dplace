@@ -84,35 +84,6 @@ def society_locations(dict_row):
     except ObjectDoesNotExist:
         print "No society with ID %s in database, skipping" % soc_id
 
-def postprocess_ea_societies():
-    '''
-    Some of the EA Variable values represent data that is needed at the society level, e.g.
-    source and location
-    '''
-    try:
-        lon_var = VariableDescription.objects.get(name='Longitude')
-        lat_var = VariableDescription.objects.get(name='Latitude')
-        focal_year_var = VariableDescription.objects.get(name='Date: Year with Century')
-    except ObjectDoesNotExist:
-        print "Unable to find vars for Lon/Lat/Year.  Have you loaded the ea_vars?"
-    for society in Society.objects.filter(source=get_source("EA")):
-        # Get location
-        try:
-            lon_val = society.variablecodedvalue_set.get(variable=lon_var)
-            lat_val = society.variablecodedvalue_set.get(variable=lat_var)
-        except ObjectDoesNotExist:
-            print "Unable to get lon/lat for society %s, skipping postprocessing" % society
-            continue
-        try:
-            location = Point(
-                float(lon_val.coded_value),
-                float(lat_val.coded_value)
-            )
-            society.location = location
-        except ValueError:
-            print "Unable to create Point from (%s,%s) for society %s" % (lon_val.coded_value, lat_val.coded_value, society)
-        society.save()
-
 def eavar_number_to_label(number):
     return "EA{0:0>3}".format(number)
 
@@ -303,12 +274,14 @@ def load_ea_stacked(val_row):
     try:
         society = Society.objects.get(ext_id=ext_id)
     except ObjectDoesNotExist:
-        print "Attempting to load EA values for %s but did not find an existing Society object" % ext_id
+        print "Attempting to load EA values for %s but did not find an existing Society object, skipping" % ext_id
         return
     
     variable = get_variable(val_row['VarID'])
     value = val_row['Code']
     comment = val_row['Comment']
+    references = val_row['References'].strip().split(";")
+    print references
 
     if variable is None:
         print "Could not find variable %s for society %s" % (val_row['VarID'], society)
@@ -323,9 +296,9 @@ def load_ea_stacked(val_row):
         coded_value=value,
         code=code,
     )
+    
     if created:
         print "Getting data for Society %s Variable ID %s" % (ext_id, val_row['VarID'])
-
     v.save()
     
 def load_ea_val(val_row):
