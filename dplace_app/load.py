@@ -17,7 +17,7 @@ LOAD_BY_ROW=('iso', 'env_vals',
              'soc_lat_long',
              'ea_soc', 'ea_vars', 'ea_vals',
              'bf_soc', 'bf_vars', 'bf_vals',
-             'vars', 'ea_stacked', 'vars')
+             'vars', 'ea_stacked', 'vars',)
 
 def run(file_name=None, mode=None):
     if mode == 'geo':
@@ -56,6 +56,8 @@ def run(file_name=None, mode=None):
                         load_bf_var(dict_row)
                     elif mode == 'bf_vals':
                         load_bf_val(dict_row)
+            elif mode == 'refs':
+                load_references(csvfile)
             elif mode == 'ea_codes':
                 #load_ea_codes(csvfile)
                 load_codes(csvfile)
@@ -64,11 +66,6 @@ def run(file_name=None, mode=None):
         if len(MISSING_CODES) > 0:
             print "Missing ISO Codes:"
             print '\n'.join(MISSING_CODES)
-        if mode == 'ea_vals':
-            # after loading values, populate society-level data from variable values
-            postprocess_ea_societies()
-        elif mode == 'bf_vals':
-            postprocess_binford_societies()
         elif mode == 'env_vars':
             create_environmental_variables()
         elif mode == 'langs':
