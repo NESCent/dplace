@@ -20,7 +20,7 @@
                 <span ng-hide="geographic.selectedRegions.length" class="search-help">Select Geographic regions by clicking the map</span>
                 <span class="region" ng-repeat="region in geographic.selectedRegions">
                     <span>{{ region.name }}</span>
-                    <span class="glyphicon glyphicon-remove region-remove" ng-click="removeRegion(region)"></span></span>
+                    <span class="glyphicon glyphicon-remove region-remove" ng-click="removeRegion(region)" style="cursor:pointer;"></span></span>
                 </span>
             </div>
             <div class="panel-body scrollable">
