@@ -293,7 +293,7 @@ class Source(models.Model):
     but since all the code has already been written with this model, I won't change it yet.
     """
     
-    year = models.CharField(max_length=10) # text, because might be '1996', '1999-2001', or 'ND'
+    year = models.CharField(max_length=30) # text, because might be '1996', '1999-2001', or 'ND'
     author = models.CharField(max_length=50)
     reference = models.CharField(max_length=500)
     subcase = models.CharField(max_length=32,null=True)
