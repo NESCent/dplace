@@ -19,9 +19,7 @@ CLASS_LEVELS = (
 CLASSIFICATION_SCHEMES = (
     ('E', 'Ethnologue17',),
     ('R', 'Ethnologue17-Revised',),
-    ('G', 'Glottolog',), #CHECK THIS
-    #... any others as they become available. I can see a time in
-    # the not too distant future when we'll get better ones.
+    ('G', 'Glottolog',), 
 )
 
 
@@ -30,6 +28,7 @@ CLASSIFICATION_SCHEMES = (
 # Other datasets references ISO Codes that were not present in 16th ed, so now
 # this is loaded from the ethnologue, and locations are annotated later if known
 
+# We don't really need a location field here...
 class ISOCode(models.Model):
     iso_code = models.CharField('ISO Code', db_index=True, max_length=3)
     location = models.PointField(null=True) # only have locations for ISO codes in 16th ed ethnologue
@@ -60,7 +59,7 @@ class Society(models.Model):
     language = models.ForeignKey('Language', null=True, related_name="societies")
     objects = models.GeoManager()
     focal_year = models.CharField('Focal Year', null=True, blank=True, max_length=100)
-    references = models.TextField('References', null=True)
+    references = models.TextField('References', null=True) #why is this here???
 
     def get_environmental_data(self):
         """Returns environmental data for the given society"""
@@ -289,13 +288,17 @@ class VariableCodedValue(models.Model):
 
 class Source(models.Model):
     """
-    Stores references for VariableCodedValues
+    Stores references for VariableCodedValues, also for dataset sources.
+    Not really sure if we should separate dataset sources from references (I think we should),
+    but since all the code has already been written with this model, I won't change it yet.
     """
+    
     year = models.CharField(max_length=10) # text, because might be '1996', '1999-2001', or 'ND'
     author = models.CharField(max_length=50)
     reference = models.CharField(max_length=500)
     focal_year = models.CharField(max_length=10,null=True)
     subcase = models.CharField(max_length=32,null=True)
+    name = models.CharField(max_length=100, default="")
     
     def __unicode__(self):
         return "%s (%s)" % (self.author, self.year)

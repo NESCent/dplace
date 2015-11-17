@@ -16,6 +16,8 @@ def get_source(source='EA'):
                 focal_year='',
                 subcase='',
             )
+        o.name = "Ethnographic Atlas"
+        o.save()
     elif source == 'Binford':
         try:
             o = Source.objects.get(year="2001", author="Binford")
@@ -27,6 +29,8 @@ def get_source(source='EA'):
                 focal_year='',
                 subcase='',
             )
+        o.name = "Binford Hunter-Gatherer"
+        o.save()
     else:
         raise ValueError("Unknown Source: %s" % source)
     _SOURCE_CACHE[source] = o

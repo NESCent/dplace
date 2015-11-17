@@ -23,7 +23,7 @@
                             ng-model="trait.selectedSource"
                             class="form-control"
                             ng-change="sourceChanged(trait)"
-                            ng-options='source as (source.author + " ("+source.year+")") for source in trait.sources'
+                            ng-options='source as (source.name) for source in trait.sources'
                             >
                             <option value="">Select a Source</option>
                         </select>
