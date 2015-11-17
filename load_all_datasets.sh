@@ -43,23 +43,20 @@ export PYTHONPATH=$DPLACE_PATH
 #python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/Revised_Ethnologue_families-Feb_10_2014-17th_Ed-ISO693-3-current.csv" langs
 #python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/Revised_Ethnologue_families-Feb_10_2014-17th_Ed_Missing_ISO_codes.csv" langs
 
-#echo "Loading EA Societies"
-#python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/ea_langs+isocodes.csv" ea_soc
+echo "Loading EA Societies"
+python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/ea_langs+isocodes.csv" ea_soc
 
 #echo "Loading EA Society and XD ID links"
 #python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/EA_soc_id_to_xd_id_10Nov2015.csv" ea_soc_xd_id
 
-echo "Linking societies to locations"
-python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/EA_Binford_Lat_long.csv" soc_lat_long
+#echo "Linking societies to locations"
+#python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/EA_Binford_Lat_long.csv" soc_lat_long
 
 #echo "Linking Societies to Glottocodes"
 #python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/xd_id_to_language_9Nov2015.csv" xd_lang
 
-#echo "Loading Binford Societies"
-#python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/binford_langs+isocodes.csv" bf_soc
-
-#echo "Loading Binford Harmonized Societies"
-#python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/binford_harm.csv" bf_harm
+echo "Loading Binford Societies"
+python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/binford_langs+isocodes.csv" bf_soc
 
 #echo "Loading Environmental Data"
 #python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/EcologicalData.DBASE.07Mar14.csv" "env_vars"
@@ -75,9 +72,9 @@ python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/EA_Binford_Lat_long
 
 #echo "Loading EA Variable Values"
 #python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/ea_vals.csv" ea_vals
+
 #echo "Loading EA Stacked Data"
 #python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/EA_DATA_stacked_10Nov2015.csv" ea_stacked
-
 
 #echo "Loading Binford Variables"
 #python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/binford_variable_names+categories.csv" bf_vars
