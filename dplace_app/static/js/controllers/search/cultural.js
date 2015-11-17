@@ -1,8 +1,9 @@
-function CulturalCtrl($scope, searchModelService, Variable, CodeDescription, BfContinuousVariable, Source, getCategories) {
+function CulturalCtrl($scope, searchModelService, Variable, CodeDescription, BfContinuousVariable, DatasetSources, getCategories) {
    var linkModel = function() {
         // Model/state lives in searchModelService
         $scope.traits = [searchModelService.getModel().getCulturalTraits()];
     };
+    
     
     $scope.$on('searchModelReset', linkModel); // When model is reset, update our model
     linkModel();
