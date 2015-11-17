@@ -14,30 +14,7 @@ function GeographicCtrl($scope, searchModelService) {
         $scope.geographic.selectedRegions.splice(index, 1);
     };
 
-    // Gets the region ID from a geographic region code
-    // The map uses region codes as the identifier for each region, they come from a shapefile
-    // The search API uses the database id (pk) for the region, it is not present in the Map
-    var regionIdFromCode = function(code) {
-        var regionId = null;
-        $scope.geographic.allRegions.forEach(function (region) {
-            if(region.tdwg_code == code) {
-                regionId = region.id;
-            }
-        });
-        return regionId;
-    };
-
-    // annotates Database IDs onto selected regions
-    var tagSelectedRegionsWithIDs = function() {
-        $scope.geographic.selectedRegions.forEach(function(selectedRegion) {
-            selectedRegion.id = regionIdFromCode(selectedRegion.code)
-        });
-    };
-
     $scope.doSearch = function() {
-        tagSelectedRegionsWithIDs();
-        var geographicRegions = $scope.geographic.selectedRegions;
-        $scope.updateSearchQuery({ geographic_regions: geographicRegions });
-        $scope.searchSocieties();
+        $scope.search();
     };
 }

@@ -1,7 +1,7 @@
 <div class="row">
-                <div ng-hide="results.societies.length">
-                    <p class="text-center help-block search-help"></p>
-                </div>
+                <div ng-show="(results.searched && (results.societies.length == 0))">
+                    <p style="margin:20px;">No societies found.</p>
+                    </div>
                 <table class="table" ng-show="results.societies.length">
                     <tr>
                         <th>Name</th>
