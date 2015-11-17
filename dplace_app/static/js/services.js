@@ -4,7 +4,7 @@ angular.module('dplaceServices', ['ngResource'])
         $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
     })
     .service('colorMapService', [ColorMapService])
-    .service('searchModelService',['VariableCategory','GeographicRegion','EnvironmentalCategory', 'LanguageClass', 'Source',SearchModelService])
+    .service('searchModelService',['VariableCategory','GeographicRegion','EnvironmentalCategory', 'LanguageClass', 'DatasetSources', SearchModelService])
     .factory('LanguageClass', function ($resource) {
         return $resource(
             '/api/v1/language_classes/:id',
@@ -123,6 +123,17 @@ angular.module('dplaceServices', ['ngResource'])
                 query: {
                     method: 'GET',
                     isArray:true
+                }
+            }
+        )
+    })
+    .factory('DatasetSources', function($resource) {
+        return $resource(
+            '/api/v1/get_dataset_sources',
+            {}, {
+                query: {
+                    method: 'GET',
+                    isArray: true
                 }
             }
         )
