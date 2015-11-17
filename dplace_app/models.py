@@ -262,6 +262,7 @@ class VariableCodedValue(models.Model):
     code = models.ForeignKey('VariableCodeDescription', db_index=True, null=True)
     source = models.ForeignKey('Source', null=True)
     comment = models.TextField(default="")
+    references = models.ManyToManyField('Source', related_name='references')
     
     def get_description(self):
         if self.code is not None:

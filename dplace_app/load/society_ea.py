@@ -281,6 +281,7 @@ def load_ea_stacked(val_row):
     value = val_row['Code']
     comment = val_row['Comment']
     references = val_row['References'].strip().split(";")
+    
     print references
 
     if variable is None:
