@@ -261,7 +261,7 @@ class VariableCodedValue(models.Model):
     coded_value = models.CharField(max_length=100, db_index=True, null=False, default='.')
     code = models.ForeignKey('VariableCodeDescription', db_index=True, null=True)
     source = models.ForeignKey('Source', null=True)
-    comment = models.TextField(default="")
+    #comment = models.TextField(default="")
     
     def get_description(self):
         if self.code is not None:
@@ -296,7 +296,6 @@ class Source(models.Model):
     year = models.CharField(max_length=10) # text, because might be '1996', '1999-2001', or 'ND'
     author = models.CharField(max_length=50)
     reference = models.CharField(max_length=500)
-    focal_year = models.CharField(max_length=10,null=True)
     subcase = models.CharField(max_length=32,null=True)
     name = models.CharField(max_length=100, default="")
     
