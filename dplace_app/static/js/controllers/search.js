@@ -186,6 +186,7 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties, 
         $scope.getCodeIDs();
         $scope.assignColors();
         addTreesToSocieties();
+        $scope.searchModel.results.searched = true;
         $scope.switchToResults();
     };
 
