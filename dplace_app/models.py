@@ -287,10 +287,9 @@ class VariableCodedValue(models.Model):
             ('variable','society','coded_value'),
         )
 
-
 class Source(models.Model):
     """
-    Source information for various items in the cultural traits data sets
+    Stores references for VariableCodedValues
     """
     year = models.CharField(max_length=10) # text, because might be '1996', '1999-2001', or 'ND'
     author = models.CharField(max_length=50)
