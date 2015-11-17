@@ -49,6 +49,9 @@ export PYTHONPATH=$DPLACE_PATH
 #echo "Loading EA Society and XD ID links"
 #python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/EA_soc_id_to_xd_id_10Nov2015.csv" ea_soc_xd_id
 
+echo "Linking societies to locations"
+python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/EA_Binford_Lat_long.csv" soc_lat_long
+
 #echo "Linking Societies to Glottocodes"
 #python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/xd_id_to_language_9Nov2015.csv" xd_lang
 
@@ -62,18 +65,18 @@ export PYTHONPATH=$DPLACE_PATH
 #python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/EcologicalData.DBASE.07Mar14.csv" "env_vars"
 #python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/EcologicalData.DBASE.07Mar14.csv" "env_vals"
 
-echo "Loading EA Variables"
+#echo "Loading EA Variables"
 #python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/ea_variable_names+categories.csv" ea_vars
-python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/VariableList_10Nov2015.csv" vars
+#python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/VariableList_10Nov2015.csv" vars
 
-echo "Loading EA Variable Codes"
+#echo "Loading EA Variable Codes"
 #python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/ea_codes.csv" ea_codes
-python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/CodeDescriptions_10Nov2015.csv" ea_codes
+#python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/CodeDescriptions_10Nov2015.csv" ea_codes
 
 #echo "Loading EA Variable Values"
 #python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/ea_vals.csv" ea_vals
-echo "Loading EA Stacked Data"
-python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/EA_DATA_stacked_10Nov2015.csv" ea_stacked
+#echo "Loading EA Stacked Data"
+#python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/EA_DATA_stacked_10Nov2015.csv" ea_stacked
 
 
 #echo "Loading Binford Variables"

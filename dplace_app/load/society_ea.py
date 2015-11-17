@@ -61,6 +61,28 @@ def load_ea_society(society_dict):
             return None
         return society
     return found_societies.first()
+    
+def society_locations(dict_row):
+    '''
+    Locations for societies from EA_Binford_Lat_Long.csv.
+    '''
+    soc_id = dict_row['soc_id']
+    lat_val = dict_row['Latitude']
+    long_val = dict_row['Longitude']
+    
+    try:
+        society = Society.objects.get(ext_id=soc_id)
+        try:
+            location = Point(
+                float(long_val),
+                float(lat_val)
+            )
+            society.location = location
+        except ValueError:
+            print "Unable to create Point from (%s,%s) for society %s" % (long_val, lat_val, society)
+        society.save()
+    except ObjectDoesNotExist:
+        print "No society with ID %s in database, skipping" % soc_id
 
 def postprocess_ea_societies():
     '''

@@ -13,6 +13,7 @@ from load.variables import *
 
 LOAD_BY_ROW=('iso', 'env_vals',
              'langs', 'iso_lat_long',
+             'soc_lat_long',
              'ea_soc', 'ea_vars', 'ea_vals',
              'bf_soc', 'bf_vars', 'bf_vals',
              'bf_harm', 'vars', 'ea_stacked', 'vars')
@@ -38,6 +39,8 @@ def run(file_name=None, mode=None):
                         load_vars(dict_row)
                     elif mode == 'ea_soc':
                         load_ea_society(dict_row)
+                    elif mode == 'soc_lat_long':
+                        society_locations(dict_row)
                     elif mode == 'env_vals':
                         load_environmental(dict_row)
                     elif mode == 'ea_vals':
