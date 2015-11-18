@@ -218,6 +218,7 @@ class VariableCodeDescription(models.Model):
     code = models.CharField(max_length=20, db_index=True, null=False, default='.')
     code_number = models.IntegerField(null=True, db_index=True)
     description = models.CharField(max_length=500, default='Unknown')
+    short_description = models.CharField(max_length=500, default="")
     n = models.IntegerField(null=True, default=0)
     
     def save(self, *args, **kwargs):
