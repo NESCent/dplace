@@ -1,15 +1,12 @@
 # -*- coding: utf-8 -*-
-# __author__ = 'dan'
+# __author__ = 'stef'
 
 import csv
 from django.contrib.gis.geos import Point
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.utils import IntegrityError
-from dplace_app.load.isocode import get_isocode
 from dplace_app.models import *
-from environmental import iso_from_code
 from sources import get_source
-# TODO: figure out how to deal with focal year.
 
 def ea_soc_to_xd_id(dict_row):
     soc_id = dict_row['soc_id']
@@ -65,12 +62,8 @@ def society_locations(dict_row):
 def eavar_number_to_label(number):
     return "EA{0:0>3}".format(number)
 
-def clean_category(category):
-    return category.strip().capitalize()
-
 _EA_VAL_CACHE, _EA_VCD_CACHE = {}, {}
 #soooooooooooooooooooooooooo slow 
-#need to read in references
 def load_ea_stacked(val_row):
     def get_variable(number):
             label = eavar_number_to_label(number)
@@ -109,7 +102,7 @@ def load_ea_stacked(val_row):
     except ObjectDoesNotExist:
         print "Attempting to load EA values for %s but did not find an existing Society object, skipping" % ext_id
         return
-    
+            
     variable = get_variable(val_row['VarID'])
     value = val_row['Code']
     comment = val_row['Comment']
@@ -125,9 +118,11 @@ def load_ea_stacked(val_row):
         variable=variable,
         society=society,
         source=source,
-        coded_value=value,
-        code=code,
     )
+    v.coded_value = value
+    v.code = code
+    v.comment = comment
+
     for r in references:
         ref_short = r.split(",")
         if len(ref_short) == 2:
@@ -136,12 +131,10 @@ def load_ea_stacked(val_row):
             try:
                 ref = Source.objects.get(author=author, year=year)
                 if ref not in v.references.all():
-                    print "Adding reference %s" % (ref)
                     v.references.add(ref)
             except ObjectDoesNotExist:
                 print "Could not find reference %s (%s) in database, skipping reference for this coded value %s" % (author, year, v)
-
-    if created:
-        print "Getting data for Society %s Variable ID %s" % (ext_id, val_row['VarID'])
     v.save()
+    print "Saved data for Society %s Variable ID %s" % (ext_id, variable.label)
+
 

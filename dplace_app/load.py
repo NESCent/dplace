@@ -16,17 +16,15 @@ from load.sources import *
 #env_vals = load environmental values
 #langs =
 #soc_lat_long = load locations for societies
-#ea_soc = 
-#ea_vars = 
+#ea_soc = load EA societies
 #bf_soc = 
-#bf_vars = 
 #bf_vals = 
-#vars = load variables
+#vars = load (EA or BF) variables
 #ea_stacked = load EA stacked
 
 LOAD_BY_ROW=('iso', 'env_vals',
              'langs','soc_lat_long',
-             'ea_soc','bf_soc', 'bf_vars', 'bf_vals',
+             'ea_soc','bf_soc', 'bf_vals',
              'vars', 'ea_stacked', 'glotto')
 
 def run(file_name=None, mode=None):
@@ -58,19 +56,14 @@ def run(file_name=None, mode=None):
                         load_lang(dict_row)
                     elif mode == 'bf_soc':
                         load_bf_society(dict_row)
-                    elif mode == 'bf_vars':
-                        load_vars(dict_row)
                     elif mode == 'glotto':
                         load_glottocode(dict_row)
                     elif mode == 'bf_vals':
                         load_bf_val(dict_row)
-            elif mode == 'refs':
+            elif mode == 'refs': #load references
                 load_references(csvfile)
-            elif mode == 'codes':
-                #load_ea_codes(csvfile)
+            elif mode == 'codes': #load codes for variables
                 load_codes(csvfile)
-            elif mode == 'bf_codes':
-                load_bf_codes(csvfile)
         if len(MISSING_CODES) > 0:
             print "Missing ISO Codes:"
             print '\n'.join(MISSING_CODES)

@@ -6,11 +6,8 @@ import csv
 from django.contrib.gis.geos import Point
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.utils import IntegrityError
-from dplace_app.load.isocode import get_isocode
 from dplace_app.models import *
-from environmental import iso_from_code
 from sources import get_source
-# TODO: figure out how to deal with focal year.
 
 def eavar_number_to_label(number):
     return "EA{0:0>3}".format(number)
@@ -59,6 +56,9 @@ CODE_COLUMN                 = 2
 DESCRIPTION_COLUMN          = 4   
 SHORT_DESCRIPTION_COLUMN    = 5
 def load_codes(csvfile=None):
+    '''
+    Used to load Code Descriptions from CodeDescriptions.csv.
+    '''
     csv_reader = csv.reader(csvfile)
     for row in csv_reader:
         dataset = row[DATASET_COLUMN].strip()
