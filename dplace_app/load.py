@@ -27,7 +27,7 @@ from load.sources import *
 LOAD_BY_ROW=('iso', 'env_vals',
              'langs','soc_lat_long',
              'ea_soc','bf_soc', 'bf_vars', 'bf_vals',
-             'vars', 'ea_stacked',)
+             'vars', 'ea_stacked', 'glotto')
 
 def run(file_name=None, mode=None):
     if mode == 'geo':
@@ -59,12 +59,14 @@ def run(file_name=None, mode=None):
                     elif mode == 'bf_soc':
                         load_bf_society(dict_row)
                     elif mode == 'bf_vars':
-                        load_bf_var(dict_row)
+                        load_vars(dict_row)
+                    elif mode == 'glotto':
+                        load_glottocode(dict_row)
                     elif mode == 'bf_vals':
                         load_bf_val(dict_row)
             elif mode == 'refs':
                 load_references(csvfile)
-            elif mode == 'ea_codes':
+            elif mode == 'codes':
                 #load_ea_codes(csvfile)
                 load_codes(csvfile)
             elif mode == 'bf_codes':
