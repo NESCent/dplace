@@ -59,7 +59,8 @@ class Society(models.Model):
     language = models.ForeignKey('Language', null=True, related_name="societies")
     objects = models.GeoManager()
     focal_year = models.CharField('Focal Year', null=True, blank=True, max_length=100)
-
+    alternate_names = models.TextField(default="")
+    
     def get_environmental_data(self):
         """Returns environmental data for the given society"""
         valueDict = defaultdict(list)
