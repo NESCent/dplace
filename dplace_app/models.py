@@ -59,7 +59,6 @@ class Society(models.Model):
     language = models.ForeignKey('Language', null=True, related_name="societies")
     objects = models.GeoManager()
     focal_year = models.CharField('Focal Year', null=True, blank=True, max_length=100)
-    references = models.TextField('References', null=True) #why is this here???
 
     def get_environmental_data(self):
         """Returns environmental data for the given society"""
@@ -261,8 +260,8 @@ class VariableCodedValue(models.Model):
     coded_value = models.CharField(max_length=100, db_index=True, null=False, default='.')
     code = models.ForeignKey('VariableCodeDescription', db_index=True, null=True)
     source = models.ForeignKey('Source', null=True)
-    comment = models.TextField(default="")
-    references = models.ManyToManyField('Source', related_name='references')
+    #comment = models.TextField(default="")
+    #references = models.ManyToManyField('Source', related_name='references')
     
     def get_description(self):
         if self.code is not None:
