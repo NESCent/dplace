@@ -7,7 +7,7 @@ from rest_framework import serializers
 class VariableCodeDescriptionSerializer(serializers.ModelSerializer):
     class Meta:
         model = VariableCodeDescription
-        fields = ('id', 'code', 'description', 'variable')
+        fields = ('id', 'code', 'description', 'short_description', 'variable')
 
 class VariableDescriptionSerializer(serializers.ModelSerializer):
     class Meta:
