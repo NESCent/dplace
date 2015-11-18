@@ -23,44 +23,22 @@ def ea_soc_to_xd_id(dict_row):
         return
 
 def load_ea_society(society_dict):
-    ext_id = society_dict['ID']
+    ext_id = society_dict['soc_id'].strip()
+    xd_id = society_dict['xd_id'].strip()
+    soc_name = society_dict['soc_name'].strip()
     source = get_source('EA')
-    found_societies = Society.objects.filter(ext_id=ext_id)
-    if len(found_societies) == 0:
-        name = society_dict['Society_name_EA']
-        iso_code = iso_from_code(get_isocode(society_dict))
-        if iso_code is None:
-            print "Warning: Unable to find a record for ISO code %s" % get_isocode(society_dict)
-        # Get the language
-        language_name = society_dict['LangNam']
-        try:
-            language = Language.objects.get(name=language_name,iso_code=iso_code)
-        except ObjectDoesNotExist:
-            language = None
-            print "Warning: Creating society record for %s but no language found with name %s" % (ext_id, language_name)
-        society = Society(ext_id=ext_id,
-                          name=name,
-                          source=source,
-                          iso_code=iso_code,
-                          language=language
-                          )
-        try:
-            society.save()
-            return society
-        except BaseException as e:
-            print "Exception saving society: %s" % e.message
-            return None
-    else:
-        society = found_societies.first()
-        if not society.source:
-            society.source = source
-        try:
-            society.save()
-        except BaseException as e:
-            print "Exception saving society: %s" % e.message
-            return None
-        return society
-    return found_societies.first()
+    focal_year = society_dict['main_focal_year'].strip()
+    alternate_names = society_dict['alternate_names'].strip()
+    
+    society, created = Society.objects.get_or_create(ext_id=ext_id)
+    society.xd_id = xd_id
+    society.source = source
+    society.name = soc_name
+    society.alternate_names = alternate_names
+    society.focal_year = focal_year
+    
+    print "Saving society %s" % society
+    society.save()
     
 def society_locations(dict_row):
     '''
@@ -281,8 +259,6 @@ def load_ea_stacked(val_row):
     value = val_row['Code']
     comment = val_row['Comment']
     references = val_row['References'].strip().split(";")
-    
-    print references
 
     if variable is None:
         print "Could not find variable %s for society %s" % (val_row['VarID'], society)
@@ -297,62 +273,20 @@ def load_ea_stacked(val_row):
         coded_value=value,
         code=code,
     )
-    
+    for r in references:
+        ref_short = r.split(",")
+        if len(ref_short) == 2:
+            author = ref_short[0].strip()
+            year = ref_short[1].strip()
+            try:
+                ref = Source.objects.get(author=author, year=year)
+                if ref not in v.references.all():
+                    print "Adding reference %s" % (ref)
+                    v.references.add(ref)
+            except ObjectDoesNotExist:
+                print "Could not find reference %s (%s) in database, skipping reference for this coded value %s" % (author, year, v)
+
     if created:
         print "Getting data for Society %s Variable ID %s" % (ext_id, val_row['VarID'])
     v.save()
-    
-def load_ea_val(val_row):
-    # So sloooow.
-    def get_variable(number):
-        label = eavar_number_to_label(number)
-        if label not in _EA_VAL_CACHE:
-            try:
-                _EA_VAL_CACHE[label] = VariableDescription.objects.get(label=label)
-            except ObjectDoesNotExist:
-                _EA_VAL_CACHE[label] = None
-        return _EA_VAL_CACHE[label]
-        
-    def get_description(variable, value):
-        key = (variable, value)
-        if key not in _EA_VCD_CACHE:
-            try:
-                # Check for Code description if it exists.
-                _EA_VCD_CACHE[key] = VariableCodeDescription.objects.get(variable=variable,code=value)
-            except ObjectDoesNotExist:
-                _EA_VCD_CACHE[key] = None
-        return _EA_VCD_CACHE[key]
-        
-    ext_id = val_row['ID'].strip()
-    source = get_source("EA")
-    # find the existing society
-    
-    if ext_id == "":
-        assert all([val_row[cell] == "" for cell in val_row])
-        return
-        
-    try:
-        society = Society.objects.get(ext_id=ext_id)
-    except ObjectDoesNotExist:
-        print "Attempting to load EA values for %s but did not find an existing Society object" % ext_id
-        return
-   
-    # get the keys that start with v
-    for key in val_row.keys():
-        if key.find('v') == 0:
-            number = int(key[1:])
-            value = val_row[key].strip()
-            variable = get_variable(number)
-            
-            if variable is None:
-                continue
-            
-            code = get_description(variable, value)
-            
-            v, created = VariableCodedValue.objects.get_or_create(
-                variable=variable,
-                society=society,
-                coded_value=value,
-                source=source,
-                code=code
-            )
+

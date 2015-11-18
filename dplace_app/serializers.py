@@ -92,7 +92,7 @@ class SocietySerializer(gis_serializers.GeoModelSerializer):
     language = LanguageSerializer(source='language')
     class Meta:
         model = Society
-        fields = ('id', 'ext_id', 'xd_id', 'name', 'location', 'iso_code', 'glotto_code', 'language', 'references','focal_year','source',)
+        fields = ('id', 'ext_id', 'xd_id', 'name', 'location', 'iso_code', 'glotto_code', 'language', 'focal_year','source',)
 
 # Geographic Regions
 class GeographicRegionSerializer(gis_serializers.GeoModelSerializer):

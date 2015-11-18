@@ -12,68 +12,26 @@ from environmental import iso_from_code
 from society_ea import clean_category
 from sources import get_source
 
-def load_bf_harm(society_dict):
-    ext_id = society_dict['Binford_ID']
-    found_societies = Society.objects.filter(ext_id=ext_id)
-    if len(found_societies) > 0:
-        society = found_societies.first()
-        society.focal_year = society_dict['Binford_FocalYear']
-        society.references = society_dict['Binford_references']
-        try:
-            society.save()
-        except BaseException as e:
-            print "Exception saving society: %s" % e.message
-            return None
-        return society
-    return found_societies.first()
-
 def _unicode_damnit(var):
     return var.decode('latin1').encode('utf8')
 
-
 def load_bf_society(society_dict):
-    ext_id = society_dict['ID']
-    source = get_source("Binford")
-    found_societies = Society.objects.filter(ext_id=ext_id, source=source)
-    if len(found_societies) == 0:
-        iso_code = iso_from_code(get_isocode(society_dict))
-        
-        if iso_code is None:
-            print "Warning: Unable to find a record for ISO code %s" % get_isocode(society_dict)
-        
-        # Get the language
-        language_name = society_dict['LangNam']
-        try:
-            language = Language.objects.get(name=language_name, iso_code=iso_code)
-        except ObjectDoesNotExist:
-            language = None
-            print "Warning: Creating society record for %s but no language found with name %s" % (ext_id, language_name)
-        
-        society = Society(
-            ext_id=ext_id,
-            name=society_dict['STANDARD SOCIETY NAME Binford'],
-            source=source,
-            iso_code=iso_code,
-            language=language
-        )
-        
-        try:
-            society.save()
-        except BaseException as e:
-            print "Exception saving society: %s" % e.message
-            return None
-        return society
-    else:
-        society = found_societies.first()
-        if not society.source:
-            society.source = source
-        try:
-            society.save()
-        except BaseException as e:
-            print "Exception saving society: %s" % e.message
-            return None
-        return society
-    return found_societies.first()
+    ext_id = society_dict['soc_id'].strip()
+    xd_id = society_dict['xd_id'].strip()
+    soc_name = society_dict['soc_name'].strip()
+    source = get_source('Binford')
+    focal_year = society_dict['main_focal_year'].strip()
+    alternate_names = society_dict['alternate_names'].strip()
+    
+    society, created = Society.objects.get_or_create(ext_id=ext_id)
+    society.xd_id = xd_id
+    society.name = soc_name
+    society.source = source
+    society.alternate_names = alternate_names
+    society.focal_year = focal_year
+    
+    print "Saving society %s" % society
+    society.save()
 
 def load_bf_var(var_dict):
     """

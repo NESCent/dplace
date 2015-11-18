@@ -68,25 +68,3 @@ def load_isocode(iso_dict):
         print "ISO Code '%s' too long, skipping" % code
         return None
     return ISOCode.objects.get_or_create(iso_code=code)
-
-def load_iso_lat_long(iso_dict):
-    code = get_isocode(iso_dict)
-    code = ISOCODE_UPDATE.get(code, code)
-    if code in ISOCODE_IGNORE:
-        print "Skipped ISO Code %s -- ignored" % code
-    
-    found_code = None
-    
-    try:
-        found_code = ISOCode.objects.get(iso_code=code)
-    except ObjectDoesNotExist:
-        print "Tried to attach Lat/Long to ISO Code %s but code not found" % code
-        return None
-    location = Point(float(iso_dict['LMP_LON']),float(iso_dict['LMP_LAT']))
-    found_code.location = location
-    try:
-        found_code.save()
-    except:
-        print "Unable to attach location to iso code"
-        return None
-    return found_code

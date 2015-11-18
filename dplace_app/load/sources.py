@@ -58,8 +58,8 @@ def load_references(csvfile=None):
             ref_short = dict_row[SHORT_REF_COLUMN].strip().split(",")
             ref_complete = dict_row[COMPLETE_REF_COLUMN].strip()
             try:
-                author = ref_short[0]
-                year = ref_short[1]
+                author = ref_short[0].strip()
+                year = ref_short[1].strip()
                 reference, created = Source.objects.get_or_create(author=author, year=year, reference=ref_complete)
                 reference.save()
                 if created:

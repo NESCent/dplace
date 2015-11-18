@@ -12,12 +12,22 @@ from load.tree import *
 from load.variables import *
 from load.sources import *
 
+#iso = load isocodes
+#env_vals = load environmental values
+#langs =
+#soc_lat_long = load locations for societies
+#ea_soc = 
+#ea_vars = 
+#bf_soc = 
+#bf_vars = 
+#bf_vals = 
+#vars = load variables
+#ea_stacked = load EA stacked
+
 LOAD_BY_ROW=('iso', 'env_vals',
-             'langs', 'iso_lat_long',
-             'soc_lat_long',
-             'ea_soc', 'ea_vars', 'ea_vals',
-             'bf_soc', 'bf_vars', 'bf_vals',
-             'vars', 'ea_stacked', 'vars',)
+             'langs','soc_lat_long',
+             'ea_soc','bf_soc', 'bf_vars', 'bf_vals',
+             'vars', 'ea_stacked',)
 
 def run(file_name=None, mode=None):
     if mode == 'geo':
@@ -34,8 +44,6 @@ def run(file_name=None, mode=None):
                 for dict_row in csv_reader:
                     if mode == 'iso':
                         load_isocode(dict_row)
-                    elif mode == 'iso_lat_long':
-                        load_iso_lat_long(dict_row)
                     elif mode == 'vars':
                         load_vars(dict_row)
                     elif mode == 'ea_soc':
@@ -44,8 +52,6 @@ def run(file_name=None, mode=None):
                         society_locations(dict_row)
                     elif mode == 'env_vals':
                         load_environmental(dict_row)
-                    elif mode == 'ea_vals':
-                        load_ea_val(dict_row)
                     elif mode == 'ea_stacked':
                         load_ea_stacked(dict_row)
                     elif mode == 'langs':
