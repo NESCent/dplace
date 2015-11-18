@@ -20,7 +20,7 @@ def clean_category(category):
 
 def load_vars(var_dict):
     """
-    Load variables from VariableList.csv
+    Load variables from EAVariableList_17Nov2015.csv
     """
     dataset = var_dict['Dataset'].strip()
     index_categories = [clean_category(x) for x in var_dict['IndexCategory'].split(',')]
@@ -35,11 +35,10 @@ def load_vars(var_dict):
         variable.name = name
         variable.codebook_info = description
         variable.data_type = datatype
-        for i in variable.index_categories.all():
-            variable.index_categories.remove(i)
         for c in index_categories:
             index_category, created = VariableCategory.objects.get_or_create(name=c)
-            variable.index_categories.add(index_category)
+            if index_category not in variable.index_categories.all():
+                variable.index_categories.add(index_category)
         variable.save()
         print "Saved variable %s - %s" % (ea_label, name)
         
