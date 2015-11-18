@@ -302,7 +302,7 @@ class Source(models.Model):
     
     def __unicode__(self):
         return "%s (%s)" % (self.author, self.year)
-    
+
     class Meta:
         unique_together = (
             ('year','author')
