@@ -333,8 +333,6 @@ class LanguageClass(models.Model):
         verbose_name = "Language Class"
         ordering= ('level', 'name')
 
-
-
 class LanguageClassification(models.Model):
     scheme = models.CharField(max_length=1, choices=CLASSIFICATION_SCHEMES, default='E');
     language = models.ForeignKey('Language', null=True)
