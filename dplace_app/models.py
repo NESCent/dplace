@@ -262,8 +262,9 @@ class VariableCodedValue(models.Model):
     coded_value = models.CharField(max_length=100, db_index=True, null=False, default='.')
     code = models.ForeignKey('VariableCodeDescription', db_index=True, null=True)
     source = models.ForeignKey('Source', null=True)
-    comment = models.TextField(default="")
-    references = models.ManyToManyField('Source', related_name='references')
+    #comment = models.TextField(default="")
+    #references = models.ManyToManyField('Source', related_name='references')
+    focal_year = models.CharField(max_length=10, default="")
     
     def get_description(self):
         if self.code is not None:
@@ -337,9 +338,6 @@ class LanguageClass(models.Model):
 class LanguageClassification(models.Model):
     scheme = models.CharField(max_length=1, choices=CLASSIFICATION_SCHEMES, default='E');
     language = models.ForeignKey('Language', null=True)
-    # From 'Ethnologue Classification (unrevised)' column
-    ethnologue_classification = models.CharField(max_length=250, db_index=True, unique=True)
-    # From 'FAMILY-REVISED', 'Class2', 'Class3'
     class_family = models.ForeignKey('LanguageClass', limit_choices_to={'level': 1}, related_name="languages1", null=True)
     class_subfamily = models.ForeignKey('LanguageClass', limit_choices_to={'level': 2}, related_name="languages2", null=True)
     class_subsubfamily = models.ForeignKey('LanguageClass', limit_choices_to={'level': 3}, related_name="languages3", null=True)
