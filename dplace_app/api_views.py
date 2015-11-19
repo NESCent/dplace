@@ -110,6 +110,7 @@ class SourceViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = SourceSerializer
     filter_fields = ('author', 'name')
     queryset = Source.objects.all()
+        
     
 #not sure if we need to keep this code since it isn't used at the moment
 #but could come in handy in the future
@@ -309,7 +310,7 @@ def get_min_and_max(request):
 @api_view(['GET'])
 @permission_classes((AllowAny,))
 @renderer_classes((JSONRenderer,))
-def bin_bfcont_data(request):
+def bin_cont_data(request): #MAKE THIS GENERIC
     query_string = request.QUERY_PARAMS['query']
     query_dict = json.loads(query_string)
     if 'bf_id' in query_dict:
@@ -318,8 +319,7 @@ def bin_bfcont_data(request):
         min_value = None
         max_value = 0.0
         missing_data_option = False
-        bins = []
-
+        bins = []        
         for v in values:
             if re.search('[a-zA-Z]', v.coded_value):
                 if not missing_data_option:

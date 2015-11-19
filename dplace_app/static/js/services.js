@@ -138,14 +138,15 @@ angular.module('dplaceServices', ['ngResource'])
             }
         )
     })
-    .factory('BfContinuousVariable', function($resource) {
+    .factory('ContinuousVariable', function($resource) {
         return $resource(
-            '/api/v1/bf_cont_variable',
+            '/api/v1/cont_variable',
             {}, {
                 query: {
                     method: 'GET',
                     isArray:true,
                     transformResponse: function(data, headers) {
+                        console.log(JSON.parse(data));
                         return JSON.parse(data);
                     }
                 }
