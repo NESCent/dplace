@@ -59,8 +59,8 @@ class Society(models.Model):
     language = models.ForeignKey('Language', null=True, related_name="societies")
     objects = models.GeoManager()
     focal_year = models.CharField('Focal Year', null=True, blank=True, max_length=100)
-    references = models.TextField('References', null=True) #why is this here???
-
+    alternate_names = models.TextField(default="")
+    
     def get_environmental_data(self):
         """Returns environmental data for the given society"""
         valueDict = defaultdict(list)
@@ -218,6 +218,7 @@ class VariableCodeDescription(models.Model):
     code = models.CharField(max_length=20, db_index=True, null=False, default='.')
     code_number = models.IntegerField(null=True, db_index=True)
     description = models.CharField(max_length=500, default='Unknown')
+    short_description = models.CharField(max_length=500, default="")
     n = models.IntegerField(null=True, default=0)
     
     def save(self, *args, **kwargs):
@@ -262,6 +263,8 @@ class VariableCodedValue(models.Model):
     code = models.ForeignKey('VariableCodeDescription', db_index=True, null=True)
     source = models.ForeignKey('Source', null=True)
     comment = models.TextField(default="")
+    references = models.ManyToManyField('Source', related_name='references')
+    focal_year = models.CharField(max_length=10, default="")
     
     def get_description(self):
         if self.code is not None:
@@ -301,7 +304,7 @@ class Source(models.Model):
     
     def __unicode__(self):
         return "%s (%s)" % (self.author, self.year)
-    
+
     class Meta:
         unique_together = (
             ('year','author')
@@ -330,24 +333,20 @@ class LanguageClass(models.Model):
         verbose_name = "Language Class"
         ordering= ('level', 'name')
 
-
-
 class LanguageClassification(models.Model):
     scheme = models.CharField(max_length=1, choices=CLASSIFICATION_SCHEMES, default='E');
     language = models.ForeignKey('Language', null=True)
-    # From 'Ethnologue Classification (unrevised)' column
-    ethnologue_classification = models.CharField(max_length=250, db_index=True, unique=True)
-    # From 'FAMILY-REVISED', 'Class2', 'Class3'
     class_family = models.ForeignKey('LanguageClass', limit_choices_to={'level': 1}, related_name="languages1", null=True)
     class_subfamily = models.ForeignKey('LanguageClass', limit_choices_to={'level': 2}, related_name="languages2", null=True)
     class_subsubfamily = models.ForeignKey('LanguageClass', limit_choices_to={'level': 3}, related_name="languages3", null=True)
     
     def __unicode__(self):
-        return "Classification: %s for language %s" % (self.ethnologue_classification, self.language)
+        return "Family: %s for language %s" % (self.class_family, self.language)
     
     class Meta:
         index_together = [
-            ['class_family', 'class_subfamily', 'class_subsubfamily']
+            ['class_family', 'class_subfamily', 'class_subsubfamily'],
+            ['scheme', 'class_family']
         ]
         ordering=("language__name",)
 
@@ -360,7 +359,7 @@ class Language(models.Model):
     glotto_code = models.ForeignKey('GlottoCode', null=True, blank=True, unique=True)
     
     def __unicode__(self):
-        return "Language: %s, ISO Code %s, Glotto Code %s" % (self.name, self.iso_code.iso_code, self.glotto_code.glotto_code)
+        return "Language: %s, ISO Code %s, Glotto Code %s" % (self.name, self.iso_code, self.glotto_code)
         
     class Meta:
         verbose_name = "Language"

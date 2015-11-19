@@ -34,15 +34,43 @@ def xd_to_language(dict_row):
     """
     Reads file xd_id_to_language.csv
     """
-    
+    classification_scheme = 'G' #Glottolog
     xd_id = dict_row['xd_id']
-    glottocode = dict_row['glottocode']
+    glottocode = dict_row['DialectLanguageGlottocode']
+    family_glottocode = dict_row['FamilyGlottocode']
     
     glotto, created = GlottoCode.objects.get_or_create(glotto_code=glottocode)
+    family, created = GlottoCode.objects.get_or_create(glotto_code=family_glottocode)
     
+    societies = Society.objects.all().filter(xd_id=xd_id)
+    if len(societies) == 0:
+        print "No societies found with xd_id %s" % (xd_id)
+    else:
+        for s in societies:
+            s.glotto_code = glotto
+            s.save()
+
     try:
-        society = Society.objects.get(xd_id=xd_id)
-        society.glotto_code = glotto
-        society.save()
-    except:
-        print "No society found for xd_id %s glottocode %s" % (xd_id, glottocode)
+        language = Language.objects.get(glotto_code=glotto)
+    except ObjectDoesNotExist:
+        print "No language found for glottocode %s, skipping" % glottocode
+        return
+    try:
+        family_language = Language.objects.get(glotto_code=family)
+    except ObjectDoesNotExist:
+        print "No language found for family glottocode %s, skipping" % family_glottocode
+        return
+        
+    class_level = 1
+    lang_class, created = LanguageClass.objects.get_or_create(level=class_level, name=family_language.name)
+    lang_class.save()
+    classification, created = LanguageClassification.objects.get_or_create(
+                                                            scheme=classification_scheme,
+                                                            language=language,
+                                                            class_family=lang_class,
+                                                            )
+    classification.save()
+    if created:
+        print "Saved classification %s, %s" % (xd_id, glotto)
+                                                            
+                                                            

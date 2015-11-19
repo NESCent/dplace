@@ -7,7 +7,7 @@ from rest_framework import serializers
 class VariableCodeDescriptionSerializer(serializers.ModelSerializer):
     class Meta:
         model = VariableCodeDescription
-        fields = ('id', 'code', 'description', 'variable')
+        fields = ('id', 'code', 'description', 'short_description', 'variable')
 
 class VariableDescriptionSerializer(serializers.ModelSerializer):
     class Meta:
@@ -38,7 +38,7 @@ class VariableCodedValueSerializer(serializers.ModelSerializer):
     code_description = VariableCodeDescriptionSerializer(source='code')
     class Meta:
         model = VariableCodedValue
-        fields = ('id', 'variable', 'society', 'coded_value', 'code_description')
+        fields = ('id', 'variable', 'society', 'coded_value', 'code_description', 'source', 'references')
 
 # ISO Codes
 class ISOCodeSerializer(gis_serializers.GeoModelSerializer):
@@ -92,7 +92,7 @@ class SocietySerializer(gis_serializers.GeoModelSerializer):
     language = LanguageSerializer(source='language')
     class Meta:
         model = Society
-        fields = ('id', 'ext_id', 'xd_id', 'name', 'location', 'iso_code', 'glotto_code', 'language', 'references','focal_year','source',)
+        fields = ('id', 'ext_id', 'xd_id', 'name', 'location', 'iso_code', 'glotto_code', 'language', 'focal_year','source',)
 
 # Geographic Regions
 class GeographicRegionSerializer(gis_serializers.GeoModelSerializer):
