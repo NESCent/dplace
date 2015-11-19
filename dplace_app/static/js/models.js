@@ -99,7 +99,7 @@ function LanguageClassificationModel(LanguageClass) {
 
     /* Populate language family for first level */
     var familyLevel = 1;
-    languageFilter[0].items = LanguageClass.query({level: familyLevel});
+    languageFilter[0].items = LanguageClass.query({level: familyLevel, scheme: 'G'});
     this.selected = [];
     this.levels = levels;
     this.languageFilters = [languageFilter];

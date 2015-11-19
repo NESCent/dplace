@@ -73,7 +73,7 @@ def run(file_name=None, mode=None):
             print '\n'.join(MISSING_CODES)
         elif mode == 'env_vars':
             create_environmental_variables()
-        elif mode == 'langs':
+        elif mode == 'langs' or mode == 'xd_lang':
             update_language_counts()
 
 if __name__ == '__main__':

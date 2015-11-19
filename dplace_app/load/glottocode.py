@@ -31,7 +31,6 @@ def load_glottocode(dict_row):
             return
             
 def xd_to_language(dict_row):
-    #Create languages not in database somewhere here too
     """
     Reads file xd_id_to_language.csv
     """
@@ -61,13 +60,17 @@ def xd_to_language(dict_row):
     except ObjectDoesNotExist:
         print "No language found for family glottocode %s, skipping" % family_glottocode
         return
+        
     class_level = 1
-    lang_class = LanguageClass(level=class_level, name=family_language.name)
-    classification = LanguageClassification.objects.get_or_create(
+    lang_class, created = LanguageClass.objects.get_or_create(level=class_level, name=family_language.name)
+    lang_class.save()
+    classification, created = LanguageClassification.objects.get_or_create(
                                                             scheme=classification_scheme,
                                                             language=language,
                                                             class_family=lang_class,
                                                             )
-    print "Saved classification %s" % classification
+    classification.save()
+    if created:
+        print "Saved classification %s, %s" % (xd_id, glotto)
                                                             
                                                             
