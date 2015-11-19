@@ -103,10 +103,11 @@ def load_ea_stacked(val_row):
         print "Attempting to load EA values for %s but did not find an existing Society object, skipping" % ext_id
         return
             
-    variable = get_variable(val_row['VarID'])
-    value = val_row['Code']
-    comment = val_row['Comment']
+    variable = get_variable(val_row['VarID'].strip())
+    value = val_row['Code'].strip()
+    comment = val_row['Comment'].strip()
     references = val_row['References'].strip().split(";")
+    focal_year = val_row['Year'].strip()
 
     if variable is None:
         print "Could not find variable %s for society %s" % (val_row['VarID'], society)
@@ -122,6 +123,7 @@ def load_ea_stacked(val_row):
     v.coded_value = value
     v.code = code
     v.comment = comment
+    v.focal_year = focal_year
 
     for r in references:
         ref_short = r.split(",")

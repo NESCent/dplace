@@ -62,14 +62,14 @@ export PYTHONPATH=$DPLACE_PATH
 #echo "Linking Societies to Locations"
 #python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/EA_Binford_Lat_Long.csv" soc_lat_long
 
-#echo "Linking Societies to Glottocodes"
-#python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/xd_id_to_language_9Nov2015.csv" xd_lang
+echo "Linking Societies to Glottocodes"
+python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/xd_id_to_language_18Nov2015.csv" xd_lang
 
 #echo "Loading References"
 #python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/ReferenceMapping_11Nov2015.csv" refs
 
-echo "Loading EA Data"
-python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/EA_DATA_Stacked_17Nov2015.csv" ea_stacked
+#echo "Loading EA Data"
+#python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/EA_DATA_Stacked_17Nov2015.csv" ea_stacked
 
 #echo "Loading Binford Variable Values" DO
 #python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/binford_vals.csv" bf_vals

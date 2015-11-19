@@ -262,8 +262,8 @@ class VariableCodedValue(models.Model):
     coded_value = models.CharField(max_length=100, db_index=True, null=False, default='.')
     code = models.ForeignKey('VariableCodeDescription', db_index=True, null=True)
     source = models.ForeignKey('Source', null=True)
-    #comment = models.TextField(default="")
-    #references = models.ManyToManyField('Source', related_name='references')
+    comment = models.TextField(default="")
+    references = models.ManyToManyField('Source', related_name='references')
     focal_year = models.CharField(max_length=10, default="")
     
     def get_description(self):
@@ -343,11 +343,12 @@ class LanguageClassification(models.Model):
     class_subsubfamily = models.ForeignKey('LanguageClass', limit_choices_to={'level': 3}, related_name="languages3", null=True)
     
     def __unicode__(self):
-        return "Classification: %s for language %s" % (self.ethnologue_classification, self.language)
+        return "Family: %s for language %s" % (self.class_family, self.language)
     
     class Meta:
         index_together = [
-            ['class_family', 'class_subfamily', 'class_subsubfamily']
+            ['class_family', 'class_subfamily', 'class_subsubfamily'],
+            ['scheme', 'class_family']
         ]
         ordering=("language__name",)
 
@@ -360,7 +361,7 @@ class Language(models.Model):
     glotto_code = models.ForeignKey('GlottoCode', null=True, blank=True, unique=True)
     
     def __unicode__(self):
-        return "Language: %s, ISO Code %s, Glotto Code %s" % (self.name, self.iso_code.iso_code, self.glotto_code.glotto_code)
+        return "Language: %s, ISO Code %s, Glotto Code %s" % (self.name, self.iso_code, self.glotto_code)
         
     class Meta:
         verbose_name = "Language"

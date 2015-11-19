@@ -9,7 +9,7 @@ from django.db.utils import IntegrityError, DataError
 from dplace_app.load.isocode import get_isocode
 from dplace_app.models import *
 from environmental import iso_from_code
-from society_ea import clean_category
+from variables import clean_category
 from sources import get_source
 
 def _unicode_damnit(var):
