@@ -1,3 +1,110 @@
+@font-face {
+    font-family: "DPLACE";
+    src: url("/static/GT-Walsheim-Regular.woff");
+}
+@font-face {
+    font-family: "DPLACE";
+    src: url("/static/GT-Walsheim-Bold.woff");
+    font-weight: bold;
+}
+@font-face {
+    font-family: "DPLACE";
+    src: url("/static/GT-Walsheim-Regular-Oblique.woff");
+    font-style: italic;
+}
+@font-face {
+    font-family: "DPLACE";
+    src: url("/static/GT-Walsheim-Bold-Oblique.woff");
+    font-weight: bold;
+    font-style: italic;
+}
+body {
+    font-family: "DPLACE";
+    padding-top: 170px;
+    padding-right: 10px;
+    padding-left: 10px;
+}
+.navbar-default {
+    background-color: #fff;
+    border:solid 0px;
+}
+.navbar-brand {
+    height: 160px;
+    margin-right: 20px;
+}
+.navbar-brand > img {
+    max-height: 140%;
+    height: 140%;
+    width: auto;
+    margin: 0 auto;
+    margin-top: -15px;
+    -o-object-fit: contain;
+    object-fit: contain; 
+}
+.footer {
+    background-color: #0a0c0c;
+    color: #fff;
+    margin-top: 75px;
+    margin-right: 1%;
+    margin-left: 1%;
+    width:98%;
+}
+.footer a {
+    text-decoration: none;
+    color: #fff;
+}
+.navicon {
+    height: 50px;
+    width: 50px;
+    opacity: 0.3;
+}
+.homeActive {
+    background-color: red;
+}
+.searchActive {
+    background-color: #f6a523;
+}
+.societiesActive {
+    background-color: #e8552a;
+}
+.sourceInfoActive {
+    background-color: #50b79c;
+}
+.aboutActive {
+    background-color: #074652;
+}
+.navbar-default .navbar-nav > li > a {
+    color: #000;
+    text-align: center;
+    width: 130px;
+    height: 90px;
+}
+.navbar-default .navbar-nav > li > a:hover,
+.navbar-default .navbar-nav > li > a:focus {
+    color: #fff;
+    background-color: transparent;
+}
+.navbar-default .navbar-nav > li > a:hover .navicon,
+.navbar-default .navbar-nav > .active .navicon {
+    opacity:1;
+}
+.navbar-default .navbar-nav > .active > a,
+.navbar-default .navbar-nav > .active > a:hover,
+.navbar-default .navbar-nav > .active > a:focus {
+    color: #fff;
+    background-color: transparent;
+}
+.navbar-default .navbar-nav > .disabled > a,
+.navbar-default .navbar-nav > .disabled > a:hover,
+.navbar-default .navbar-nav > .disabled > a:focus {
+    color: #fff;
+    background-color: transparent;
+}
+
+.jvectormap-zoomin, .jvectormap-zoomout, .jvectormap-goback {
+    padding: 2px;
+}
+
 .tree-tooltip {
     position:absolute;
     text-align:center;
@@ -32,8 +139,8 @@
 }
 
 .scrollable {
-    overflow: scroll;
-    height: 30rem;
+    overflow-x: scroll;
+    height: 32rem;
 }
 
 label.light {
@@ -110,10 +217,3 @@ label.light {
     top: 50px;
 }
 
-.footer {
-	margin-top: 75px;
-	margin-right: 1%;
-	margin-left: 1%;
-	border-top: 1px solid #aaa;
-	width:98%;
-}
