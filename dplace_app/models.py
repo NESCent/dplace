@@ -312,6 +312,7 @@ class Source(models.Model):
 
 class LanguageClass(models.Model):
     # max length 37
+    scheme = models.CharField(max_length=1, choices=CLASSIFICATION_SCHEMES, default='G')
     name = models.CharField(max_length=50, db_index=True)
     level = models.IntegerField(db_index=True, choices=CLASS_LEVELS)
     parent = models.ForeignKey('self', null=True, default=None)
@@ -334,7 +335,7 @@ class LanguageClass(models.Model):
         ordering= ('level', 'name')
 
 class LanguageClassification(models.Model):
-    scheme = models.CharField(max_length=1, choices=CLASSIFICATION_SCHEMES, default='E');
+    scheme = models.CharField(max_length=1, choices=CLASSIFICATION_SCHEMES, default='G');
     language = models.ForeignKey('Language', null=True)
     class_family = models.ForeignKey('LanguageClass', limit_choices_to={'level': 1}, related_name="languages1", null=True)
     class_subfamily = models.ForeignKey('LanguageClass', limit_choices_to={'level': 2}, related_name="languages2", null=True)
