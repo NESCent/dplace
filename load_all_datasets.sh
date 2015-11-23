@@ -30,16 +30,16 @@ fi
 export DJANGO_SETTINGS_MODULE=dplace.settings
 export PYTHONPATH=$DPLACE_PATH
 
-#echo "Loading ISO Codes from Ethnologue" FIX THIS
+#echo "Loading ISO Codes from Ethnologue"
 #python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/Revised_Ethnologue_families-Feb_10_2014-17th_Ed-ISO693-3-current.csv" iso
 #python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/Revised_Ethnologue_families-Feb_10_2014-17th_Ed_Missing_ISO_codes.csv" iso
 
-#echo "Loading Languages from Ethnologue" NOT WORKING
+#echo "Loading Languages from Ethnologue" 
 #python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/Revised_Ethnologue_families-Feb_10_2014-17th_Ed-ISO693-3-current.csv" langs
 #python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/Revised_Ethnologue_families-Feb_10_2014-17th_Ed_Missing_ISO_codes.csv" langs
 
-echo "Loading Glottolog Languages"
-python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/glottolog_mapping.csv" glotto
+#echo "Loading Glottolog Languages"
+#python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/glottolog_mapping.csv" glotto
 
 #echo "Loading EA Variables"
 #python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/EAVariableList_17Nov2015.csv" vars
@@ -53,23 +53,28 @@ python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/glottolog_mapping.c
 #echo "Loading Binford Variable Codes" 
 #python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/BinfordVariableListCodeDescription_18Nov2015.csv" codes
 
-echo "Loading EA Societies"
-python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/EA_Society_HeaderData.csv" ea_soc
+#echo "Loading EA Societies"
+#python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/EA_Society_HeaderData.csv" ea_soc
 
-echo "Loading Binford Societies"
-python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/Binford_Society_HeaderData.csv" bf_soc
+#echo "Loading Binford Societies"
+#python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/Binford_Society_HeaderData.csv" bf_soc
 
-echo "Linking Societies to Locations"
-python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/EA_Binford_Lat_Long.csv" soc_lat_long
+#echo "Linking Societies to Locations"
+#python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/EA_Binford_Lat_Long.csv" soc_lat_long
 
-echo "Linking Societies to Glottocodes"
-python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/xd_id_to_language_18Nov2015.csv" xd_lang
+#echo "Linking Societies to Glottocodes"
+#python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/xd_id_to_language_18Nov2015.csv" xd_lang
 
 #echo "Loading References"
 #python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/ReferenceMapping_11Nov2015.csv" refs
 
 #echo "Loading EA Data"
 #python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/EA_DATA_Stacked_17Nov2015.csv" ea_stacked
+
+echo "Loading References for EA data"
+python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/EA_DATA_Stacked_17Nov2015.csv" ea_refs
+
+#ALL GOOD UNTIL HERE!
 
 #echo "Loading Binford Variable Values" DO
 #python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/binford_vals.csv" bf_vals

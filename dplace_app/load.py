@@ -27,7 +27,7 @@ LOAD_BY_ROW=('iso', 'env_vals',
              'langs','soc_lat_long',
              'ea_soc','bf_soc', 'bf_vals',
              'vars', 'ea_stacked', 'glotto',
-             'xd_lang')
+             'xd_lang', 'ea_refs')
 
 def run(file_name=None, mode=None):
     if mode == 'geo':
@@ -54,6 +54,8 @@ def run(file_name=None, mode=None):
                         load_environmental(dict_row)
                     elif mode == 'ea_stacked':
                         load_ea_stacked(dict_row)
+                    elif mode == 'ea_refs':
+                        load_ea_references(dict_row)
                     elif mode == 'langs':
                         load_lang(dict_row)
                     elif mode == 'bf_soc':
