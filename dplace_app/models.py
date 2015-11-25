@@ -69,7 +69,8 @@ class Society(models.Model):
             for value in environmental.values.order_by('variable__name').all():
                 valueDict[str(value.variable.category)].append({
                     'name': value.variable.name,
-                    'value': value.value
+                    'value': format(value.value, '.4f'),
+                    'units': value.variable.units
                 })
         return valueDict
 
