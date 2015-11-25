@@ -25,8 +25,6 @@ function CulturalCtrl($scope, searchModelService, Variable, CodeDescription, Con
         console.log(trait.selectedVariable);
         trait.selectedCode = "";
         if (trait.selectedVariable.data_type == 'Continuous') {
-            console.log("Continuous variable");
-        
             trait.codes = ContinuousVariable.query({query: {bf_id: trait.selectedVariable.id}});
         } else
             trait.codes = CodeDescription.query({variable: trait.selectedVariable.id });

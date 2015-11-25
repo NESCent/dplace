@@ -331,6 +331,7 @@ def bin_cont_data(request): #MAKE THIS GENERIC
                     missing_data_option = True
                 continue
             else:
+                v.coded_value = v.coded_value.replace(',', '')
                 if min_value is None:
                     min_value = float(v.coded_value)
                 elif float(v.coded_value) < min_value:
