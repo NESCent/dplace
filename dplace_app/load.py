@@ -10,6 +10,7 @@ from load.society_binford import *
 from load.geographic import *
 from load.tree import *
 from load.variables import *
+from load.values import *
 from load.sources import *
 from load.glottocode import *
 
@@ -26,7 +27,7 @@ from load.glottocode import *
 LOAD_BY_ROW=('iso', 'env_vals',
              'langs','soc_lat_long',
              'ea_soc','bf_soc', 'bf_vals',
-             'vars', 'ea_stacked', 'glotto',
+             'vars', 'ea_vals', 'glotto',
              'xd_lang', 'ea_refs')
 
 def run(file_name=None, mode=None):
@@ -52,18 +53,18 @@ def run(file_name=None, mode=None):
                         society_locations(dict_row)
                     elif mode == 'env_vals':
                         load_environmental(dict_row)
-                    elif mode == 'ea_stacked':
-                        load_ea_stacked(dict_row)
+                    elif mode == 'ea_vals':
+                        load_data(dict_row)
+                    elif mode == 'bf_vals':
+                        load_data(dict_row)
                     elif mode == 'ea_refs':
-                        load_ea_references(dict_row)
+                        load_val_references(dict_row)
                     elif mode == 'langs':
                         load_lang(dict_row)
                     elif mode == 'bf_soc':
                         load_bf_society(dict_row)
                     elif mode == 'glotto':
                         load_glottocode(dict_row)
-                    elif mode == 'bf_vals':
-                        load_bf_val(dict_row)
                     elif mode == 'xd_lang':
                         xd_to_language(dict_row)
             elif mode == 'refs': #load references
