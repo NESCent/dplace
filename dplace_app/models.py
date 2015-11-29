@@ -100,7 +100,7 @@ class Society(models.Model):
             for r in value.references.all():
                 if r not in refs:
                     refs.append(r)
-        return refs
+        return sorted(refs, key=lambda r: r.author)
 
     def __unicode__(self):
         return "%s - %s (%s)" % (self.ext_id, self.name, self.source)
