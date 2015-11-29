@@ -7,10 +7,13 @@
     {% else %}
         <h1>Society: {{ society.name }}</h1>
         {% if society.language %}
-            <h4>Language: {{ society.language.name }}</h4>
+            <h4>Language: {{ society.language.name }} 
+            {% if society.iso_code %}(<a href="https://www.ethnologue.com/language/{{society.iso_code.iso_code}}" target="_blank">{{ society.iso_code.iso_code }}</a>){% endif %}
+            {% if society.glotto_code %}(<a href="http://glottolog.org/resource/languoid/id/{{society.glotto_code.glotto_code}}" target="_blank">{{ society.glotto_code.glotto_code }}</a>){% endif %}
+            </h4>
             <h4>Alternate Names: {{ society.alternate_names }}</h4>
             <h4>Focal Year: {{ society.focal_year }}</h4>
-            <h4>Other Societies in Database: {% for x in xd_id %} <a href="/society/{{ x.id }}" target="_blank">{{ x.name }} ({{ x.source.name}})</a>{% endfor %}</h4>
+            <h4>Society in Other Dataset(s): {% for x in xd_id %} <a href="/society/{{ x.id }}" target="_blank">{{ x.name }} ({{ x.source.name}})</a>{% endfor %}</h4>
         {% endif %}
     {% endif %}
     <h2>Environmental Data</h2>
