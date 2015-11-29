@@ -1,16 +1,16 @@
 {% extends 'base.html' %}
 {% load bootstrap3 %}
 {% block content %}
-<div class="container">
+<div class="container" style="margin-top:-150px;">
     {% if language %}
         <h1>Language {{ language.name }} from {{ society.name }}</h1>
     {% else %}
         <h1>Society: {{ society.name }}</h1>
         {% if society.language %}
-            <h3>Language: {{ society.language.name }}</h3>
-            {% if language_classification %}
-                Language Classification: {% for classification in language_classification %} {{ classification.ethnologue_classification }} {% endfor %}
-            {% endif %}
+            <h4>Language: {{ society.language.name }}</h4>
+            <h4>Alternate Names: {{ society.alternate_names }}</h4>
+            <h4>Focal Year: {{ society.focal_year }}</h4>
+            <h4>Other Societies in Database: {% for x in xd_id %} <a href="/society/{{ x.id }}" target="_blank">{{ x.name }} ({{ x.source.name}})</a>{% endfor %}</h4>
         {% endif %}
     {% endif %}
     <h2>Environmental Data</h2>
@@ -61,7 +61,7 @@
                         </tr>
                         <tr>
                             <th>Label</th>
-                            <th>Name</th>
+                            <th width="16%">Name</th>
                             <th>Code</th>
                             <th>Description</th>
                             <th width="12%">Comment</th>
