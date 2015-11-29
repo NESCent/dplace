@@ -42,8 +42,24 @@ angular.module('dplaceFilters', [])
             return values.map( function(code_value) {   
                 if (code_value.code_description && (variable_id == code_value.code_description.variable)) return code_value.code_description.description;
                 else if (variable_id == code_value.variable) return code_value.coded_value;
-                else return ''
+                else return '-'
             }).join('');
+        };
+    })
+    .filter('formatValueSources', function() {
+        return function(values, variable_id) {
+            return values.map( function(code_value) {
+                if (code_value.code_description && (variable_id == code_value.code_description.variable)) {
+                    return code_value.references.map(function(reference) {
+                        return reference.author + ' (' + reference.year + ')';
+                    });
+                }
+                else if (variable_id == code_value.variable) {
+                    return code_value.references.map(function(reference) {
+                        return reference.author + ' (' + reference.year + ')';
+                    });
+                }
+            }).join('')
         };
     })
     .filter('formatEnvironmentalValues', function () {
