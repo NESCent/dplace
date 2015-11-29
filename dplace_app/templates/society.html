@@ -1,6 +1,12 @@
 {% extends 'base.html' %}
 {% load bootstrap3 %}
 {% block content %}
+<script type="text/javascript">
+    $(document).ready(function() {
+        $("a.comment-tooltip").tooltip();
+    });
+</script>
+
 <div class="container" style="margin-top:-150px;">
     {% if language %}
         <h1>Language {{ language.name }} from {{ society.name }}</h1>
@@ -64,10 +70,9 @@
                         </tr>
                         <tr>
                             <th>Label</th>
-                            <th width="16%">Name</th>
+                            <th width="30%">Name</th>
                             <th>Code</th>
                             <th>Description</th>
-                            <th width="12%">Comment</th>
                         </tr>
                         {% for v in value %}
                         <tr>
@@ -81,7 +86,8 @@
                                     {% endfor %}
                                 </div>
                             </td>
-                            <td>Focal Year: {{v.year}}<br>{{v.comment}}</td>
+                            <td><a class="comment-tooltip" data-toggle="tooltip" title="Focal Year: {{v.year}}
+{{v.comment}}"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span></a></td>
                         </tr>
                         {% endfor %}
                     </table>

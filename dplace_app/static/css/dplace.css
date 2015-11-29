@@ -118,6 +118,14 @@ body {
     border:0px;
 }
 
+.tooltip-inner {
+    white-space:pre-wrap;
+}
+
+.comment-tooltip {
+    cursor:pointer;
+}
+
 .row-margin-top {
     margin-top: 5px;
 }
