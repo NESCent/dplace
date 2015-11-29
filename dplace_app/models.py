@@ -86,6 +86,9 @@ class Society(models.Model):
                     'name': value.variable.name,
                     'code':value.coded_value,
                     'description':value.get_description(),
+                    'year':value.focal_year,
+                    'comment':value.comment,
+                    'sources':value.references.all(),
                 })
         return valueDict
 

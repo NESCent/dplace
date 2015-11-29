@@ -57,13 +57,15 @@
                     <table class="panel-body table table-condensed table-striped table-bordered">
                         <tr>
                             <th colspan="2">Variable</th>
-                            <th colspan="2">Value</th>
+                            <th colspan="4">Value</th>
                         </tr>
                         <tr>
                             <th>Label</th>
                             <th>Name</th>
                             <th>Code</th>
                             <th>Description</th>
+                            <th width="12%">Comment</th>
+                            <th width="30%">Sources</th>
                         </tr>
                         {% for v in value %}
                         <tr>
@@ -71,6 +73,10 @@
                             <td>{{v.name}}</td>
                             <td>{{v.code}}</td>
                             <td>{{v.description}}</td>
+                            <td>Focal Year: {{v.year}}<br>{{v.comment}}</td>
+                            <td>{% for s in v.sources %}
+                            {{s}};
+                            {% endfor %}</td>
                         </tr>
                         {% endfor %}
                     </table>
