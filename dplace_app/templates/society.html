@@ -78,7 +78,7 @@
                             <td>{{v.description}}</td>
                             <td>Focal Year: {{v.year}}<br>{{v.comment}}</td>
                             <td>{% for s in v.sources %}
-                            {{s}};
+                            <a href="#r{{s.id}}">{{s}}</a>;
                             {% endfor %}</td>
                         </tr>
                         {% endfor %}
@@ -87,6 +87,12 @@
             </div>
         </div>
     {% endfor %}
-
+    
+    <ul>
+    {% for ref in references %}
+    <li id="r{{ ref.id }}"> {{ ref.reference }} </li>
+    {% endfor %}
+    </ul>
+    
 </div>
 {% endblock %}
