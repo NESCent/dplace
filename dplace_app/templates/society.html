@@ -74,9 +74,13 @@
                             <td>{{v.label}}</td>
                             <td>{{v.name}}</td>
                             <td>{{v.code}}</td>
-                            <td>{{v.description}} (<a data-toggle="collapse" href="#s{{v.label}}" aria-expanded="false" aria-controls="s{{v.label}}">Source</a>) <div class="collapse" id="s{{v.label}}">{% for s in v.sources %}
-                            <a href="#r{{s.id}}">{{s}}</a>;
-                            {% endfor %}</div></td>
+                            <td>{{v.description}} (<a data-toggle="collapse" href="#s{{v.label}}" aria-expanded="false" aria-controls="s{{v.label}}">Source</a>) 
+                                <div class="collapse" id="s{{v.label}}">
+                                    {% for s in v.sources %}
+                                        <a href="#r{{s.id}}">{{s}}</a>;
+                                    {% endfor %}
+                                </div>
+                            </td>
                             <td>Focal Year: {{v.year}}<br>{{v.comment}}</td>
                         </tr>
                         {% endfor %}
