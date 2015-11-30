@@ -42,7 +42,7 @@ angular.module('dplaceFilters', [])
             return values.map( function(code_value) {   
                 if (code_value.code_description && (variable_id == code_value.code_description.variable)) return code_value.code_description.description;
                 else if (variable_id == code_value.variable) return code_value.coded_value;
-                else return '-'
+                else return ''
             }).join('');
         };
     })
@@ -59,6 +59,25 @@ angular.module('dplaceFilters', [])
                         return reference.author + ' (' + reference.year + ')';
                     });
                 }
+            }).join('')
+        };
+    })
+    .filter('formatComment', function() {
+        return function(values, variable_id) {
+            str = '';
+            return values.map( function(code_value) {
+                if (code_value.code_description && (variable_id == code_value.code_description.variable)) {
+                    if (code_value.focal_year != 'NA')
+                        str = 'Focal Year: ' + code_value.focal_year;
+                    if (code_value.comment) str += '\n' + code_value.comment;
+                    return str;
+                }
+                else if (variable_id == code_value.variable) {
+                    if (code_value.focal_year != 'NA') str = 'Focal Year: ' + code_value.focal_year;
+                    if (code_value.comment) str += '\n' + code_value.comment;
+                    return str;
+                } else return ''
+
             }).join('')
         };
     })

@@ -79,15 +79,21 @@
                             <td>{{v.label}}</td>
                             <td>{{v.name}}</td>
                             <td>{{v.code}}</td>
-                            <td>{{v.description}} (<a data-toggle="collapse" href="#s{{v.label}}" aria-expanded="false" aria-controls="s{{v.label}}">Source</a>) 
-                                <div class="collapse" id="s{{v.label}}">
+                            <td>{{v.description}} (<a style="cursor:pointer;" data-toggle="collapse" href="#s{{v.label}}" aria-expanded="false" aria-controls="s{{v.label}}">Source</a>) 
+                                <div class="collapse" id="s{{v.label}}" style="padding-left:10px; padding-top:5px;">
                                     {% for s in v.sources %}
                                         <a href="#r{{s.id}}">{{s}}</a>;
                                     {% endfor %}
                                 </div>
                             </td>
-                            <td><a class="comment-tooltip" data-toggle="tooltip" title="Focal Year: {{v.year}}
-{{v.comment}}"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span></a></td>
+                            {% if v.year or v.comment %}
+                            <td width="10px">
+                                <a class="comment-tooltip" data-toggle="tooltip" title="{% if v.year %} Focal Year: {{v.year}} {% endif %}
+{{v.comment}}"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span></a>
+                                </td>
+                            {% else %}
+                                <td width="0px"></td>
+                            {% endif %}
                         </tr>
                         {% endfor %}
                     </table>

@@ -22,12 +22,12 @@ function SocietiesCtrl($scope, searchModelService, LanguageClass, ZipTest) {
         
     if ($scope.query.environmental_filters) {
         $scope.variables = $scope.variables.concat($scope.results.environmental_variables);
-        //$scope.results.code_ids[$scope.results.environmental_variables[0].id] = [];
     }
     
     for (var key in $scope.results.code_ids) {
         $scope.results.code_ids[key]['svgSize'] = $scope.results.code_ids[key].length * 27;
     }
+    
     $scope.setActive('societies');
 
     $scope.resizeMap = function() {
@@ -148,6 +148,17 @@ function SocietiesCtrl($scope, searchModelService, LanguageClass, ZipTest) {
             .attr("download", "legend.svg")
             .attr("href", "/api/v1/zip_legends?query="+encodeURIComponent(JSON.stringify(query)))
             .html("Download this phylogeny");
+    };
+    
+    $scope.showComments = function(society, variable_id) {
+        for (var i = 0; i < society.variable_coded_values.length; i++) {
+            if (society.variable_coded_values[i].variable == variable_id) {
+                if ((society.variable_coded_values[i].focal_year.length > 0 && society.variable_coded_values[i].focal_year != 'NA') || society.variable_coded_values[i].comment.length > 0)
+                    return true
+                else    
+                    return false
+            }
+        }
     };
     
     $scope.changeMap = function(chosenVariable) {

@@ -122,8 +122,17 @@ body {
     white-space:pre-wrap;
 }
 
-.comment-tooltip {
+.comment-tooltip, .source-link {
     cursor:pointer;
+}
+
+.source-link, .val-sources {
+    font-size: 12.5px;
+}
+
+.val-sources {
+    padding-top: 5px;
+    padding-left: 10px;
 }
 
 .row-margin-top {
