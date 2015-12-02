@@ -265,6 +265,7 @@ class VariableCodedValue(models.Model):
     source = models.ForeignKey('Source', null=True)
     comment = models.TextField(default="")
     references = models.ManyToManyField('Source', related_name='references')
+    subcase = models.TextField(default="")
     focal_year = models.CharField(max_length=10, default="")
     
     def get_description(self):
@@ -300,7 +301,6 @@ class Source(models.Model):
     year = models.CharField(max_length=30) # text, because might be '1996', '1999-2001', or 'ND'
     author = models.CharField(max_length=50)
     reference = models.CharField(max_length=500)
-    subcase = models.CharField(max_length=32,null=True)
     name = models.CharField(max_length=100, default="")
     
     def __unicode__(self):
