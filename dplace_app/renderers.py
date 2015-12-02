@@ -16,7 +16,10 @@ class DPLACECSVResults(object):
 
     def field_names_for_cultural_variable(self, variable):
         return {'code' : "Code: %s %s" % (variable['label'], variable['name']),
-                'description': "Description: %s %s" % (variable['label'], variable['name'])}
+                'description': "Description: %s %s" % (variable['label'], variable['name']),
+                'comments': "Comment: %s %s" % (variable['label'], variable['name']),
+                'focal_year': "Focal Year: %s %s" % (variable['label'], variable['name']),
+                'sources': "References: %s %s" % (variable['label'], variable['name'])}
     def field_names_for_environmental_variable(self, variable):
         return {'name' : "%s (%s)" % (variable['name'], variable['units']) }
 
@@ -31,8 +34,11 @@ class DPLACECSVResults(object):
             for v in self.data['variable_descriptions']:
                 field_names = self.field_names_for_cultural_variable(v)
                 self.field_map['variable_descriptions'][v['id']] = field_names
+                self.field_names.append(field_names['focal_year'])
                 self.field_names.append(field_names['code'])
                 self.field_names.append(field_names['description'])
+                self.field_names.append(field_names['comments'])
+                self.field_names.append(field_names['sources'])
         if 'environmental_variables' in self.data:
             self.field_map['environmental_variables'] = dict()
             for v in self.data['environmental_variables']:
@@ -75,11 +81,14 @@ class DPLACECSVResults(object):
                 variable_id = cultural_trait_value['variable']
                 field_names = self.field_map['variable_descriptions'][variable_id]
                 row[field_names['code']] = cultural_trait_value['coded_value']
+                row[field_names['focal_year']] = cultural_trait_value['focal_year']
                 if 'code_description' in cultural_trait_value:
                     try:
                         row[field_names['description']] = cultural_trait_value['code_description']['description']
                     except:
                         break
+                row[field_names['comments']] = cultural_trait_value['comment']
+                row[field_names['sources']] = ''.join([x['author']+'('+x['year']+'); ' for x in cultural_trait_value['references']])
             # environmental
             environmental_values = item['environmental_values']
             for environmental_value in environmental_values:

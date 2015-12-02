@@ -161,6 +161,15 @@ function SocietiesCtrl($scope, searchModelService, LanguageClass, ZipTest) {
         }
     };
     
+    $scope.showSource = function(society, variable_id) {
+        for (var i = 0; i < society.variable_coded_values.length; i++) {
+            if (society.variable_coded_values[i].variable == variable_id) {
+                return true;
+            }
+        }
+        return false;
+    };
+    
     $scope.changeMap = function(chosenVariable) {
         chosenVariableId = chosenVariable.id;
         d3.select(".legend-for-download").html('');
