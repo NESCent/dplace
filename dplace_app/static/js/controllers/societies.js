@@ -164,7 +164,9 @@ function SocietiesCtrl($scope, searchModelService, LanguageClass, ZipTest) {
     $scope.showSource = function(society, variable_id) {
         for (var i = 0; i < society.variable_coded_values.length; i++) {
             if (society.variable_coded_values[i].variable == variable_id) {
-                return true;
+                if (society.variable_coded_values[i].references.length > 0)
+                    return true;
+                else return false;
             }
         }
         return false;
