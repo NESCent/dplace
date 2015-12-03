@@ -154,9 +154,9 @@ def load_data(val_row):
         coded_value=value,
         code=code,
         focal_year=focal_year,
-        comment=comment
+        comment=comment,
+        subcase=subcase
     )
-    v.subcase = subcase
     v.save()
     print "Saved data for Society %s Variable ID %s" % (ext_id, variable.label)
 
