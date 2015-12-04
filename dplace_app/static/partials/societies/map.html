@@ -1,4 +1,4 @@
-<div class="row">
+<div class="row" style="padding-bottom:10px;">
                 <h4 ng-show="variables.length > 0">Choose a variable:</h4>
                 <select 
                     ng-model="results.chosenVariable"
@@ -11,7 +11,7 @@
                  </select>
              </div>
             <dplace-map results="results" map-div-id="result-map" visible="visible" query="query" chosen="results.chosenVariable"></dplace-map>
-            <table id="mapLegend" style="position:absolute; margin-top:-270px; margin-left:750px; margin-right:10px;">
+            <table class="map-legend">
                 <tr class="download-links">
                 </tr>
                 <tr ng-show="results.chosenVariable.data_type !== 'CONTINUOUS'" ng-repeat="code in results.code_ids[results.chosenVariable.id]">
@@ -27,7 +27,7 @@
                                     />
                             </svg>
                     </td>
-                    <td>{{code.description}}</td>
+                    <td>{{code.short_description}}</td>
                 </tr>
                 <tr ng-show="(results.chosenVariable && (results.chosenVariable==results.environmental_variables[0]))">
                     <td>
