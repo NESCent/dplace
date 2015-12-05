@@ -642,6 +642,7 @@ angular.module('dplaceMapDirective', [])
                     }
                     
                 };
+                
                 var num_lines = 0;              
                 scope.wrapText = function(text, string) {
                     text.each(function() {
@@ -662,7 +663,7 @@ angular.module('dplaceMapDirective', [])
                         while (word = words.pop()) {
                             line.push(word);
                             tspan.text(line.join(" "));
-                            if (tspan.node().getComputedTextLength() > 700) {
+                            if (tspan.node().getComputedTextLength() > 800) {
                                 y += 20;
                                 line.pop();
                                 tspan.text(line.join(" "));
@@ -686,7 +687,7 @@ angular.module('dplaceMapDirective', [])
                         var map_svg = d3.select(".jvectormap-container").select("svg")
                             .attr("version", 1.1)
                             .attr("xmlns", "http://www.w3.org/2000/svg")
-                            .attr("height", "900")
+                            .attr("height", "1500")
                             .node().parentNode.innerHTML;
                         map_svg = map_svg.substring(0, map_svg.indexOf("<div")); //remove zoom in/out buttons from map
                         //construct legend for download
@@ -719,6 +720,7 @@ angular.module('dplaceMapDirective', [])
                                 g.append("svg:text")
                                     .attr("x", "20")
                                     .attr("y", "15")
+                                    .attr("style", "font-size: 14px;")
                                     .call(scope.wrapText, scope.results.code_ids[scope.chosen.id][i].description);
                                 num_lines += 1;
                             }
@@ -735,7 +737,7 @@ angular.module('dplaceMapDirective', [])
                                 .attr("style", "padding-bottom:20px")
                                 .append("a")
                                 .attr("class", "btn btn-info btn-dplace-download")
-                                .attr("download", scope.chosen.name+" map.svg")
+                                .attr("download", scope.chosen.name.replace(" ", "-").toLowerCase()+"-map.svg")
                                 .attr("href", imgsrc)
                                 .html("Download Map");
                         }
