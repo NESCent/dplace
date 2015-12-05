@@ -642,9 +642,46 @@ angular.module('dplaceMapDirective', [])
                     }
                     
                 };
+                var num_lines = 0;              
+                scope.wrapText = function(text, string) {
+                    text.each(function() {
+                        var text = d3.select(this),
+                        words = string.split(/\s+/).reverse(),
+                        word,
+                        line = [],
+                        lineNumber = 0,
+                        lineHeight = 0.1,
+                        x = text.attr("x"),
+                        y = 0,
+                        dy = 1,
+                        tspan = text.text(null)
+                            .append("svg:tspan")
+                            .attr("x", x)
+                            .attr("y", y)
+                            .attr("dy", dy + "em");
+                        while (word = words.pop()) {
+                            line.push(word);
+                            tspan.text(line.join(" "));
+                            if (tspan.node().getComputedTextLength() > 700) {
+                                y += 20;
+                                line.pop();
+                                tspan.text(line.join(" "));
+                                line = [word];
+                                tspan = text.append("svg:tspan")
+                                    .attr("x", "20")
+                                    .attr("y", y)
+                                    .attr("dy", ++lineNumber * lineHeight + dy + "em")
+                                    .text(word);
+                                num_lines += 1;
+                            }
+                        }
+                    });
+                    
+                };
                 
                 //constructs download link for map
-                scope.mapLink = function() {                     
+                scope.mapLink = function() {
+                    num_lines = 0;
                         d3.select(".download-links").html('');
                         var map_svg = d3.select(".jvectormap-container").select("svg")
                             .attr("version", 1.1)
@@ -658,13 +695,13 @@ angular.module('dplaceMapDirective', [])
                         if (scope.chosen) {
                             if (scope.results.environmental_variables.length > 0 && scope.chosen.id == scope.results.environmental_variables[0].id) {
                                 //if the chosen map is an environmental variable
-                                    legend_svg = "<g transform='translate(0,350)'>"+d3.select(".envLegend").node().innerHTML+"</g>";
+                                    legend_svg = "<g transform='translate(0,0)'>"+d3.select(".envLegend").node().innerHTML+"</g>";
                             }
                             else if (scope.results.code_ids) {
                             for (var i = 0; i < scope.results.code_ids[scope.chosen.id].length; i++) {
                                 g = legend.append("svg:g")
                                     .attr("transform", function() {
-                                        return 'translate(0,'+i*25+')';
+                                            return 'translate(0,'+((num_lines)*25)+')';
                                     });
                                 g.append("svg:circle")
                                     .attr("cx", "10")
@@ -682,8 +719,10 @@ angular.module('dplaceMapDirective', [])
                                 g.append("svg:text")
                                     .attr("x", "20")
                                     .attr("y", "15")
-                                    .text(scope.results.code_ids[scope.chosen.id][i].description);
+                                    .call(scope.wrapText, scope.results.code_ids[scope.chosen.id][i].description);
+                                num_lines += 1;
                             }
+
                             legend_svg = "<g transform='translate(0,350)'>"+legend.node().innerHTML+"</g>";
                             }
                             var map_svg = map_svg.substring(0, map_svg.indexOf("</svg>"));
@@ -744,7 +783,7 @@ angular.module('dplaceMapDirective', [])
                                 .html("Download Map: " + lang_family);
                         }
                 };
-                
+
                 scope.mapLegend = function() {
                     if (!scope.chosen) return;
                     if (scope.chosen.id == 34 || scope.chosen.id == 36) {
