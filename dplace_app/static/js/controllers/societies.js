@@ -1,4 +1,4 @@
-function SocietiesCtrl($scope, searchModelService, LanguageClass, ZipTest) {
+function SocietiesCtrl($scope, $timeout, searchModelService, LanguageClass, ZipTest) {
     $scope.results = searchModelService.getModel().getResults();
     $scope.query = searchModelService.getModel().getQuery();
     $scope.variables = [];
@@ -14,7 +14,7 @@ function SocietiesCtrl($scope, searchModelService, LanguageClass, ZipTest) {
         { title: "Tree", content: "tree", active: false},
         { title: "Download", content: "download", active: false},
     ];
-    
+        
     console.log($scope.results);
     if ($scope.results.variable_descriptions) {
         $scope.variables = $scope.variables.concat($scope.results.variable_descriptions);
@@ -29,10 +29,164 @@ function SocietiesCtrl($scope, searchModelService, LanguageClass, ZipTest) {
     }
     
     $scope.setActive('societies');
-
-    $scope.resizeMap = function() {
-        $scope.$broadcast('mapTabActivated');
+    
+    var num_lines = 0;              
+    $scope.wrapText = function(text, string) {
+        text.each(function() {
+            var text = d3.select(this),
+            words = string.split(/\s+/).reverse(),
+            word,
+            line = [],
+            lineNumber = 0,
+            lineHeight = 0.1,
+            x = text.attr("x"),
+            y = 0,
+            dy = 1,
+            tspan = text.text(null)
+                .append("svg:tspan")
+                .attr("x", x)
+                .attr("y", y)
+                .attr("dy", dy + "em");
+            while (word = words.pop()) {
+                line.push(word);
+                tspan.text(line.join(" "));
+                if (tspan.node().getComputedTextLength() > 800) {
+                    y += 20;
+                    line.pop();
+                    tspan.text(line.join(" "));
+                    line = [word];
+                    tspan = text.append("svg:tspan")
+                        .attr("x", "20")
+                        .attr("y", y)
+                        .attr("dy", ++lineNumber * lineHeight + dy + "em")
+                        .text(word);
+                    num_lines += 1;
+                }
+            }
+        });
+        
     };
+    
+    $scope.constructMapDownload = function() {
+        console.log("Constructing");
+        d3.select(".legend-for-download").html('');
+        d3.select(".download-links").html('');
+        num_lines = 0;
+        var gradients_svg = d3.select("#gradients").node().innerHTML;
+        map_svg = d3.select(".jvectormap-container").select("svg")
+                        .attr("version", 1.1)
+                        .attr("xmlns", "http://www.w3.org/2000/svg")
+                        .attr("height", function() {
+                            if ($scope.results.chosenVariable && $scope.results.environmental_variables.length > 0 && $scope.results.chosenVariable == $scope.results.environmental_variables[0]) return "500";
+                            else return "1500";
+                        })
+                        .node().parentNode.innerHTML;
+        map_svg = map_svg.substring(0, map_svg.indexOf("<div")); //remove zoom in/out buttons from map
+        
+        //construct legend for download
+        var legend = d3.select(".legend-for-download");
+        var legend_svg = "";
+        
+        //cultural and environmental variables
+        if ($scope.results.chosenVariable) {
+            if ($scope.results.environmental_variables.length > 0 && $scope.results.chosenVariable == $scope.results.environmental_variables[0]) {
+                //if the chosen map is an environmental variable
+                    legend_svg = "<g transform='translate(0,350)'>"+d3.select(".envLegend").node().innerHTML+"</g>";
+            }
+            else if ($scope.results.code_ids) {
+                //cultural variables
+                for (var i = 0; i < $scope.results.code_ids[$scope.results.chosenVariable.id].length; i++) {
+                    g = legend.append("svg:g")
+                        .attr("transform", function() {
+                                return 'translate(0,'+((num_lines)*25)+')';
+                        });
+                    g.append("svg:circle")
+                        .attr("cx", "10")
+                        .attr("cy", "10")
+                        .attr("r", "4.5")
+                        .attr("stroke", "#000")
+                        .attr("stroke-width", "0.5")
+                        .attr("fill", function() {
+                            if ($scope.results.code_ids[$scope.results.chosenVariable.id][i].description.indexOf("Missing data") != -1)
+                                return 'hsl(0, 0%, 100%)';
+                            var value = $scope.results.code_ids[$scope.results.chosenVariable.id][i].code;
+                            var hue = value * 240 / $scope.results.code_ids[$scope.results.chosenVariable.id].length;
+                            return 'hsl('+hue+',100%,50%)';
+                        });
+                    g.append("svg:text")
+                        .attr("x", "20")
+                        .attr("y", "15")
+                        .attr("style", "font-size: 14px;")
+                        .call($scope.wrapText, $scope.results.code_ids[$scope.results.chosenVariable.id][i].description);
+                    num_lines += 1;
+                }
+
+                legend_svg = "<g transform='translate(0,350)'>"+legend.node().innerHTML+"</g>";
+            }
+            var map_svg = map_svg.substring(0, map_svg.indexOf("</svg>"));
+            map_svg = map_svg.concat(legend_svg);
+            map_svg = map_svg.concat(gradients_svg +"</svg>");
+            //generate download
+            var imgsrc = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(map_svg)));
+            d3.select(".download-links").append("td")
+                .attr("colspan", "2")
+                .attr("style", "padding-bottom:20px")
+                .append("a")
+                .attr("class", "btn btn-info btn-dplace-download")
+                .attr("download", $scope.results.chosenVariable.name.replace(" ", "-").toLowerCase()+"-map.svg")
+                .attr("href", imgsrc)
+                .html("Download Map");
+        }
+        
+        else if ($scope.results.classifications && $scope.results.languages.length > 0) {
+            count = 0;
+            for (var key in $scope.results.classifications) {
+                for (var i = 0; i < $scope.results.classifications[key].length; i++) {
+                    g = legend.append("svg:g")
+                        .attr("transform", function() {
+                            return 'translate(0,'+ count*25 + ')';
+                        });
+                    g.append("svg:circle")
+                        .attr("cx", "10")
+                        .attr("cy", "10")
+                        .attr("r", "4.5")
+                        .attr("stroke", "#000")
+                        .attr("stroke-width", "0.5")
+                        .attr("fill", function() {
+                            var value = $scope.results.classifications[key][i].id;
+                            var hue = value * 240 / $scope.results.classifications['NumClassifications'];
+                            return 'hsl('+hue+',100%,50%)';
+                        });
+                    g.append("svg:text")
+                        .attr("x", "20")
+                        .attr("y", "15")
+                        .text($scope.results.classifications[key][i].name);
+                    count++;
+                }
+                
+            }
+            var legend_svg = "<g transform='translate(0,350)'>"+legend.node().innerHTML+"</g>";
+            var map_svg = map_svg.substring(0, map_svg.indexOf("</svg>"));
+            map_svg = map_svg.concat(legend_svg+"</svg>");
+            var imgsrc = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(map_svg)));
+            lang_family = $scope.results.languages[0].language_family.name;
+            
+            d3.select(".download-links").append("td")
+                .attr("colspan", "2")
+                .attr("style", "padding-bottom:20px")
+                .append("a")
+                .attr("class", "btn btn-info btn-dplace-download")
+                .attr("download", lang_family+"map.svg")
+                .attr("href", imgsrc)
+                .html("Download Map: " + lang_family);
+        }
+    }
+    
+    $scope.tabChanged = function() {
+        if ($scope.tabs[1].active) {
+            $scope.constructMapDownload();
+        }
+    }
     
     $scope.buttonChanged = function(buttonVal) {
         d3.select('language-phylogeny').html('');
@@ -171,10 +325,11 @@ function SocietiesCtrl($scope, searchModelService, LanguageClass, ZipTest) {
         }
         return false;
     };
+
     
     $scope.changeMap = function(chosenVariable) {
-        chosenVariableId = chosenVariable.id;
-        d3.select(".legend-for-download").html('');
+        $timeout(function() { $scope.constructMapDownload(); });
+
     }
 
     $scope.generateDownloadLinks = function() {

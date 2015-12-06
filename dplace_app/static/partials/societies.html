@@ -1,6 +1,6 @@
 <div class="container results">
 <!-- NEED A BETTER WAY TO DO THIS -->
- <svg height="0" width="0">
+ <svg id="gradients" height="0" width="0">
     <defs>
         <linearGradient id="temp" x1="0%" y1="0%" x2="100%" y2="0%">
             <stop offset="0%" style="stop-color:hsl(252,100%,50%);stop-opacity:0.7" />
@@ -35,7 +35,7 @@
     </div>
     <tabset>
     
-        <tab ng-repeat="tab in tabs" heading="{{tab.title}}" active="tab.active" select="visible=true" deselect="visible=false">
+        <tab ng-repeat="tab in tabs" heading="{{tab.title}}" active="tab.active" select="visible=true" deselect="visible=false" ng-click="tabChanged()">
             <ng-include src="'/static/partials/societies/' + tab.content + '.html'"></ng-include>
         </tab>
     </tabset>

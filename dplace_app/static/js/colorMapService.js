@@ -1,15 +1,15 @@
 function ColorMapService() {
 
     //blue to red gradient for environmental variables
-    function tempColor(index, min, max, id ) {
-    if (id == 34 || id == 36) {
+    function tempColor(index, min, max, name) {
+    if (name == "Net Primary Production" || name == "Mean Growing Season NPP") {
         hue = 30 + (((index - min) / (max - min)) * 88);
-    } else if (id == 27){
+    } else if (name == "Annual Mean Precipitation"){
         color = mapColorMonochrome(min, max, index, 252);
         return color;
     }
     else {
-    hue = 240 - (((index - min) / (max - min))*240);
+        hue = 240 - (((index - min) / (max - min))*240);
     }
         return 'hsl('+hue+',100%, 50%)';
     }
@@ -43,7 +43,7 @@ function ColorMapService() {
                     return env_var.id == society.environmental_values[j].variable;
                 });
                 if (variable.length > 0) {
-                    var color = tempColor(society.environmental_values[0].value,  results.environmental_variables[0].min, results.environmental_variables[0].max, results.environmental_variables[0].id);
+                    var color = tempColor(society.environmental_values[0].value,  results.environmental_variables[0].min, results.environmental_variables[0].max, results.environmental_variables[0].name);
                     colors[society.society.id] = color;
                 }    
             }
