@@ -68,7 +68,6 @@ function SocietiesCtrl($scope, $timeout, searchModelService, LanguageClass, ZipT
     };
     
     $scope.constructMapDownload = function() {
-        console.log("Constructing");
         d3.select(".legend-for-download").html('');
         d3.select(".download-links").html('');
         num_lines = 0;
@@ -178,7 +177,7 @@ function SocietiesCtrl($scope, $timeout, searchModelService, LanguageClass, ZipT
                 .attr("class", "btn btn-info btn-dplace-download")
                 .attr("download", lang_family+"map.svg")
                 .attr("href", imgsrc)
-                .html("Download Map: " + lang_family);
+                .html("Download Map");
         }
     }
     

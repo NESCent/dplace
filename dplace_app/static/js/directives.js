@@ -155,14 +155,14 @@ angular.module('languagePhylogenyDirective', [])
                                         })
                                         .on("mouseover", function() { 
                                                  d3.select("body").append("div")
-                                                    .attr("class", "tooltip")
+                                                    .attr("class", "tree-tooltip")
                                                     .html("<b>"+society_name+":</b><br>"+hover_text_value)
                                                     .style("left", (d3.event.pageX + 10)+"px")
                                                     .style("top", (d3.event.pageY + 5)+"px")
                                                     .style("opacity", .9);
                                         })
                                         .on("mouseout", function() {
-                                            d3.select(".tooltip").remove();
+                                            d3.select(".tree-tooltip").remove();
                                         }); 
                                 }
                             }
@@ -575,13 +575,14 @@ angular.module('dplaceMapDirective', [])
                     results.societies = [];
                     results.environmental_variables = scope.results.environmental_variables;
                     results.geographic_regions = scope.results.geographic_regions;
+                    results.languages = scope.results.languages;
                     results.code_ids = scope.results.code_ids;
                     scope.results.societies.forEach(function(societyResult) {
                         var society = societyResult.society;
                         // Add a marker for each point
                         var marker = {latLng: [society.location.coordinates[1], society.location.coordinates[0]], name: society.name}
                         scope.map.addMarker(society.id, marker); 
-                         if (!scope.chosen) {
+                         if (!scope.chosen) {   
                             results = scope.results;
                         } else {
                             if (scope.results.variable_descriptions.indexOf(scope.chosen) != -1) {
@@ -615,20 +616,6 @@ angular.module('dplaceMapDirective', [])
                                     }
                                 });
                             } 
-                            else {
-                                societyResult.languages.forEach(function(language) {
-                                    var classification = scope.query.language_classifications.filter(function(l) { return l.language.id == language.id });
-                                    if (classification.length > 0) {
-                                        results.societies.push({
-                                        'society': society,
-                                            'language_family': classification[0].class_subfamily,
-                                            'num_classifications': scope.results.classifications['NumClassifications'],
-                                            'environmental_values': [],
-                                            'variable_coded_values': [],
-                                        });
-                                    }
-                                });
-                            }
                         }
                     });
 

@@ -15,7 +15,7 @@ function ColorMapService() {
     }
 
     //normal gradient
-    function mapColor(index, count) {
+    function mapColor(index, count) {   
         hue = (index / count)*240;
         return 'hsl(' + hue + ',100%,50%)';
     }
@@ -37,7 +37,13 @@ function ColorMapService() {
                     colors[society.society.id] = color;
                 }
             }
+            
+            if (results.languages.length > 0 && society.environmental_values.length == 0 && society.variable_coded_values.length == 0) {
+                    var color = mapColor(society.society.language.language_family.id, results.classifications.NumClassifications);
+                    colors[society.society.id] = color;
                 
+            }
+            
             for (var j = 0; j < society.environmental_values.length; j++) {
                 variable = results.environmental_variables.filter(function(env_var) {
                     return env_var.id == society.environmental_values[j].variable;
@@ -59,11 +65,7 @@ function ColorMapService() {
                     colors[society.society.id] = color;
                 }
             }
-            
-            if (society.language_family) {
-                var color = mapColor(society.language_family, society.num_classifications);
-                colors[society.society.id] = color;
-            }
+
         }
         return colors;
     };
