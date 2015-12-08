@@ -14,10 +14,10 @@ def load_lang(lang_row):
     # Extract values from dictionary
     code = get_isocode(lang_row)
     if code is None:
-        print "ISO Code not found in row, skipping"
+        print "No ISO Code found, skipping"
         return None
     language_name = get_value(lang_row,('Language name','NAM'))
-    ethnologue_classification = get_value(lang_row,('Ethnologue Classification (unrevised)','Ethnologue classification (if applicable)'))
+    #ethnologue_classification = get_value(lang_row,('Ethnologue Classification (unrevised)','Ethnologue classification (if applicable)'))
     family_names = [
         get_value(lang_row,('FAMILY-REVISED','FAMILY')),
         lang_row['Class2'],
@@ -47,27 +47,27 @@ def load_lang(lang_row):
             # empty cell
             continue
         try:
-            classes.append(LanguageClass.objects.get(level=level,name=name))
+            classes.append(LanguageClass.objects.get(scheme='R',level=level,name=name))
         except ObjectDoesNotExist:
             if len(classes) > 0:
                 parent = classes[-1]
             else:
                 parent = None
-            lang_class = LanguageClass(level=level, name=name, parent=parent)
+            lang_class = LanguageClass(scheme='R',level=level, name=name, parent=parent)
             lang_class.save()
             classes.append(lang_class)
 
     # Finally, create the LanguageClassification
     classification_scheme = 'R' # Ethnologue17-Revised
+    class_family = classes[0]
+    class_subfamily = classes[1] if len(classes) > 1 else None
+    class_subsubfamily = classes[2] if len(classes) > 2 else None
     try:
-        classification = LanguageClassification.objects.get(ethnologue_classification=ethnologue_classification)
+        classification = LanguageClassification.objects.get(scheme=classification_scheme, language=language, class_family=class_family, class_subfamily=class_subfamily, class_subsubfamily=class_subsubfamily)
     except ObjectDoesNotExist:
-        class_family = classes[0]
-        class_subfamily = classes[1] if len(classes) > 1 else None
-        class_subsubfamily = classes[2] if len(classes) > 2 else None
+        print "Creating new Ethnologue Language Classification for Language %s" % language
         classification = LanguageClassification(scheme=classification_scheme,
                                                 language=language,
-                                                ethnologue_classification=ethnologue_classification,
                                                 class_family=class_family,
                                                 class_subfamily=class_subfamily,
                                                 class_subsubfamily=class_subsubfamily,

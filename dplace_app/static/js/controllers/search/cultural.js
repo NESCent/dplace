@@ -1,4 +1,4 @@
-function CulturalCtrl($scope, searchModelService, Variable, CodeDescription, BfContinuousVariable, DatasetSources, getCategories) {
+function CulturalCtrl($scope, searchModelService, Variable, CodeDescription, ContinuousVariable, DatasetSources, getCategories) {
    var linkModel = function() {
         // Model/state lives in searchModelService
         $scope.traits = [searchModelService.getModel().getCulturalTraits()];
@@ -16,16 +16,16 @@ function CulturalCtrl($scope, searchModelService, Variable, CodeDescription, BfC
     // triggered by the view when a category is changed
     $scope.categoryChanged = function(trait) {
         trait.indexVariables = Variable.query({index_categories: trait.selectedCategory.id, source: trait.selectedSource.id});
-        trait.nicheVariables = Variable.query({niche_categories: trait.selectedCategory.id, source: trait.selectedSource.id});
 		trait.codes = [];
         trait.selectedCode = "";
     };
 
     // triggered by the view when a trait is changed in the picker
     $scope.traitChanged = function(trait) {
+        console.log(trait.selectedVariable);
         trait.selectedCode = "";
-        if (trait.selectedVariable.data_type == 'CONTINUOUS') {
-            trait.codes = BfContinuousVariable.query({query: {bf_id: trait.selectedVariable.id}});
+        if (trait.selectedVariable.data_type == 'Continuous') {
+            trait.codes = ContinuousVariable.query({query: {bf_id: trait.selectedVariable.id}});
         } else
             trait.codes = CodeDescription.query({variable: trait.selectedVariable.id });
     };

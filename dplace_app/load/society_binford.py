@@ -34,35 +34,20 @@ def load_bf_society(society_dict):
     society.save()
 
 def load_bf_val(val_row):
-    ext_id = val_row['ID'].strip()
-    source = get_source("Binford")
-    # find the existing society
+    ext_id = val_row['soc_id']
     try:
         society = Society.objects.get(ext_id=ext_id)
     except ObjectDoesNotExist:
-        print "Attempting to load Binford values for %s but did not find an existing Society object" % ext_id
+        print "Attempting to load EA values for %s but did not find an existing Society object, skipping" % ext_id
         return
-    # Variable values are in columns after 'ID' and 'Name'
-    for key in val_row.keys():
-        if key not in ('ID', 'Name'):
-            label = key
-            value = val_row[key].strip()
-            try:
-                variable = VariableDescription.objects.get(label=label)
-            except ObjectDoesNotExist:
-                continue
-            try:
-                # Check for Code description if it exists.
-                code = VariableCodeDescription.objects.get(variable=variable,code=value)
-            except ObjectDoesNotExist:
-                code = None
-            try:
-                variable_value = VariableCodedValue(variable=variable,
-                                                    society=society,
-                                                    coded_value=value,
-                                                    code=code)
-                variable_value.save()
-            except IntegrityError:
-                print "Unable to store value '%s' for var %s in society %s, already exists" % (value, variable.label, society)
-            except DataError:
-                print "data error saving '%s'" % value
+        
+    variable = get_variable(val_row['VarID'].strip())
+    value = val_row['Code'].strip()
+    comment = val_row['Comment'].strip()
+    references = val_row['References'].strip().split(";")   
+    focal_year = val_row['Year'].strip()
+    
+    if variable is None:
+        print "Could not find variable %s for society %s" % (val_row['VarID'], society)
+        return
+

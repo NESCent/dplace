@@ -69,7 +69,8 @@ class Society(models.Model):
             for value in environmental.values.order_by('variable__name').all():
                 valueDict[str(value.variable.category)].append({
                     'name': value.variable.name,
-                    'value': value.value
+                    'value': format(value.value, '.4f'),
+                    'units': value.variable.units
                 })
         return valueDict
 
@@ -264,6 +265,7 @@ class VariableCodedValue(models.Model):
     source = models.ForeignKey('Source', null=True)
     comment = models.TextField(default="")
     references = models.ManyToManyField('Source', related_name='references')
+    subcase = models.TextField(default="")
     focal_year = models.CharField(max_length=10, default="")
     
     def get_description(self):
@@ -299,7 +301,6 @@ class Source(models.Model):
     year = models.CharField(max_length=30) # text, because might be '1996', '1999-2001', or 'ND'
     author = models.CharField(max_length=50)
     reference = models.CharField(max_length=500)
-    subcase = models.CharField(max_length=32,null=True)
     name = models.CharField(max_length=100, default="")
     
     def __unicode__(self):
@@ -312,6 +313,7 @@ class Source(models.Model):
 
 class LanguageClass(models.Model):
     # max length 37
+    scheme = models.CharField(max_length=1, choices=CLASSIFICATION_SCHEMES, default='G')
     name = models.CharField(max_length=50, db_index=True)
     level = models.IntegerField(db_index=True, choices=CLASS_LEVELS)
     parent = models.ForeignKey('self', null=True, default=None)
@@ -334,7 +336,7 @@ class LanguageClass(models.Model):
         ordering= ('level', 'name')
 
 class LanguageClassification(models.Model):
-    scheme = models.CharField(max_length=1, choices=CLASSIFICATION_SCHEMES, default='E');
+    scheme = models.CharField(max_length=1, choices=CLASSIFICATION_SCHEMES, default='G');
     language = models.ForeignKey('Language', null=True)
     class_family = models.ForeignKey('LanguageClass', limit_choices_to={'level': 1}, related_name="languages1", null=True)
     class_subfamily = models.ForeignKey('LanguageClass', limit_choices_to={'level': 2}, related_name="languages2", null=True)

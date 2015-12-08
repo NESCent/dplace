@@ -30,28 +30,28 @@ fi
 export DJANGO_SETTINGS_MODULE=dplace.settings
 export PYTHONPATH=$DPLACE_PATH
 
-#echo "Loading ISO Codes from Ethnologue" FIX THIS
-#python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/Revised_Ethnologue_families-Feb_10_2014-17th_Ed-ISO693-3-current.csv" iso
-#python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/Revised_Ethnologue_families-Feb_10_2014-17th_Ed_Missing_ISO_codes.csv" iso
+echo "Loading ISO Codes from Ethnologue"
+python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/Revised_Ethnologue_families-Feb_10_2014-17th_Ed-ISO693-3-current.csv" iso
+python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/Revised_Ethnologue_families-Feb_10_2014-17th_Ed_Missing_ISO_codes.csv" iso
 
-#echo "Loading Languages from Ethnologue" NOT WORKING
-#python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/Revised_Ethnologue_families-Feb_10_2014-17th_Ed-ISO693-3-current.csv" langs
-#python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/Revised_Ethnologue_families-Feb_10_2014-17th_Ed_Missing_ISO_codes.csv" langs
+echo "Loading Languages from Ethnologue" 
+python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/Revised_Ethnologue_families-Feb_10_2014-17th_Ed-ISO693-3-current.csv" langs
+python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/Revised_Ethnologue_families-Feb_10_2014-17th_Ed_Missing_ISO_codes.csv" langs
 
 echo "Loading Glottolog Languages"
 python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/glottolog_mapping.csv" glotto
 
-#echo "Loading EA Variables"
-#python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/EAVariableList_17Nov2015.csv" vars
+echo "Loading EA Variables"
+python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/EAVariableList_17Nov2015.csv" vars
 
-#echo "Loading EA Variable Codes"
-#python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/EACodeDescriptions_17Nov2015.csv" codes
+echo "Loading EA Variable Codes"
+python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/EACodeDescriptions_17Nov2015.csv" codes
 
-#echo "Loading Binford Variables" 
-#python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/BinfordVariableList_18Nov2015.csv" vars
+echo "Loading Binford Variables" 
+python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/BinfordVariableList_18Nov2015.csv" vars
 
-#echo "Loading Binford Variable Codes" 
-#python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/BinfordVariableListCodeDescription_18Nov2015.csv" codes
+echo "Loading Binford Variable Codes" 
+python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/BinfordVariableListCodeDescription_18Nov2015.csv" codes
 
 echo "Loading EA Societies"
 python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/EA_Society_HeaderData.csv" ea_soc
@@ -65,31 +65,37 @@ python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/EA_Binford_Lat_Long
 echo "Linking Societies to Glottocodes"
 python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/xd_id_to_language_18Nov2015.csv" xd_lang
 
-#echo "Loading References"
-#python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/ReferenceMapping_11Nov2015.csv" refs
+echo "Loading References"
+python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/ReferenceMapping_11Nov2015.csv" refs
 
-#echo "Loading EA Data"
-#python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/EA_DATA_Stacked_17Nov2015.csv" ea_stacked
+echo "Loading EA Data"
+python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/EA_DATA_Stacked_17Nov2015.csv" ea_vals
 
-#echo "Loading Binford Variable Values" DO
-#python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/binford_vals.csv" bf_vals
+echo "Loading References for EA data"
+python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/EA_DATA_Stacked_17Nov2015.csv" ea_refs
 
-#echo "Loading Environmental Data"
-#python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/EcologicalData.DBASE.07Mar14.csv" "env_vars"
-#python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/EcologicalData.DBASE.07Mar14.csv" "env_vals"
+echo "Loading Binford Data" 
+python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/Binford_merged_18Nov2015.csv" bf_vals
+
+#echo "Loading References for Binford data" DO THIS!!
+#python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/EA_DATA_Stacked_17Nov2015.csv" ea_refs
+
+echo "Loading Environmental Data"
+python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/EcologicalData.DBASE.07Mar14.csv" "env_vars"
+python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/EcologicalData.DBASE.07Mar14.csv" "env_vals"
 
 #echo "Loading Geographic regions from shapefile"
 #python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/geo/level2-shape/level2.shp" geo
 
-#TREE_FILES="${REPO_DEST}/trees/*.trees"
-#for tree_file in $TREE_FILES; do
-#    echo "Loading Language tree $tree_file"   
-#    if [[ $tree_file == *"glotto"* ]]
-#    then
-#        python "${DPLACE_PATH}/dplace_app/load.py" "$tree_file" glottotree
-#    else
-#        python "${DPLACE_PATH}/dplace_app/load.py" "$tree_file" tree
-#    fi
-#done
+TREE_FILES="${REPO_DEST}/trees/*.trees"
+for tree_file in $TREE_FILES; do
+    echo "Loading Language tree $tree_file"   
+    if [[ $tree_file == *"glotto"* ]]
+    then
+        python "${DPLACE_PATH}/dplace_app/load.py" "$tree_file" glottotree
+    else
+        python "${DPLACE_PATH}/dplace_app/load.py" "$tree_file" tree
+    fi
+done
 
 
