@@ -21,12 +21,14 @@ function ColorMapService() {
     }
     
     function mapColorMonochrome(min, max, value, color) {
-        var lum = (((value-min)/(max-min))) * 78;
-        lum = 100 - lum;
+        if ((max-min) > 100000) { var lum = ((((value-min)/(max-min))) * 7800)/100; lum = 100 - lum;} //this is bad when the range is very large
+        else { var lum = (((value-min)/(max-min))) * 78; lum = 100 - lum; }
+        console.log(lum);
         return 'hsl('+color+', 65%,'+lum+'%)'; 
     }
 
     this.generateColorMap = function(results) {
+        console.log(results);
         var colors = {};
         for (var i = 0; i < results.societies.length; i++) {
             var society = results.societies[i];
@@ -57,7 +59,7 @@ function ColorMapService() {
             for (var j = 0; j < society.variable_coded_values.length; j++) {
                 if (society.variable_coded_values[j].code_description && (society.variable_coded_values[j].code_description.description.indexOf("Missing data") != -1))
                     colors[society.society.id] = 'hsl(0, 0%, 100%)';
-                else if (society.bf_cont_var) {
+                else if (results.code_ids[society.variable_coded_values[j].variable].bf_var) {
                     var color = mapColorMonochrome(results.code_ids[society.variable_coded_values[j].variable].min, results.code_ids[society.variable_coded_values[j].variable].max, society.variable_coded_values[j].coded_value, 0);
                     colors[society.society.id] = color;
                 } else {
