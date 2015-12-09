@@ -43,7 +43,7 @@ class VariableCodedValueSerializer(serializers.ModelSerializer):
     references = SourceSerializer(many=True)
     class Meta:
         model = VariableCodedValue
-        fields = ('id', 'variable', 'society', 'coded_value', 'code_description', 'focal_year', 'comment', 'source', 'references')
+        fields = ('id', 'variable', 'society', 'coded_value', 'code_description', 'source', 'references', 'subcase')
 
 # ISO Codes
 class ISOCodeSerializer(gis_serializers.GeoModelSerializer):

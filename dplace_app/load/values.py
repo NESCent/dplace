@@ -82,8 +82,8 @@ def load_val_references(val_row):
             coded_value=value,
             code=code,
             focal_year=focal_year,
-            comment=comment
-        ) 
+            comment=comment,
+        )
         
     except:
         print "Could not find VariableCodedValue for Society %s Variable %s, skipping" % (society, variable.label)
@@ -139,6 +139,7 @@ def load_data(val_row):
     comment = val_row['Comment'].strip()
     references = val_row['References'].strip().split(";")   
     focal_year = val_row['Year'].strip()
+    subcase = val_row['SpecRef'].strip()
 
     if variable is None:
         print "Could not find variable %s for society %s" % (variable_id, society)
@@ -153,7 +154,8 @@ def load_data(val_row):
         coded_value=value,
         code=code,
         focal_year=focal_year,
-        comment=comment
+        comment=comment,
+        subcase=subcase
     )
     v.save()
     print "Saved data for Society %s Variable ID %s" % (ext_id, variable.label)
