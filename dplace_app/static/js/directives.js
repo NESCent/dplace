@@ -395,7 +395,6 @@ angular.module('languagePhylogenyDirective', [])
                 }
                 }
                 console.log(scope.query);
-                langs = {};
                 scope.results.societies.forEach(function(society) {
                     if (society.society.language) to_match = (langTree.name.indexOf("glotto") == -1) ? society.society.language.iso_code : society.society.language.glotto_code;
                     else to_match = (langTree.name.indexOf("glotto") == -1) ? society.society.iso_code : society.society.glotto_code;
@@ -431,7 +430,6 @@ angular.module('languagePhylogenyDirective', [])
                             }); 
                             }
                 });
-                console.log(langs);
                 //Time Scale
                 if (langTree.name.indexOf("glotto") == -1 && langTree.name.indexOf("global") == -1) {
                     line_svg= d3.select('language-phylogeny').append("svg:svg")
@@ -460,15 +458,15 @@ angular.module('languagePhylogenyDirective', [])
 
             scope.$on('treeSelected', function(event, args) {
                 constructTree(args.tree);
-                var pos = $("#varLabels").offset();
+                var pos = $(".phylogeny").offset();
                 $(window).scroll(function() {
                     //if ($(window).scrollTop() > 100)
                        // $("#legend").stop().animate({"marginTop":($(window).scrollTop() - 100) + "px"}, "slow");
-                    if ($(window).scrollTop() > (pos.top - 20) && $("#varLabels").css('position') == 'static') {
+                    if ($(window).scrollTop() > $(".navbar").height()+100) {
                         d3.select("#varLabels")
                             .attr('class', 'var-labels-fixed')
                             .style("visibility", "visible");
-                   } else if ($(window).scrollTop() < pos.top) {
+                   } else {
                         d3.select("#varLabels")
                             .classed('var-labels-fixed', false)
                             .style("visibility", "hidden");
