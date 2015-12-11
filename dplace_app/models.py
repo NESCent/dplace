@@ -54,8 +54,6 @@ class Society(models.Model):
     name = models.CharField('Name', db_index=True, max_length=200)
     location = models.PointField('Location',null=True)
     source = models.ForeignKey('Source', null=True)
-    iso_code = models.ForeignKey('ISOCode', null=True, related_name="societies")
-    glotto_code = models.ForeignKey('GlottoCode', null=True, default=None, related_name="societies")
     language = models.ForeignKey('Language', null=True, related_name="societies")
     objects = models.GeoManager()
     focal_year = models.CharField('Focal Year', null=True, blank=True, max_length=100)
