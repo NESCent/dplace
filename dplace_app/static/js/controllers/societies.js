@@ -78,6 +78,11 @@ function SocietiesCtrl($scope, searchModelService, LanguageClass, ZipTest) {
         else return true;
     };
     
+    $scope.legendArrow = function(code) {
+        if (code.hidden) code.hidden = false;
+        else code.hidden = true;
+    };
+    
     $scope.clicked = function(trees) {
         if (trees.length == 1) {
             tree_to_display = trees[0].name;
