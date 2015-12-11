@@ -8,27 +8,27 @@ def load_glottocode(dict_row):
     """
     Reads file glottolog_mapping.csv
     """
-    iso_code = dict_row['iso_693-3']
-    glotto_code = dict_row['id']
-    name = dict_row['name']
-   # level = dict_row['level']
-   # parent_id = dict_row['parent_id']
+    iso_code = dict_row['iso_code'].strip()
+    glotto_code = dict_row['id'].strip()
+    name = dict_row['name'].strip()
     glotto, created = GlottoCode.objects.get_or_create(glotto_code=glotto_code)
-    
     if not iso_code:
-        language, created = Language.objects.get_or_create(name=name, glotto_code=glotto)
-        if created:
-            print "Created language %s, glottocode %s" % (name, glotto)
+        language, created = Language.objects.get_or_create(glotto_code=glotto)
+        language.name = name
         language.save()
+        print "Saved language %s, %s" % (name, glotto)
+
     else:
+        iso, created = ISOCode.objects.get_or_create(iso_code=iso_code)
         try:
-            language = Language.objects.get(iso_code__iso_code=iso_code)
-            if glotto:
-                language.glotto_code = glotto
-                language.save()
+            language = Language.objects.get(glotto_code=glotto)
+            language.iso_code = iso
+            language.name = name
+            language.save()
         except ObjectDoesNotExist:
-            print "No language found for ISO Code %s" % iso_code
-            return
+            language = Language(name=name, glotto_code=glotto, iso_code=iso)
+            language.save()
+        print "Saved language %s, %s, %s" % (name, glotto, iso)
             
 def xd_to_language(dict_row):
     """
