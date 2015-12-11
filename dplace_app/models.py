@@ -263,8 +263,8 @@ class VariableCodedValue(models.Model):
     coded_value = models.CharField(max_length=100, db_index=True, null=False, default='.')
     code = models.ForeignKey('VariableCodeDescription', db_index=True, null=True)
     source = models.ForeignKey('Source', null=True)
-    comment = models.TextField(default="")
-    references = models.ManyToManyField('Source', related_name='references')
+    #comment = models.TextField(default="")
+    #references = models.ManyToManyField('Source', related_name='references')
     subcase = models.TextField(default="")
     focal_year = models.CharField(max_length=10, default="")
     
@@ -365,6 +365,9 @@ class Language(models.Model):
         
     class Meta:
         verbose_name = "Language"
+        unique_together = (
+            ('iso_code', 'glotto_code')
+        )
 
 
 class GeographicRegion(models.Model):
