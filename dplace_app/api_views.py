@@ -110,38 +110,6 @@ class SourceViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = SourceSerializer
     filter_fields = ('author', 'name')
     queryset = Source.objects.all()
-        
-    
-#not sure if we need to keep this code since it isn't used at the moment
-#but could come in handy in the future
-def get_language_trees_from_query_dict(query_dict):
-    if 'language_ids' in query_dict:
-        language_ids = [int(x) for x in query_dict['language_ids']]
-        trees = LanguageTree.objects.filter(languages__pk__in=language_ids).distinct()
-    else:
-        trees = None
-    return trees
-    
-#not used at the moment; not sure if needs to be kept
-@api_view(['POST'])
-@permission_classes((AllowAny,))
-def trees_from_languages(request):
-    from ete2 import Tree
-    trees = get_language_trees_from_query_dict(request.DATA)
-    if 'language_ids' in request.DATA:
-        languages = request.DATA['language_ids']
-        for t in trees:
-            langs_in_tree = [str(l.iso_code.iso_code) for l in t.languages.all() if l.id in languages] 
-            newick = Tree(t.newick_string)
-            #only works if tips use isocodes
-            try:
-                newick.prune(langs_in_tree, preserve_branch_length=True)
-            except ValueError as e:
-                print e
-                print t.name
-                continue
-            t.newick_string = newick.write(format=5)
-    return Response(LanguageTreeSerializer(trees, many=True).data,)
   
 #returns trees that contain the societies from the SocietyResultSet  
 def trees_from_languages_array(language_ids):
