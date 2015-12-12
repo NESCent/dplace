@@ -356,7 +356,7 @@ class Language(models.Model):
     #needs to be null=True because some glottolog languages do not have isocodes
     iso_code = models.ForeignKey('ISOCode', null=True) 
     #glottocode is now primary key
-    glotto_code = models.ForeignKey('GlottoCode', null=True, blank=True, unique=True)
+    glotto_code = models.ForeignKey('GlottoCode', null=True)
     
     def __unicode__(self):
         return "Language: %s, ISO Code %s, Glotto Code %s" % (self.name, self.iso_code, self.glotto_code)
