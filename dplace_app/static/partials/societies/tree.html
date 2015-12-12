@@ -24,11 +24,14 @@
                 <option value="">Select a Tree</option>
             </select>
             <div class="tree-download"></div>
+            
             <div id="legend" ng-show="results.selectedTree">
                 <table ng-repeat="(id, code) in results.code_ids">
-                    <tr ng-show="!globalTree" data-toggle="collapse" data-target="#{{code.CID}}" class="accordion-toggle legends" style="cursor:pointer;"><th>{{code.CID}}: {{code.name}}</th></tr>
+                    <tr ng-show="!globalTree" ng-click="legendArrow(code)" data-toggle="collapse" data-target="#{{code.CID}}" class="accordion-toggle legends" style="cursor:pointer;">
+                        <th><span ng-show="!code.hidden" class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span><span ng-show="code.hidden" class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span>{{code.CID}}: {{code.name}}</th>
+                    </tr>
                     <tr>
-                        <td class="hiddenRow">
+                        <td class="hiddenRow" >
                             <div ng-class="{'accordion-body collapse':!globalTree}" ng-hide="showOrHide(results.chosenTVariable.id, id)" id="{{code.CID}}">
                                 <svg ng-show="!code.bf_var" height="{{code.svgSize}}" width="600" class="tree-legend bf{{code.bf_var}} legends" var-id="{{id}}">
                                     <g ng-repeat="c in code" transform="{{$index|transformG}}">
@@ -40,7 +43,7 @@
                                                 stroke="#000"
                                                 stroke-width="0.5"
                                                 />
-                                        <text x="20" y="15">{{c.description}}</text>
+                                        <text x="20" y="15">{{c.short_description}}</text>
                                     </g>
                                 </svg>
                                 <svg ng-show="code.bf_var" class="bf-cont-gradient legends" height="80" height="30" var-id="{{id}}">
@@ -71,9 +74,11 @@
                 </table>
 
                 <table ng-repeat="environmental in results.environmental_variables">
-                    <tr data-toggle="collapse" data-target="#E1" class="accordion-toggle" style="cursor:pointer;"><th>E1: {{environmental.name}}</th></tr>
+                    <tr ng-show="!globalTree" ng-click="legendArrow(environmental)" data-toggle="collapse" data-target="#E1" class="accordion-toggle" style="cursor:pointer;">
+                        <th><span ng-show="!environmental.hidden" class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span><span ng-show="environmental.hidden" class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span>E1: {{environmental.name}}</th>
+                    </tr>
                     <tr><td class="hiddenRow">
-                    <div class="accordion-body collapse" id="E1">
+                    <div ng-class="{'accordion-body collapse':!globalTree}" ng-hide="showOrHide(results.chosenTVariable.name, environmental.name)" class="accordion-body collapse" id="E1">
                         <svg height="50" width="400" class="envLegend">
                             <rect class="envVar" height="30" width="300" x="20" />
                             <text x="0" y="45">{{environmental.min}} {{environmental.units}}</text>
