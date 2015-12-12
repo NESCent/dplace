@@ -80,7 +80,7 @@ angular.module('languagePhylogenyDirective', [])
             var addMarkers = function(results, variable, node, global, translate) { 
                 scope.results.societies.forEach(function(society) {
                     var selected = node.filter(function(d) {
-                        return d.name == society.society.iso_code || d.name == society.society.glotto_code;
+                        return d.name == society.society.language.iso_code || d.name == society.society.language.glotto_code;
                     });
                     if (global) selected.select("circle").remove(); 
                     var society_name = society.society.name + " (" + society.society.iso_code + ")"; //change this to glottocode?
@@ -371,7 +371,7 @@ angular.module('languagePhylogenyDirective', [])
                     //get lang classification
                     scope.results.societies.forEach(function(society) {
                         var selected = node.filter(function(d) {
-                            return d.name == society.society.iso_code;
+                            return d.name == society.society.language.iso_code;
                         });
                         
                         for (var i = 0; i < society.languages.length; i++) {
@@ -397,9 +397,9 @@ angular.module('languagePhylogenyDirective', [])
                 scope.results.societies.forEach(function(society) {
                     var selected = node.filter(function(d) {
                         if (langTree.name.indexOf("glotto") == -1)
-                            return d.name == society.society.iso_code;
+                            return d.name == society.society.language.iso_code;
                         else
-                            return d.name == society.society.glotto_code;
+                            return d.name == society.society.language.glotto_code;
                     });
                     
                     //lastly, append the text
