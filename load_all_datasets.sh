@@ -39,7 +39,7 @@ export PYTHONPATH=$DPLACE_PATH
 #python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/Revised_Ethnologue_families-Feb_10_2014-17th_Ed_Missing_ISO_codes.csv" langs
 
 echo "Loading Glottolog Languages"
-python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/glottolog_mapping_11Dec2015.csv" glotto
+python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/glottolog_mapping_11Dec2015.csv" glotto#
 
 echo "Mapping ISOCodes to Glottolog Codes"
 python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/glottolog_mapping.csv" glotto_iso
