@@ -114,7 +114,7 @@ class SourceViewSet(viewsets.ReadOnlyModelViewSet):
 #returns trees that contain the societies from the SocietyResultSet  
 def trees_from_languages_array(language_ids):
     from ete2 import Tree
-    trees = LanguageTree.objects.filter(languages__pk__in=language_ids).distinct().order_by('name')
+    trees = LanguageTree.objects.filter(languages__pk__in=language_ids).distinct()
     for t in trees:
         if 'glotto' in t.name:
             langs_in_tree = [str(l.glotto_code.glotto_code) for l in t.languages.all() if l.id in language_ids]
@@ -139,7 +139,6 @@ def trees_from_languages_array(language_ids):
                 t.newick_string = newick.write(format=1)
         except:
             continue
-        print t.newick_string
     return trees
 
 def result_set_from_query_dict(query_dict):
