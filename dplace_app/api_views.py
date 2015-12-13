@@ -122,10 +122,24 @@ def trees_from_languages_array(language_ids):
             langs_in_tree = [str(l.iso_code.iso_code) for l in t.languages.all() if l.id in language_ids]
         newick = Tree(t.newick_string, format=1)
         try:
-            newick.prune(langs_in_tree, preserve_branch_length=True)
+        
+            #kind of hacky, but needed for when langs_in_tree is only 1
+            #in future, maybe exclude these trees from the search results?
+            if len(langs_in_tree) == 1:
+                node = newick.search_nodes(name=langs_in_tree[0])
+                if len(node[0].get_leaves()) > 1:
+                    t.newick_string = "(%s:1);" % (langs_in_tree[0])
+                elif (len(node[0].get_leaves()) == 1) and not (node[0].get_leaves()[0].name == langs_in_tree[0]):
+                        t.newick_string = "(%s:1);" % (langs_in_tree[0])
+                else:
+                    newick.prune(langs_in_tree, preserve_branch_length=True)
+                    t.newick_string = newick.write(format=1)
+            else:
+                newick.prune(langs_in_tree, preserve_branch_length=True)
+                t.newick_string = newick.write(format=1)
         except:
             continue
-        t.newick_string = newick.write(format=1)
+        print t.newick_string
     return trees
 
 def result_set_from_query_dict(query_dict):
