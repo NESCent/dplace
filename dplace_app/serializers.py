@@ -227,13 +227,10 @@ class ZipResultSet(object):
     def __init__(self):
         self.tree = None
         self.name = None
-        self.legends = set()
+        self.legends = []
 
     def add_tree(self,tree):
         self.tree = tree
-    
-    def add_legend(self, legend):
-        self.legends.add(legend)
 
 class ZipResultSetSerializer (serializers.Serializer):
     tree = serializers.CharField()

@@ -111,7 +111,8 @@ class SourceViewSet(viewsets.ReadOnlyModelViewSet):
     filter_fields = ('author', 'name')
     queryset = Source.objects.all()
   
-#returns trees that contain the societies from the SocietyResultSet  
+#returns trees that contain the societies from the SocietyResultSet 
+#maybe needs cleaning up in the future 
 def trees_from_languages_array(language_ids):
     from ete2 import Tree
     trees = LanguageTree.objects.filter(languages__pk__in=language_ids).distinct()
@@ -391,7 +392,7 @@ def zip_legends(request):
     if 'legends' in result_set:
         for l in result_set['legends']:
             legend = Legend(l['name'], l['svg'])
-            to_download.add_legend(legend)
+            to_download.legends.append(legend)
     response = Response(ZipResultSetSerializer(to_download).data)
     filename = "dplace-trees-%s.zip" % datetime.datetime.now().strftime("%Y-%m-%d")
     response['Content-Disposition'] = 'attachment; filename="%s"' % filename
