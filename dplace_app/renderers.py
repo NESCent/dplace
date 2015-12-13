@@ -135,19 +135,20 @@ class ZipRenderer(renderers.BaseRenderer):
         import zipfile
         if data is None:
             return ''
+        
         s = StringIO()
-        zf = zipfile.ZipFile(s, "w") 
-        if 'legends' in data:
-            for l in data['legends']:
-                if not 'svg' in l:
-                    continue
-                if 'svg' in l:
-                    if 'name' in l:
-                        zf.writestr(str(l['name']), str(l['svg']))
-        if 'tree' in data:
-            if 'name' in data:
-                zf.writestr(str(data['name']), str(data['tree']))
-            else:
-                zf.writestr('tree.svg', str(data['tree']))
-        zf.close()
+        try:
+            zf = zipfile.ZipFile(s, "w") 
+            if 'legends' in data:
+                for l in data['legends']:
+                    if 'svg' in l:
+                        if 'name' in l:
+                            zf.writestr(str(l['name']), str(l['svg']))
+            if 'tree' in data:
+                if 'name' in data:
+                    zf.writestr(str(data['name']), str(data['tree']))
+                else:
+                    zf.writestr('tree.svg', str(data['tree']))
+        finally:
+            zf.close()
         return s.getvalue()

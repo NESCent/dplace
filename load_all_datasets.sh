@@ -30,16 +30,19 @@ fi
 export DJANGO_SETTINGS_MODULE=dplace.settings
 export PYTHONPATH=$DPLACE_PATH
 
-echo "Loading ISO Codes from Ethnologue"
-python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/Revised_Ethnologue_families-Feb_10_2014-17th_Ed-ISO693-3-current.csv" iso
-python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/Revised_Ethnologue_families-Feb_10_2014-17th_Ed_Missing_ISO_codes.csv" iso
+#echo "Loading ISO Codes from Ethnologue"
+#python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/Revised_Ethnologue_families-Feb_10_2014-17th_Ed-ISO693-3-current.csv" iso
+#python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/Revised_Ethnologue_families-Feb_10_2014-17th_Ed_Missing_ISO_codes.csv" iso
 
-echo "Loading Languages from Ethnologue" 
-python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/Revised_Ethnologue_families-Feb_10_2014-17th_Ed-ISO693-3-current.csv" langs
-python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/Revised_Ethnologue_families-Feb_10_2014-17th_Ed_Missing_ISO_codes.csv" langs
+#echo "Loading Languages from Ethnologue" 
+#python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/Revised_Ethnologue_families-Feb_10_2014-17th_Ed-ISO693-3-current.csv" langs
+#python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/Revised_Ethnologue_families-Feb_10_2014-17th_Ed_Missing_ISO_codes.csv" langs
 
 echo "Loading Glottolog Languages"
-python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/glottolog_mapping.csv" glotto
+python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/glottolog_mapping_11Dec2015.csv" glotto#
+
+echo "Mapping ISOCodes to Glottolog Codes"
+python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/glottolog_mapping.csv" glotto_iso
 
 echo "Loading EA Variables"
 python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/EAVariableList_17Nov2015.csv" vars
@@ -63,7 +66,7 @@ echo "Linking Societies to Locations"
 python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/EA_Binford_Lat_Long.csv" soc_lat_long
 
 echo "Linking Societies to Glottocodes"
-python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/xd_id_to_language_18Nov2015.csv" xd_lang
+python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/xd_id_to_language_11Dec2015.csv" xd_lang
 
 echo "Loading References"
 python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/ReferenceMapping_11Nov2015.csv" refs

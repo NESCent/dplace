@@ -160,6 +160,8 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties, 
             else {
                 $scope.searchModel.results.language_trees.phylogenies.push(tree);
             }
+        $scope.searchModel.results.language_trees.glotto_trees.sort(function(a, b) { return a.name > b.name; });
+        $scope.searchModel.results.language_trees.phylogenies.sort(function(a, b) { return a.name > b.name; });
         });
         $scope.searchModel.getSocieties().forEach(function (container) {
             var language = container.society.language;

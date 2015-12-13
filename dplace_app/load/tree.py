@@ -11,15 +11,20 @@ def get_language(taxon_name):
     # taxon name may be an iso code, language name, or glotto code
     language = None
     try:
-        language = Language.objects.get(iso_code__iso_code=taxon_name)
+        language = [Language.objects.get(iso_code__iso_code=taxon_name)]
+        
+    except MultipleObjectsReturned:
+        language = Language.objects.filter(iso_code__iso_code=taxon_name)
+    
     except ObjectDoesNotExist:
         # Not found by ISO Code, try by glotto code
         try:
-            language = Language.objects.get(glotto_code__glotto_code=taxon_name)
+            language = [Language.objects.get(glotto_code__glotto_code=taxon_name)]
+            
         except ObjectDoesNotExist:
             # Not found by Glotto Code either, try by name
             try:
-                language = Language.objects.get(name=taxon_name)
+                language = [Language.objects.get(name=taxon_name)]
             except ObjectDoesNotExist:
                 #No language found at all
                 raise ValueError("Warning: Language %s not found" % (taxon_name))
@@ -62,7 +67,11 @@ def load_tree(file_name, verbose=False):
             print("load_tree: Error with taxon - `%s`" % taxon_name)
             
         if language:
-            tree.languages.add(language)
+            if len(language) > 1:
+                for l in language:
+                    tree.languages.add(l)
+            else:
+                tree.languages.add(language[0])
     tree.save()
 
 load_glotto_tree = load_tree
