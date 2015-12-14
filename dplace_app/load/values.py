@@ -160,6 +160,5 @@ def load_data(val_row):
         subcase=subcase
     )
     v.save()
-    if created:
-        print "Saved data for Society %s Variable ID %s" % (ext_id, variable.label)
+    print "Saved data for Society %s Variable ID %s" % (ext_id, variable.label)
 
