@@ -67,6 +67,7 @@ def load_val_references(val_row):
     comment = val_row['Comment'].strip()
     references = val_row['References'].strip().split(";")   
     focal_year = val_row['Year'].strip()
+    subcase = val_row['SpecRef'].strip()
 
     if variable is None:
         print "Could not find variable %s for society %s" % (variable_id, society)
@@ -83,6 +84,7 @@ def load_val_references(val_row):
             code=code,
             focal_year=focal_year,
             comment=comment,
+            subcase=subcase
         )
         
     except:
@@ -120,7 +122,7 @@ def load_data(val_row):
         return
         
     variable_id = val_row['VarID'].strip()
-    
+
     if val_row['Dataset'].strip() == 'EA':
         source = get_source("EA")
         label = eavar_number_to_label(variable_id)

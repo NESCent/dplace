@@ -15,7 +15,7 @@ def load_glottocode(dict_row):
     language, created = Language.objects.get_or_create(glotto_code=glotto)
     language.name = name
     language.save()
-    print "Saved language %s, %s" % (name, glotto)
+    print "Saved Glottocode %s, %s" % (name, glotto)
 
 def map_isocodes(dict_row):
     """
@@ -38,7 +38,7 @@ def map_isocodes(dict_row):
         language = Language.objects.get(glotto_code=glotto)
         language.iso_code = iso
         language.save()
-        print "Saved language %s %s" % (glotto_code, iso_code)
+        print "Mapped isocode %s to glottocode %s" % (iso_code, glotto_code)
     except ObjectDoesNotExist:
         print "No language found with glottocode %s" % glotto_code
     
