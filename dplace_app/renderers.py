@@ -63,8 +63,8 @@ class DPLACECSVResults(object):
                 row ['Society source'] = society['source']
             row['Longitude'] = "" if society['location'] is None else society['location']['coordinates'][0]
             row['Latitude'] = "" if society['location'] is None else society['location']['coordinates'][1]
-            row['ISO code'] = society['iso_code']
             if society['language'] is not None and 'name' in society['language']:
+                row['ISO code'] = society['language']['iso_code']
                 row['Language name'] = society['language']['name']
             else:
                 row['Language name'] = ""
@@ -144,19 +144,20 @@ class ZipRenderer(renderers.BaseRenderer):
         import zipfile
         if data is None:
             return ''
+        
         s = StringIO()
-        zf = zipfile.ZipFile(s, "w") 
-        if 'legends' in data:
-            for l in data['legends']:
-                if not 'svg' in l:
-                    continue
-                if 'svg' in l:
-                    if 'name' in l:
-                        zf.writestr(str(l['name']), str(l['svg']))
-        if 'tree' in data:
-            if 'name' in data:
-                zf.writestr(str(data['name']), str(data['tree']))
-            else:
-                zf.writestr('tree.svg', str(data['tree']))
-        zf.close()
+        try:
+            zf = zipfile.ZipFile(s, "w") 
+            if 'legends' in data:
+                for l in data['legends']:
+                    if 'svg' in l:
+                        if 'name' in l:
+                            zf.writestr(str(l['name']), str(l['svg']))
+            if 'tree' in data:
+                if 'name' in data:
+                    zf.writestr(str(data['name']), str(data['tree']))
+                else:
+                    zf.writestr('tree.svg', str(data['tree']))
+        finally:
+            zf.close()
         return s.getvalue()

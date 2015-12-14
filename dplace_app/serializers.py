@@ -43,7 +43,7 @@ class VariableCodedValueSerializer(serializers.ModelSerializer):
     references = SourceSerializer(many=True)
     class Meta:
         model = VariableCodedValue
-        fields = ('id', 'variable', 'society', 'coded_value', 'code_description', 'source', 'references', 'subcase')
+        fields = ('id', 'variable', 'society', 'coded_value', 'code_description', 'source', 'references', 'subcase', 'focal_year')
 
 # ISO Codes
 class ISOCodeSerializer(gis_serializers.GeoModelSerializer):
@@ -94,7 +94,7 @@ class SocietySerializer(gis_serializers.GeoModelSerializer):
     language = LanguageSerializer(source='language')
     class Meta:
         model = Society
-        fields = ('id', 'ext_id', 'xd_id', 'name', 'location', 'language', 'focal_year','source',)
+        fields = ('id', 'ext_id', 'xd_id', 'name', 'location','language', 'focal_year','source',)
 
 # Geographic Regions
 class GeographicRegionSerializer(gis_serializers.GeoModelSerializer):
@@ -229,13 +229,10 @@ class ZipResultSet(object):
     def __init__(self):
         self.tree = None
         self.name = None
-        self.legends = set()
+        self.legends = []
 
     def add_tree(self,tree):
         self.tree = tree
-    
-    def add_legend(self, legend):
-        self.legends.add(legend)
 
 class ZipResultSetSerializer (serializers.Serializer):
     tree = serializers.CharField()

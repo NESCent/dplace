@@ -111,7 +111,8 @@ class SourceViewSet(viewsets.ReadOnlyModelViewSet):
     filter_fields = ('author', 'name')
     queryset = Source.objects.all()
   
-#returns trees that contain the societies from the SocietyResultSet  
+#returns trees that contain the societies from the SocietyResultSet 
+#maybe needs cleaning up in the future 
 def trees_from_languages_array(language_ids):
     from ete2 import Tree
     trees = LanguageTree.objects.filter(languages__pk__in=language_ids).distinct()
@@ -120,12 +121,28 @@ def trees_from_languages_array(language_ids):
             langs_in_tree = [str(l.glotto_code.glotto_code) for l in t.languages.all() if l.id in language_ids]
         else:
             langs_in_tree = [str(l.iso_code.iso_code) for l in t.languages.all() if l.id in language_ids]
-        newick = Tree(t.newick_string)
+        newick = Tree(t.newick_string, format=1)
         try:
-            newick.prune(langs_in_tree, preserve_branch_length=True)
+            if not 'glotto' in t.name:
+                newick.prune(langs_in_tree, preserve_branch_length=True)
+                t.newick_string = newick.write(format=1)
+            else:
+                #kind of hacky, but needed for when langs_in_tree is only 1
+                #in future, maybe exclude these trees from the search results?
+                if len(langs_in_tree) == 1:
+                    node = newick.search_nodes(name=langs_in_tree[0])
+                    if len(node[0].get_leaves()) > 1:
+                        t.newick_string = "(%s:1);" % (langs_in_tree[0])
+                    elif (len(node[0].get_leaves()) == 1) and not (node[0].get_leaves()[0].name == langs_in_tree[0]):
+                            t.newick_string = "(%s:1);" % (langs_in_tree[0])
+                    else:
+                        newick.prune(langs_in_tree, preserve_branch_length=True)
+                        t.newick_string = newick.write(format=1)
+                else:
+                    newick.prune(langs_in_tree, preserve_branch_length=True)
+                    t.newick_string = newick.write(format=1)
         except:
             continue
-        t.newick_string = newick.write(format=5)
     return trees
 
 def result_set_from_query_dict(query_dict):
@@ -375,7 +392,7 @@ def zip_legends(request):
     if 'legends' in result_set:
         for l in result_set['legends']:
             legend = Legend(l['name'], l['svg'])
-            to_download.add_legend(legend)
+            to_download.legends.append(legend)
     response = Response(ZipResultSetSerializer(to_download).data)
     filename = "dplace-trees-%s.zip" % datetime.datetime.now().strftime("%Y-%m-%d")
     response['Content-Disposition'] = 'attachment; filename="%s"' % filename
