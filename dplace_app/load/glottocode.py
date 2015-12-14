@@ -95,7 +95,7 @@ def xd_to_language(dict_row):
     class_level = 1
     lang_class, created = LanguageClass.objects.get_or_create(scheme=classification_scheme, level=class_level, name=family_language.name)
     if created:
-        print "Created language class for famimly %s" % family_language.name
+        print "Created language class for family %s" % family_language.name.encode("UTF-8", "ignore")
     lang_class.save()
     classification, created = LanguageClassification.objects.get_or_create(
                                                             scheme=classification_scheme,
