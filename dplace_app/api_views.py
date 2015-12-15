@@ -11,6 +11,7 @@ from rest_framework.renderers import JSONRenderer
 from filters import *
 from renderers import *
 
+
 # Resource routes
 class VariableDescriptionViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = VariableDescriptionSerializer
@@ -22,6 +23,7 @@ class VariableDescriptionViewSet(viewsets.ReadOnlyModelViewSet):
         serializer = VariableDescriptionDetailSerializer(self.object)
         return Response(serializer.data)
 
+
 class VariableCategoryViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = VariableCategorySerializer
     filter_fields = ('name', 'index_variables', 'niche_variables',)
@@ -32,12 +34,14 @@ class VariableCategoryViewSet(viewsets.ReadOnlyModelViewSet):
         serializer = VariableCategoryDetailSerializer(self.object)
         return Response(serializer.data)
 
+
 class VariableCodeDescriptionViewSet(viewsets.ReadOnlyModelViewSet):
     # Model ordering is ignored when filter_fields enabled, requires FilterSet subclass
     # see https://github.com/tomchristie/django-rest-framework/issues/1432
     serializer_class = VariableCodeDescriptionSerializer
     filter_class = VariableCodeDescriptionFilter
     queryset = VariableCodeDescription.objects.all()
+
 
 # Can filter by code, code__variable, or society
 class VariableCodedValueViewSet(viewsets.ReadOnlyModelViewSet):
@@ -46,39 +50,47 @@ class VariableCodedValueViewSet(viewsets.ReadOnlyModelViewSet):
     # Avoid additional database trips by select_related for foreign keys
     queryset = VariableCodedValue.objects.select_related('variable').select_related('code').all()
 
+
 class SocietyViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = SocietySerializer
     queryset = Society.objects.all()
+
 
 class ISOCodeViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = ISOCodeSerializer
     filter_fields = ('iso_code',)
     queryset = ISOCode.objects.all()
-    
+
+
 class GlottoCodeViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = GlottoCodeSerializer
     filter_fields = ('glotto_code',)
     queryset = GlottoCode.objects.all()
-    
+
+
 class EnvironmentalCategoryViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = EnvironmentalCategorySerializer
     filter_fields = ('name',)
     queryset = EnvironmentalCategory.objects.all()
+
 
 class EnvironmentalVariableViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = EnvironmentalVariableSerializer
     filter_fields = ('name', 'category', 'units',)
     queryset = EnvironmentalVariable.objects.all()
 
+
 class EnvironmentalValueViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = EnvironmentalValueSerializer
     filter_fields = ('variable','environmental',)
     queryset = EnvironmentalValue.objects.all()
 
+
 class EnvironmentalViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = EnvironmentalSerializer
     filter_fields = ('society', 'iso_code',)
     queryset = Environmental.objects.all()
+
 
 class LanguageClassViewSet(viewsets.ReadOnlyModelViewSet):
     # Model ordering is ignored when filter_fields enabled, requires FilterSet subclass
@@ -87,8 +99,8 @@ class LanguageClassViewSet(viewsets.ReadOnlyModelViewSet):
     filter_class = LanguageClassFilter
     queryset = LanguageClass.objects.all()
 
-# Need an API to get classifications / languages for a class
 
+# Need an API to get classifications / languages for a class
 class LanguageClassificationViewSet(viewsets.ReadOnlyModelViewSet):
     # Model ordering is ignored when filter_fields enabled, requires FilterSet subclass
     # see https://github.com/tomchristie/django-rest-framework/issues/1432
@@ -96,21 +108,25 @@ class LanguageClassificationViewSet(viewsets.ReadOnlyModelViewSet):
     filter_class = LanguageClassificationFilter
     queryset = LanguageClassification.objects.all()
 
+
 class LanguageViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = LanguageSerializer
     filter_fields = ('name', 'iso_code', 'societies',)
     queryset = Language.objects.all()
 
+
 class LanguageTreeViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = LanguageTreeSerializer
     filter_fields = ('name',)
     queryset = LanguageTree.objects.all()
-    
+
+
 class SourceViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = SourceSerializer
     filter_fields = ('author', 'name')
     queryset = Source.objects.all()
-  
+
+
 #returns trees that contain the societies from the SocietyResultSet 
 #maybe needs cleaning up in the future 
 def trees_from_languages_array(language_ids):
@@ -144,6 +160,7 @@ def trees_from_languages_array(language_ids):
         except:
             continue
     return trees
+
 
 def result_set_from_query_dict(query_dict):
     result_set = SocietyResultSet()
@@ -238,7 +255,7 @@ def find_societies(request):
 
     Returns serialized collection of SocietyResult objects
     """
-    result_set = result_set_from_query_dict(request.DATA)
+    result_set = result_set_from_query_dict(request.data)
     return Response(SocietyResultSetSerializer(result_set).data)
 
 @api_view(['GET'])
@@ -270,6 +287,7 @@ class GeographicRegionViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = GeographicRegionSerializer
     model = GeographicRegion
     filter_class = GeographicRegionFilter
+    queryset = GeographicRegion.objects.all()
 
     
 @api_view(['GET'])

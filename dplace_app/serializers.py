@@ -80,7 +80,7 @@ class LanguageSerializer(serializers.ModelSerializer):
         model = Language
 
 class LanguageClassificationSerializer(serializers.ModelSerializer):
-    language = LanguageSerializer(source='language')
+    language = LanguageSerializer()
     class Meta:
         model = LanguageClassification
 class SourceSerializer(serializers.ModelSerializer):
@@ -89,7 +89,7 @@ class SourceSerializer(serializers.ModelSerializer):
         
 # Societies
 class SocietySerializer(gis_serializers.GeoModelSerializer):
-    language = LanguageSerializer(source='language')
+    language = LanguageSerializer()
     class Meta:
         model = Society
         fields = ('id', 'ext_id', 'xd_id', 'name', 'location','language', 'focal_year','source',)

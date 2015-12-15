@@ -1,4 +1,4 @@
-__author__ = 'dan'
+from __future__ import unicode_literals
 
 from dplace_app.models import *
 from dplace_app.serializers import *
@@ -19,9 +19,8 @@ class ISOCodeAPITestCase(APITestCase):
         url = reverse('isocode-list')
         response = self.client.get(url,format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        response_dict = response.data
-        self.assertEqual(response_dict['count'],1)
-        self.assertEqual(response_dict['results'][0]['iso_code'],self.code.iso_code)
+        self.assertEqual(len(response.data),1)
+        self.assertEqual(response.data[0]['iso_code'],self.code.iso_code)
 
 
 class VariableCodeDescriptionAPITestCase(APITestCase):
@@ -43,7 +42,7 @@ class VariableCodeDescriptionAPITestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         response_dict = response.data
         index_of_1 = index_of_2 = index_of_10 = index = 0
-        for result in response_dict['results']:
+        for result in response.data:
             if result['code'] == self.code1.code:
                 index_of_1 = index
             elif result['code'] == self.code2.code:
@@ -68,9 +67,8 @@ class GeographicRegionAPITestCase(APITestCase):
         url = reverse('geographicregion-list')
         response = self.client.get(url,format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        response_dict = response.data
-        self.assertEqual(response_dict['count'],1)
-        self.assertEqual(response_dict['results'][0]['region_nam'],self.geographic_region.region_nam)
+        self.assertEqual(len(response.data),1)
+        self.assertEqual(response.data[0]['region_nam'],self.geographic_region.region_nam)
 
 class FindSocietiesTestCase(APITestCase):
     '''
@@ -269,9 +267,8 @@ class FindSocietiesTestCase(APITestCase):
         url = reverse('languageclassification-list')
         response = self.client.get(url,format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        response_dict = response.data
         index_of_A = index_of_B = index_of_C = index =0
-        for result in response_dict['results']:
+        for result in response.data:
             if result['language']['name'] == self.languageA1.name:
                 index_of_A = index
             elif result['language']['name'] == self.languageC2.name:
@@ -288,8 +285,7 @@ class FindSocietiesTestCase(APITestCase):
         url = reverse('languageclass-list')
         response = self.client.get(url,format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        response_dict = response.data
-        results = response_dict['results']
+        results = response.data
         def getkey(item):
             return item['level'], item['name'],
         sorted_results = sorted(results, key=getkey)
