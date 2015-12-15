@@ -1,6 +1,8 @@
 language: python
 python:
   - "2.7"
+before_install:
+  pip install coverage codecov
 # command to install dependencies
 install:
   - pip install -r requirements.txt
@@ -10,4 +12,7 @@ before_script:
   - psql -c 'CREATE EXTENSION postgis;' -U postgres -d travis_postgis
   - psql -c 'CREATE EXTENSION postgis_topology;' -U postgres -d travis_postgis
 # command to run tests
-script: "python manage.py test"
+script: "coverage run --source='.' manage.py test"
+after_success:
+  - coverage report -m
+  - codecov
