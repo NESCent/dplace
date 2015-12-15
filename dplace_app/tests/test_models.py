@@ -40,15 +40,15 @@ class EATestCase(TestCase):
     def setUp(self):
         self.iso_code = ISOCode.objects.create(iso_code='abc',location=Point(5.0,5.0))
         self.source = Source.objects.create(year="2014", author="Greenhill", reference="Great paper")
-        self.ea_society = Society.objects.create(ext_id='easoc',name='EA Society',location=Point(0.0,0.0),source=self.source,iso_code=self.iso_code)
-        self.binford_society = Society.objects.create(ext_id='binfordsoc',name='Binford Society',location=Point(0.0,0.0),source=self.source,iso_code=self.iso_code)
+        self.ea_society = Society.objects.create(
+            ext_id='easoc',name='EA Society',location=Point(0.0,0.0),source=self.source)
+        self.binford_society = Society.objects.create(
+            ext_id='binfordsoc',name='Binford Society',location=Point(0.0,0.0),source=self.source)
         self.variable = VariableDescription.objects.create(label='EA001',name='Variable 1', source=self.source)
         self.code10 = VariableCodeDescription.objects.create(variable=self.variable, code='10', description='Code 10')
         self.code1 = VariableCodeDescription.objects.create(variable=self.variable, code='1', description='Code 1')
         self.code2 = VariableCodeDescription.objects.create(variable=self.variable, code='2', description='Code 2')
         self.value = VariableCodedValue.objects.create(variable=self.variable,society=self.ea_society,coded_value='1',code=self.code1, source=self.source)
-    def test_isocode(self):
-        self.assertEqual(Society.objects.get(ext_id='easoc').iso_code, self.iso_code)
     def test_society_coded_value(self):
         society = Society.objects.get(ext_id='easoc')
         self.assertIn(self.value,society.variablecodedvalue_set.all())
