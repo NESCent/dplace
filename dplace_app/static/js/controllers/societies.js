@@ -214,9 +214,9 @@ function SocietiesCtrl($scope, $timeout, searchModelService, LanguageClass, ZipT
         
         //for environmental legend
         if ($scope.results.environmental_variables.length > 0) {
-            if ($scope.results.environmental_variables[0].id == 34 || $scope.results.environmental_variables[0].id == 36) 
+            if ($scope.results.environmental_variables[0].name == 'Net Primary Production' || $scope.results.environmental_variables[0].name == 'Mean Growing Season NPP') 
                 d3.selectAll(".envVar").attr("fill", "url(#earthy)");
-            else if ($scope.results.environmental_variables[0].id == 27)
+            else if ($scope.results.environmental_variables[0].name == "Annual Mean Precipitation")
                 d3.selectAll(".envVar").attr("fill", "url(#blue)");
             else 
                 d3.selectAll(".envVar").attr("fill", "url(#temp)");
@@ -277,28 +277,23 @@ function SocietiesCtrl($scope, $timeout, searchModelService, LanguageClass, ZipT
          tree_svg = tree_svg.concat("</svg>");
          var all_legends = {};
         legends = [];
-        
-        if ($scope.results.classifications) {
-            item = d3.select('.tree-legend-langs');
-            svg_string = '<svg version="1.1" xmlns="http://www.w3.org/2000/svg">' + item.node().innerHTML + '</svg>';
-            legends.push({'name': 'Language Classifications', 'svg': svg_string});
-        } else {
-             d3.selectAll(".legends").each( function(){
-                    item = d3.select(this);
-                    if (item.attr("var-id")) {
-                       if (item.attr("class").indexOf("hide") == -1)
-                        all_legends[item.attr("var-id")] = item;
-                    }
-                });
-                
-            for (var key in $scope.results.code_ids) {
-                    item = all_legends[key];
-                    name = $scope.results.code_ids[key].name;
-                    svg_string = item.node().innerHTML;
-                    svg_string = '<svg version="1.1" xmlns="http://www.w3.org/2000/svg">' + svg_string + '</svg>';
-                    legends.push({'name': name.replace(/[\W]+/g, "-")+'-legend.svg', 'svg': svg_string});    
-            }
+
+        d3.selectAll(".legends").each( function(){
+                item = d3.select(this);
+                if (item.attr("var-id")) {
+                   if (item.attr("class").indexOf("hide") == -1)
+                    all_legends[item.attr("var-id")] = item;
+                }
+            });
+            
+        for (var key in $scope.results.code_ids) {
+                item = all_legends[key];
+                name = $scope.results.code_ids[key].name;
+                svg_string = item.node().innerHTML;
+                svg_string = '<svg version="1.1" xmlns="http://www.w3.org/2000/svg">' + svg_string + '</svg>';
+                legends.push({'name': name.replace(/[\W]+/g, "-")+'-legend.svg', 'svg': svg_string});    
         }
+        
         
         query = {"legends": legends, "tree": tree_svg, "name": $scope.results.selectedTree.name+'.svg'};
         d3.select(".tree-download").append("a")

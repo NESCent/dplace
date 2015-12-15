@@ -21,14 +21,11 @@ function ColorMapService() {
     }
     
     function mapColorMonochrome(min, max, value, color) {
-        if ((max-min) > 100000) { var lum = ((((value-min)/(max-min))) * 7800)/100; lum = 100 - lum;} //this is bad when the range is very large
-        else { var lum = (((value-min)/(max-min))) * 78; lum = 100 - lum; }
-        console.log(lum);
+        var lum = (((value-min)/(max-min))) * 78; lum = 100 - lum; 
         return 'hsl('+color+', 65%,'+lum+'%)'; 
     }
 
     this.generateColorMap = function(results) {
-        console.log(results);
         var colors = {};
         for (var i = 0; i < results.societies.length; i++) {
             var society = results.societies[i];

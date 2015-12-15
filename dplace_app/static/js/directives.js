@@ -80,13 +80,14 @@ angular.module('languagePhylogenyDirective', [])
             var addMarkers = function(langTree, results, variable, node, global, translate) { 
                 scope.results.societies.forEach(function(society) {
                     if (society.society.language) to_match = (langTree.name.indexOf("glotto") == -1) ? society.society.language.iso_code : society.society.language.glotto_code;
-                    else to_match = (langTree.name.indexOf("glotto") == -1) ? society.society.iso_code : society.society.glotto_code;
+                    else to_match = society.society.name;
                     
                     var selected = node.filter(function(d) {
                         return d.name == to_match;
                     });
                     if (global) selected.select("circle").remove(); 
-                    var society_name = society.society.name + " (" + society.society.language.glotto_code + ")"; //formerly isocode
+                    var society_name = society.society.name;
+                    if (society.society.language) society_name += " (" + society.society.language.glotto_code + ")"; //formerly isocode
                     
                     if (!variable) {
                         if (scope.query.language_classifications) {
@@ -130,9 +131,9 @@ angular.module('languagePhylogenyDirective', [])
                                         value = society.environmental_values[0].value; //only 1 environmental value at a time so we can do this
                                         min = scope.results.environmental_variables[0].min;
                                         max = scope.results.environmental_variables[0].max;
-                                        if (society.environmental_values[0].variable == 34 || society.environmental_values[0].variable == 36) {
+                                        if (scope.results.environmental_variables[0].name == 'Net Primary Production' || scope.results.environmental_variables[0].name == ' Mean Growing Season NPP') {
                                             hue = 30 + (((value - min) / (max - min))*88)
-                                        }  else if (society.environmental_values[0].variable == 27) {
+                                        }  else if (scope.results.environmental_variables[0].name == 'Annual Mean Precipitation') {
                                             lum = 100 - (((value - min) / (max - min))*95);
                                             return 'hsl(252,65%,'+lum+'%)';
                                         }
@@ -260,7 +261,8 @@ angular.module('languagePhylogenyDirective', [])
                             keysWritten++;
                             translate += 20;
                             }
-                        }
+                        }                        
+                       
                     }
                     
                     if (scope.query.environmental_filters) {
@@ -403,39 +405,12 @@ angular.module('languagePhylogenyDirective', [])
                 
                 else if (scope.query.language_classifications && !scope.query.environmental_filters) {
                     addMarkers(langTree, scope.results, null, node, false, translate);
-
-                    //get lang classification
-                    /*scope.results.societies.forEach(function(society) {
-                    if (society.society.language) to_match = (langTree.name.indexOf("glotto") == -1) ? society.society.language.iso_code : society.society.language.glotto_code;
-                    else to_match = (langTree.name.indexOf("glotto") == -1) ? society.society.language.iso_code : society.society.language.glotto_code;
-                        var selected = node.filter(function(d) {
-                            return d.name == to_match;
-                        });
-                        
-                        for (var i = 0; i < society.languages.length; i++) {
-                            var classification = scope.query.language_classifications.filter(function(l) { return l.language.id == society.languages[i].id });
-                            if (classification[0].class_subfamily || classification[0].class_sub_subfamily) {
-                            selected.append("svg:circle")
-                                .attr("r", 4.5)
-                                .attr("stroke", "#000")
-                                .attr("stroke-width", "0.5")
-                                .attr("fill", function(n) {
-                                    if (classification.length > 0) {
-                                        value = classification[0].class_subfamily;
-                                        hue = value * 240 / scope.results.classifications['NumClassifications'];
-                                        return 'hsl('+hue+',100%, 50%)';
-                                    }
-                                });
-                            }
-                        }
-                        
-                    });*/
                 }
                 }
                 console.log(scope.query);
                 scope.results.societies.forEach(function(society) {
-                    if (society.society.language) to_match = (langTree.name.indexOf("glotto") == -1) ? society.society.language.iso_code : society.society.language.glotto_code;
-                    else to_match = (langTree.name.indexOf("glotto") == -1) ? society.society.iso_code : society.society.glotto_code;
+                    if (society.society.language) to_match = langTree.name.indexOf("glotto") == -1 ? society.society.language.iso_code : society.society.language.glotto_code;
+                    else to_match = society.society.name;
                     
                     var selected = node.filter(function(d) {
                         return d.name == to_match;
@@ -495,8 +470,8 @@ angular.module('languagePhylogenyDirective', [])
                 constructTree(args.tree);
                 var pos = $(".phylogeny").offset();
                 $(window).scroll(function() {
-                    //if ($(window).scrollTop() > 100)
-                       // $("#legend").stop().animate({"marginTop":($(window).scrollTop() - 100) + "px"}, "slow");
+                    if ($(window).scrollTop() > $(".navbar").height()+100)
+                        $("#legend").stop().animate({"marginTop":($(window).scrollTop() - 200) + "px"}, "slow");
                     if ($(window).scrollTop() > $(".navbar").height()+100) {
                         d3.select("#varLabels")
                             .attr('class', 'var-labels-fixed')
