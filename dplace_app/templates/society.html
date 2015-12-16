@@ -1,30 +1,36 @@
 {% extends 'base.html' %}
 {% load bootstrap3 %}
 {% block content %}
-<div class="container">
-    {% if language %}
-        <h1>Language {{ language.name }} from {{ society.name }}</h1>
-    {% else %}
+<script type="text/javascript">
+    $(document).ready(function() {
+        $("a.comment-tooltip").tooltip();
+    });
+</script>
+
+<div class="container" style="margin-top:-150px;">
         <h1>Society: {{ society.name }}</h1>
         {% if society.language %}
-            <h3>Language: {{ society.language.name }}</h3>
-            {% if language_classification %}
-                Language Classification: {% for classification in language_classification %} {{ classification.ethnologue_classification }} {% endfor %}
-            {% endif %}
+            <h4>Language or dialect: {{ society.language.name }} </h4>
+            <h5>{% if society.language.glotto_code %}Glottolog ID: <a href="http://glottolog.org/resource/languoid/id/{{society.language.glotto_code.glotto_code}}" target="_blank">{{ society.language.glotto_code.glotto_code }}</a>{% endif %}
+            </h5><h5>{% if society.language.iso_code %}ISOCode: <a href="https://www.ethnologue.com/language/{{society.language.iso_code.iso_code}}" target="_blank">{{ society.language.iso_code.iso_code }}</a>{% endif %}
+            </h5>
+            <h4>Language family: {% for classification in language_classification %}{{classification.class_family.name}}{% endfor %}</h4>
         {% endif %}
-    {% endif %}
+            <h4>Alternate names: {{ society.alternate_names }}</h4>
+            <h4>Principal year to which data refer: {{ society.focal_year }}</h4>
+            {% if xd_id %}<h4>Name and ID in other cross-cultural databases: {% for x in xd_id %} <a href="/society/{{ x.id }}" target="_blank">{{ x.name }} ({{ x.source.name}})</a>{% endfor %}</h4>{% endif %}
     <h2>Environmental Data</h2>
     {% for key, value in environmentals.items %}
         <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
             <div class="panel panel-default">
                 <div class="panel-heading" role="tab" id="h{{key|cut:" "}}">
                     <h4 class="panel-title">
-                        <a data-toggle="collapse" data-parent="#accordion" href="#c{{key|cut:" "}}" aria-expanded="true" aria-controls="c{{key|cut:" "}}">
+                        <a data-toggle="collapse" data-parent="#accordion" href="#e{{key|cut:" "}}" aria-expanded="true" aria-controls="e{{key|cut:" "}}">
                             {{key}}
                         </a>
                     </h4>
                 </div>
-                <div id="c{{key|cut:" "}}" class="panel-collapse collapse out" role="tabpanel" aria-labelledby="h{{key|cut:" "}}">
+                <div id="e{{key|cut:" "}}" class="panel-collapse collapse out" role="tabpanel" aria-labelledby="h{{key|cut:" "}}">
                     <table class="panel-body table table-condensed table-striped table-bordered">
                         <tr>
                             <th>Variable</th>
@@ -57,11 +63,11 @@
                     <table class="panel-body table table-condensed table-striped table-bordered">
                         <tr>
                             <th colspan="2">Variable</th>
-                            <th colspan="2">Value</th>
+                            <th colspan="4">Value</th>
                         </tr>
                         <tr>
                             <th>Label</th>
-                            <th>Name</th>
+                            <th width="30%">Name</th>
                             <th>Code</th>
                             <th>Description</th>
                         </tr>
@@ -70,7 +76,21 @@
                             <td>{{v.label}}</td>
                             <td>{{v.name}}</td>
                             <td>{{v.code}}</td>
-                            <td>{{v.description}}</td>
+                            <td>{{v.description}} (<a style="cursor:pointer;" data-toggle="collapse" href="#s{{v.label}}" aria-expanded="false" aria-controls="s{{v.label}}">Source</a>) 
+                                <div class="collapse" id="s{{v.label}}" style="padding-left:10px; padding-top:5px;">
+                                    {% for s in v.sources %}
+                                        <a href="#r{{s.id}}">{{s}}</a>;
+                                    {% endfor %}
+                                </div>
+                            </td>
+                            {% if v.year or v.comment %}
+                            <td width="10px">
+                                <a class="comment-tooltip" data-toggle="tooltip" title="{% if v.year %} Focal Year: {{v.year}} {% endif %}
+{{v.comment}}"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span></a>
+                                </td>
+                            {% else %}
+                                <td width="0px"></td>
+                            {% endif %}
                         </tr>
                         {% endfor %}
                     </table>
@@ -78,6 +98,13 @@
             </div>
         </div>
     {% endfor %}
-
+    
+    <h2>References</h2>
+    <ul>
+    {% for ref in references %}
+    <li id="r{{ ref.id }}"> {{ ref.reference }} </li>
+    {% endfor %}
+    </ul>
+    
 </div>
 {% endblock %}

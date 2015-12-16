@@ -68,28 +68,33 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties, 
         $scope.searchModel.results.code_ids = {};
         if ($scope.searchModel.query.language_classifications && !$scope.searchModel.query.variable_codes && !$scope.searchModel.query.environmental_filters) {
             $scope.searchModel.results.classifications = {};
-            LanguageClass.query().$promise.then(function(result) {
-                for (var i = 0; i < $scope.searchModel.results.societies.length; i++) {
-                    for (var j = 0; j < $scope.searchModel.results.societies[i].languages.length; j++) {
-                        language_family = $scope.searchModel.results.societies[i].languages[j].language_family.name;
-                        classification = $scope.searchModel.query.language_classifications.filter(function(l) { return l.language.id == $scope.searchModel.results.societies[i].languages[j].id; });
-                        if (classification.length > 0) {
-                            toAdd = result.filter(function(l) { return l.id == classification[0].class_subfamily; });
-                            if (toAdd[0]){
-                                if (language_family in $scope.searchModel.results.classifications) {
-                                    if ($scope.searchModel.results.classifications[language_family].indexOf(toAdd[0]) == -1)
-                                        $scope.searchModel.results.classifications[language_family] = $scope.searchModel.results.classifications[language_family].concat(toAdd);
-                                        $scope.searchModel.results.classifications['NumClassifications'] += 1;
-                               } else {
-                                    $scope.searchModel.results.classifications[language_family] = toAdd;
-                                    $scope.searchModel.results.classifications['NumClassifications'] = 1;
+            var all_classifications = $scope.searchModel.getLanguageClassifications().allClasses;
+            
+            for (var i = 0; i < $scope.searchModel.results.societies.length; i++) {
+                $scope.searchModel.results.societies[i].languages.forEach(function(lang) {
+                    language_family = lang.language_family.name;
+                    classification = $scope.searchModel.query.language_classifications.filter(function(l) { return l.language.id == lang.id; });
+                    if (classification.length > 0) {
+                        if (classification[0].class_subfamily) toAdd = all_classifications.filter(function(l) { return l.id == classification[0].class_subfamily; });
+                        else toAdd = all_classifications.filter(function(l) { return l.id == classification[0].class_family; });
+                        if (toAdd[0]) {
+                            if (language_family in $scope.searchModel.results.classifications) {
+                                if ($scope.searchModel.results.classifications[language_family].indexOf(toAdd[0]) == -1) {
+                                    $scope.searchModel.results.classifications[language_family] = $scope.searchModel.results.classifications[language_family].concat(toAdd);
+                                    $scope.searchModel.results.classifications['NumClassifications'] += 1;
                                 }
+                            } else {
+                                $scope.searchModel.results.classifications[language_family] = toAdd;
+                                if (!$scope.searchModel.results.classifications['NumClassifications']) $scope.searchModel.results.classifications['NumClassifications'] = 1;
+                                else $scope.searchModel.results.classifications['NumClassifications'] += 1;
                             }
+                        
                         }
                     }
-                }
-            });
-        
+                
+                });
+            
+            }
         }
 
         if (!$scope.searchModel.query.variable_codes) return;

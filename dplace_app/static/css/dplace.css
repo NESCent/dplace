@@ -118,6 +118,23 @@ body {
     border:0px;
 }
 
+.tooltip-inner {
+    white-space:pre-wrap;
+}
+
+.comment-tooltip, .source-link {
+    cursor:pointer;
+}
+
+.source-link, .val-sources {
+    font-size: 12.5px;
+}
+
+.val-sources {
+    padding-top: 5px;
+    padding-left: 10px;
+}
+
 .row-margin-top {
     margin-top: 5px;
 }
@@ -202,6 +219,12 @@ label.light {
 
 .region-remove {
     cursor: hand;
+}
+
+.map-legend {
+    position: absolute;
+    margin-top: -290px;
+    margin-left: 800px;
 }
 
 .circle {

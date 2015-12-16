@@ -81,7 +81,7 @@ class Society(models.Model):
         return valueDict
 
     def get_cultural_trait_data(self):
-        """Returns the Ethnographic Atlas data for the given society"""
+        """Returns the data for the given society"""
         valueDict = defaultdict(list)
         qset = self.variablecodedvalue_set.select_related('code')
         qset = qset.select_related('variable')
@@ -91,10 +91,23 @@ class Society(models.Model):
                 valueDict[str(c)].append({
                     'label': value.variable.label,
                     'name': value.variable.name,
-                    'code': value.coded_value,
-                    'description': value.get_description(),
+                    'code':value.coded_value,
+                    'description':value.get_description(),
+                    'year':value.focal_year,
+                    'comment':value.comment,
+                    'sources':value.references.all(),
                 })
         return valueDict
+        
+    def get_data_references(self):
+        """Returns the references for the cultural trait data"""
+        refs = []
+        qset = self.variablecodedvalue_set
+        for value in qset.all():
+            for r in value.references.all():
+                if r not in refs:
+                    refs.append(r)
+        return sorted(refs, key=lambda r: r.author)
 
     def __unicode__(self):
         return "%s - %s (%s)" % (self.ext_id, self.name, self.source)

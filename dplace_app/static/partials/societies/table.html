@@ -21,7 +21,13 @@
                         <td>{{ society_result.society.language | formatLanguageName }}</td>
                         <td><a style="cursor: pointer;" ng-click="clicked(society_result.society.trees)" title="'Trees'">{{ society_result.society.trees | countOrBlank }}</a></td>
                         <td ng-repeat="variable in results.variable_descriptions">
-                            {{ society_result.variable_coded_values | formatVariableCodeValues:variable.id }}
+                            {{ society_result.variable_coded_values | formatVariableCodeValues:variable.id }} <a ng-show="showSource(society_result, variable.id)" data-toggle="collapse" data-target="#s{{society_result.society.ext_id}}{{variable.label}}" class="source-link">(Source)</a>
+                            <a ng-show="showComments(society_result, variable.id)" class="comment-tooltip" tooltip="{{ society_result.variable_coded_values | formatComment:variable.id }}">
+                                <span class="glyphicon glyphicon-comment" aria-hidden="true"></span>
+                            </a>
+                            <div id="s{{society_result.society.ext_id}}{{variable.label}}" class="collapse val-sources">
+                                {{ society_result.variable_coded_values | formatValueSources:variable.id }}
+                            </div>
                         </td>
                         <td ng-repeat="environmental in results.environmental_variables">
                             {{ society_result.environmental_values | formatEnvironmentalValues }}

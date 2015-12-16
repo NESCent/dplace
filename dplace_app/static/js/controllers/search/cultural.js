@@ -22,7 +22,6 @@ function CulturalCtrl($scope, searchModelService, Variable, CodeDescription, Con
 
     // triggered by the view when a trait is changed in the picker
     $scope.traitChanged = function(trait) {
-        console.log(trait.selectedVariable);
         trait.selectedCode = "";
         if (trait.selectedVariable.data_type == 'Continuous') {
             trait.codes = ContinuousVariable.query({query: {bf_id: trait.selectedVariable.id}});

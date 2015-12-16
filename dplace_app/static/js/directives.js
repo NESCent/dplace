@@ -80,13 +80,42 @@ angular.module('languagePhylogenyDirective', [])
             var addMarkers = function(langTree, results, variable, node, global, translate) { 
                 scope.results.societies.forEach(function(society) {
                     if (society.society.language) to_match = (langTree.name.indexOf("glotto") == -1) ? society.society.language.iso_code : society.society.language.glotto_code;
-                    else to_match = (langTree.name.indexOf("glotto") == -1) ? society.society.iso_code : society.society.glotto_code;
+                    else to_match = society.society.name;
                     
                     var selected = node.filter(function(d) {
                         return d.name == to_match;
                     });
                     if (global) selected.select("circle").remove(); 
-                    var society_name = society.society.name + " (" + society.society.language.glotto_code + ")"; //formerly isocode
+                    var society_name = society.society.name;
+                    if (society.society.language) society_name += " (" + society.society.language.glotto_code + ")"; //formerly isocode
+                    
+                    if (!variable) {
+                        if (scope.query.language_classifications) {
+                        
+                            for (var i = 0; i < society.languages.length; i++) {
+                                var classification = scope.query.language_classifications.filter(function(l) { return l.language.id == society.languages[i].id });
+                                if (classification[0].class_subfamily || classification[0].class_sub_subfamily || global) {
+                                selected.append("svg:circle")
+                                    .attr("r", function() {
+                                        if (global) return 1.5;
+                                        else return 4.5;
+                                    })
+                                    .attr("stroke", "#000")
+                                    .attr("stroke-width", "0.5")
+                                    .attr("fill", function(n) {
+                                        if (classification.length > 0) {
+                                            value = classification[0].class_subfamily ? classification[0].class_subfamily : classification[0].class_family;
+                                            hue = value * 240 / scope.results.classifications['NumClassifications'];
+                                            return 'hsl('+hue+',100%, 50%)';
+                                        }
+                                    });
+                                }
+                            }
+                        
+                        }
+                    
+                    }
+                    
                     //if the marker is an environmental variable
                     if (society.environmental_values.length > 0 && society.environmental_values[0].variable == variable)  { 
                             var hover_text_value = society.environmental_values[0].value + ' ' + results.environmental_variables[0].units;
@@ -102,9 +131,9 @@ angular.module('languagePhylogenyDirective', [])
                                         value = society.environmental_values[0].value; //only 1 environmental value at a time so we can do this
                                         min = scope.results.environmental_variables[0].min;
                                         max = scope.results.environmental_variables[0].max;
-                                        if (society.environmental_values[0].variable == 34 || society.environmental_values[0].variable == 36) {
+                                        if (scope.results.environmental_variables[0].name == 'Net Primary Production' || scope.results.environmental_variables[0].name == ' Mean Growing Season NPP') {
                                             hue = 30 + (((value - min) / (max - min))*88)
-                                        }  else if (society.environmental_values[0].variable == 27) {
+                                        }  else if (scope.results.environmental_variables[0].name == 'Annual Mean Precipitation') {
                                             lum = 100 - (((value - min) / (max - min))*95);
                                             return 'hsl(252,65%,'+lum+'%)';
                                         }
@@ -232,7 +261,8 @@ angular.module('languagePhylogenyDirective', [])
                             keysWritten++;
                             translate += 20;
                             }
-                        }
+                        }                        
+                       
                     }
                     
                     if (scope.query.environmental_filters) {
@@ -344,9 +374,17 @@ angular.module('languagePhylogenyDirective', [])
                 translate = 0;
                 //changes markers for global tree
                 if (langTree.name.indexOf("global") != -1) {
+                    if (scope.query.language_classifications && !scope.query.environmental_filters && !scope.query.variable_codes) {
+                            addMarkers(langTree, scope.results, null, node, true, translate);
+
+                    }
+                
+                
                     scope.$watch('results.chosenTVariable', function(oldValue, newvalue) {
-                        chosen_var_id = scope.results.chosenTVariable.id;
-                        addMarkers(langTree, scope.results, chosen_var_id, node, true, translate);
+                        if (scope.results.chosenTVariable.id) {
+                            chosen_var_id = scope.results.chosenTVariable.id;
+                            addMarkers(langTree, scope.results, chosen_var_id, node, true, translate);
+                        } 
                     });
                 } 
                 else {
@@ -366,37 +404,13 @@ angular.module('languagePhylogenyDirective', [])
                 }
                 
                 else if (scope.query.language_classifications && !scope.query.environmental_filters) {
-                    //get lang classification
-                    scope.results.societies.forEach(function(society) {
-                    if (society.society.language) to_match = (langTree.name.indexOf("glotto") == -1) ? society.society.language.iso_code : society.society.language.glotto_code;
-                    else to_match = (langTree.name.indexOf("glotto") == -1) ? society.society.language.iso_code : society.society.language.glotto_code;
-                        var selected = node.filter(function(d) {
-                            return d.name == to_match;
-                        });
-                        
-                        for (var i = 0; i < society.languages.length; i++) {
-                            var classification = scope.query.language_classifications.filter(function(l) { return l.language.id == society.languages[i].id });
-                            selected.append("svg:circle")
-                                .attr("r", 4.5)
-                                .attr("stroke", "#000")
-                                .attr("stroke-width", "0.5")
-                                .attr("fill", function(n) {
-                                    if (classification.length > 0) {
-                                        value = classification[0].class_subfamily;
-                                        hue = value * 240 / scope.results.classifications['NumClassifications'];
-                                        return 'hsl('+hue+',100%, 50%)';
-                                    }
-                                });
-                                
-                        }
-                        
-                    });
+                    addMarkers(langTree, scope.results, null, node, false, translate);
                 }
                 }
                 console.log(scope.query);
                 scope.results.societies.forEach(function(society) {
-                    if (society.society.language) to_match = (langTree.name.indexOf("glotto") == -1) ? society.society.language.iso_code : society.society.language.glotto_code;
-                    else to_match = (langTree.name.indexOf("glotto") == -1) ? society.society.iso_code : society.society.glotto_code;
+                    if (society.society.language) to_match = langTree.name.indexOf("glotto") == -1 ? society.society.language.iso_code : society.society.language.glotto_code;
+                    else to_match = society.society.name;
                     
                     var selected = node.filter(function(d) {
                         return d.name == to_match;
@@ -456,8 +470,8 @@ angular.module('languagePhylogenyDirective', [])
                 constructTree(args.tree);
                 var pos = $(".phylogeny").offset();
                 $(window).scroll(function() {
-                    //if ($(window).scrollTop() > 100)
-                       // $("#legend").stop().animate({"marginTop":($(window).scrollTop() - 100) + "px"}, "slow");
+                    if ($(window).scrollTop() > $(".navbar").height()+100)
+                        $("#legend").stop().animate({"marginTop":($(window).scrollTop() - 200) + "px"}, "slow");
                     if ($(window).scrollTop() > $(".navbar").height()+100) {
                         d3.select("#varLabels")
                             .attr('class', 'var-labels-fixed')
@@ -573,13 +587,14 @@ angular.module('dplaceMapDirective', [])
                     results.societies = [];
                     results.environmental_variables = scope.results.environmental_variables;
                     results.geographic_regions = scope.results.geographic_regions;
+                    results.languages = scope.results.languages;
                     results.code_ids = scope.results.code_ids;
                     scope.results.societies.forEach(function(societyResult) {
                         var society = societyResult.society;
                         // Add a marker for each point
                         var marker = {latLng: [society.location.coordinates[1], society.location.coordinates[0]], name: society.name}
                         scope.map.addMarker(society.id, marker); 
-                         if (!scope.chosen) {
+                         if (!scope.chosen) {   
                             results = scope.results;
                         } else {
                             if (scope.results.variable_descriptions.indexOf(scope.chosen) != -1) {
@@ -613,20 +628,6 @@ angular.module('dplaceMapDirective', [])
                                     }
                                 });
                             } 
-                            else {
-                                societyResult.languages.forEach(function(language) {
-                                    var classification = scope.query.language_classifications.filter(function(l) { return l.language.id == language.id });
-                                    if (classification.length > 0) {
-                                        results.societies.push({
-                                        'society': society,
-                                            'language_family': classification[0].class_subfamily,
-                                            'num_classifications': scope.results.classifications['NumClassifications'],
-                                            'environmental_values': [],
-                                            'variable_coded_values': [],
-                                        });
-                                    }
-                                });
-                            }
                         }
                     });
 
@@ -640,117 +641,14 @@ angular.module('dplaceMapDirective', [])
                     }
                     
                 };
-                
-                //constructs download link for map
-                scope.mapLink = function() {                     
-                        d3.select(".download-links").html('');
-                        var map_svg = d3.select(".jvectormap-container").select("svg")
-                            .attr("version", 1.1)
-                            .attr("xmlns", "http://www.w3.org/2000/svg")
-                            .attr("height", "900")
-                            .node().parentNode.innerHTML;
-                        map_svg = map_svg.substring(0, map_svg.indexOf("<div")); //remove zoom in/out buttons from map
-                        //construct legend for download
-                        var legend = d3.select(".legend-for-download");
-                        var legend_svg = "";
-                        if (scope.chosen) {
-                            if (scope.results.environmental_variables.length > 0 && scope.chosen.id == scope.results.environmental_variables[0].id) {
-                                //if the chosen map is an environmental variable
-                                    legend_svg = "<g transform='translate(0,350)'>"+d3.select(".envLegend").node().innerHTML+"</g>";
-                            }
-                            else if (scope.results.code_ids) {
-                            for (var i = 0; i < scope.results.code_ids[scope.chosen.id].length; i++) {
-                                g = legend.append("svg:g")
-                                    .attr("transform", function() {
-                                        return 'translate(0,'+i*25+')';
-                                    });
-                                g.append("svg:circle")
-                                    .attr("cx", "10")
-                                    .attr("cy", "10")
-                                    .attr("r", "4.5")
-                                    .attr("stroke", "#000")
-                                    .attr("stroke-width", "0.5")
-                                    .attr("fill", function() {
-                                        if (scope.results.code_ids[scope.chosen.id][i].description.indexOf("Missing data") != -1)
-                                            return 'hsl(0, 0%, 100%)';
-                                        var value = scope.results.code_ids[scope.chosen.id][i].code;
-                                        var hue = value * 240 / scope.results.code_ids[scope.chosen.id].length;
-                                        return 'hsl('+hue+',100%,50%)';
-                                    });
-                                g.append("svg:text")
-                                    .attr("x", "20")
-                                    .attr("y", "15")
-                                    .text(scope.results.code_ids[scope.chosen.id][i].description);
-                            }
-                            legend_svg = "<g transform='translate(0,350)'>"+legend.node().innerHTML+"</g>";
-                            }
-                            var map_svg = map_svg.substring(0, map_svg.indexOf("</svg>"));
-                            map_svg = map_svg.concat(legend_svg+"</svg>");
-                            //generate download
-                            
-                            var imgsrc = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(map_svg)));
-                            d3.select(".download-links").append("td")
-                                .attr("colspan", "2")
-                                .attr("style", "padding-bottom:20px")
-                                .append("a")
-                                .attr("class", "btn btn-info btn-dplace-download")
-                                .attr("download", scope.chosen.name+" map.svg")
-                                .attr("href", imgsrc)
-                                .html("Download Map");
-                        }
-                        
-                        else if (scope.results.classifications && scope.results.languages.length > 0) {
-                            count = 0;
-                            for (var key in scope.results.classifications) {
-                                for (var i = 0; i < scope.results.classifications[key].length; i++) {
-                                    g = legend.append("svg:g")
-                                        .attr("transform", function() {
-                                            return 'translate(0,'+ count*25 + ')';
-                                        });
-                                    g.append("svg:circle")
-                                        .attr("cx", "10")
-                                        .attr("cy", "10")
-                                        .attr("r", "4.5")
-                                        .attr("stroke", "#000")
-                                        .attr("stroke-width", "0.5")
-                                        .attr("fill", function() {
-                                            var value = scope.results.classifications[key][i].id;
-                                            var hue = value * 240 / scope.results.classifications['NumClassifications'];
-                                            return 'hsl('+hue+',100%,50%)';
-                                        });
-                                    g.append("svg:text")
-                                        .attr("x", "20")
-                                        .attr("y", "15")
-                                        .text(scope.results.classifications[key][i].name);
-                                    count++;
-                                }
-                                
-                            }
-                            var legend_svg = "<g transform='translate(0,350)'>"+legend.node().innerHTML+"</g>";
-                            var map_svg = map_svg.substring(0, map_svg.indexOf("</svg>"));
-                            map_svg = map_svg.concat(legend_svg+"</svg>");
-                            var imgsrc = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(map_svg)));
-                            lang_family = scope.results.languages[0].language_family.name;
-                            
-                            d3.select(".download-links").append("td")
-                                .attr("colspan", "2")
-                                .attr("style", "padding-bottom:20px")
-                                .append("a")
-                                .attr("class", "btn btn-info btn-dplace-download")
-                                .attr("download", lang_family+"map.svg")
-                                .attr("href", imgsrc)
-                                .html("Download Map: " + lang_family);
-                        }
-                };
-                
+
                 scope.mapLegend = function() {
                     if (!scope.chosen) return;
-                    if (scope.chosen.id == 34 || scope.chosen.id == 36) {
+                    if (scope.chosen.name == "Net Primary Production" || scope.chosen.name == "Mean Growing Season NPP") {
                         d3.selectAll(".envVar").attr("fill", "url(#earthy)");
-                    } else if (scope.chosen.id == 27) {
+                    } else if (scope.chosen.name == "Annual Mean Precipitation") {
                         d3.selectAll(".envVar").attr("fill", "url(#blue)");
                     }
-                    
                     else {
                         d3.selectAll(".envVar").attr("fill", "url(#temp)");
                     }
@@ -765,9 +663,7 @@ angular.module('dplaceMapDirective', [])
                 if (attrs.chosen) {
                     scope.$watchCollection('chosen', function(oldvalue, newvalue) {
                         scope.addMarkers(); 
-                        scope.mapLegend();
-                        scope.mapLink();
-                        
+                        scope.mapLegend();                        
                     });
                 }
                 

@@ -3,6 +3,10 @@ from rest_framework_gis import serializers as gis_serializers
 from models import *
 from rest_framework import serializers
 
+class SourceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Source
+
 # Cultural Trait Variables
 class VariableCodeDescriptionSerializer(serializers.ModelSerializer):
     class Meta:
@@ -36,9 +40,10 @@ class VariableCategoryDetailSerializer(serializers.ModelSerializer):
 
 class VariableCodedValueSerializer(serializers.ModelSerializer):
     code_description = VariableCodeDescriptionSerializer(source='code')
+    references = SourceSerializer(many=True)
     class Meta:
         model = VariableCodedValue
-        fields = ('id', 'variable', 'society', 'coded_value', 'code_description', 'source', 'references', 'subcase', 'focal_year')
+        fields = ('id', 'variable', 'society', 'coded_value', 'code_description', 'source', 'references', 'subcase', 'focal_year', 'comment')
 
 # ISO Codes
 class ISOCodeSerializer(gis_serializers.GeoModelSerializer):
@@ -83,9 +88,6 @@ class LanguageClassificationSerializer(serializers.ModelSerializer):
     language = LanguageSerializer(source='language')
     class Meta:
         model = LanguageClassification
-class SourceSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Source
         
 # Societies
 class SocietySerializer(gis_serializers.GeoModelSerializer):

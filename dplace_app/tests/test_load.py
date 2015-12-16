@@ -1,5 +1,6 @@
-from collections import defaultdict
 
+__author__ = 'dan'
+from collections import defaultdict
 from dplace_app.load.isocode import load_isocode
 from dplace_app.load.society_binford import load_bf_society
 from dplace_app.load.society_ea import load_ea_society
@@ -22,11 +23,6 @@ class LoadISOCodeTestCase(TestCase):
         row_dict = {'foo':'bar'}
         isocode = load_isocode(row_dict)
         self.assertIsNone(isocode, 'Should not load an isocode without iso code')
-    def load_iso_lat_long(self):
-        row_dict = {'ISO':'abc','LMP_LON': 30.43, 'LMP_LAT': 21.44}
-        isocode = load_isocode(row_dict)
-        self.assertIsNotNone(isocode, 'Unable to load code before attaching lat/long')
-        self.assertIsNotNone(isocode, 'Unable to attach lat/long to iso code')
     def test_load_ea_society(self):
         row_dict = defaultdict(
             lambda: '',
