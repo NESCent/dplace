@@ -88,10 +88,10 @@ class FindSocietiesTestCase(APITestCase):
         # Make source
         self.source = Source.objects.create(year="2014", author="Greenhill", reference="Great paper")
         
-        self.society1 = Society.objects.create(ext_id='society1',name='Society1',location=Point(1.0,1.0),source=self.source,iso_code=iso_code1,language=self.languageA1)
-        self.society2 = Society.objects.create(ext_id='society2',name='Society2',location=Point(2.0,2.0),source=self.source,iso_code=iso_code2,language=self.languageC2)
+        self.society1 = Society.objects.create(ext_id='society1',name='Society1',location=Point(1.0,1.0),source=self.source,language=self.languageA1)
+        self.society2 = Society.objects.create(ext_id='society2',name='Society2',location=Point(2.0,2.0),source=self.source,language=self.languageC2)
         # Society 3 has the same language characteristics as society 1 but different EA Vars
-        self.society3 = Society.objects.create(ext_id='society3',name='Society3',location=Point(3.0,3.0),source=self.source,iso_code=iso_code3,language=self.languageB3)
+        self.society3 = Society.objects.create(ext_id='society3',name='Society3',location=Point(3.0,3.0),source=self.source,language=self.languageB3)
 
         # make a language class tree
         self.root_language_class = LanguageClass.objects.create(name='root',level=1,parent=None)
