@@ -1,5 +1,4 @@
-# D-PLACE  [![Build Status](https://travis-ci.org/NESCent/dplace.svg?branch=master)](https://travis-ci.org/NESCent/dplace) [![Dependency Status](https://gemnasium.com/NESCent/dplace.svg)](https://gemnasium.com/NESCent/dplace)
-
+# D-PLACE  [![Build Status](https://travis-ci.org/D-PLACE/dplace.svg?branch=master)](https://travis-ci.org/D-PLACE/dplace)
 ## Synopsis
 
 This repository contains a [GeoDjango](http://geodjango.org) application for the NESCent working group [Explaining cultural diversity: A new evolutionary synthesis](http://evolutionary-synthesis.wikispaces.com) (wiki login required)
@@ -104,7 +103,7 @@ As a best practice, avoid putting AngularJS code into Django templates. This cou
 
 ### Loading Data
 
-D-PLACE data is collected/curated by the Working Group, and periodic CSV exports have been stored in a [private BitBucket repository](http://bitbucket.org/nescent/dplace-datasets). To request access, email dan.leehr@nescent.org.
+D-PLACE data is collected/curated by the Working Group, and periodic CSV exports have been stored in a [private BitBucket repository](http://bitbucket.org/nescent/dplace-datasets). 
 
 To load the data, run the `load_all_datasets.sh` script. This scripts clones the bitbucket repository, and runs `dplace_app/load.py` with appropriate parameters for each of the CSV files we import.  The python files in `dplace_app/load/` are tailored to each CSV file format - if the format changes, the scripts will need to be tweaked.
 
