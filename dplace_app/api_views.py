@@ -164,11 +164,12 @@ def result_set_from_query_dict(query_dict):
 
     if 'variable_codes' in query_dict:
         criteria.append(SEARCH_VARIABLES)
+        ids = [x['id'] for x in query_dict['variable_codes']]
+
         for x in query_dict['variable_codes']:
             variable = VariableDescription.objects.get(id=x['variable'])
             if variable.data_type.lower() == 'continuous':
                 values = VariableCodedValue.objects.filter(variable__id=x['variable'])
-
                 if 'min' in x:
                     min = x['min']
                     max = x['max']
@@ -188,8 +189,8 @@ def result_set_from_query_dict(query_dict):
                 values = values.select_related('society','variable')  
 
             for value in values:
-                codes = VariableCodeDescription.objects.filter(variable=value.variable)
-                result_set.add_cultural(value.society, value.variable, codes, value)
+                var_codes = VariableCodeDescription.objects.filter(variable=value.variable).filter(id__in=ids)
+                result_set.add_cultural(value.society, value.variable, var_codes, value)
 
         
     if 'environmental_filters' in query_dict:
