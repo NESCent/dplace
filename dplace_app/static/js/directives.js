@@ -492,7 +492,7 @@ angular.module('languagePhylogenyDirective', [])
                 
                 phyloWidth = d3.select("language-phylogeny").select("g").node().getBBox().width;
                 d3.select("#legend")
-                    .attr("style", "width:"+($(window).width()-phyloWidth-100)+"px; position:absolute; right:5px; z-index:1; margin-top:10px;");
+                    .attr("style", "width:"+($(window).width()-phyloWidth-100)+"px; position:absolute; right:20px; z-index:1;");
             };
 
             scope.$on('treeSelected', function(event, args) {
@@ -504,9 +504,8 @@ angular.module('languagePhylogenyDirective', [])
                     else {
                         d3.select("#legend")
                             .style("position", "absolute")
-                            .style("right", "5px")
-                            .style("z-index", "1")
-                            .style("margin-top", "10px");
+                            .style("right", "20px")
+                            .style("z-index", "1");
                     } 
                     if ($(window).scrollTop() > $(".navbar").height()+100) {
                         d3.select("#varLabels")
