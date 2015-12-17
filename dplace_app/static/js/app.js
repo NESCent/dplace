@@ -23,6 +23,30 @@ function dplaceRouter($routeProvider) {
             templateUrl:'/static/partials/source_info.html',
             controller:'SourceInfoCtrl'
         })
+        .when('/team', {
+            templateUrl:'/static/partials/team.html',
+            controller:'AboutCtrl'
+        })
+        .when('/legal', {
+            templateUrl:'/static/partials/legal.html',
+            controller:'AboutCtrl'
+        })
+        .when('/source', {
+            templateUrl:'/static/partials/source.html',
+            controller:'AboutCtrl'
+        })
+        .when('/technology', {
+            templateUrl:'/static/partials/technology.html',
+            controller:'AboutCtrl'
+        })
+        .when('/publication', {
+            templateUrl:'/static/partials/publication.html',
+            controller:'AboutCtrl'
+        })
+        .when('/howtocite', {
+            templateUrl:'/static/partials/howtocite.html',
+            controller:'AboutCtrl'
+        })
         .otherwise({
 	        redirectTo: '/home'
 	});
