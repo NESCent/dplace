@@ -179,7 +179,7 @@ angular.module('languagePhylogenyDirective', [])
                                                 if (variable.variable.data_type.toUpperCase() == 'CONTINUOUS') {
                                                     var min = variable.variable.min;
                                                     var max = variable.variable.max;
-                                                    var lum = (value-min)/(max-min) * 95;
+                                                    var lum = 100 - ((value-min)/(max-min) * 78);
                                                     return 'hsl(0, 65%,'+lum+'%)';
                                                 }                                               
                                                 hue = value * 240 / variable.codes.length;
@@ -501,6 +501,13 @@ angular.module('languagePhylogenyDirective', [])
                 $(window).scroll(function() {
                     if ($(window).scrollTop() > $(".navbar").height()+100)
                         $("#legend").stop().animate({"marginTop":($(window).scrollTop() - 200) + "px"}, "slow");
+                    else {
+                        d3.select("#legend")
+                            .style("position", "absolute")
+                            .style("right", "5px")
+                            .style("z-index", "1")
+                            .style("margin-top", "10px");
+                    } 
                     if ($(window).scrollTop() > $(".navbar").height()+100) {
                         d3.select("#varLabels")
                             .attr('class', 'var-labels-fixed')
