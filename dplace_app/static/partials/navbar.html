@@ -17,8 +17,22 @@
         <!-- <li ng-class="homeActive"><a ng-href href="#/home">Home</a></li> -->
         <li ng-class="searchActive" class="searchActive"><a ng-href href="#/search"><img class="navicon" src="/static/images/Search_Icon.png"><br />SEARCH</a></li>
         <li ng-class="societiesActive" class="societiesActive"><a ng-href href="#/societies"><img class="navicon" src="/static/images/Results_Icon.png"><br />RESULTS <span ng-show="model.results.societies.length">({{ model.results.societies.length }})</span></a></li>
-        <li ng-class="sourceInfoActive" class="sourceInfoActive"><a ng-href href="#/source_info"><img class="navicon" src="/static/images/DataSet_Icon.png"><br />SOURCES</a></li>
-        <li ng-class="aboutActive" class="aboutActive"><a ng-href href="#/about"><img class="navicon" src="/static/images/About_Icon.png"><br />ABOUT</a></li>
+        <li ng-class="sourceInfoActive" class="sourceInfoActive"><a ng-href href="#/source_info"><img class="navicon" src="/static/images/DataSet_Icon.png"><br />HOW-TO</a></li>
+        <li ng-class="aboutActive" class="aboutActive">
+            <!-- <div class="btn-group"> -->
+            <a class="dropdown-toggle" data-toggle="dropdown"><img class="navicon" src="/static/images/About_Icon.png"><br />INFO</a>
+            <ul class="dropdown-menu" role="menu">
+                <li><a ng-href href="#/about">ABOUT</a></li>
+                <li><a ng-href href="#/howtocite">HOW TO CITE</a></li>
+                <li><a ng-href href="#/source">SOURCE</a></li>
+                <li><a ng-href href="#/team">TEAM</a></li>
+                <li><a ng-href href="#/technology">TECHNOLOGY</a></li>
+                <li><a ng-href href="#/publication">PUBLICATION</a></li>
+                <li><a ng-href href="#/legal">LEGAL</a></li>
+            </ul>
+        </div>
+        </li>
+        <!-- <li ng-class="aboutActive" class="aboutActive"><a ng-href href="#/about"><img class="navicon" src="/static/images/About_Icon.png"><br />ABOUT</a></li> -->
       </ul>
     </div><!-- /.navbar-collapse -->
   </div><!-- /.container-fluid -->
