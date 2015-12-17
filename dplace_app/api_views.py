@@ -164,11 +164,12 @@ def result_set_from_query_dict(query_dict):
 
     if 'variable_codes' in query_dict:
         criteria.append(SEARCH_VARIABLES)
-        ids = [x['id'] for x in query_dict['variable_codes']]
+        ids = [x['id'] for x in query_dict['variable_codes'] if 'id' in x]
 
         for x in query_dict['variable_codes']:
             variable = VariableDescription.objects.get(id=x['variable'])
-            if variable.data_type.lower() == 'continuous':
+            
+            if variable.data_type and variable.data_type.lower() == 'continuous':
                 values = VariableCodedValue.objects.filter(variable__id=x['variable'])
                 if 'min' in x:
                     min = x['min']
