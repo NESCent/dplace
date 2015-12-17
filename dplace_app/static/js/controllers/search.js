@@ -65,7 +65,7 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties, 
     //calculates number of codes selected for each variable and saves to coded_value
     //needed for coloring of markers
     $scope.getCodeIDs = function() {
-        $scope.searchModel.results.code_ids = {};
+        //$scope.searchModel.results.code_ids = {};
         if ($scope.searchModel.query.language_classifications && !$scope.searchModel.query.variable_codes && !$scope.searchModel.query.environmental_filters) {
             $scope.searchModel.results.classifications = {};
             var all_classifications = $scope.searchModel.getLanguageClassifications().allClasses;
@@ -96,10 +96,34 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties, 
             
             }
         }
+        
+        for (var i = 0; i < $scope.searchModel.results.variable_descriptions.length; i++) {
+            if ($scope.searchModel.results.variable_descriptions[i].variable.data_type.toUpperCase() == 'CONTINUOUS') {
+                codes = $scope.searchModel.query.variable_codes.filter(function(code) { return code.variable == $scope.searchModel.results.variable_descriptions[i].variable.id; });
+                var min;
+                var max = 0;
+                
+                codes.forEach(function(c_var) {
+                    if (!min) {
+                        min = c_var.min;
+                    } else {
+                        if (c_var.min < min) min = c_var.min;
+                    }
+                    if (c_var.max > max) max = c_var.max;
+                });
+                
+                $scope.searchModel.results.variable_descriptions[i].variable['min'] = min;
+                $scope.searchModel.results.variable_descriptions[i].variable['max'] = max;
+                $scope.searchModel.results.variable_descriptions[i].variable['units'] = $scope.searchModel.results.variable_descriptions[i].variable.name.substring($scope.searchModel.results.variable_descriptions[i].variable.name.indexOf('(')+1, $scope.searchModel.results.variable_descriptions[i].variable.name.indexOf(')'));
+            }                    
+            
 
-        if (!$scope.searchModel.query.variable_codes) return;
+            
+        }
 
-        for (var i = 0; i < $scope.searchModel.query.variable_codes.length; i++) {
+        //if (!$scope.searchModel.query.variable_codes) return;
+
+        /*for (var i = 0; i < $scope.searchModel.query.variable_codes.length; i++) {
             if ($scope.searchModel.query.variable_codes[i].bf_id) {
                 if (!($scope.searchModel.query.variable_codes[i].bf_id in $scope.searchModel.results.code_ids)) {
                     $scope.searchModel.results.code_ids[$scope.searchModel.query.variable_codes[i].bf_id] = [];
@@ -127,13 +151,13 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties, 
                 if ($scope.searchModel.results.variable_descriptions[i].data_type=='CONTINUOUS')
                     $scope.searchModel.results.code_ids[$scope.searchModel.results.variable_descriptions[i].id].units = $scope.searchModel.results.variable_descriptions[i].name.substring($scope.searchModel.results.variable_descriptions[i].name.indexOf('(')+1, $scope.searchModel.results.variable_descriptions[i].name.indexOf(')'));
             }
-         }
+         }*/
     }
     $scope.assignColors = function() {
         results = $scope.searchModel.getResults();
         
         results = $scope.calculateRange(results);
-        bf_codes = [];
+        /*bf_codes = [];
         if ($scope.searchModel.query.variable_codes) {
             for (var i = 0; i < $scope.searchModel.query.variable_codes.length; i++) {
                 if ($scope.searchModel.query.variable_codes[i].bf_id)
@@ -147,7 +171,7 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties, 
                 if (bf_codes.indexOf(results.societies[i].variable_coded_values[j].variable) != -1)
                     results.societies[i]['bf_cont_var'] = true;
             }
-        }
+        }*/
         var colorMap = colorMapService.generateColorMap(results);
         $scope.searchModel.getSocieties().forEach(function(container) {
             container.society.style = {'background-color' : colorMap[container.society.id] };

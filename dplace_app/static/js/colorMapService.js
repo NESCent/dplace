@@ -52,15 +52,19 @@ function ColorMapService() {
                     colors[society.society.id] = color;
                 }    
             }
-            
             for (var j = 0; j < society.variable_coded_values.length; j++) {
+                variable_description = results.variable_descriptions.filter(function(variable) {
+                    return variable.variable.id == society.variable_coded_values[j].variable;
+                });
+
                 if (society.variable_coded_values[j].code_description && (society.variable_coded_values[j].code_description.description.indexOf("Missing data") != -1))
                     colors[society.society.id] = 'hsl(0, 0%, 100%)';
-                else if (results.code_ids[society.variable_coded_values[j].variable].bf_var) {
-                    var color = mapColorMonochrome(results.code_ids[society.variable_coded_values[j].variable].min, results.code_ids[society.variable_coded_values[j].variable].max, society.variable_coded_values[j].coded_value, 0);
+                else if (variable_description[0].variable.data_type.toUpperCase() == 'CONTINUOUS') {
+                    var color = mapColorMonochrome(variable_description[0].variable.min, variable_description[0].variable.max, society.variable_coded_values[j].coded_value, 0);
                     colors[society.society.id] = color;
-                } else {
-                    var color = mapColor(society.variable_coded_values[j].coded_value, results.code_ids[society.variable_coded_values[j].variable].length);
+                } 
+                else {
+                    var color = mapColor(society.variable_coded_values[j].coded_value, variable_description[0].codes.length);
                     colors[society.society.id] = color;
                 }
             }

@@ -142,7 +142,14 @@ class SocietyResult(object):
         if SEARCH_GEOGRAPHIC in criteria and len(self.geographic_regions) == 0:
             result = False
         return result
-
+class VariableCode(object):
+    '''
+    Encapsulates societies and their related search values for serializing
+    '''
+    def __init__(self, codes, variable):
+        self.codes = codes
+        self.variable = variable
+        
 class SocietyResultSet(object):
     '''
     Provides a mapping of Societies to SocietyResult objects
@@ -152,23 +159,30 @@ class SocietyResultSet(object):
     def __init__(self):
         # Use a dictionary to map society_id -> SocietyResult
         self._society_results = dict()
+        self._codes = dict()
         self.societies = None # not valid until finalize() is called
         # These are the column headers in the search results
-        self.variable_descriptions = set()
+        self.variable_descriptions = None
         self.environmental_variables = set()
         self.languages = set()
         self.geographic_regions = set()
         self.language_trees = set()
+        #self.var_codes = None
 
     def _get_society_result(self,society):
         if society.id not in self._society_results.keys():
             self._society_results[society.id] = SocietyResult(society)
         return self._society_results[society.id]
+        
+    def add_code(self, codes, variable):
+        if variable.id not in self._codes.keys():
+            self._codes[variable.id] = VariableCode(codes, variable)
+     #   return self._codes[variable.id]
 
-    def add_cultural(self,society,variable_description,variable_coded_value):
-        self.variable_descriptions.add(variable_description)
+    def add_cultural(self,society,variable_description,codes,variable_coded_value):
         self._get_society_result(society).add_variable_coded_value(variable_coded_value)
-
+        self.add_code(codes, variable_description)
+        
     def add_environmental(self,society,environmental_variable,environmental_value):
         self.environmental_variables.add(environmental_variable)
         self._get_society_result(society).add_environmental_value(environmental_value)
@@ -185,9 +199,15 @@ class SocietyResultSet(object):
         self.language_trees.add(language_tree)
     
     def finalize(self,criteria):
-        self.societies = [x for x in self._society_results.values() if x.includes_criteria(criteria)]
+        self.societies = [x for x in self._society_results.values() if x.includes_criteria(criteria)] 
+        self.variable_descriptions = [x for x in self._codes.values()]
 
 
+        
+class VariableCodeSerializer(serializers.Serializer):    
+    codes = VariableCodeDescriptionSerializer(many=True)
+    variable = VariableDescriptionSerializer()
+        
 class SocietyResultSerializer(serializers.Serializer):
     '''
     Serializer for the SocietyResult object
@@ -206,7 +226,7 @@ class SocietyResultSetSerializer(serializers.Serializer):
     societies = SocietyResultSerializer(many=True)
     # These contain the search parameters
     # variable descriptions -> variable codes
-    variable_descriptions = VariableDescriptionSerializer(many=True)
+    variable_descriptions = VariableCodeSerializer(many=True)
     # environmental variables -> environmental values
     environmental_variables = EnvironmentalVariableSerializer(many=True)
     # languages - Does not map to a more specific value
@@ -215,6 +235,7 @@ class SocietyResultSetSerializer(serializers.Serializer):
     geographic_regions = GeographicRegionSerializer(many=True)
     #language trees for this society result set
     language_trees = LanguageTreeSerializer(many=True)
+    #var_codes = VariableCodeSerializer(many=True)
     
 class Legend(object):
     def __init__(self, name, svg):

@@ -26,6 +26,48 @@
             <div class="tree-download"></div>
             
             <div id="legend" ng-show="results.selectedTree">
+                <table ng-repeat="variable in results.variable_descriptions">
+                    <tr ng-show="!globalTree" data-toggle="collapse" data-target="#{{variable.CID}}" class="accordion-toggle legends" style="cursor:pointer;">
+                        <th>{{variable.CID}}: {{variable.variable.name}}</th>
+                    </tr>
+                    <tr>
+                        <td class="hiddenRow">
+                            <div ng-class="{'accordion-body collapse': !globalTree}" ng-hide="showOrHide(results.chosenTVariable.id, variable.variable.id)" id="{{variable.CID}}">
+                                <svg ng-show="variable.variable.data_type !== 'Continuous'" height="{{variable.svgSize}}" width="600" class="tree-legend legends" var-id="{{variable.variable.id}}">
+                                    <g ng-repeat="c in variable.codes" transform="{{$index|transformG}}">
+                                    <circle
+                                                cx="10"
+                                                cy="10"
+                                                r="4.5"
+                                                fill="{{c.code|colorNode:variable.codes}}"
+                                                stroke="#000"
+                                                stroke-width="0.5"
+                                                />
+                                        <text x="20" y="15">{{c.short_description}}</text>
+                                    </g>
+                                </svg>
+                                
+                                <svg ng-show="variable.variable.data_type == 'Continuous'" class="cont-gradient legends" height="80" height="30" var-id="{{variable.variable.id}}">
+                                    <circle
+                                            cx="10"
+                                            cy="10"
+                                            r="4.5"
+                                            fill="hsl(360, 100%, 100%)"
+                                            stroke="#000"
+                                            stroke-width="0.5"
+                                            />
+                                        <text x="20" y="15">Missing Data</text>
+                                    <rect x="10" y="25" fill="url(#grad1)" height="30" width="300" />
+                                    <text x="0" y="70">{{variable.variable.min}} {{code.units}}</text>
+                                    <text x="300" y="70">{{variable.variable.max}} {{code.units}}</text>
+                                </svg>
+                            </div>
+                        </td>
+                    </tr>
+                
+                </table>
+            
+            
                 <table ng-repeat="(id, code) in results.code_ids">
                     <tr ng-show="!globalTree" ng-click="legendArrow(code)" data-toggle="collapse" data-target="#{{code.CID}}" class="accordion-toggle legends" style="cursor:pointer;">
                         <th><span ng-show="!code.hidden" class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span><span ng-show="code.hidden" class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span>{{code.CID}}: {{code.name}}</th>
