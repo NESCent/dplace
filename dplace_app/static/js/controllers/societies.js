@@ -4,7 +4,7 @@ function SocietiesCtrl($scope, $timeout, searchModelService, LanguageClass, ZipT
     $scope.variables = [];
     $scope.buttons = [
         {value:'phylogeny', name:'Phylogenies', description: "Trees derived from discrete data using phylogenetic methods (branch lengths informative)"},
-        {value:'glottolog', name:'Glottolog Trees', description: "Trees derived Glotolog language family taxonomies (branch lengths uninformative)"},
+        {value:'glottolog', name:'Glottolog Trees', description: "Trees derived from Glottolog language family taxonomies (branch lengths uninformative)"},
         {value:'global', name:'Global Tree', description: "A global language supertree composed from language family taxonomies in Glottolog (branch lengths uninformative)"},
     ];
     
@@ -28,6 +28,8 @@ function SocietiesCtrl($scope, $timeout, searchModelService, LanguageClass, ZipT
     }
     
     $scope.setActive('societies');
+    
+    $scope.columnSort = { sortColumn: 'society.name', reverse: false };
     
     var num_lines = 0;              
     $scope.wrapText = function(text, string) {
