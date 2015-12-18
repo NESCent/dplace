@@ -32,8 +32,8 @@ class DPLACECSVResults(object):
         if 'variable_descriptions' in self.data:
             self.field_map['variable_descriptions'] = dict()
             for v in self.data['variable_descriptions']:
-                field_names = self.field_names_for_cultural_variable(v)
-                self.field_map['variable_descriptions'][v['id']] = field_names
+                field_names = self.field_names_for_cultural_variable(v['variable'])
+                self.field_map['variable_descriptions'][v['variable']['id']] = field_names
                 self.field_names.append(field_names['focal_year'])
                 self.field_names.append(field_names['code'])
                 self.field_names.append(field_names['description'])
@@ -125,7 +125,7 @@ class DPLACECsvRenderer(renderers.BaseRenderer):
         csv_buffer = StringIO()
         csv_writer = csv.DictWriter(csv_buffer, results.field_names)
         cite_writer = csv.writer(csv_buffer)
-        cite_writer.writerow(['To cite D-PLACE: CITATION GOES HERE']) #add in 'How to cite' here
+        cite_writer.writerow(['To cite D-PLACE: Research that uses data from D-PLACE should cite both the original source of the coded data and this paper (e.g., for anthropological data from the Ethnographic Atlas: "Murdock (1962-1971); Kirby et al n.d.)." In the reference list, the D-PLACE URL (www.d-place.org) and the date the data were downloaded should be given.']) #add in 'How to cite' here
         csv_writer.writeheader()
         for row in results.rows:
             csv_writer.writerow(encode_rowdict(row))

@@ -164,9 +164,13 @@ def result_set_from_query_dict(query_dict):
 
     if 'variable_codes' in query_dict:
         criteria.append(SEARCH_VARIABLES)
+        ids = [x['id'] for x in query_dict['variable_codes'] if 'id' in x]
+
         for x in query_dict['variable_codes']:
-            if 'bf_id' in x:
-                values = VariableCodedValue.objects.filter(variable__id=x['bf_id'])
+            variable = VariableDescription.objects.get(id=x['variable'])
+            
+            if variable.data_type and variable.data_type.lower() == 'continuous':
+                values = VariableCodedValue.objects.filter(variable__id=x['variable'])
                 if 'min' in x:
                     min = x['min']
                     max = x['max']
@@ -186,7 +190,9 @@ def result_set_from_query_dict(query_dict):
                 values = values.select_related('society','variable')  
 
             for value in values:
-                result_set.add_cultural(value.society, value.variable, value)
+                var_codes = VariableCodeDescription.objects.filter(variable=value.variable).filter(id__in=ids)
+                result_set.add_cultural(value.society, value.variable, var_codes, value)
+
         
     if 'environmental_filters' in query_dict:
         criteria.append(SEARCH_ENVIRONMENTAL)
@@ -311,7 +317,7 @@ def bin_cont_data(request): #MAKE THIS GENERIC
                     bins.append({
                         'code': v.coded_value,
                         'description': v.code.description,
-                        'bf_id': query_dict['bf_id']
+                        'variable': query_dict['bf_id'],
                     })
                     missing_data_option = True
                 continue
@@ -335,9 +341,7 @@ def bin_cont_data(request): #MAKE THIS GENERIC
                 'description': str(min) + ' - ' + str(max),
                 'min': min_bin,
                 'max': min_bin + bin_size,
-                'bf_id': query_dict['bf_id'],
-                'absolute_min': min_value,
-                'absolute_max': max_value,
+                'variable': query_dict['bf_id'],
             })
             min_bin = min_bin + bin_size + 1
     else:

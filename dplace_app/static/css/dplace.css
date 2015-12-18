@@ -1,20 +1,20 @@
 @font-face {
     font-family: "DPLACE";
-    src: url("/static/GT-Walsheim-Regular.woff");
+    src: url("/static/fonts/GT-Walsheim-Regular.woff");
 }
 @font-face {
     font-family: "DPLACE";
-    src: url("/static/GT-Walsheim-Bold.woff");
+    src: url("/static/fonts/GT-Walsheim-Bold.woff");
     font-weight: bold;
 }
 @font-face {
     font-family: "DPLACE";
-    src: url("/static/GT-Walsheim-Regular-Oblique.woff");
+    src: url("/static/fonts/GT-Walsheim-Regular-Oblique.woff");
     font-style: italic;
 }
 @font-face {
     font-family: "DPLACE";
-    src: url("/static/GT-Walsheim-Bold-Oblique.woff");
+    src: url("/static/fonts/GT-Walsheim-Bold-Oblique.woff");
     font-weight: bold;
     font-style: italic;
 }
@@ -23,6 +23,10 @@ body {
     padding-top: 170px;
     padding-right: 10px;
     padding-left: 10px;
+}
+
+a {
+    cursor: pointer;
 }
 .navbar-default {
     background-color: #fff;

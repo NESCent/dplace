@@ -155,10 +155,10 @@ angular.module('languagePhylogenyDirective', [])
                             return;
                         } else if (society.variable_coded_values.length > 0) {
                         for (var i = 0; i < society.variable_coded_values.length; i++) {
-                            if (society.variable_coded_values[i].variable == variable) {
-                                if (society.bf_cont_var) {
+                            if (society.variable_coded_values[i].variable == variable.variable.id) {
+                                if (variable.variable.data_type.toUpperCase() == 'CONTINUOUS') {
                                     var hover_text_value = society.variable_coded_values[i].coded_value;
-                                    if (scope.results.code_ids[society.variable_coded_values[i].variable].units) hover_text_value += ' ' + scope.results.code_ids[society.variable_coded_values[i].variable].units;
+                                    if (variable.variable.units) hover_text_value += ' ' + variable.variable.units;
                                 } else
                                     var hover_text_value = society.variable_coded_values[i].code_description.description;
                                     selected.append("svg:circle")
@@ -174,13 +174,15 @@ angular.module('languagePhylogenyDirective', [])
                                                    return 'hsl(360, 100%, 100%)';
                                                 }
                                                 value = society.variable_coded_values[i].coded_value;
-                                                if (society.bf_cont_var) {
-                                                    min = scope.results.code_ids[society.variable_coded_values[i].variable].min;
-                                                    max = scope.results.code_ids[society.variable_coded_values[i].variable].max;
-                                                    var lum = (value-min)/(max-min) * 95;
+                                                
+                                                
+                                                if (variable.variable.data_type.toUpperCase() == 'CONTINUOUS') {
+                                                    var min = variable.variable.min;
+                                                    var max = variable.variable.max;
+                                                    var lum = 100 - ((value-min)/(max-min) * 78);
                                                     return 'hsl(0, 65%,'+lum+'%)';
                                                 }                                               
-                                                hue = value * 240 / scope.results.code_ids[society.variable_coded_values[i].variable].length;
+                                                hue = value * 240 / variable.codes.length;
                                                 return 'hsl('+hue+',100%, 50%)';
                                         })
                                         .on("mouseover", function() { 
@@ -247,7 +249,21 @@ angular.module('languagePhylogenyDirective', [])
                     keysWritten = 1;
                     translate = 0;
                     if (scope.query.variable_codes) {
-                        for (var key in scope.results.code_ids) {
+                        for (var r = 0; r < scope.results.variable_descriptions.length; r++) {
+                            vis.append("svg:text")
+                                .attr("dx", w+translate-9)
+                                .attr("dy", 10)
+                                .text("C"+keysWritten);
+                            labels.append("svg:text")
+                                .attr("dx", w+translate)
+                                .attr("dy", 15)
+                                .text("C"+keysWritten);
+                            scope.results.variable_descriptions[r].CID = "C"+keysWritten;
+                            keysWritten++;
+                            translate += 20;
+                        }
+                    
+                        /*for (var key in scope.results.code_ids) {
                             if (scope.results.code_ids[key].length > 0 || scope.results.code_ids[key].bf_var) {
                             vis.append("svg:text")
                                 .attr("dx", w+translate-9)
@@ -261,7 +277,7 @@ angular.module('languagePhylogenyDirective', [])
                             keysWritten++;
                             translate += 20;
                             }
-                        }                        
+                        }    */                    
                        
                     }
                     
@@ -382,8 +398,15 @@ angular.module('languagePhylogenyDirective', [])
                 
                     scope.$watch('results.chosenTVariable', function(oldValue, newvalue) {
                         if (scope.results.chosenTVariable.id) {
-                            chosen_var_id = scope.results.chosenTVariable.id;
-                            addMarkers(langTree, scope.results, chosen_var_id, node, true, translate);
+                            chosen_var_id = scope.results.variable_descriptions.filter(function(variable) { return variable.variable.id == scope.results.chosenTVariable.id });
+                            if (chosen_var_id.length > 0)
+                                addMarkers(langTree, scope.results, chosen_var_id[0], node, true, translate);
+                            else {
+                                if (scope.query.environmental_filters && scope.query.environmental_filters[0].id==scope.results.chosenTVariable.id) {
+                                    addMarkers(langTree, scope.results,scope.results.chosenTVariable.id, node, true, translate);
+                                }
+                            
+                            }
                         } 
                     });
                 } 
@@ -391,12 +414,18 @@ angular.module('languagePhylogenyDirective', [])
                 //markers for non-global trees
                 if (scope.query.variable_codes) {
                     if (langTree.name.indexOf("global") == -1) {
-                        for (var key in scope.results.code_ids) {
+                        for (var r = 0; r < scope.results.variable_descriptions.length; r++) {
+                            addMarkers(langTree, scope.results, scope.results.variable_descriptions[r], node, false, translate);
+                            translate += 20;
+                        }
+                    
+                    
+                        /*for (var key in scope.results.code_ids) {
                             if (!(scope.query.environmental_filters && key==scope.query.environmental_filters[0].id)) {
                                 addMarkers(langTree, scope.results, key, node, false, translate);
                                 translate += 20; 
                             }
-                        }
+                        }*/
                     }
                 }
                 if (scope.query.environmental_filters) {
@@ -463,7 +492,7 @@ angular.module('languagePhylogenyDirective', [])
                 
                 phyloWidth = d3.select("language-phylogeny").select("g").node().getBBox().width;
                 d3.select("#legend")
-                    .attr("style", "width:"+($(window).width()-phyloWidth-100)+"px; position:absolute; right:5px; z-index:1; margin-top:10px;");
+                    .attr("style", "width:"+($(window).width()-phyloWidth-100)+"px; position:absolute; right:20px; z-index:1;");
             };
 
             scope.$on('treeSelected', function(event, args) {
@@ -472,6 +501,12 @@ angular.module('languagePhylogenyDirective', [])
                 $(window).scroll(function() {
                     if ($(window).scrollTop() > $(".navbar").height()+100)
                         $("#legend").stop().animate({"marginTop":($(window).scrollTop() - 200) + "px"}, "slow");
+                    else {
+                        d3.select("#legend")
+                            .style("position", "absolute")
+                            .style("right", "20px")
+                            .style("z-index", "1");
+                    } 
                     if ($(window).scrollTop() > $(".navbar").height()+100) {
                         d3.select("#varLabels")
                             .attr('class', 'var-labels-fixed')
@@ -588,7 +623,7 @@ angular.module('dplaceMapDirective', [])
                     results.environmental_variables = scope.results.environmental_variables;
                     results.geographic_regions = scope.results.geographic_regions;
                     results.languages = scope.results.languages;
-                    results.code_ids = scope.results.code_ids;
+                    results.variable_descriptions = scope.results.variable_descriptions
                     scope.results.societies.forEach(function(societyResult) {
                         var society = societyResult.society;
                         // Add a marker for each point
@@ -597,15 +632,18 @@ angular.module('dplaceMapDirective', [])
                          if (!scope.chosen) {   
                             results = scope.results;
                         } else {
-                            if (scope.results.variable_descriptions.indexOf(scope.chosen) != -1) {
+                            variable = scope.results.variable_descriptions.filter(function(var_code) {
+                                return var_code.variable == scope.chosen;
+                            });
+                        
+                            if (variable.length > 0) {
                                 societyResult.variable_coded_values.forEach(function(coded_value) {
                                     if (coded_value.variable == scope.chosen.id) {
-                                        if (scope.chosen.data_type == 'CONTINUOUS') {
+                                        if (scope.chosen.data_type.toUpperCase() == 'CONTINUOUS') {
                                             results.societies.push({
                                                 'variable_coded_values':[coded_value],
                                                 'environmental_values': [],
                                                 'society':society,
-                                                'bf_cont_var':true,
                                             });
                                         } else {
                                             results.societies.push({

@@ -11,24 +11,26 @@
                  </select>
              </div>
             <dplace-map results="results" map-div-id="result-map" visible="visible" query="query" chosen="results.chosenVariable"></dplace-map>
-            <table class="map-legend">
-                <tr class="download-links">
-                </tr>
-                <tr ng-show="results.chosenVariable.data_type !== 'CONTINUOUS'" ng-repeat="code in results.code_ids[results.chosenVariable.id]">
+           <div class="download-links"></div>
+           <table class="map-legend" ng-show="results.chosenVariable.data_type !== 'Continuous'" ng-repeat="variable in results.variable_descriptions" ng-if="variable.variable.id==results.chosenVariable.id">
+              
+                <tr ng-repeat="code in variable.codes">
                     <td>
                         <svg height="20" width="20">
                             <circle
                                     cx="10"
                                     cy="10"
                                     r="4.5"
-                                    fill="{{code.code|colorNode:results.code_ids[results.chosenVariable.id]}}"
+                                    fill="{{code.code|colorNode:variable.codes}}"
                                     stroke="#000"
                                     stroke-width="0.5"
                                     />
-                            </svg>
+                            </svg>                               
                     </td>
                     <td>{{code.short_description}}</td>
                 </tr>
+                </table>
+                <table class="map-legend">
                 <tr ng-show="(results.chosenVariable && (results.chosenVariable==results.environmental_variables[0]))">
                     <td>
                         <svg height="50" width="400" class="envLegend">
@@ -38,7 +40,7 @@
                       </svg>
                     </td>
                 </tr>
-                <tr ng-show="results.chosenVariable.data_type == 'CONTINUOUS'">
+                <tr ng-show="results.chosenVariable.data_type == 'Continuous'">
                     <td width="20">
                         <svg height="20" width="20">
                             <circle
@@ -53,22 +55,17 @@
                         </td>
                     <td>Missing Data</td>
                </tr>
-                <tr ng-show="results.chosenVariable.data_type == 'CONTINUOUS'">
+                <tr ng-show="results.chosenVariable.data_type  == 'Continuous'">
                     <td colspan="2">
-                        <svg class="bf-cont-gradient" width="400" height="50">
-                            <defs>
-                                <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="0%">
-                                    <stop offset="0%" style="stop-color:hsl(0, 65%, 95%);stop-opacity:1" />
-                                    <stop offset="50%" style="stop-color:hsl(0, 65%, 50%);stop-opacity:1" />
-                                    <stop offset="100%" style="stop-color:hsl(0, 65%, 22%);stop-opacity:1" />
-                                </linearGradient>
-                            </defs>
+                        <svg class="cont-gradient" width="400" height="50">
                             <rect x="10" fill="url(#grad1)" height="30" width="300" />
-                            <text x="0" y="45">{{results.code_ids[results.chosenVariable.id].min}} {{results.code_ids[results.chosenVariable.id].units}}</text>
-                            <text x="300" y="45">{{results.code_ids[results.chosenVariable.id].max}} {{results.code_ids[results.chosenVariable.id].units}}</text>
+                            <text x="0" y="45">{{results.chosenVariable.min}} {{results.chosenVariable.units}}</text>
+                            <text x="300" y="45">{{results.chosenVariable.max}} {{results.chosenVariable.units}}</text>
                         </svg>
                     </td>
                 </tr>
+                </table>
+                <table class="map-legend">
                 <tr ng-repeat="code in results.classifications|joinDictItems">
                     <td>
                         <svg height="20" width="20">
