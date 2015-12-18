@@ -76,12 +76,12 @@
                             <td>{{v.label}}</td>
                             <td>{{v.name}}</td>
                             <td>{{v.code}}</td>
-                            <td>{{v.description}} (<a style="cursor:pointer;" data-toggle="collapse" href="#s{{v.label}}" aria-expanded="false" aria-controls="s{{v.label}}">Source</a>) 
+                            <td>{{v.description}} {% if v.sources %}(<a style="cursor:pointer;" data-toggle="collapse" href="#s{{v.label}}" aria-expanded="false" aria-controls="s{{v.label}}">Source</a>) 
                                 <div class="collapse" id="s{{v.label}}" style="padding-left:10px; padding-top:5px;">
                                     {% for s in v.sources %}
                                         <a href="#r{{s.id}}">{{s}}</a>;
                                     {% endfor %}
-                                </div>
+                                </div>{% endif %}
                             </td>
                             {% if v.year or v.comment %}
                             <td width="10px">
@@ -98,13 +98,13 @@
             </div>
         </div>
     {% endfor %}
-    
-    <h2>References</h2>
-    <ul>
-    {% for ref in references %}
-    <li id="r{{ ref.id }}"> {{ ref.reference }} </li>
-    {% endfor %}
-    </ul>
-    
+    {% if references %}
+        <h2>References</h2>
+        <ul>
+        {% for ref in references %}
+        <li id="r{{ ref.id }}"> {{ ref.reference }} </li>
+        {% endfor %}
+        </ul>
+    {% endif %}
 </div>
 {% endblock %}
