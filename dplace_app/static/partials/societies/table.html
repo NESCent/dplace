@@ -5,6 +5,7 @@
                 <table class="table" ng-show="results.societies.length">
                     <tr>
                         <th><a ng-click="columnSort.sortColumn='society.name';columnSort.reverse=!columnSort.reverse">Name</a></th>
+                        <th><a ng-click="columnSort.sortColumn='society.source.name';columnSort.reverse=!columnSort.reverse">Dataset</a></th>
                         <th><a ng-click="columnSort.sortColumn='society.language.glotto_code';columnSort.reverse=!columnSort.reverse">Glottolog Code</a></th>
                         <th><a ng-click="columnSort.sortColumn='society.language.name';columnSort.reverse=!columnSort.reverse">Language</a></th>
                         <th>Trees</th>
@@ -17,6 +18,7 @@
                         <td><span class="circle" ng-style="society_result.society.style"></span>
                             <a ng-href="/society/{{ society_result.society.id }}" target="_blank">{{ society_result.society.name }}</a>
                         </td>
+                        <td>{{ society_result.society.source.name }}</td>
                         <td>{{ society_result.society.language.glotto_code }}</td>
                         <td>{{ society_result.society.language | formatLanguageName }}</td>
                         <td><a style="cursor: pointer;" ng-click="clicked(society_result.society.trees)" title="'Trees'">{{ society_result.society.trees | countOrBlank }}</a></td>
