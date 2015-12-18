@@ -334,12 +334,6 @@ function SocietiesCtrl($scope, $timeout, searchModelService, LanguageClass, ZipT
         }
         return false;
     };
-    
-    /*$scope.showLegend = function(chosenVariable, mode) {
-        if (chosenVariable.data_type.toUpperCase() == 'CONTINUOUS' && mode == 'cont') return true;
-        else if (chosenVariable.data_type.toUpperCase() != 'CONTINUOUS' && mode == 'var') return true;
-        else 
-    };*/
 
     
     $scope.changeMap = function(chosenVariable) {
