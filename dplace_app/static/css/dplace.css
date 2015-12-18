@@ -248,17 +248,9 @@ label.light {
     width:100%;
 }
 
-.teamTR {
-    
-}
-
 .teamImgTD {
     padding-right:10px;
     padding-bottom:10px;
-}
-
-.teamLinkTD {
-    
 }
 
 .leftParaTab {
@@ -267,9 +259,130 @@ label.light {
     margin-left:10px;
     margin-right:10px;
 }
+
 .rightParaTab {
     float: right;
     position: relative;
     margin-left:10px;
     margin-right:10px;
+}
+
+.radioicon {
+    height: 90px;
+    width: 90px;
+}
+
+.btn.radioBack {
+    margin-bottom: 0;
+    color:#000;
+    font-size:120%;
+    font-weight:normal;
+    text-align: center;
+    white-space: nowrap;
+    cursor: pointer;
+    width: 150px;
+    height: 50px;
+    background-repeat: no-repeat;
+    background-size: 150px 150px;
+    vertical-align:middle;
+    opacity:0.8; 
+    background-position:0px -25px;
+}
+
+.btn.radioPlaces {
+    background-image: url(/static/images/Places_Pattern.jpg);
+}
+
+.btn.radioEnv {
+    background-image: url(/static/images/Env_Pattern.jpg);
+}
+
+.btn.radioCulture {
+    background-image: url(/static/images/Culture_Pattern.jpg);
+}
+
+.btn.radioLanguage {
+    background-image: url(/static/images/Language_Pattern.jpg);
+}
+
+.btn.radioBack:hover,
+.btn.radioBack:focus {
+    text-decoration: none;
+    color:#fff;
+    opacity:1.0;
+}
+
+.btn.radioBack:active,
+.btn.radioBack.active {
+    opacity:1.0; 
+    color:#fff;
+}
+
+.btn.radioPlaces:active:before,
+.btn.radioPlaces.active:before {
+    content: '';
+    position: absolute;
+    left: 42%;
+    top: 102%;
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-top: 10px solid #074652;
+}
+
+.btn.radioEnv:active:before,
+.btn.radioEnv.active:before {
+    content: '';
+    position: absolute;
+    left: 42%;
+    top: 102%;
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-top: 10px solid #50b79c;
+}
+
+.btn.radioCulture:active:before,
+.btn.radioCulture.active:before {
+    content: '';
+    position: absolute;
+    left: 42%;
+    top: 102%;
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-top: 10px solid #e8552a;
+}
+
+.btn.radioLanguage:active:before,
+.btn.radioLanguage.active:before {
+    content: '';
+    position: absolute;
+    left: 42%;
+    top: 102%;
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-top: 10px solid #f6a523;
+}
+
+.radiolead {
+    color:#000;
+    font-size:110%;
+    text-align: left;
+    margin-top:8px;
+    margin-bottom:10px;
+}
+
+.radioLabel {
+    line-height:40px;
+}
+
+.btn .badge {
+    margin-left:-4px;
+    top:-60px !important;
 }

@@ -11,23 +11,45 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties, 
     $scope.setActive('search');
     $scope.searchModel = searchModelService.getModel();
     $scope.selectedButton = $scope.searchModel.selectedButton;
+    var rP = 'radioPlaces';
+    var rL = 'radioLanguage';
+    var rC = 'radioCulture';
+    var rE = 'radioEnv';
+    // preserve active button style if any
+    if($scope.selectedButton) {
+        switch($scope.selectedButton.radioClass) {
+        case 'radioPlaces':
+            rP += ' active';
+            break;
+        case 'radioLanguage':
+            rL += ' active';
+            break;
+        case 'radioCulture':
+            rC += ' active';
+            break;
+        case 'radioEnv':
+            rE += ' active';
+            break;
+        }
+    }
     $scope.buttons = [
-        {value:'geographic', name:'Geographic', badgeValue:
+        {radioClass: rP, value:'geographic', name:'PLACES', badgeValue:
             function() { return $scope.searchModel.getGeographicRegions().badgeValue; }
         },
-        {value:'cultural', name:'Cultural Traits', badgeValue:
+        {radioClass: rL, value:'language', name:'LANGUAGE', badgeValue:
+            function() { return $scope.searchModel.getLanguageClassifications().badgeValue; }
+        },
+        {radioClass: rC, value:'cultural', name:'CULTURE', badgeValue:
             function() { return $scope.searchModel.getCulturalTraits().badgeValue; }
         },
-        {value:'environmental', name:'Environmental', badgeValue:
+        {radioClass: rE, value:'environmental', name:'ENVIRONMENT', badgeValue:
             function() { return $scope.searchModel.getEnvironmentalData().badgeValue; }
-        },
-        {value:'language', name:'Language', badgeValue:
-            function() { return $scope.searchModel.getLanguageClassifications().badgeValue; }
         }
     ];
 
     $scope.buttonChanged = function(selectedButton) {
         $scope.selectedButton = selectedButton;
+        $scope.searchModel.selectedButton = selectedButton;
     };
 
     // All of this needs to move into model

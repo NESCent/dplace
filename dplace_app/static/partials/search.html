@@ -1,14 +1,16 @@
 <div class="">
     <div class="container">
-        <p class="lead">Search for societies by selecting a mode:</p>
+        <div class="radiolead pull-left">SEARCH<br>Begin your search by selecting a mode:</div>
         <div class="row text-center">
             <div class="btn-group">
                 <button ng-repeat="button in buttons"
-                        type="button" class="btn btn-lg btn-default btn-dplace-search"
+                        type="button" class="btn radioBack {{button.radioClass}}"
                         ng-model="model.searchParams.selectedButton"
                         ng-click="buttonChanged(button)"
                         btn-radio="button"
-                        >{{ button.name }} <span class="badge" ng-show="button.badgeValue()">{{ button.badgeValue() }}</span></button>
+                        >
+                        <span class="radioLabel">{{ button.name }}</span>
+                        <br><span class="badge" ng-show="button.badgeValue()">{{ button.badgeValue() }}</span></button>
             </div>
         </div>
     </div>
