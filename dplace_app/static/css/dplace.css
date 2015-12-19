@@ -33,7 +33,7 @@ a {
     border:solid 0px;
 }
 .navbar-brand {
-    height: 160px;
+    height: 125px;
     margin-right: 20px;
 }
 .navbar-brand > img {
@@ -386,3 +386,8 @@ label.light {
     margin-left:-4px;
     top:-60px !important;
 }
+
+.homeTitle {
+    font-size:150%;
+}
+
