@@ -1,4 +1,4 @@
-function SocietiesCtrl($scope, $timeout, searchModelService, LanguageClass, ZipTest) {
+function SocietiesCtrl($scope, $timeout, $http, searchModelService, LanguageClass, ZipTest) {
     $scope.results = searchModelService.getModel().getResults();
     $scope.query = searchModelService.getModel().getQuery();
     $scope.variables = [];
@@ -16,6 +16,9 @@ function SocietiesCtrl($scope, $timeout, searchModelService, LanguageClass, ZipT
     ];
         
     console.log($scope.results);
+    
+    $scope.csvDownloadButton = {text: 'CSV', disabled: false};
+
     if ($scope.results.variable_descriptions) {
         $scope.results.variable_descriptions.forEach(function(variable) {
             $scope.variables.push(variable.variable);
@@ -30,6 +33,16 @@ function SocietiesCtrl($scope, $timeout, searchModelService, LanguageClass, ZipT
     $scope.setActive('societies');
     
     $scope.columnSort = { sortColumn: 'society.name', reverse: false };
+        
+    $scope.disableCSVButton = function () {
+        $scope.csvDownloadButton.disabled = true;
+        $scope.csvDownloadButton.text = 'Downloading...';
+    };
+
+    $scope.enableCSVButton = function () {
+        $scope.csvDownloadButton.disabled = false;
+        $scope.csvDownloadButton.text = 'CSV';
+    };
     
     var num_lines = 0;              
     $scope.wrapText = function(text, string) {
@@ -336,22 +349,41 @@ function SocietiesCtrl($scope, $timeout, searchModelService, LanguageClass, ZipT
         }
         return false;
     };
-
     
     $scope.changeMap = function(chosenVariable) {
         $timeout(function() { $scope.constructMapDownload(); });
-
     }
+    
+    //NEW CSV DOWNLOAD CODE
+    //Sends a POST (rather than GET) request to the server, then constructs a Blob and uses FileSaver.js to trigger the save as dialog
+    //Better because we can send more data to the server using POST request than GET request
+    var file;
+    $scope.download = function() {
+        var date = new Date();
+        var filename = "dplace-societies-"+date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate()+".csv"
+        if (!file) {
+           $scope.disableCSVButton();
+            var queryObject = searchModelService.getModel().getQuery(); 
+            $http.post('/api/v1/csv_download', queryObject).then(function(data) {
+                file = new Blob([data.data], {type: 'text/csv'});
+                saveAs(file, filename);
+                $scope.enableCSVButton();
 
-    $scope.generateDownloadLinks = function() {
+            });
+        } else {
+            saveAs(file, filename);
+        }
+    };
+    
+    //OLD CSV DOWNLOAD CODE
+    //Keeping just in case we need it in the future, will delete if we do not.
+    /*$scope.generateDownloadLinks = function() {
         // queryObject is the in-memory JS object representing the chosen search options
         var queryObject = searchModelService.getModel().getQuery();
+        console.log(queryObject);
         // the CSV download endpoint is a GET URL, so we must send the query object as a string.
         var queryString = encodeURIComponent(JSON.stringify(queryObject));
         // format (csv/svg/etc) should be an argument, and change the endpoint to /api/v1/download
         $scope.csvDownloadLink = "/api/v1/csv_download?query=" + queryString;
-    };
-    
-    $scope.generateDownloadLinks();
-    
+    };    */
 }
