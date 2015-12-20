@@ -33,7 +33,7 @@ a {
     border:solid 0px;
 }
 .navbar-brand {
-    height: 160px;
+    height: 125px;
     margin-right: 20px;
 }
 .navbar-brand > img {
@@ -386,3 +386,42 @@ label.light {
     margin-left:-4px;
     top:-60px !important;
 }
+
+.homeTitle {
+    font-size:150%;
+}
+
+.tabHeading {
+    vertical-align:center;
+    background-size: 35px 35px;
+    background-position: center;
+    background-repeat: no-repeat;
+    height:50px !important;
+    width:80px !important;
+}
+
+.tabHeading_table {
+    background-image: url(/static/images/Table_Icon.png);
+}
+
+.tabHeading_map {
+    background-image: url(/static/images/Map_Icon.png);
+}
+
+.tabHeading_download {
+    background-image: url(/static/images/Download_Icon.png);
+}
+
+.tabHeading_tree {
+    background-image: url(/static/images/Tree_Icon.png);
+}
+
+.tablead {
+    color:#000;
+    font-size:110%;
+    text-align: left;
+    margin-top:8px;
+    margin-bottom:10px;
+    margin-right:40px;
+}
+
