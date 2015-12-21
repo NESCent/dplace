@@ -57,10 +57,7 @@ class DPLACECSVResults(object):
             # Merge in society data
             society = item['society']
             row['Society name'] = society['name']
-            try:
-                row['Society source'] = str(Source.objects.filter(id=society['source'])[0])#society['source']
-            except:
-                row ['Society source'] = society['source']
+            row ['Society source'] = society['source']['name']
             row['Longitude'] = "" if society['location'] is None else society['location']['coordinates'][0]
             row['Latitude'] = "" if society['location'] is None else society['location']['coordinates'][1]
             if society['language'] is not None and 'name' in society['language']:
