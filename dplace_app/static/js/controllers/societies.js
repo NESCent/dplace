@@ -83,9 +83,8 @@ function SocietiesCtrl($scope, $timeout, $http, searchModelService, LanguageClas
     
     $scope.constructMapDownload = function() {
         d3.select(".legend-for-download").html('');
-        d3.select(".download-links").html('');
         num_lines = 0;
-        var gradients_svg = d3.select("#gradients").node().innerHTML;
+        var gradients_svg = d3.select("#gradients-div").node().innerHTML;
         map_svg = d3.select(".jvectormap-container").select("svg")
                         .attr("version", 1.1)
                         .attr("xmlns", "http://www.w3.org/2000/svg")
@@ -104,14 +103,14 @@ function SocietiesCtrl($scope, $timeout, $http, searchModelService, LanguageClas
         if ($scope.results.chosenVariable) {
             if ($scope.results.environmental_variables.length > 0 && $scope.results.chosenVariable == $scope.results.environmental_variables[0]) {
                 //if the chosen map is an environmental variable
-                    legend_svg = "<g transform='translate(0,350)'>"+d3.select(".envLegend").node().innerHTML+"</g>";
+                    legend_svg = "<g transform='translate(0,350)'>"+d3.select(".env-legend-td").node().innerHTML+"</g>";
             }
             else if ($scope.results.variable_descriptions.length > 0) {
                 //cultural variables
                 variable = $scope.results.variable_descriptions.filter(function(var_desc) { return var_desc.variable.id ? var_desc.variable.id == $scope.results.chosenVariable.id : var_desc.variable == $scope.results.chosenVariable.id; });
                 if (variable.length > 0) {
                     if (variable[0].variable.data_type.toUpperCase() == 'CONTINUOUS') {
-                        legend_svg = "<g transform='translate(20,350)'>"+d3.select(".cont-gradient").node().innerHTML+"</g>";
+                        legend_svg = "<g transform='translate(20,350)'>"+d3.select(".cont-gradient-td").node().innerHTML+"</g>";
                     } else {
                 
                     for (var c = 0; c < variable[0].codes.length; c++) {
@@ -149,16 +148,7 @@ function SocietiesCtrl($scope, $timeout, $http, searchModelService, LanguageClas
             var map_svg = map_svg.substring(0, map_svg.indexOf("</svg>"));
             map_svg = map_svg.concat(legend_svg);
             map_svg = map_svg.concat(gradients_svg +"</svg>");
-            //generate download
-            var imgsrc = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(map_svg)));
-            d3.select(".download-links").append("td")
-                .attr("colspan", "2")
-                .attr("style", "padding-bottom:20px")
-                .append("a")
-                .attr("class", "btn btn-info btn-dplace-download")
-                .attr("download", $scope.results.chosenVariable.name.replace(" ", "-").toLowerCase()+"-map.svg")
-                .attr("href", imgsrc)
-                .html("Download Map");
+            var filename = $scope.results.chosenVariable.name.replace(/[\W]+/g, "-").toLowerCase()+"-map.svg";
         }
         
         else if ($scope.results.classifications && $scope.results.languages.length > 0) {
@@ -191,24 +181,12 @@ function SocietiesCtrl($scope, $timeout, $http, searchModelService, LanguageClas
             var legend_svg = "<g transform='translate(0,350)'>"+legend.node().innerHTML+"</g>";
             var map_svg = map_svg.substring(0, map_svg.indexOf("</svg>"));
             map_svg = map_svg.concat(legend_svg+"</svg>");
-            var imgsrc = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(map_svg)));
             lang_family = $scope.results.languages[0].language_family.name;
-            
-            d3.select(".download-links").append("td")
-                .attr("colspan", "2")
-                .attr("style", "padding-bottom:20px")
-                .append("a")
-                .attr("class", "btn btn-info btn-dplace-download")
-                .attr("download", lang_family+"map.svg")
-                .attr("href", imgsrc)
-                .html("Download Map");
+            var filename = $scope.results.languages[0].language_family.name.replace(/[\W]+/g, "-")+"-map.svg";
+
         }
-    }
-    
-    $scope.tabChanged = function() {
-        if ($scope.tabs[1].active) {
-            $scope.constructMapDownload();
-        }
+        file = new Blob([map_svg], {type: 'image/svg+xml'});
+        saveAs(file, filename);
     }
     
     $scope.buttonChanged = function(buttonVal) {
@@ -349,10 +327,7 @@ function SocietiesCtrl($scope, $timeout, $http, searchModelService, LanguageClas
         }
         return false;
     };
-    
-    $scope.changeMap = function(chosenVariable) {
-        $timeout(function() { $scope.constructMapDownload(); });
-    }
+
     
     //NEW CSV DOWNLOAD CODE
     //Sends a POST (rather than GET) request to the server, then constructs a Blob and uses FileSaver.js to trigger the save as dialog
