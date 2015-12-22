@@ -216,8 +216,8 @@ function SocietiesCtrl($scope, $timeout, $http, searchModelService, LanguageClas
             var filename = "geographic-regions-map.svg";
         }
         
-        file = new Blob([map_svg], {type: 'image/svg+xml'});
-        saveAs(file, filename);
+        map_file = new Blob([map_svg], {type: 'image/svg+xml'});
+        saveAs(map_file, filename);
     }
     
     $scope.buttonChanged = function(buttonVal) {
@@ -334,7 +334,7 @@ function SocietiesCtrl($scope, $timeout, $http, searchModelService, LanguageClas
             .attr("class", "btn btn-info btn-dplace-download")
             .attr("download", "legend.svg")
             .attr("href", "/api/v1/zip_legends?query="+encodeURIComponent(JSON.stringify(query)))
-            .html("Download this phylogeny");
+            .html("Download this phylogeny");z
     };
     
     $scope.showComments = function(society, variable_id) {
