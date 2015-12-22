@@ -330,11 +330,13 @@ function SocietiesCtrl($scope, $timeout, $http, searchModelService, LanguageClas
         }
             
         query = {"legends": legends, "tree": tree_svg, "name": $scope.results.selectedTree.name+'.svg'};
+        
         d3.select(".tree-download").append("a")
             .attr("class", "btn btn-info btn-dplace-download")
             .attr("download", "legend.svg")
             .attr("href", "/api/v1/zip_legends?query="+encodeURIComponent(JSON.stringify(query)))
-            .html("Download this phylogeny");z
+            .html("Download this phylogeny");
+
     };
     
     $scope.showComments = function(society, variable_id) {
