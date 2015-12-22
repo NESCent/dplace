@@ -185,6 +185,37 @@ function SocietiesCtrl($scope, $timeout, $http, searchModelService, LanguageClas
             var filename = $scope.results.languages[0].language_family.name.replace(/[\W]+/g, "-")+"-map.svg";
 
         }
+        
+        else if ($scope.results.geographic_regions.length > 0) {
+            count = 0;
+            for (var i = 0; i < $scope.results.geographic_regions.length; i++) {
+                g = legend.append("svg:g")
+                    .attr("transform", function() {
+                        return 'translate(0,'+ count*25 + ')';
+                    });
+                g.append("svg:circle")
+                    .attr("cx", "10")
+                    .attr("cy", "10")
+                    .attr("r", "4.5")
+                    .attr("stroke", "#000")
+                    .attr("stroke-width", "0.5")
+                    .attr("fill", function() {
+                        var value = $scope.results.geographic_regions[i].tdwg_code;
+                        var hue = value * 240 / $scope.results.geographic_regions.length;
+                        return 'hsl('+hue+',100%,50%)';
+                    });
+                g.append("svg:text")
+                    .attr("x", "20")
+                    .attr("y", "15")
+                    .text($scope.results.geographic_regions[i].region_nam);
+                count++;
+            }
+            var legend_svg = "<g transform='translate(0,350)'>"+legend.node().innerHTML+"</g>";
+            var map_svg = map_svg.substring(0, map_svg.indexOf("</svg>"));
+            map_svg = map_svg.concat(legend_svg+"</svg>");
+            var filename = "geographic-regions-map.svg";
+        }
+        
         file = new Blob([map_svg], {type: 'image/svg+xml'});
         saveAs(file, filename);
     }
