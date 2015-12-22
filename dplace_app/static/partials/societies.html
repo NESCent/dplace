@@ -1,36 +1,38 @@
 <div class="container results">
 <!-- NEED A BETTER WAY TO DO THIS -->
- <svg id="gradients" height="0" width="0">
-    <defs>
-        <linearGradient id="temp" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" style="stop-color:hsl(252,100%,50%);stop-opacity:0.7" />
-            <stop offset="12.5%" style="stop-color:hsl(216,100%,50%);stop-opacity:0.7" />
-            <stop offset="25%" style="stop-color:hsl(180,100%,50%);stop-opacity:0.7" />
-            <stop offset="37.5%" style="stop-color:hsl(144,100%,50%);stop-opacity:0.7" />
-            <stop offset="50%" style="stop-color:hsl(108,100%,50%);stop-opacity:0.7" />
-            <stop offset="62.5%" style="stop-color:hsl(72,100%,50%);stop-opacity:0.7" />
-            <stop offset="75%" style="stop-color:hsl(36,100%,50%);stop-opacity:0.7" />
-            <stop offset="100%" style="stop-color:hsl(0,100%,50%);stop-opacity:1" />
+ <div id="gradients-div">
+     <svg id="gradients" height="0" width="0">
+        <defs>
+            <linearGradient id="temp" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" style="stop-color:hsl(252,100%,50%);stop-opacity:0.7" />
+                <stop offset="12.5%" style="stop-color:hsl(216,100%,50%);stop-opacity:0.7" />
+                <stop offset="25%" style="stop-color:hsl(180,100%,50%);stop-opacity:0.7" />
+                <stop offset="37.5%" style="stop-color:hsl(144,100%,50%);stop-opacity:0.7" />
+                <stop offset="50%" style="stop-color:hsl(108,100%,50%);stop-opacity:0.7" />
+                <stop offset="62.5%" style="stop-color:hsl(72,100%,50%);stop-opacity:0.7" />
+                <stop offset="75%" style="stop-color:hsl(36,100%,50%);stop-opacity:0.7" />
+                <stop offset="100%" style="stop-color:hsl(0,100%,50%);stop-opacity:1" />
+            </linearGradient>
+            
+            <linearGradient id="earthy" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="10%" style="stop-color:hsl(36,100%,50%);stop-opacity:0.7" />
+                <stop offset="60%" style="stop-color:hsl(72,100%,50%);stop-opacity:0.7" />
+                <stop offset="90%" style="stop-color:hsl(144,100%,50%);stop-opacity:0.7" />
+                <stop offset="100%" style="stop-color:hsl(108,100%,50%);stop-opacity:0.7" />
+            </linearGradient>
+         <linearGradient id="blue" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" style="stop-color:hsl(252, 65%, 95%);stop-opacity:1" />
+            <stop offset="50%" style="stop-color:hsl(252, 65%, 50%);stop-opacity:1" />
+            <stop offset="100%" style="stop-color:hsl(252, 65%, 22%);stop-opacity:1" />
         </linearGradient>
-        
-        <linearGradient id="earthy" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="10%" style="stop-color:hsl(36,100%,50%);stop-opacity:0.7" />
-            <stop offset="60%" style="stop-color:hsl(72,100%,50%);stop-opacity:0.7" />
-            <stop offset="90%" style="stop-color:hsl(144,100%,50%);stop-opacity:0.7" />
-            <stop offset="100%" style="stop-color:hsl(108,100%,50%);stop-opacity:0.7" />
+        <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" style="stop-color:hsl(0, 65%, 95%);stop-opacity:1" />
+            <stop offset="50%" style="stop-color:hsl(0, 65%, 50%);stop-opacity:1" />
+            <stop offset="100%" style="stop-color:hsl(0, 65%, 22%);stop-opacity:1" />
         </linearGradient>
-     <linearGradient id="blue" x1="0%" y1="0%" x2="100%" y2="0%">
-        <stop offset="0%" style="stop-color:hsl(252, 65%, 95%);stop-opacity:1" />
-        <stop offset="50%" style="stop-color:hsl(252, 65%, 50%);stop-opacity:1" />
-        <stop offset="100%" style="stop-color:hsl(252, 65%, 22%);stop-opacity:1" />
-    </linearGradient>
-    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="0%">
-        <stop offset="0%" style="stop-color:hsl(0, 65%, 95%);stop-opacity:1" />
-        <stop offset="50%" style="stop-color:hsl(0, 65%, 50%);stop-opacity:1" />
-        <stop offset="100%" style="stop-color:hsl(0, 65%, 22%);stop-opacity:1" />
-    </linearGradient>
-    </defs>
-</svg>
+        </defs>
+    </svg>
+</div>
     <div class="row">
         <span>
             <p class="pull-left lead">Societies<span ng-show="results.societies.length"> ({{ results.societies.length }})</span></p>
@@ -39,7 +41,7 @@
 
     <div class="tablead pull-left">RESULT<br>Select a viewing mode<br>for your search results:</div>
     <tabset>
-        <tab ng-repeat="tab in tabs" active="tab.active" select="visible=true" deselect="visible=false" ng-click="tabChanged()">
+        <tab ng-repeat="tab in tabs" active="tab.active" select="visible=true" deselect="visible=false">
             <tab-heading><div class="tabHeading tabHeading_{{tab.content}}"></div><div class="text-center">{{tab.title}}</div></tab-heading>
                 <ng-include src="'/static/partials/societies/' + tab.content + '.html'"></ng-include>
         </tab>
