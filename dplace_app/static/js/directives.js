@@ -608,14 +608,15 @@ angular.module('dplaceMapDirective', [])
                     },
                     regionsSelectable: true
                 }).vectorMap('get','mapObject');
-                
-                d3.select(".jvectormap-container").select("svg").append("svg:g").append("svg:image")
-                    .attr("x", "130")
-                    .attr("y", "180")
-                    .attr("width", "80")
-                    .attr("height", "80")
-                    .attr("style", "opacity: 0.5;")
-                    .attr("xlink:href", "/static/images/D-PLACE_Logo.png");
+                    
+                $.get("/static/images/D-PLACE_VLogo_RGB.svg", function(data) {
+                    var svg_data = data.childNodes;
+                    d3.select(".jvectormap-container").select("svg").append("svg:g")//.append("svg:image")
+                        .attr("transform", "scale(0.37) translate(350, 470)")
+                        .attr("style", "opacity: 0.5;")
+                        .attr("id", "map-logo");
+                    document.getElementById("map-logo").innerHTML = svg_data[1].innerHTML;
+                });
 
                 
                 scope.addMarkers = function() {
