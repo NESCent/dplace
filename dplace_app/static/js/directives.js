@@ -606,6 +606,15 @@ angular.module('dplaceMapDirective', [])
                     regionsSelectable: true
                 }).vectorMap('get','mapObject');
                 
+                d3.select(".jvectormap-container").select("svg").append("svg:g").append("svg:image")
+                    .attr("x", "130")
+                    .attr("y", "180")
+                    .attr("width", "80")
+                    .attr("height", "80")
+                    .attr("style", "opacity: 0.5;")
+                    .attr("xlink:href", "http://127.0.0.1:8000/static/images/D-PLACE_Logo.png");
+
+                
                 scope.addMarkers = function() {
                     scope.map.removeAllMarkers();
                     if(!scope.results) {

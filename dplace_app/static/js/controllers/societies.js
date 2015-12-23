@@ -88,6 +88,7 @@ function SocietiesCtrl($scope, $timeout, $http, searchModelService, LanguageClas
         map_svg = d3.select(".jvectormap-container").select("svg")
                         .attr("version", 1.1)
                         .attr("xmlns", "http://www.w3.org/2000/svg")
+                        .attr("xmlns:xmlns:xlink", "http://www.w3.org/1999/xlink")
                         .attr("height", function() {
                             if ($scope.results.chosenVariable && $scope.results.environmental_variables.length > 0 && $scope.results.chosenVariable == $scope.results.environmental_variables[0]) return "500";
                             else return "1500";
