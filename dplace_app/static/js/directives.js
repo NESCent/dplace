@@ -615,7 +615,7 @@ angular.module('dplaceMapDirective', [])
                     .attr("width", "80")
                     .attr("height", "80")
                     .attr("style", "opacity: 0.5;")
-                    .attr("xlink:href", "http://127.0.0.1:8000/static/images/D-PLACE_Logo.png");
+                    .attr("xlink:href", "/static/images/D-PLACE_Logo.png");
 
                 
                 scope.addMarkers = function() {
