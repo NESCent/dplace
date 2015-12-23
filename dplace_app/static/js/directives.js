@@ -580,6 +580,9 @@ angular.module('dplaceMapDirective', [])
                       selectedHover: {
                       }
                     },
+                    onMarkerClick: function(e, code) {
+                        window.open("/society/"+code);
+                    },
                     onRegionOver: function(e, code) {
                         if(attrs.region) {
                             scope.$apply(function () {
