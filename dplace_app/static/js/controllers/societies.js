@@ -304,9 +304,9 @@ function SocietiesCtrl($scope, $timeout, $http, searchModelService, LanguageClas
             .attr("version", 1.1)
             .attr("xmlns", "http://www.w3.org/2000/svg")
             .node().parentNode.innerHTML;
-         tree_svg = tree_svg.substring(tree_svg.indexOf("<svg xml"));
-         tree_svg = tree_svg.substring(0, tree_svg.indexOf("</svg>"));
-         tree_svg = tree_svg.concat("</svg>");
+        tree_svg = tree_svg.substring(tree_svg.indexOf("</svg>")+6);
+        tree_svg = tree_svg.substring(0, tree_svg.indexOf("</svg>"));
+        tree_svg = tree_svg.concat("</svg>");
         var all_legends = {};
         legends_list = [];
         var gradients_svg = d3.select("#gradients-div").node().innerHTML;

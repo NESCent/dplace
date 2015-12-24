@@ -204,8 +204,7 @@ angular.module('languagePhylogenyDirective', [])
             var constructTree = function(langTree) {   
                 d3.select("language-phylogeny").html('');
                 var newick = Newick.parse(langTree.newick_string);
-                if (langTree.name.indexOf("global") != -1)
-                    var w = 900;
+                if (langTree.name.indexOf("global") != -1) var w = 900;
                 else  var w = 700;
                 if (langTree.name.indexOf("global") != -1)  {
                     var tree = d3.layout.cluster()
@@ -213,8 +212,7 @@ angular.module('languagePhylogenyDirective', [])
                     .sort(function(node) { return node.children ? node.children.length : -1; })
                     .children(function(node) { return node.branchset; })
                     .separation(function separation(a, b) { return 8; });
-                }
-                else {
+                } else {
                     var tree = d3.layout.cluster()
                         .children(function(node) { return node.branchset; });
                     var nodes = tree(newick);
@@ -261,23 +259,7 @@ angular.module('languagePhylogenyDirective', [])
                             scope.results.variable_descriptions[r].CID = "C"+keysWritten;
                             keysWritten++;
                             translate += 20;
-                        }
-                    
-                        /*for (var key in scope.results.code_ids) {
-                            if (scope.results.code_ids[key].length > 0 || scope.results.code_ids[key].bf_var) {
-                            vis.append("svg:text")
-                                .attr("dx", w+translate-9)
-                                .attr("dy", 10)
-                                .text("C"+keysWritten);
-                            labels.append("svg:text")
-                                .attr("dx", w+translate)
-                                .attr("dy", 15)
-                                .text("C"+keysWritten);
-                            scope.results.code_ids[key].CID = "C"+keysWritten;
-                            keysWritten++;
-                            translate += 20;
-                            }
-                        }    */                    
+                        }                 
                        
                     }
                     
@@ -412,29 +394,21 @@ angular.module('languagePhylogenyDirective', [])
                 } 
                 else {
                 //markers for non-global trees
-                if (scope.query.variable_codes) {
-                    if (langTree.name.indexOf("global") == -1) {
-                        for (var r = 0; r < scope.results.variable_descriptions.length; r++) {
-                            addMarkers(langTree, scope.results, scope.results.variable_descriptions[r], node, false, translate);
-                            translate += 20;
-                        }
-                    
-                    
-                        /*for (var key in scope.results.code_ids) {
-                            if (!(scope.query.environmental_filters && key==scope.query.environmental_filters[0].id)) {
-                                addMarkers(langTree, scope.results, key, node, false, translate);
-                                translate += 20; 
+                    if (scope.query.variable_codes) {
+                        if (langTree.name.indexOf("global") == -1) {
+                            for (var r = 0; r < scope.results.variable_descriptions.length; r++) {
+                                addMarkers(langTree, scope.results, scope.results.variable_descriptions[r], node, false, translate);
+                                translate += 20;
                             }
-                        }*/
+                        }
                     }
-                }
-                if (scope.query.environmental_filters) {
-                    addMarkers(langTree, scope.results, scope.query.environmental_filters[0].id, node, false, translate);
-                }
-                
-                else if (scope.query.language_classifications && !scope.query.environmental_filters) {
-                    addMarkers(langTree, scope.results, null, node, false, translate);
-                }
+                    if (scope.query.environmental_filters) {
+                        addMarkers(langTree, scope.results, scope.query.environmental_filters[0].id, node, false, translate);
+                    }
+                    
+                    if (scope.query.language_classifications && !scope.query.environmental_filters && !scope.query.variable_codes) {
+                        addMarkers(langTree, scope.results, null, node, false, translate);
+                    }
                 }
                 console.log(scope.query);
                 scope.results.societies.forEach(function(society) {
