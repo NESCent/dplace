@@ -149,12 +149,12 @@ class ZipRenderer(renderers.BaseRenderer):
                 for l in data['legends']:
                     if 'svg' in l:
                         if 'name' in l:
-                            zf.writestr(str(l['name']), str(l['svg']))
+                            zf.writestr(l['name'].encode('utf-8'), l['svg'].encode('utf-8'))
             if 'tree' in data:
                 if 'name' in data:
-                    zf.writestr(str(data['name']), str(data['tree']))
+                    zf.writestr(data['name'].encode('utf-8'), data['tree'].encode('utf-8'))
                 else:
-                    zf.writestr('tree.svg', str(data['tree']))
+                    zf.writestr('tree.svg', data['tree'].encode('utf-8'))
         finally:
             zf.close()
         return s.getvalue()

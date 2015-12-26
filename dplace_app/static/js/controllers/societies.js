@@ -329,7 +329,9 @@ function SocietiesCtrl($scope, $timeout, $http, searchModelService, LanguageClas
         }
         
         if ($scope.results.environmental_variables.length > 0) {
-            var env_svg = '<svg version="1.1" xmlns="http://www.w3.org/2000/svg" transform="translate(10, 10)">'+d3.select("#E1").node().innerHTML + gradients_svg + '</svg>';
+            var env_svg = d3.select("#E1").node().innerHTML;
+            
+            env_svg = '<svg version="1.1" xmlns="http://www.w3.org/2000/svg" transform="translate(10, 10)">'+env_svg.substring(0, env_svg.indexOf("</svg>")) + '</svg>' + gradients_svg + '</svg>';
             name = "E1-"+$scope.results.environmental_variables[0].name;
             legends_list.push({'name': name.replace(/[\W]+/g, "-")+'-legend.svg', 'svg': env_svg});
         }

@@ -24,7 +24,7 @@
                 <option value="">Select a Tree</option>
             </select>
             <div class="tree-download">
-               <button ng-click="treeDownload()" class="btn btn-info btn-dplace-download">Download This Phylogeny</button>
+               <button ng-show="!globalTree && results.selectedTree" ng-click="treeDownload()" class="btn btn-info btn-dplace-download">Download This Phylogeny</button>
             </div>
             
             <div id="legend" ng-show="results.selectedTree">
@@ -117,7 +117,7 @@
                  </select>  
                  Double click the tree or scroll to zoom.
              </div>
-            <p>Note: trees have been pruned to display only societies present in D-PLACE.</p>
+            <p ng-show="results.selectedTree">Note: trees have been pruned to display only societies present in D-PLACE.</p>
             <language-phylogeny>
             
             </language-phylogeny>
