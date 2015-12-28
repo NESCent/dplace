@@ -201,6 +201,18 @@ angular.module('languagePhylogenyDirective', [])
                 });
             };
             
+            var addLogo = function(height) {
+                $.get("/static/images/D-PLACE_VLogo_RGB.svg", function(data) {
+                    var svg_data = data.childNodes;
+                    d3.select(".phylogeny").append("svg:g")
+                        .attr("transform", "scale(0.75) translate(350,0)")
+                        .attr("style", "opacity: 0.5;")
+                        .attr("id", "tree-logo");
+                    document.getElementById("tree-logo").innerHTML = svg_data[1].innerHTML;
+                });
+            
+            }
+            
             var constructTree = function(langTree) {   
                 d3.select("language-phylogeny").html('');
                 var newick = Newick.parse(langTree.newick_string);
@@ -240,7 +252,7 @@ angular.module('languagePhylogenyDirective', [])
                         .attr("fill-opacity", "0.8");
                     var vis = d3.select("language-phylogeny").append("svg:svg")
                         .attr("width", w+300)
-                        .attr("height", h+50)
+                        .attr("height", h+150)
                         .attr("class", "phylogeny")
                         .append("svg:g")
                         .attr("transform", "translate(2,5)");
@@ -462,6 +474,8 @@ angular.module('languagePhylogenyDirective', [])
                         })
                         .text("100 years");
                 }
+                
+                if (langTree.name.indexOf("global") == -1) addLogo(h/2);
                 
                 
                 phyloWidth = d3.select("language-phylogeny").select("g").node().getBBox().width;
