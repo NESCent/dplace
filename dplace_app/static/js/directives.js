@@ -201,11 +201,22 @@ angular.module('languagePhylogenyDirective', [])
                 });
             };
             
+            var addLogo = function(height) {
+                $.get("/static/images/D-PLACE_VLogo_RGB.svg", function(data) {
+                    var svg_data = data.childNodes;
+                    d3.select(".phylogeny").append("svg:g")
+                        .attr("transform", "scale(0.75) translate(350,0)")
+                        .attr("style", "opacity: 0.5;")
+                        .attr("id", "tree-logo");
+                    document.getElementById("tree-logo").innerHTML = svg_data[1].innerHTML;
+                });
+            
+            }
+            
             var constructTree = function(langTree) {   
                 d3.select("language-phylogeny").html('');
                 var newick = Newick.parse(langTree.newick_string);
-                if (langTree.name.indexOf("global") != -1)
-                    var w = 900;
+                if (langTree.name.indexOf("global") != -1) var w = 900;
                 else  var w = 700;
                 if (langTree.name.indexOf("global") != -1)  {
                     var tree = d3.layout.cluster()
@@ -213,8 +224,7 @@ angular.module('languagePhylogenyDirective', [])
                     .sort(function(node) { return node.children ? node.children.length : -1; })
                     .children(function(node) { return node.branchset; })
                     .separation(function separation(a, b) { return 8; });
-                }
-                else {
+                } else {
                     var tree = d3.layout.cluster()
                         .children(function(node) { return node.branchset; });
                     var nodes = tree(newick);
@@ -242,7 +252,7 @@ angular.module('languagePhylogenyDirective', [])
                         .attr("fill-opacity", "0.8");
                     var vis = d3.select("language-phylogeny").append("svg:svg")
                         .attr("width", w+300)
-                        .attr("height", h+50)
+                        .attr("height", h+150)
                         .attr("class", "phylogeny")
                         .append("svg:g")
                         .attr("transform", "translate(2,5)");
@@ -261,23 +271,7 @@ angular.module('languagePhylogenyDirective', [])
                             scope.results.variable_descriptions[r].CID = "C"+keysWritten;
                             keysWritten++;
                             translate += 20;
-                        }
-                    
-                        /*for (var key in scope.results.code_ids) {
-                            if (scope.results.code_ids[key].length > 0 || scope.results.code_ids[key].bf_var) {
-                            vis.append("svg:text")
-                                .attr("dx", w+translate-9)
-                                .attr("dy", 10)
-                                .text("C"+keysWritten);
-                            labels.append("svg:text")
-                                .attr("dx", w+translate)
-                                .attr("dy", 15)
-                                .text("C"+keysWritten);
-                            scope.results.code_ids[key].CID = "C"+keysWritten;
-                            keysWritten++;
-                            translate += 20;
-                            }
-                        }    */                    
+                        }                 
                        
                     }
                     
@@ -412,29 +406,21 @@ angular.module('languagePhylogenyDirective', [])
                 } 
                 else {
                 //markers for non-global trees
-                if (scope.query.variable_codes) {
-                    if (langTree.name.indexOf("global") == -1) {
-                        for (var r = 0; r < scope.results.variable_descriptions.length; r++) {
-                            addMarkers(langTree, scope.results, scope.results.variable_descriptions[r], node, false, translate);
-                            translate += 20;
-                        }
-                    
-                    
-                        /*for (var key in scope.results.code_ids) {
-                            if (!(scope.query.environmental_filters && key==scope.query.environmental_filters[0].id)) {
-                                addMarkers(langTree, scope.results, key, node, false, translate);
-                                translate += 20; 
+                    if (scope.query.variable_codes) {
+                        if (langTree.name.indexOf("global") == -1) {
+                            for (var r = 0; r < scope.results.variable_descriptions.length; r++) {
+                                addMarkers(langTree, scope.results, scope.results.variable_descriptions[r], node, false, translate);
+                                translate += 20;
                             }
-                        }*/
+                        }
                     }
-                }
-                if (scope.query.environmental_filters) {
-                    addMarkers(langTree, scope.results, scope.query.environmental_filters[0].id, node, false, translate);
-                }
-                
-                else if (scope.query.language_classifications && !scope.query.environmental_filters) {
-                    addMarkers(langTree, scope.results, null, node, false, translate);
-                }
+                    if (scope.query.environmental_filters) {
+                        addMarkers(langTree, scope.results, scope.query.environmental_filters[0].id, node, false, translate);
+                    }
+                    
+                    if (scope.query.language_classifications && !scope.query.environmental_filters && !scope.query.variable_codes) {
+                        addMarkers(langTree, scope.results, null, node, false, translate);
+                    }
                 }
                 console.log(scope.query);
                 scope.results.societies.forEach(function(society) {
@@ -488,6 +474,8 @@ angular.module('languagePhylogenyDirective', [])
                         })
                         .text("100 years");
                 }
+                
+                if (langTree.name.indexOf("global") == -1) addLogo(h/2);
                 
                 
                 phyloWidth = d3.select("language-phylogeny").select("g").node().getBBox().width;

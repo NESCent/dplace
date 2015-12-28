@@ -237,10 +237,9 @@ function SocietiesCtrl($scope, $timeout, $http, searchModelService, LanguageClas
     
     $scope.treeSelected = function() {
         $scope.$broadcast('treeSelected', {tree: $scope.results.selectedTree});
-        d3.select(".tree-download").html('');
         if ($scope.results.selectedTree.name.indexOf("global") == -1) {
             $scope.globalTree = false;
-            $scope.treeDownload();
+            //$scope.treeDownload();
         } else {
             $scope.globalTree = true;
         }
@@ -305,38 +304,45 @@ function SocietiesCtrl($scope, $timeout, $http, searchModelService, LanguageClas
             .attr("version", 1.1)
             .attr("xmlns", "http://www.w3.org/2000/svg")
             .node().parentNode.innerHTML;
-         tree_svg = tree_svg.substring(tree_svg.indexOf("<svg xml"));
-         tree_svg = tree_svg.substring(0, tree_svg.indexOf("</svg>"));
-         tree_svg = tree_svg.concat("</svg>");
-         var all_legends = {};
-        legends = [];
-
+        tree_svg = tree_svg.substring(tree_svg.indexOf("</svg>")+6);
+        tree_svg = tree_svg.substring(0, tree_svg.indexOf("</svg>"));
+        tree_svg = tree_svg.concat("</svg>");
+        var all_legends = {};
+        legends_list = [];
+        var gradients_svg = d3.select("#gradients-div").node().innerHTML;
+        
         d3.selectAll(".legends").each( function(){
-                item = d3.select(this);
-                if (item.attr("var-id")) {
-                   if (item.attr("class").indexOf("hide") == -1)
-                    all_legends[item.attr("var-id")] = item;
-                }
-            });
+            leg = d3.select(this);
+            if (leg.attr("var-id")) {
+               if (leg.attr("class").indexOf("hide") == -1)
+                all_legends[leg.attr("var-id")] = leg;
+            }
+        });
             
         for (var i = 0; i < $scope.results.variable_descriptions.length; i++) {
             id = $scope.results.variable_descriptions[i].variable.id;
-            item = all_legends[id];
+            legend_id = all_legends[id];
             name = $scope.results.variable_descriptions[i].CID + '-'+ $scope.results.variable_descriptions[i].variable.name;
-            svg_string = item.node().innerHTML;
-            svg_string = '<svg version="1.1" xmlns="http://www.w3.org/2000/svg">' + svg_string + '</svg>';
-            legends.push({'name': name.replace(/[\W]+/g, "-")+'-legend.svg', 'svg': svg_string});    
+            svg_string = legend_id.node().innerHTML;
+            svg_string = '<svg version="1.1" xmlns="http://www.w3.org/2000/svg" transform="translate(10, 10)">' + svg_string + gradients_svg + '</svg>';
+            legends_list.push({'name': name.replace(/[\W]+/g, "-")+'-legend.svg', 'svg': svg_string});    
+        }
+        
+        if ($scope.results.environmental_variables.length > 0) {
+            var env_svg = d3.select("#E1").node().innerHTML;
             
+            env_svg = '<svg version="1.1" xmlns="http://www.w3.org/2000/svg" transform="translate(10, 10)">'+env_svg.substring(0, env_svg.indexOf("</svg>")) + '</svg>' + gradients_svg + '</svg>';
+            name = "E1-"+$scope.results.environmental_variables[0].name;
+            legends_list.push({'name': name.replace(/[\W]+/g, "-")+'-legend.svg', 'svg': env_svg});
         }
             
-        query = {"legends": legends, "tree": tree_svg, "name": $scope.results.selectedTree.name+'.svg'};
-        
-        d3.select(".tree-download").append("a")
-            .attr("class", "btn btn-info btn-dplace-download")
-            .attr("download", "legend.svg")
-            .attr("href", "/api/v1/zip_legends?query="+encodeURIComponent(JSON.stringify(query)))
-            .html("Download this phylogeny");
-
+        query = {"legends": legends_list, "tree": tree_svg, "name": $scope.results.selectedTree.name+'.svg'};
+        var date = new Date();
+        var filename = "dplace-tree-"+date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate()+".zip"
+        $http.post('/api/v1/zip_legends', query, {'responseType': 'arraybuffer'}).then(function(data) {
+            file = new Blob([data.data], {type: 'application/zip'});
+            saveAs(file, filename);
+        });
     };
     
     $scope.showComments = function(society, variable_id) {

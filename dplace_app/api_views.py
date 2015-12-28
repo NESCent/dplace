@@ -395,13 +395,13 @@ def csv_download(request):
 #    response['Content-Disposition']  = 'attachment; filename="%s"' % filename
 #    return response
     
-@api_view(['GET'])
+@api_view(['POST'])
 @permission_classes((AllowAny,))
 @renderer_classes((ZipRenderer,))
 def zip_legends(request):
     import datetime
-    query_string = request.QUERY_PARAMS['query']
-    result_set = json.loads(query_string)
+    #query_string = request.QUERY_PARAMS['query']
+    result_set = request.DATA#json.loads(query_string)
     to_download = ZipResultSet()
     if 'name' in result_set:
         to_download.name = str(result_set['name'])

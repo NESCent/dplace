@@ -23,7 +23,9 @@
                 >
                 <option value="">Select a Tree</option>
             </select>
-            <div class="tree-download"></div>
+            <div class="tree-download">
+               <button ng-show="!globalTree && results.selectedTree" ng-click="treeDownload()" class="btn btn-info btn-dplace-download">Download This Phylogeny</button>
+            </div>
             
             <div id="legend" ng-show="results.selectedTree">
                 <table ng-repeat="variable in results.variable_descriptions" style="margin-bottom:8px;">
@@ -46,7 +48,6 @@
                                         <text x="20" y="15">{{c.short_description}}</text>
                                     </g>
                                 </svg>
-                                
                                 <svg ng-show="variable.variable.data_type == 'Continuous'" class="cont-gradient legends" height="80" height="30" var-id="{{variable.variable.id}}">
                                     <circle
                                             cx="10"
@@ -64,7 +65,6 @@
                             </div>
                         </td>
                     </tr>
-                
                 </table>
                
                 <table ng-repeat="environmental in results.environmental_variables">
@@ -117,9 +117,8 @@
                  </select>  
                  Double click the tree or scroll to zoom.
              </div>
-
+            <p ng-show="results.selectedTree">Note: trees have been pruned to display only societies present in D-PLACE.</p>
             <language-phylogeny>
-            <p>Note: trees have been pruned to display only societies present in D-PLACE.</p>
-            <h4>{{results.selectedTree.name}}</h4>
+            
             </language-phylogeny>
             </div>
