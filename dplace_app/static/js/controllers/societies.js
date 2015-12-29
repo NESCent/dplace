@@ -96,7 +96,7 @@ function SocietiesCtrl($scope, $timeout, $http, searchModelService, LanguageClas
         map_svg = map_svg.substring(0, map_svg.indexOf("<div")); //remove zoom in/out buttons from map
         
         //construct legend for download
-        var legend = d3.select(".legend-for-download");
+        var legend = d3.select(".legend-for-download").append("svg:svg");
         var legend_svg = "";
         
         //cultural and environmental variables
