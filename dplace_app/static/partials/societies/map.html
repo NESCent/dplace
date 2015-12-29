@@ -42,8 +42,8 @@
         </td>
     </tr>
     <tr ng-show="results.chosenVariable.data_type == 'Continuous'">
-        <td width="20">
-            <svg height="20" width="20">
+        <td class="cont-gradient-td">
+            <svg height="100" width="400">
                 <circle
                         cx="10"
                         cy="13"
@@ -52,19 +52,14 @@
                         stroke="#000"
                         stroke-width="0.5"
                         />
+                    <text x="20" y="18">Missing Data</text>
+
+                <rect x="10" y="25" fill="url(#grad1)" height="30" width="300" />
+                <text x="0" y="70">{{results.chosenVariable.min}} {{results.chosenVariable.units}}</text>
+                <text x="300" y="70">{{results.chosenVariable.max}} {{results.chosenVariable.units}}</text>
                 </svg>
             </td>
-        <td>Missing Data</td>
    </tr>
-    <tr ng-show="results.chosenVariable.data_type  == 'Continuous'">
-        <td colspan="2" class="cont-gradient-td">
-            <svg class="cont-gradient" width="400" height="50">
-                <rect x="10" fill="url(#grad1)" height="30" width="300" />
-                <text x="0" y="45">{{results.chosenVariable.min}} {{results.chosenVariable.units}}</text>
-                <text x="300" y="45">{{results.chosenVariable.max}} {{results.chosenVariable.units}}</text>
-            </svg>
-        </td>
-    </tr>
     </table>
     <table class="map-legend">
     <tr ng-repeat="code in results.classifications|joinDictItems">
