@@ -1,4 +1,8 @@
-<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+<script>
+$(document).ready(function(){
+    $('[data-toggle="tooltip"]').tooltip(); 
+});
+</script><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container-fluid">
     <!-- Brand and toggle get grouped for better mobile display -->
     <div class="navbar-header">
@@ -25,6 +29,7 @@
             <a class="dropdown-toggle" data-toggle="dropdown"><img class="navicon" src="/static/images/About_Icon.png"><br />INFO</a>
             <ul class="dropdown-menu" role="menu">
                 <li><a ng-href href="#/about">ABOUT</a></li>
+				<li><a ng-href href="mailto:dplace@shh.mpg.de" title="Send email to dplace@shh.mpg.de" data-toggle="tooltip" data-placement="top">CONTACT US</a></li>
                 <li><a ng-href href="#/howtocite">HOW TO CITE</a></li>
                 <li><a ng-href href="#/source">SOURCE</a></li>
                 <li><a ng-href href="#/team">TEAM</a></li>
