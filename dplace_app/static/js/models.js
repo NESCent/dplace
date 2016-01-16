@@ -96,7 +96,10 @@ function LanguageClassificationModel(LanguageClass) {
     languageFilter.forEach(function (filterLevel) {
         filterLevel.selectedItem = undefined;
     });
-
+    
+    /* List of all Language Classes - needed for language search */
+    this.allClasses = LanguageClass.query();
+    
     /* Populate language family for first level */
     var familyLevel = 1;
     languageFilter[0].items = LanguageClass.query({level: familyLevel, scheme: 'G'});

@@ -16,12 +16,36 @@ function dplaceRouter($routeProvider) {
             controller: 'HomeCtrl'
         })
         .when('/about', {
-            templateUrl: '/static/partials/about.html',
+            templateUrl: '/static/partials/info/about.html',
             controller: 'AboutCtrl'
         })
         .when('/source_info', {
             templateUrl:'/static/partials/source_info.html',
             controller:'SourceInfoCtrl'
+        })
+        .when('/team', {
+            templateUrl:'/static/partials/info/team.html',
+            controller:'AboutCtrl'
+        })
+        .when('/legal', {
+            templateUrl:'/static/partials/info/legal.html',
+            controller:'AboutCtrl'
+        })
+        .when('/source', {
+            templateUrl:'/static/partials/info/source.html',
+            controller:'AboutCtrl'
+        })
+        .when('/technology', {
+            templateUrl:'/static/partials/info/technology.html',
+            controller:'AboutCtrl'
+        })
+        .when('/publication', {
+            templateUrl:'/static/partials/info/publication.html',
+            controller:'AboutCtrl'
+        })
+        .when('/howtocite', {
+            templateUrl:'/static/partials/info/howtocite.html',
+            controller:'AboutCtrl'
         })
         .otherwise({
 	        redirectTo: '/home'

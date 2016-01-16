@@ -2,7 +2,7 @@
     <h4>Download results as:</h4>
     <ul>
         <li>
-            <a ng-href="{{ csvDownloadLink }}" class="btn btn-info btn-dplace-download">CSV</a>
+            <button ng-show="results.searched" ng-disabled="csvDownloadButton.disabled" ng-click="download()" class="btn btn-info btn-dplace-download">{{ csvDownloadButton.text }}</button>
         </li>
     </ul>
 </div>

@@ -9,6 +9,11 @@ function AppCtrl($scope, $location, searchModelService) {
         $scope.aboutActive = '';
         $scope.sourceInfoActive = '';
         $scope[tabName + 'Active'] = 'active'
+        if (tabName === 'home') {
+            $('#homeLogo').css('visibility', 'hidden');
+        } else {
+            $('#homeLogo').css('visibility', 'visible');
+        }
     };
 
     $scope.switchToResults = function() {

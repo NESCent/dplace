@@ -181,9 +181,13 @@ def result_set_from_query_dict(query_dict):
 
     if 'variable_codes' in query_dict:
         criteria.append(SEARCH_VARIABLES)
+        ids = [x['id'] for x in query_dict['variable_codes'] if 'id' in x]
+
         for x in query_dict['variable_codes']:
-            if 'bf_id' in x:
-                values = VariableCodedValue.objects.filter(variable__id=x['bf_id'])
+            variable = VariableDescription.objects.get(id=x['variable'])
+            
+            if variable.data_type and variable.data_type.lower() == 'continuous':
+                values = VariableCodedValue.objects.filter(variable__id=x['variable'])
                 if 'min' in x:
                     min = x['min']
                     max = x['max']
@@ -203,7 +207,9 @@ def result_set_from_query_dict(query_dict):
                 values = values.select_related('society','variable')  
 
             for value in values:
-                result_set.add_cultural(value.society, value.variable, value)
+                var_codes = VariableCodeDescription.objects.filter(variable=value.variable).filter(id__in=ids)
+                result_set.add_cultural(value.society, value.variable, var_codes, value)
+
         
     if 'environmental_filters' in query_dict:
         criteria.append(SEARCH_ENVIRONMENTAL)
@@ -329,7 +335,7 @@ def bin_cont_data(request): #MAKE THIS GENERIC
                     bins.append({
                         'code': v.coded_value,
                         'description': v.code.description,
-                        'bf_id': query_dict['bf_id']
+                        'variable': query_dict['bf_id'],
                     })
                     missing_data_option = True
                 continue
@@ -353,9 +359,7 @@ def bin_cont_data(request): #MAKE THIS GENERIC
                 'description': str(min) + ' - ' + str(max),
                 'min': min_bin,
                 'max': min_bin + bin_size,
-                'bf_id': query_dict['bf_id'],
-                'absolute_min': min_value,
-                'absolute_max': max_value,
+                'variable': query_dict['bf_id'],
             })
             min_bin = min_bin + bin_size + 1
     else:
@@ -379,29 +383,43 @@ def newick_tree(key):
     except ValueError:
         tree = tree
     return tree
-
-@api_view(['GET'])
+    
+#NEW CSV DOWNLOAD CODE
+@api_view(['POST'])
 @permission_classes((AllowAny,))
 @renderer_classes((DPLACECsvRenderer,))
 def csv_download(request):
     import datetime
-    # Ideally these would be handled by serializers, but we've already got logic to parse a query object
-    query_string = request.QUERY_PARAMS['query']
-    # Need to parse the JSON
-    query_dict = json.loads(query_string)
-    result_set = result_set_from_query_dict(query_dict)
+    result_set = result_set_from_query_dict(request.DATA)
     response = Response(SocietyResultSetSerializer(result_set).data)
     filename = "dplace-societies-%s.csv" % datetime.datetime.now().strftime("%Y-%m-%d")
     response['Content-Disposition']  = 'attachment; filename="%s"' % filename
     return response
+
+#OLD CSV DOWNLOAD CODE
+#Keeping just in case we need it in the future, will delete if we do not.
+#@api_view(['GET'])
+#@permission_classes((AllowAny,))
+#@renderer_classes((DPLACECsvRenderer,))
+#def csv_download(request):
+#    import datetime
+    # Ideally these would be handled by serializers, but we've already got logic to parse a query object
+#    query_string = request.QUERY_PARAMS['query']
+    # Need to parse the JSON
+#    query_dict = json.loads(query_string)
+#    result_set = result_set_from_query_dict(query_dict)
+#    response = Response(SocietyResultSetSerializer(result_set).data)
+#    filename = "dplace-societies-%s.csv" % datetime.datetime.now().strftime("%Y-%m-%d")
+#    response['Content-Disposition']  = 'attachment; filename="%s"' % filename
+#    return response
     
-@api_view(['GET'])
+@api_view(['POST'])
 @permission_classes((AllowAny,))
 @renderer_classes((ZipRenderer,))
 def zip_legends(request):
     import datetime
-    query_string = request.QUERY_PARAMS['query']
-    result_set = json.loads(query_string)
+    #query_string = request.QUERY_PARAMS['query']
+    result_set = request.DATA#json.loads(query_string)
     to_download = ZipResultSet()
     if 'name' in result_set:
         to_download.name = str(result_set['name'])

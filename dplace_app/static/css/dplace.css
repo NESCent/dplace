@@ -1,20 +1,20 @@
 @font-face {
     font-family: "DPLACE";
-    src: url("/static/GT-Walsheim-Regular.woff");
+    src: url("/static/fonts/GT-Walsheim-Regular.woff");
 }
 @font-face {
     font-family: "DPLACE";
-    src: url("/static/GT-Walsheim-Bold.woff");
+    src: url("/static/fonts/GT-Walsheim-Bold.woff");
     font-weight: bold;
 }
 @font-face {
     font-family: "DPLACE";
-    src: url("/static/GT-Walsheim-Regular-Oblique.woff");
+    src: url("/static/fonts/GT-Walsheim-Regular-Oblique.woff");
     font-style: italic;
 }
 @font-face {
     font-family: "DPLACE";
-    src: url("/static/GT-Walsheim-Bold-Oblique.woff");
+    src: url("/static/fonts/GT-Walsheim-Bold-Oblique.woff");
     font-weight: bold;
     font-style: italic;
 }
@@ -24,12 +24,16 @@ body {
     padding-right: 10px;
     padding-left: 10px;
 }
+
+a {
+    cursor: pointer;
+}
 .navbar-default {
     background-color: #fff;
     border:solid 0px;
 }
 .navbar-brand {
-    height: 160px;
+    height: 125px;
     margin-right: 20px;
 }
 .navbar-brand > img {
@@ -118,6 +122,23 @@ body {
     border:0px;
 }
 
+.tooltip-inner {
+    white-space:pre-wrap;
+}
+
+.comment-tooltip, .source-link {
+    cursor:pointer;
+}
+
+.source-link, .val-sources {
+    font-size: 12.5px;
+}
+
+.val-sources {
+    padding-top: 5px;
+    padding-left: 10px;
+}
+
 .row-margin-top {
     margin-top: 5px;
 }
@@ -204,6 +225,12 @@ label.light {
     cursor: hand;
 }
 
+.map-legend {
+    position: absolute;
+    margin-top: -290px;
+    margin-left: 800px;
+}
+
 .circle {
     border-radius: 50%;
     border: 1px solid darkgray;
@@ -216,4 +243,197 @@ label.light {
     position: fixed;
     top: 160px;
 }
+
+.teamTABLE {
+    width:100%;
+}
+
+.teamImgTD {
+    padding-right:10px;
+    padding-bottom:10px;
+}
+
+.leftParaTab {
+    float: left;
+    position: relative;
+    margin-left:10px;
+    margin-right:10px;
+}
+
+.rightParaTab {
+    float: right;
+    position: relative;
+    margin-left:10px;
+    margin-right:10px;
+}
+
+.radioicon {
+    height: 90px;
+    width: 90px;
+}
+
+.btn.radioBack {
+    margin-bottom: 0;
+    color:#000;
+    font-size:120%;
+    font-weight:normal;
+    text-align: center;
+    white-space: nowrap;
+    cursor: pointer;
+    width: 150px;
+    height: 50px;
+    background-repeat: no-repeat;
+    background-size: 150px 150px;
+    vertical-align:middle;
+    opacity:0.8; 
+    background-position:0px -25px;
+}
+
+.btn.radioPlaces {
+    background-image: url(/static/images/Places_Pattern.jpg);
+}
+
+.btn.radioEnv {
+    background-image: url(/static/images/Env_Pattern.jpg);
+}
+
+.btn.radioCulture {
+    background-image: url(/static/images/Culture_Pattern.jpg);
+}
+
+.btn.radioLanguage {
+    background-image: url(/static/images/Language_Pattern.jpg);
+}
+
+.btn.radioBack:hover,
+.btn.radioBack:focus {
+    text-decoration: none;
+    color:#fff;
+    opacity:1.0;
+}
+
+.btn.radioBack:active,
+.btn.radioBack.active {
+    opacity:1.0; 
+    color:#fff;
+}
+
+.btn.radioPlaces:active:before,
+.btn.radioPlaces.active:before {
+    content: '';
+    position: absolute;
+    left: 42%;
+    top: 102%;
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-top: 10px solid #074652;
+}
+
+.btn.radioEnv:active:before,
+.btn.radioEnv.active:before {
+    content: '';
+    position: absolute;
+    left: 42%;
+    top: 102%;
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-top: 10px solid #50b79c;
+}
+
+.btn.radioCulture:active:before,
+.btn.radioCulture.active:before {
+    content: '';
+    position: absolute;
+    left: 42%;
+    top: 102%;
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-top: 10px solid #e8552a;
+}
+
+.btn.radioLanguage:active:before,
+.btn.radioLanguage.active:before {
+    content: '';
+    position: absolute;
+    left: 42%;
+    top: 102%;
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-top: 10px solid #f6a523;
+}
+
+.radiolead {
+    color:#000;
+    font-size:110%;
+    text-align: left;
+    margin-top:8px;
+    margin-bottom:10px;
+}
+
+.radioLabel {
+    line-height:40px;
+}
+
+.btn .badge {
+    margin-left:-4px;
+    top:-60px !important;
+}
+
+.homeTitle {
+    font-size:150%;
+}
+
+.tabHeading {
+    vertical-align:center;
+    background-size: 35px 35px;
+    background-position: center;
+    background-repeat: no-repeat;
+    height:50px !important;
+    width:80px !important;
+}
+
+.tabHeading_table {
+    background-image: url(/static/images/Table_Icon.png);
+}
+
+.tabHeading_map {
+    background-image: url(/static/images/Map_Icon.png);
+}
+
+.tabHeading_download {
+    background-image: url(/static/images/Download_Icon.png);
+}
+
+.tabHeading_tree {
+    background-image: url(/static/images/Tree_Icon.png);
+}
+
+.tablead {
+    color:#000;
+    font-size:110%;
+    text-align: left;
+    margin-top:8px;
+    margin-bottom:10px;
+    margin-right:40px;
+}
+
+.st0{fill:#074652;}
+.st1{fill:#0A0C0C;}
+.st2{fill:#50B79C;}
+.st3{fill:#0C9E6D;}
+.st4{fill:#E8552A;}
+.st5{fill:#E12024;}
+.st6{fill:#0D9E6C;}
+.st7{fill:#090C0C;}
+.st8{fill:#E21E24;}
+.st9{fill:#F6A523;}
+.st10{fill:#EE8025;}
 

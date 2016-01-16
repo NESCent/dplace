@@ -4,3 +4,5 @@
 local_settings.py
 datasets
 uploads
+.DS_Store
+language_trees
