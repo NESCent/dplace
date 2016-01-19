@@ -1,4 +1,46 @@
 function ColorMapService() {
+    // converts hsl to rgb
+    function hslToRgb(h, s, l) {
+        if (h < 0) h += 360;
+        var r, g, b;
+        var r1, g1, b1;
+        chroma = (1 - Math.abs(2*l - 1)) * s;
+        
+        _h = h / 60;
+        
+        x = chroma*(1 - Math.abs(_h % 2 - 1));
+        
+        if(!h) {
+            r1 = 0; g1 = 0; b1 = 0;
+        } else if (_h >= 0 && _h < 1) {
+            r1 = chroma;
+            g1 = x;
+            b1 = 0;
+        } else if (_h >= 1 && _h < 2) {
+            r1 = x;
+            g1 = chroma;
+            b1 = 0;
+        } else if (_h >= 2 && _h < 3) {
+            r1 = 0;
+            g1 = chroma;
+            b1 = x;
+        } else if (_h >= 3 && _h < 4) {
+            r1 = 0;
+            g1 = x;
+            b1 = chroma;
+        } else if (_h >= 4 && _h < 5) {
+            r1 = x;
+            g1 = 0;
+            b1 = chroma;
+        } else if (_h >= 5 && _h < 6) {
+            r1 = chroma;
+            g1 = 0;
+            b1 = x;
+        }
+        m = l - (0.5 * chroma);
+        rgb = [Math.round((r1 + m)*255), Math.round((g1 + m)*255), Math.round((b1 + m)*255)];
+        return rgb;
+    }
 
     //blue to red gradient for environmental variables
     function tempColor(index, min, max, name) {
@@ -11,18 +53,22 @@ function ColorMapService() {
     else {
         hue = 240 - (((index - min) / (max - min))*240);
     }
-        return 'hsl('+hue+',100%, 50%)';
+        rgb = hslToRgb(hue, 1, 0.5);
+        return 'rgb('+rgb[0]+','+rgb[1]+','+rgb[2]+')';
     }
 
     //normal gradient
     function mapColor(index, count) {   
         hue = (index / count)*240;
-        return 'hsl(' + hue + ',100%,50%)';
+        rgb = hslToRgb(hue, 1, 0.5);
+        return 'rgb('+rgb[0]+','+rgb[1]+','+rgb[2]+')';
     }
     
     function mapColorMonochrome(min, max, value, color) {
         var lum = (((value-min)/(max-min))) * 78; lum = 100 - lum; 
-        return 'hsl('+color+', 65%,'+lum+'%)'; 
+        rgb = hslToRgb(color, 0.65, lum/100);
+        return 'rgb('+rgb[0]+','+rgb[1]+','+rgb[2]+')';
+
     }
 
     this.generateColorMap = function(results) {
