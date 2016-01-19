@@ -132,7 +132,9 @@ class SocietyResult(object):
         self.languages.add(language)
     def add_geographic_region(self,geographic_region):
         self.geographic_regions.add(geographic_region)
-    def includes_criteria(self,criteria=[]):
+    def includes_criteria(self,criteria=None):
+        if criteria is None:
+            criteria = []
         result = True
         if SEARCH_VARIABLES in criteria and len(self.variable_coded_values) == 0:
             result = False
