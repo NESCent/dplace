@@ -2,6 +2,7 @@ function ColorMapService() {
     // converts hsl to rgb
     function hslToRgb(h, s, l) {
         if (h < 0) h += 360;
+        if (h > 360) h = h % 360;
         var r, g, b;
         var r1, g1, b1;
         chroma = (1 - Math.abs(2*l - 1)) * s;
@@ -10,9 +11,7 @@ function ColorMapService() {
         
         x = chroma*(1 - Math.abs(_h % 2 - 1));
         
-        if(!h) {
-            r1 = 0; g1 = 0; b1 = 0;
-        } else if (_h >= 0 && _h < 1) {
+        if (_h >= 0 && _h < 1) {
             r1 = chroma;
             g1 = x;
             b1 = 0;
@@ -36,18 +35,20 @@ function ColorMapService() {
             r1 = chroma;
             g1 = 0;
             b1 = x;
-        }
+        } else if (!h) {
+            r1 = 0; g1 = 0; b1 = 0;
+        } 
         m = l - (0.5 * chroma);
         rgb = [Math.round((r1 + m)*255), Math.round((g1 + m)*255), Math.round((b1 + m)*255)];
         return rgb;
     }
 
     //blue to red gradient for environmental variables
-    function tempColor(index, min, max, name) {
+    this.tempColor = function(index, min, max, name) {
     if (name == "Net Primary Production" || name == "Mean Growing Season NPP") {
         hue = 30 + (((index - min) / (max - min)) * 88);
     } else if (name == "Annual Mean Precipitation"){
-        color = mapColorMonochrome(min, max, index, 252);
+        color = this.mapColorMonochrome(min, max, index, 252);
         return color;
     }
     else {
@@ -58,13 +59,13 @@ function ColorMapService() {
     }
 
     //normal gradient
-    function mapColor(index, count) {   
+    this.mapColor = function(index, count) {  
         hue = (index / count)*240;
         rgb = hslToRgb(hue, 1, 0.5);
         return 'rgb('+rgb[0]+','+rgb[1]+','+rgb[2]+')';
     }
     
-    function mapColorMonochrome(min, max, value, color) {
+    this.mapColorMonochrome = function(min, max, value, color) {
         var lum = (((value-min)/(max-min))) * 78; lum = 100 - lum; 
         rgb = hslToRgb(color, 0.65, lum/100);
         return 'rgb('+rgb[0]+','+rgb[1]+','+rgb[2]+')';
@@ -78,13 +79,13 @@ function ColorMapService() {
             
             if (society.geographic_regions) {
                 for (var j = 0; j < society.geographic_regions.length; j++) {
-                    var color = mapColor(society.geographic_regions[0].tdwg_code, results.geographic_regions.length);
+                    var color = this.mapColor(society.geographic_regions[0].tdwg_code, results.geographic_regions.length);
                     colors[society.society.id] = color;
                 }
             }
             
             if (results.languages.length > 0 && society.environmental_values.length == 0 && society.variable_coded_values.length == 0) {
-                    var color = mapColor(society.society.language.language_family.id, results.classifications.NumClassifications);
+                    var color = this.mapColor(society.society.language.language_family.id, results.classifications.NumClassifications);
                     colors[society.society.id] = color;
                 
             }
@@ -94,7 +95,7 @@ function ColorMapService() {
                     return env_var.id == society.environmental_values[j].variable;
                 });
                 if (variable.length > 0) {
-                    var color = tempColor(society.environmental_values[0].value,  results.environmental_variables[0].min, results.environmental_variables[0].max, results.environmental_variables[0].name);
+                    var color = this.tempColor(society.environmental_values[0].value,  results.environmental_variables[0].min, results.environmental_variables[0].max, results.environmental_variables[0].name);
                     colors[society.society.id] = color;
                 }    
             }
@@ -104,13 +105,13 @@ function ColorMapService() {
                 });
 
                 if (society.variable_coded_values[j].code_description && (society.variable_coded_values[j].code_description.description.indexOf("Missing data") != -1))
-                    colors[society.society.id] = 'hsl(0, 0%, 100%)';
+                    colors[society.society.id] = 'rgb(255, 255, 255)';
                 else if (variable_description[0].variable.data_type.toUpperCase() == 'CONTINUOUS') {
-                    var color = mapColorMonochrome(variable_description[0].variable.min, variable_description[0].variable.max, society.variable_coded_values[j].coded_value, 0);
+                    var color = this.mapColorMonochrome(variable_description[0].variable.min, variable_description[0].variable.max, society.variable_coded_values[j].coded_value, 0);
                     colors[society.society.id] = color;
                 } 
                 else {
-                    var color = mapColor(society.variable_coded_values[j].coded_value, variable_description[0].codes.length);
+                    var color = this.mapColor(society.variable_coded_values[j].coded_value, variable_description[0].codes.length);
                     colors[society.society.id] = color;
                 }
             }
