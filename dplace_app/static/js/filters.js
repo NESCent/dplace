@@ -18,7 +18,7 @@ angular.module('dplaceFilters', [])
             return items;
         }
     })
-    .filter('colorNode', function() {
+    .filter('colorNode', ['colorMapService', function(colorMapService) {
         return function(value, codes) {
             var missingData = false;
             var missingDataValue;
@@ -29,14 +29,13 @@ angular.module('dplaceFilters', [])
                     break;
                 }
             }
-            if (missingData && value == missingDataValue) return 'hsl(0, 0%, 100%)';
+            if (missingData && value == missingDataValue) return 'rgb(255, 255, 255)';
             else {
-               var hue = value * 240 / codes.length;
+                rgb = colorMapService.mapColor(value, codes.length);
+                return rgb;
             }
-            return 'hsl('+hue+',100%, 50%)';
-            
         }
-    })
+    }])
     .filter('formatVariableCodeValues', function() {
         return function(values, variable_id) {
             return values.map( function(code_value) {   
