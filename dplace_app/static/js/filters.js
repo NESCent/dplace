@@ -31,7 +31,7 @@ angular.module('dplaceFilters', [])
             }
             if (missingData && value == missingDataValue) return 'rgb(255, 255, 255)';
             else {
-                rgb = colorMapService.mapColor(value, codes.length);
+                rgb = colorMapService.colorMap[parseInt(value)];
                 return rgb;
             }
         }

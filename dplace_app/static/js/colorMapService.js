@@ -1,4 +1,27 @@
 function ColorMapService() {
+    //an array of colors for coded values
+    this.colorMap = [
+        'rgb(0,0,0)', //need some sort of placeholder here because 0 is missing data...
+        'rgb(228,26,28)',
+        'rgb(69,117,180)',
+        'rgb(77,146,33)',
+        'rgb(152,78,163)',
+        'rgb(255,127,0)',
+        'rgb(255,255,51)',
+        'rgb(166,86,40)',
+        'rgb(247,129,191)',
+        'rgb(153,153,153)',
+        'rgb(0,68,27)',
+        'rgb(171,217,233)',
+        'rgb(73,0,106)',
+        'rgb(174,1,126)',
+        'rgb(179,222,105)',
+        'rgb(8,48,107)',
+        'rgb(255,255,153)',
+        'rgb(82,82,82)',
+        'rgb(0,0,0)',
+        'rgb(103,1,13)'
+    ];
     // converts hsl to rgb
     function hslToRgb(h, s, l) {
         if (h < 0) h += 360;
@@ -74,6 +97,7 @@ function ColorMapService() {
 
     this.generateColorMap = function(results) {
         var colors = {};
+        var missing = false;
         for (var i = 0; i < results.societies.length; i++) {
             var society = results.societies[i];
             
@@ -99,21 +123,41 @@ function ColorMapService() {
                     colors[society.society.id] = color;
                 }    
             }
+            
             for (var j = 0; j < society.variable_coded_values.length; j++) {
                 variable_description = results.variable_descriptions.filter(function(variable) {
                     return variable.variable.id == society.variable_coded_values[j].variable;
                 });
+                
+                for (var c = 0; c < variable_description[0].codes.length; c++) {
+                    if (parseInt(variable_description[0].codes[c].code) == 0 && variable_description[0].codes[c].description.indexOf("Missing data") != -1) { missing = true; break; }
+                }
+                console.log(missing);
+                
+                if (variable_description[0].variable.data_type.toUpperCase() == 'CONTINUOUS') {
+                    var color = this.mapColorMonochrome(variable_description[0].variable.min, variable_description[0].variable.max, society.variable_coded_values[j].coded_value, 0);
+                    colors[society.society.id] = color;
+                } else {
+                    
+                    if (society.variable_coded_values[j].code_description && (society.variable_coded_values[j].code_description.description.indexOf("Missing data") != -1))
+                        colors[society.society.id] = 'rgb(255,255,255)';
+                    else {
+                            colors[society.society.id] = this.colorMap[parseInt(society.variable_coded_values[j].coded_value)];
+                    }
 
-                if (society.variable_coded_values[j].code_description && (society.variable_coded_values[j].code_description.description.indexOf("Missing data") != -1))
-                    colors[society.society.id] = 'rgb(255, 255, 255)';
+                
+                }
+
+                /*if (society.variable_coded_values[j].code_description && (society.variable_coded_values[j].code_description.description.indexOf("Missing data") != -1))
+                    colors[society.society.id] = 'rgb(255,255,255)';
                 else if (variable_description[0].variable.data_type.toUpperCase() == 'CONTINUOUS') {
                     var color = this.mapColorMonochrome(variable_description[0].variable.min, variable_description[0].variable.max, society.variable_coded_values[j].coded_value, 0);
                     colors[society.society.id] = color;
                 } 
                 else {
-                    var color = this.mapColor(society.variable_coded_values[j].coded_value, variable_description[0].codes.length);
+                    //var color = this.mapColor(society.variable_coded_values[j].coded_value, variable_description[0].codes.length);
                     colors[society.society.id] = color;
-                }
+                }*/
             }
 
         }
