@@ -78,8 +78,7 @@ def xd_to_language(dict_row):
                     s.save()
             except ObjectDoesNotExist:
                 print "No language found for isocode %s and glottocode %s, skipping" % (isocode, glottocode)
-
-            return
+                return
             
     try:
         language = Language.objects.get(glotto_code=glotto, iso_code=iso)
