@@ -176,6 +176,7 @@ label.light {
 
 .variable-label {
     text-align: right;
+    margin-left: 5px;
 }
 
 .variable-description {
