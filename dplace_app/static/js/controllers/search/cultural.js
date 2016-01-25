@@ -32,7 +32,7 @@ function CulturalCtrl($scope, searchModelService, Variable, CodeDescription, Con
         trait.codes.isSelected = true;
         trait.codes.$promise.then(function(result) {
             result.forEach(function(code) {
-                code.isSelected = true;
+               code.isSelected = true;
                 if (trait.selected.indexOf(code) == -1) {
                     trait.selected.push(code);
                 }
