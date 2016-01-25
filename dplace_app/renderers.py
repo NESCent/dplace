@@ -122,7 +122,7 @@ class DPLACECsvRenderer(renderers.BaseRenderer):
         csv_buffer = StringIO()
         csv_writer = csv.DictWriter(csv_buffer, results.field_names)
         cite_writer = csv.writer(csv_buffer)
-        cite_writer.writerow(['Research that uses data from D-PLACE should cite both the original source(s) of the data and this paper (e.g., research using cultural data from the Binford Hunter-Gatherer dataset: “Binford (2001); Binford and Johnson (2006); Kirby et al. Submitted).” The reference list should include the date data were accessed and URL for D-PLACE (http://d-place.org), in addition to the full references for Binford (2001) and Binford and Johnson (2006).']) #add in 'How to cite' here
+        cite_writer.writerow(['Research that uses data from D-PLACE should cite both the original source(s) of the data and this paper (e.g., research using cultural data from the Binford Hunter-Gatherer dataset: "Binford (2001); Binford and Johnson (2006); Kirby et al. Submitted)." The reference list should include the date data were accessed and URL for D-PLACE (http://d-place.org), in addition to the full references for Binford (2001) and Binford and Johnson (2006).']) #add in 'How to cite' here
         csv_writer.writeheader()
         for row in results.rows:
             csv_writer.writerow(encode_rowdict(row))
