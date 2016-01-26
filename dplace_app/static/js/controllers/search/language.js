@@ -38,6 +38,19 @@ function LanguageCtrl($scope, searchModelService, LanguageClass, LanguageClassif
         } else {
             languageFilter.classifications = LanguageClassification.query(params);
         }
+        
+        //make select all the default
+        languageFilter.classifications.isSelected = true;
+        already_selected = $scope.languageClassifications.selected.map(function(x) { return x.id; });
+        languageFilter.classifications.$promise.then(function(result) {
+            result.forEach(function(classification) {
+                classification.isSelected = true;
+                if (already_selected.indexOf(classification.id) == -1) {
+                    $scope.languageClassifications.selected.push(classification);
+                }
+            });
+            $scope.languageClassifications.badgeValue = $scope.languageClassifications.selected.filter(function(lang) { return lang.isSelected; }).length;
+        });
     }
 
     function updateItems(languageFilter, parentObject, levelObject) {
@@ -68,17 +81,23 @@ function LanguageCtrl($scope, searchModelService, LanguageClass, LanguageClassif
     };
 
 	$scope.selectAllChanged = function(languageFilter) {
-		if (languageFilter.classifications.id.isSelected) {
+		if (languageFilter.classifications.isSelected) {
 			languageFilter.classifications.forEach(function(classification) {
 			    classification.isSelected = true;
-			    $scope.languageClassifications.selected.push(classification);
-			    $scope.languageClassifications.badgeValue++;
+                if ($scope.languageClassifications.selected.indexOf(classification) == -1) {
+                    $scope.languageClassifications.selected.push(classification);
+                }
             });
 		} else {
-			languageFilter.classifications.forEach(function(classification){ classification.isSelected = false; $scope.languageClassifications.badgeValue--;} );
+			languageFilter.classifications.forEach(function(classification){ 
+                classification.isSelected = false; 
+            });
         }
-	};
+        $scope.languageClassifications.selected = $scope.languageClassifications.selected.filter(function(x) { return x.isSelected; });
+        $scope.languageClassifications.badgeValue = $scope.languageClassifications.selected.length;
 
+	};
+    
     function getSelectedLanguageClassifications(languageFilter) {
         return languageFilter.classifications.filter( function (classification) {
             return classification.isSelected;
@@ -89,8 +108,11 @@ function LanguageCtrl($scope, searchModelService, LanguageClass, LanguageClassif
         var languageQueryFilters = [];
         $scope.languageClassifications.languageFilters.forEach(function(languageFilter) {
             var selectedClassifications = getSelectedLanguageClassifications(languageFilter);
+            if (selectedClassifications.length == languageFilter.classifications.length) languageFilter.classifications.isSelected = true;
+            else languageFilter.classifications.isSelected = false;
             selectedClassifications.forEach(function(f) {
-                $scope.languageClassifications.selected.push(f);
+                if ($scope.languageClassifications.selected.indexOf(f) == -1)
+                    $scope.languageClassifications.selected.push(f);
             });
 	   });
         return languageQueryFilters;
@@ -100,11 +122,8 @@ function LanguageCtrl($scope, searchModelService, LanguageClass, LanguageClassif
         // Since the selections are stored deep in the model, this is greatly simplified by +1 / -1
         // get the currently selected languages and add them to the "selected" array
 		currentSelection = $scope.getLanguageQueryFilters();
-        if(classification.isSelected) {
-            $scope.languageClassifications.badgeValue++;
-        } else {
-            $scope.languageClassifications.badgeValue--;
-        }
+        $scope.languageClassifications.selected = $scope.languageClassifications.selected.filter(function(x) { return x.isSelected; });
+        $scope.languageClassifications.badgeValue = $scope.languageClassifications.selected.length;
     };
 
     $scope.doSearch = function() {
