@@ -83,7 +83,7 @@ class DPLACECSVResults(object):
                     try:
                         row[field_names['description']] = cultural_trait_value['code_description']['description']
                     except:
-                        break
+                        row[field_names['description']] = ''
                 row[field_names['comments']] = cultural_trait_value['comment']
                 row[field_names['sources']] = ''.join([x['author']+'('+x['year']+'); ' for x in cultural_trait_value['references']])
             # environmental
