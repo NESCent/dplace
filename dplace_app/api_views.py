@@ -100,6 +100,11 @@ class LanguageViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = LanguageSerializer
     filter_fields = ('name', 'iso_code', 'societies',)
     queryset = Language.objects.all()
+    
+class LanguageFamilyViewSet(viewsets.ReadOnlyModelViewSet):
+    serializer_class = LanguageFamilySerializer
+    filter_fields = ('name', 'scheme',)
+    queryset = LanguageFamily.objects.all()
 
 class LanguageTreeViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = LanguageTreeSerializer
