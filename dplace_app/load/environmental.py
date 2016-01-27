@@ -201,6 +201,6 @@ def load_environmental(env_dict):
                 EnvironmentalValue.objects.get_or_create(variable=variable,value=value,
                     environmental=environmental, source=source
                 )
-            logging.warn(
+            logging.info(
                 "Created environmental value for variable %s and society %s" % (var_dict['name'], society)
             )
