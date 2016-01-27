@@ -34,7 +34,7 @@ def load_bf_society(society_dict):
     society.save()
 
 def load_bf_val(val_row):
-    ext_id = val_row['soc_id']
+    ext_id = val_row['soc_id'].strip()
     try:
         society = Society.objects.get(ext_id=ext_id)
     except ObjectDoesNotExist:

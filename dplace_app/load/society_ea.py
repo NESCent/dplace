@@ -9,8 +9,8 @@ from dplace_app.models import *
 from sources import get_source
 
 def ea_soc_to_xd_id(dict_row):
-    soc_id = dict_row['soc_id']
-    xd_id = dict_row['xd_id']
+    soc_id = dict_row['soc_id'].strip()
+    xd_id = dict_row['xd_id'].strip()
     try:
         society = Society.objects.get(ext_id=soc_id)
         society.xd_id = xd_id
@@ -41,7 +41,7 @@ def society_locations(dict_row):
     '''
     Locations for societies from EA_Binford_Lat_Long.csv.
     '''
-    soc_id = dict_row['soc_id']
+    soc_id = dict_row['soc_id'].strip()
     lat_val = dict_row['Latitude']
     long_val = dict_row['Longitude']
     

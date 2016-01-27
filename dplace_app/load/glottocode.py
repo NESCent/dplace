@@ -49,10 +49,10 @@ def xd_to_language(dict_row):
     """
     
     classification_scheme = 'G' # for Glottolog
-    xd_id = dict_row['xd_id']
-    isocode = dict_row['iso_6933']
-    glottocode = dict_row['DialectLanguageGlottocode']
-    family_glottocode = dict_row['FamilyGlottocode']
+    xd_id = dict_row['xd_id'].strip()
+    isocode = dict_row['iso_6933'].strip()
+    glottocode = dict_row['DialectLanguageGlottocode'].strip()
+    family_glottocode = dict_row['FamilyGlottocode'].strip()
     
     iso, created = ISOCode.objects.get_or_create(iso_code=isocode)
     glotto, created = GlottoCode.objects.get_or_create(glotto_code=glottocode)
@@ -78,7 +78,6 @@ def xd_to_language(dict_row):
             if lang_fam:
                 language.family = lang_fam
                 language.save()
-                print "Assigned language family %s to language %s" % (lang_fam.name, language.name)
             for s in societies:
                 s.language = language
                 s.save()
@@ -88,7 +87,6 @@ def xd_to_language(dict_row):
                 if lang_fam:
                     language.family = lang_fam
                     language.save()
-                    print "Assigned language family %s to language %s" % (lang_fam.name, language.name)
                 for s in societies:
                     s.language = language
                     s.save()
