@@ -2,6 +2,7 @@
 # __author__ = 'stef'
 
 import csv
+import logging
 from django.contrib.gis.geos import Point
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.utils import IntegrityError
@@ -44,7 +45,7 @@ def load_val_references(val_row):
     try:
         society = Society.objects.get(ext_id=ext_id)
     except ObjectDoesNotExist:
-        print "Attempting to load EA values for %s but did not find an existing Society object, skipping" % ext_id
+        logging.warn("Attempting to load EA values for %s but did not find an existing Society object, skipping" % ext_id)
         return
         
     variable_id = val_row['VarID'].strip()
@@ -59,7 +60,7 @@ def load_val_references(val_row):
         
     else:
         source = None
-        print "Could not determine dataset source for row %s, skipping" % str(val_row)
+        logging.warn("Could not determine dataset source for row %s, skipping" % str(val_row))
         return
 
     variable = get_variable(variable_id, label)
@@ -70,7 +71,7 @@ def load_val_references(val_row):
     subcase = val_row['SpecRef'].strip()
 
     if variable is None:
-        print "Could not find variable %s for society %s" % (variable_id, society)
+        logging.warn("Could not find variable %s for society %s" % (variable_id, society))
         return
 
     code = get_description(variable, value)
@@ -88,7 +89,9 @@ def load_val_references(val_row):
         )
         
     except:
-        print "Could not find VariableCodedValue for Society %s Variable %s, skipping" % (society, variable.label)
+        logging.warn(
+            "Could not find VariableCodedValue for Society %s Variable %s, skipping" % (society, variable.label)
+        )
         return
         
     for r in references:
@@ -101,10 +104,12 @@ def load_val_references(val_row):
                 if ref not in v.references.all():
                     v.references.add(ref)
             except ObjectDoesNotExist:
-                print "Could not find reference %s (%s) in database, skipping reference" % (author, year)
+                logging.warn(
+                    "Could not find reference %s (%s) in database, skipping reference" % (author, year)
+                )
 
     v.save()
-    print "Saved references for Society %s Variable %s" % (ext_id, variable.label)
+    logging.info("Saved references for Society %s Variable %s" % (ext_id, variable.label))
         
 #soooooooooooooooooooooooooo slow 
 def load_data(val_row):
@@ -118,7 +123,9 @@ def load_data(val_row):
     try:
         society = Society.objects.get(ext_id=ext_id)
     except ObjectDoesNotExist:
-        print "Attempting to load EA values for %s but did not find an existing Society object, skipping" % ext_id
+        logging.warn(
+            "Attempting to load EA values for %s but did not find an existing Society object, skipping" % ext_id
+        )
         return
         
     variable_id = val_row['VarID'].strip()
@@ -133,7 +140,7 @@ def load_data(val_row):
         
     else:
         source = None
-        print "Could not determine dataset source for row %s, skipping" % str(val_row)
+        logging.warn("Could not determine dataset source for row %s, skipping" % str(val_row))
         return
 
     variable = get_variable(variable_id, label)
@@ -144,7 +151,7 @@ def load_data(val_row):
     subcase = val_row['SpecRef'].strip()
 
     if variable is None:
-        print "Could not find variable %s for society %s" % (variable_id, society)
+        logging.warn("Could not find variable %s for society %s" % (variable_id, society))
         return
 
     code = get_description(variable, value)
@@ -160,5 +167,5 @@ def load_data(val_row):
         subcase=subcase
     )
     v.save()
-    print "Saved data for Society %s Variable ID %s" % (ext_id, variable.label)
+    logging.info("Saved data for Society %s Variable ID %s" % (ext_id, variable.label))
 

@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
-# __author__ = 'dan'
-
 import csv
 import re
+import logging
 from django.contrib.gis.geos import Point
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.utils import IntegrityError, DataError
@@ -30,7 +29,7 @@ def load_bf_society(society_dict):
     society.alternate_names = alternate_names
     society.focal_year = focal_year
     
-    print "Saving society %s" % society
+    logging.info("Saving society %s" % society)
     society.save()
 
 def load_bf_val(val_row):
@@ -38,7 +37,9 @@ def load_bf_val(val_row):
     try:
         society = Society.objects.get(ext_id=ext_id)
     except ObjectDoesNotExist:
-        print "Attempting to load EA values for %s but did not find an existing Society object, skipping" % ext_id
+        logging.warn(
+            "Attempting to load EA values for %s but did not find an existing Society object, skipping" % ext_id
+        )
         return
         
     variable = get_variable(val_row['VarID'].strip())
@@ -48,6 +49,8 @@ def load_bf_val(val_row):
     focal_year = val_row['Year'].strip()
     
     if variable is None:
-        print "Could not find variable %s for society %s" % (val_row['VarID'], society)
-        return
+        logging.warn(
+            "Could not find variable %s for society %s" % (val_row['VarID'], society)
+        )
+    return
 

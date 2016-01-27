@@ -2,6 +2,7 @@
 # __author__ = 'stef'
 
 import csv
+import logging
 from dplace_app.models import Source
 
 _SOURCE_CACHE = {}  
@@ -59,9 +60,9 @@ def load_references(csvfile=None):
                 reference, created = Source.objects.get_or_create(author=author, year=year, reference=ref_complete)
                 reference.save()
                 if created:
-                    print "Saved new reference %s" % reference
+                    logging.info("Saved new reference %s" % reference)
             except IndexError:
-                print "No author and/or year for %s" % str(dict_row)
+                logging.warn("No author and/or year for %s" % str(dict_row))
         except:
-            print "Could not save reference for row %s" % str(dict_row)
+            logging.warn("Could not save reference for row %s" % str(dict_row))
     

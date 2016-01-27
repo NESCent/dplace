@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# __author__ = 'dan'
+import logging
 from django.contrib.gis.geos import Point
 from django.core.exceptions import ObjectDoesNotExist
 from dplace_app.models import *
@@ -144,16 +144,18 @@ def create_environmental_variables():
         if 'category' in var_dict:
             env_category, created = EnvironmentalCategory.objects.get_or_create(name=var_dict['category'])
             if created:
-                print "Created environmental category %s" % env_category
+                logging.info("Created environmental category %s" % env_category)
             obj, created = EnvironmentalVariable.objects.get_or_create(name=var_dict['name'])
             obj.category = env_category
             obj.units = var_dict['units'].decode('utf-8').strip()
             obj.codebook_info = var_dict['description']
             obj.save()
-            print "Saved environmental variable %s" % obj
+            logging.info("Saved environmental variable %s" % obj)
         else:
-            EnvironmentalVariable.objects.get_or_create(name=var_dict['name'],units=var_dict['units'].decode('utf-8').strip())
-            print "Saved environmental variable %s" % var_dict['name']
+            EnvironmentalVariable.objects.get_or_create(
+                name=var_dict['name'],units=var_dict['units'].decode('utf-8').strip()
+            )
+            logging.info("Saved environmental variable %s" % var_dict['name'])
     
 def load_environmental(env_dict):
     ext_id = env_dict['ID']
@@ -166,8 +168,11 @@ def load_environmental(env_dict):
     try:
         society = Society.objects.get(ext_id=ext_id, source=source)
     except ObjectDoesNotExist:
-        print "Unable to find a Society object with ext_id %s and source %s, skipping..." % (ext_id, source)
+        logging.warn(
+            "Unable to find a Society object with ext_id %s and source %s, skipping..." % (ext_id, source)
+        )
         return
+    
     # This limits the environmental data to one record per society record
     found_environmentals = Environmental.objects.filter(society=society)
     if len(found_environmentals) == 0:
@@ -176,23 +181,26 @@ def load_environmental(env_dict):
         iso_code = iso_from_code(env_dict['iso'])
         
         # Create the base Environmental
-        environmental, created = Environmental.objects.get_or_create(society=society,
-                                      reported_location=reported_latlon,
-                                      actual_location=actual_latlon,
-                                      source=source,
-                                      iso_code=iso_code)
-        environmental.save()
+        environmental, created = Environmental.objects.get_or_create(
+            society=society,
+            reported_location=reported_latlon,
+            actual_location=actual_latlon,
+            source=source,
+            iso_code=iso_code
+        )
         for k in ENVIRONMENTAL_MAP: # keys are the columns in the CSV file
             var_dict = ENVIRONMENTAL_MAP[k]
             try:
                 # Get the variable
                 variable = EnvironmentalVariable.objects.get(name=var_dict['name'])
             except ObjectDoesNotExist:
-                print "Warning: Did not find an EnvironmentalVariable with name %s" % var_dict['name']
+                logging.warn("Did not find an EnvironmentalVariable with name %s" % var_dict['name'])
                 continue
             if env_dict[k] and env_dict[k] != 'NA':
                 value = float(env_dict[k])
                 EnvironmentalValue.objects.get_or_create(variable=variable,value=value,
                     environmental=environmental, source=source
                 )
-            print "Created environmental value for variable %s and society %s" % (var_dict['name'], society)
+            logging.warn(
+                "Created environmental value for variable %s and society %s" % (var_dict['name'], society)
+            )
