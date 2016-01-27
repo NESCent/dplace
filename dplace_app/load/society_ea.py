@@ -55,7 +55,7 @@ def society_locations(dict_row):
             )
             society.location = location
             society.save()
-            logging.warn(
+            logging.info(
                 "Added location (%s,%s) for society %s" % (long_val, lat_val, society)
             )
         except ValueError:
