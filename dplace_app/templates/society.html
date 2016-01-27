@@ -11,7 +11,7 @@
 <script type="text/javascript">
     $(document).ready(function() {
         $("a.comment-tooltip").tooltip();
-        document.title += ' – {{ society.name }}';
+        document.title = '{{ society.name }} – ' + document.title;
     });
 </script>
 
