@@ -16,13 +16,10 @@ REPO_DEST="${BASEDIR}/datasets"
 
 DPLACE_PATH="${BASEDIR}"
 
-## Clone the repository
+# Clone the repository
 if [ ! -d "$REPO_DEST" ]; then
-	mkdir -p "$REPO_DEST"
-	git clone $REPO_SRC $REPO_DEST
-else
-  orig=`pwd`
-  cd $REPO_DEST && git pull && cd "$orig"
+    mkdir -p "$REPO_DEST"
+    git clone $REPO_SRC $REPO_DEST
 fi
 
 ## import the data
@@ -34,7 +31,7 @@ echo "Loading ISO Codes from Ethnologue"
 python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/Revised_Ethnologue_families-Feb_10_2014-17th_Ed-ISO693-3-current.csv" iso
 python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/Revised_Ethnologue_families-Feb_10_2014-17th_Ed_Missing_ISO_codes.csv" iso
 
-echo "Loading Languages from Ethnologue" 
+echo "Loading Languages from Ethnologue"
 python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/Revised_Ethnologue_families-Feb_10_2014-17th_Ed-ISO693-3-current.csv" langs
 python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/Revised_Ethnologue_families-Feb_10_2014-17th_Ed_Missing_ISO_codes.csv" langs
 
@@ -50,10 +47,10 @@ python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/EAVariableList_17No
 echo "Loading EA Variable Codes"
 python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/EACodeDescriptions_17Nov2015.csv" codes
 
-echo "Loading Binford Variables" 
+echo "Loading Binford Variables"
 python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/BinfordVariableList_18Nov2015.csv" vars
 
-echo "Loading Binford Variable Codes" 
+echo "Loading Binford Variable Codes"
 python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/BinfordVariableListCodeDescription_18Nov2015.csv" codes
 
 echo "Loading EA Societies"
@@ -68,16 +65,13 @@ python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/EA_Binford_Lat_Long
 echo "Linking Societies to Glottocodes"
 python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/xd_id_to_language_11Dec2015.csv" xd_lang
 
-echo "Loading EA Data"
-python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/EA_DATA_Stacked_17Nov2015.csv" ea_vals
-
 echo "Loading References"
 python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/ReferenceMapping_11Nov2015.csv" refs
 
-echo "Loading References for EA data"
-python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/EA_DATA_Stacked_17Nov2015.csv" ea_refs
+echo "Loading EA Data"
+python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/EA_DATA_Stacked_17Nov2015.csv" ea_vals
 
-echo "Loading Binford Data" 
+echo "Loading Binford Data"
 python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/Binford_merged_18Nov2015.csv" bf_vals
 
 # TODO -- check?
