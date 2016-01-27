@@ -186,7 +186,7 @@ class FindSocietiesTestCase(APITestCase):
         return self.assertNotIn(society.id, response_society_ids)
     def test_find_societies_by_language(self):
         # Find the societies that use language1
-        classifications = SocietySerializer(Society.objects.all().filter(language=self.languageA1),many=True)
+        classifications = SocietySerializer([s for s in Society.objects.all().filter(language=self.languageA1)],many=True)
         data = {'language_classifications' : classifications.data }
         response = self.client.post(self.url,data,format='json')
         self.assertSocietyInResponse(self.society1,response)
