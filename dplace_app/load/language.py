@@ -71,7 +71,7 @@ def load_lang(lang_row):
         class_subfamily=class_subfamily,
         class_subsubfamily=class_subsubfamily
     )
-    logging.info('Created Classification: %s' % classification)
+    logging.info('Created Classification')
     return language
 
 def update_language_counts():
