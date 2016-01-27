@@ -48,7 +48,7 @@ def add_missing_isocode(isocode):
 #        name = family_names[i].strip()
 #        if len(name) == 0:
             # empty cell
-            continue
+            # continue
         try:
             classes.append(LanguageClass.objects.get(scheme='R',level=level,name=name))
         except ObjectDoesNotExist:
