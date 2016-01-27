@@ -83,7 +83,7 @@ def xd_to_language(dict_row):
                 if lang_fam:
                     language.family = lang_fam
                     language.save()
-                	logging.info("Mapped isocode %s to glottocode %s" % (isocode, glottocode))
+                    logging.info("Mapped isocode %s to glottocode %s" % (isocode, glottocode))
                 for s in societies:
                     s.language = language
                     s.save()
