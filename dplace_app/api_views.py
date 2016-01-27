@@ -160,7 +160,7 @@ def result_set_from_query_dict(query_dict):
         criteria.append(SEARCH_LANGUAGE)
         classifications = query_dict['language_classifications']
         for classification in classifications:
-            language_ids = [int(classification['language']['id'])]
+            language_ids = [int(classification['id'])]
             languages = Language.objects.filter(pk__in=language_ids) # Returns a queryset
             languages.select_related('societies')
             for language in languages:
