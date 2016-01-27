@@ -272,7 +272,7 @@ class FindSocietiesTestCase(APITestCase):
         '''
         verify the API returns language classifications ordered by language name
         '''
-        url = reverse('languagefamilies-list')
+        url = reverse('language_families')
         response = self.client.get(url,format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         response_dict = response.data
