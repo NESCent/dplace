@@ -42,9 +42,11 @@ COMPLETE_REF_COLUMN = 1
 def load_references(csvfile=None):
     csv_reader = csv.reader(csvfile)
     for dict_row in csv_reader:
+        
         #skip rows that don't have two columns
         if len(dict_row) != 2:
             continue
+            
         #skip headers
         if dict_row[SHORT_REF_COLUMN] == 'ReferenceShort' and dict_row[COMPLETE_REF_COLUMN] == 'ReferenceComplete':
             continue
@@ -52,17 +54,16 @@ def load_references(csvfile=None):
         #ReferenceShort field is in the format Author, Year
         #ref_short = array containing [Author, Year]
         try:
-            ref_short = dict_row[SHORT_REF_COLUMN].strip().split(",")
-            ref_complete = dict_row[COMPLETE_REF_COLUMN].strip()
+            ref_short = dict_row[SHORT_REF_COLUMN].strip().decode('utf8').split(",")
+            ref_complete = dict_row[COMPLETE_REF_COLUMN].strip().decode('utf8')
             try:
                 author = ref_short[0].strip()
                 year = ref_short[1].strip()
                 reference, created = Source.objects.get_or_create(author=author, year=year, reference=ref_complete)
-                reference.save()
                 if created:
                     logging.info("Saved new reference %s" % reference)
             except IndexError:
                 logging.warn("No author and/or year for %s" % str(dict_row))
-        except:
-            logging.warn("Could not save reference for row %s" % str(dict_row))
+        except e:
+            logging.warn("Could not save reference for row %s: %e" % (str(dict_row), e))
     
