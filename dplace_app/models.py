@@ -353,63 +353,17 @@ class Source(models.Model):
         unique_together = (
             ('year', 'author')
         )
-
-class LanguageClass(models.Model):
+        
+class LanguageFamily(models.Model):
     scheme = models.CharField(
         max_length=1, choices=CLASSIFICATION_SCHEMES, default='G'
     )
     name = models.CharField(max_length=50, db_index=True)
-    level = models.IntegerField(db_index=True, choices=CLASS_LEVELS)
-    parent = models.ForeignKey('self', null=True, default=None)
     language_count = models.IntegerField(default=0, null=False)
     
     def update_counts(self):
-        if self.level == 1:
-            self.language_count = self.languages1.count()
-        elif self.level == 2:
-            self.language_count = self.languages2.count()
-        elif self.level == 3:
-            self.language_count = self.languages3.count()
+        self.language_count = Language.objects.all().filter(family=self).count()
         self.save()
-    
-    def __unicode__(self):
-        return "Language Class %s, level %d" % (self.name, self.level)
-    
-    class Meta:
-        verbose_name = "Language Class"
-        ordering = ('level', 'name')
-
-
-class LanguageClassification(models.Model):
-    scheme = models.CharField(
-        max_length=1, choices=CLASSIFICATION_SCHEMES, default='G'
-    )
-    language = models.ForeignKey('Language', null=True)
-    class_family = models.ForeignKey(
-        'LanguageClass', limit_choices_to={'level': 1},
-        related_name="languages1", null=True
-    )
-    class_subfamily = models.ForeignKey(
-        'LanguageClass', limit_choices_to={'level': 2},
-        related_name="languages2", null=True
-    )
-    class_subsubfamily = models.ForeignKey(
-        'LanguageClass', limit_choices_to={'level': 3},
-        related_name="languages3", null=True
-    )
-    
-    def __unicode__(self):
-        return "Family: %s for language %s" % (
-            self.class_family, self.language
-        )
-    
-    class Meta:
-        index_together = [
-            ['class_family', 'class_subfamily', 'class_subsubfamily'],
-            ['scheme', 'class_family']
-        ]
-        ordering = ("language__name",)
-
 
 class Language(models.Model):
     name = models.CharField(max_length=200, db_index=True)
@@ -417,6 +371,7 @@ class Language(models.Model):
     #needs to be null=True because some glottolog languages do not have
     # isocodes
     iso_code = models.ForeignKey('ISOCode', null=True)
+    family = models.ForeignKey('LanguageFamily', null=True)
     
     def __unicode__(self):
         return "Language: %s, ISO Code %s, Glotto Code %s" % (

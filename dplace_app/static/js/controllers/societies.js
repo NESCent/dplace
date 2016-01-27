@@ -1,4 +1,4 @@
-function SocietiesCtrl($scope, $timeout, $http, searchModelService, LanguageClass, ZipTest) {
+function SocietiesCtrl($scope, $timeout, $http, searchModelService) {
     $scope.results = searchModelService.getModel().getResults();
     $scope.query = searchModelService.getModel().getQuery();
     $scope.variables = [];

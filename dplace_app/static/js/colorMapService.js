@@ -38,7 +38,7 @@ function ColorMapService() {
             }
             
             if (results.languages.length > 0 && society.environmental_values.length == 0 && society.variable_coded_values.length == 0) {
-                    var color = mapColor(society.society.language.language_family.id, results.classifications.NumClassifications);
+                    var color = mapColor(society.society.language.family.id, results.classifications.length);
                     colors[society.society.id] = color;
                 
             }

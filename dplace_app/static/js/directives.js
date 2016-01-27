@@ -90,11 +90,10 @@ angular.module('languagePhylogenyDirective', [])
                     if (society.society.language) society_name += " (" + society.society.language.glotto_code + ")"; //formerly isocode
                     
                     if (!variable) {
+                        if (!global) return;
                         if (scope.query.language_classifications) {
-                        
                             for (var i = 0; i < society.languages.length; i++) {
-                                var classification = scope.query.language_classifications.filter(function(l) { return l.language.id == society.languages[i].id });
-                                if (classification[0].class_subfamily || classification[0].class_sub_subfamily || global) {
+                                var classification = scope.query.language_classifications.filter(function(l) { return l.id == society.languages[i].id });
                                 selected.append("svg:circle")
                                     .attr("r", function() {
                                         if (global) return 1.5;
@@ -104,12 +103,12 @@ angular.module('languagePhylogenyDirective', [])
                                     .attr("stroke-width", "0.5")
                                     .attr("fill", function(n) {
                                         if (classification.length > 0) {
-                                            value = classification[0].class_subfamily ? classification[0].class_subfamily : classification[0].class_family;
-                                            hue = value * 240 / scope.results.classifications['NumClassifications'];
+                                            value = classification[0].family.id;
+                                            hue = value * 240 / scope.results.classifications.length;
                                             return 'hsl('+hue+',100%, 50%)';
                                         }
                                     });
-                                }
+                                
                             }
                         
                         }

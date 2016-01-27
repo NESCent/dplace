@@ -4,10 +4,10 @@ angular.module('dplaceServices', ['ngResource'])
         $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
     })
     .service('colorMapService', [ColorMapService])
-    .service('searchModelService',['VariableCategory','GeographicRegion','EnvironmentalCategory', 'LanguageClass', 'DatasetSources', SearchModelService])
-    .factory('LanguageClass', function ($resource) {
+    .service('searchModelService',['VariableCategory','GeographicRegion','EnvironmentalCategory', 'LanguageFamily', 'DatasetSources', SearchModelService])
+    .factory('LanguageFamily', function($resource) {
         return $resource(
-            '/api/v1/language_classes/:id',
+            '/api/v1/language_families/:id',
             {page_size: 1000}, {
                 query: {
                     method: 'GET',
@@ -16,7 +16,22 @@ angular.module('dplaceServices', ['ngResource'])
                         return JSON.parse(data).results;
                     }
                 }
-            });
+            }
+        )
+    })
+    .factory('Language', function($resource) {
+        return $resource(
+            '/api/v1/languages/:id',
+            {page_size: 1000}, {
+                query: {
+                    method: 'GET',
+                    isArray: true,
+                    transformResponse: function(data, headers) {
+                        return JSON.parse(data).results;
+                    }
+                }
+            }
+        )
     })
     .factory('Source', function ($resource) {
         return $resource (
@@ -31,19 +46,6 @@ angular.module('dplaceServices', ['ngResource'])
                 }
             }
         )
-    })
-    .factory('LanguageClassification', function ($resource) {
-        return $resource(
-            '/api/v1/language_classifications/:id',
-            {page_size: 1000}, {
-                query: {
-                    method: 'GET',
-                    isArray: true,
-                    transformResponse: function(data, headers) {
-                        return JSON.parse(data).results;
-                    }
-                }
-            });
     })
     .factory('Variable', function ($resource) {
         return $resource(
@@ -200,18 +202,6 @@ angular.module('dplaceServices', ['ngResource'])
                     }
                 }
             });
-    })
-    .factory('ZipTest', function($resource) {
-        return $resource(
-            '/api/v1/zip_legends',
-            {}, {
-                 
-                query: {
-                    method: 'GET',
-                    isArray:false,
-                }
-            }
-        )
     })
     //not used at the moment
     .factory('TreesFromLanguages', function($resource) {

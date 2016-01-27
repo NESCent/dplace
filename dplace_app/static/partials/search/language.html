@@ -1,6 +1,6 @@
 <div ng-controller="LanguageCtrl"> 
     <span class="form-inline clearfix">
-        <h4 class="pull-left">Search by Language Family</h4>
+        <h4 class="pull-left">Search by Language Family </h4>
         <div class="pull-right">
             <button class="btn btn-primary form-control"
                         ng-disabled="searchButton.disabled"
@@ -15,30 +15,28 @@
         </div>
     </span>
     <form class="form-inline" role="form" style="margin-top:20px;">
-        <div class="panel panel-default" ng-repeat="languageFilter in languageClassifications.languageFilters">
+        <div class="panel panel-default" ng-repeat="scheme in families">
             <div class="panel-heading">
                 <div class="row">
-                    <div ng-repeat="levelObject in languageClassifications.levels"
-                         class="form-group col-xs-4">
+                    <div class="form-group col-xs-4">
                         <select
-                                ng-model="languageFilter[levelObject.level - 1].selectedItem"
+                                ng-model="scheme.selectedFamily"
                                 class="form-control"
                                 style="width:100%"
-                                ng-show="languageFilter[levelObject.level - 1].items.length > 0"
-								ng-change="selectionChanged(languageFilter,levelObject)"
-                                ng-options="item.name + ' (' + item.language_count + ')' for item in languageFilter[levelObject.level - 1].items"
+								ng-change="selectionChanged(scheme)"
+                                ng-options="item.name + ' (' + item.language_count + ')' for item in scheme"
                                 >
-                            <option value="">{{ levelObject.name }}</option>
+                            <option value="">Select a Language Family</option>
                         </select>
                     </div>
                 </div>
             </div>
             <div class="panel-body scrollable">
-				<span class="variable-label"  ng-show="languageFilter.classifications.length > 1">Select All<input type="checkbox" class="pull-left" ng-model="languageFilter.classifications.isSelected" ng-change="selectAllChanged(languageFilter)" />
+				<span class="variable-label"  ng-show="scheme.languages.length > 1">Select All<input type="checkbox" class="pull-left" ng-model="scheme.languages.allSelected" ng-change="selectAllChanged(scheme)" />
 					</span>
-                <div ng-repeat="classification in languageFilter.classifications">
-                    <input class="pull-left" type="checkbox" ng-model="classification.isSelected" ng-change="classificationSelectionChanged(classification)">
-                    <span class="language-label">{{ classification.language.name }}</span>
+                <div ng-repeat="language in scheme.languages">
+                    <input class="pull-left" type="checkbox" ng-model="language.isSelected" ng-change="classificationSelectionChanged(language)">
+                    <span class="language-label">{{ language.name }}</span>
                 </div>
             </div>
         </div>

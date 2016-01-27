@@ -80,26 +80,15 @@ class EnvironmentalViewSet(viewsets.ReadOnlyModelViewSet):
     filter_fields = ('society', 'iso_code',)
     queryset = Environmental.objects.all()
 
-class LanguageClassViewSet(viewsets.ReadOnlyModelViewSet):
-    # Model ordering is ignored when filter_fields enabled, requires FilterSet subclass
-    # see https://github.com/tomchristie/django-rest-framework/issues/1432
-    serializer_class = LanguageClassSerializer
-    filter_class = LanguageClassFilter
-    queryset = LanguageClass.objects.all()
-
-# Need an API to get classifications / languages for a class
-
-class LanguageClassificationViewSet(viewsets.ReadOnlyModelViewSet):
-    # Model ordering is ignored when filter_fields enabled, requires FilterSet subclass
-    # see https://github.com/tomchristie/django-rest-framework/issues/1432
-    serializer_class = LanguageClassificationSerializer
-    filter_class = LanguageClassificationFilter
-    queryset = LanguageClassification.objects.all()
-
 class LanguageViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = LanguageSerializer
-    filter_fields = ('name', 'iso_code', 'societies',)
+    filter_fields = ('name', 'iso_code', 'societies', 'family',)
     queryset = Language.objects.all()
+    
+class LanguageFamilyViewSet(viewsets.ReadOnlyModelViewSet):
+    serializer_class = LanguageFamilySerializer
+    filter_fields = ('name', 'scheme',)
+    queryset = LanguageFamily.objects.all()
 
 class LanguageTreeViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = LanguageTreeSerializer
@@ -155,7 +144,7 @@ def result_set_from_query_dict(query_dict):
         criteria.append(SEARCH_LANGUAGE)
         classifications = query_dict['language_classifications']
         for classification in classifications:
-            language_ids = [int(classification['language']['id'])]
+            language_ids = [int(classification['id'])]
             languages = Language.objects.filter(pk__in=language_ids) # Returns a queryset
             languages.select_related('societies')
             for language in languages:
