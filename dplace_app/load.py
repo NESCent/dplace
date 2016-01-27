@@ -65,8 +65,12 @@ def run(file_name=None, mode=None):
                     for k in dict_row:
                         if dict_row[k] is None:
                             continue
-                        dict_row[k] = dict_row[k].decode('utf8')
-                    
+                        try:
+                            dict_row[k] = dict_row[k].decode('utf8')
+                        except UnicodeDecodeError:
+                            print("Non UTF8 in %r" % dict_row)
+                            raise
+                            
                     if mode == 'iso':
                         load_isocode(dict_row)
                     elif mode == 'vars':
@@ -81,8 +85,6 @@ def run(file_name=None, mode=None):
                         load_data(dict_row)
                     elif mode == 'bf_vals':
                         load_data(dict_row)
-                    elif mode == 'ea_refs':
-                        load_val_references(dict_row)
                     elif mode == 'langs':
                         load_lang(dict_row)
                     elif mode == 'bf_soc':
