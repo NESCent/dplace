@@ -40,6 +40,7 @@ def run(file_name=None, mode=None):
     else:
         # read the csv file
         with open(file_name, 'rb') as csvfile:
+            mode = mode.strip()
             if mode in LOAD_BY_ROW:
                 csv_reader = csv.DictReader(csvfile)
                 for dict_row in csv_reader:
