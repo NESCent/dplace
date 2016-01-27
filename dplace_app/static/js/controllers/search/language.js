@@ -2,8 +2,7 @@ function LanguageCtrl($scope, searchModelService, Language, LanguageClass, Langu
     var linkModel = function() {
         // Get a reference to the language classifications from the model
         $scope.languageClassifications = searchModelService.getModel().getLanguageClassifications();
-        $scope.families = [LanguageFamily.query()];
-        console.log($scope.families);
+        $scope.families = [$scope.languageClassifications.allClasses];
     };
     $scope.$on('searchModelReset', linkModel); // When model is reset, update our model
     linkModel();
