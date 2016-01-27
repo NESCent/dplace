@@ -24,7 +24,7 @@
                                 class="form-control"
                                 style="width:100%"
 								ng-change="selectionChanged(scheme)"
-                                ng-options="item.name for item in scheme"
+                                ng-options="item.name + ' (' + item.language_count + ')' for item in scheme"
                                 >
                             <option value="">Select a Language Family</option>
                         </select>
