@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# __author__ = 'dan'
+import logging
 from django.contrib.gis.geos import Point
 from django.core.exceptions import ObjectDoesNotExist
 from dplace_app.models import *
@@ -62,9 +62,9 @@ def get_isocode(dict):
 def load_isocode(iso_dict):
     code = get_isocode(iso_dict)
     if code is None:
-        print "ISO Code not found in row, skipping"
+        logging.warn("ISO Code not found in row, skipping")
         return None
     if len(code) > 3:
-        print "ISO Code '%s' too long, skipping" % code
+        logging.warn("ISO Code '%s' too long, skipping" % code)
         return None
     return ISOCode.objects.get_or_create(iso_code=code)

@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 import csv
 import sys
+import codecs
+import logging
 from django.db import transaction
 from load.isocode import *
 from load.environmental import *
@@ -31,6 +33,22 @@ LOAD_BY_ROW=('iso', 'env_vals',
              'xd_lang', 'ea_refs')
 
 def run(file_name=None, mode=None):
+    logger = logging.getLogger()
+    logger.setLevel(logging.INFO)
+    # file load.log gets everything
+    fh = logging.FileHandler('load.log')
+    fh.setLevel(logging.INFO)
+    # create console handler with a higher log level
+    ch = logging.StreamHandler()
+    ch.setLevel(logging.WARN)
+    # create formatter and add it to the handlers
+    formatter = logging.Formatter('%(levelname)s:%(message)s')
+    fh.setFormatter(formatter)
+    ch.setFormatter(formatter)
+    # add the handlers to the logger
+    logger.addHandler(fh)
+    logger.addHandler(ch)
+    
     if mode == 'geo':
         load_regions(file_name)
     elif mode == 'tree':
@@ -39,11 +57,21 @@ def run(file_name=None, mode=None):
         load_glotto_tree(file_name)
     else:
         # read the csv file
-        with open(file_name, 'rb') as csvfile:
+        with open(file_name, 'r') as csvfile:
             mode = mode.strip()
             if mode in LOAD_BY_ROW:
                 csv_reader = csv.DictReader(csvfile)
                 for dict_row in csv_reader:
+                    
+                    for k in dict_row:
+                        if dict_row[k] is None:
+                            continue
+                        try:
+                            dict_row[k] = dict_row[k].decode('utf8')
+                        except UnicodeDecodeError:
+                            print("Non UTF8 in %r" % dict_row)
+                            raise
+                            
                     if mode == 'iso':
                         load_isocode(dict_row)
                     elif mode == 'vars':
@@ -58,8 +86,6 @@ def run(file_name=None, mode=None):
                         load_data(dict_row)
                     elif mode == 'bf_vals':
                         load_data(dict_row)
-                    elif mode == 'ea_refs':
-                        load_val_references(dict_row)
                     elif mode == 'langs':
                         load_lang(dict_row)
                     elif mode == 'bf_soc':

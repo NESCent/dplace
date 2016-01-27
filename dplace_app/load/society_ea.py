@@ -2,6 +2,7 @@
 # __author__ = 'stef'
 
 import csv
+import logging
 from django.contrib.gis.geos import Point
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.utils import IntegrityError
@@ -16,7 +17,7 @@ def ea_soc_to_xd_id(dict_row):
         society.xd_id = xd_id
         society.save()
     except ObjectDoesNotExist:
-        "Warning: Unable to find society %s" % soc_id
+        logging.warn("Warning: Unable to find society %s" % soc_id)
         return
 
 def load_ea_society(society_dict):
@@ -34,7 +35,7 @@ def load_ea_society(society_dict):
     society.alternate_names = alternate_names
     society.focal_year = focal_year
     
-    print "Saving society %s" % society
+    logging.info("Saving society %s" % society)
     society.save()
     
 def society_locations(dict_row):
@@ -53,8 +54,13 @@ def society_locations(dict_row):
                 float(lat_val)
             )
             society.location = location
+            society.save()
+            logging.warn(
+                "Added location (%s,%s) for society %s" % (long_val, lat_val, society)
+            )
         except ValueError:
-            print "Unable to create Point from (%s,%s) for society %s" % (long_val, lat_val, society)
-        society.save()
+            logging.warn(
+                "Unable to create Point from (%s,%s) for society %s" % (long_val, lat_val, society)
+            )
     except ObjectDoesNotExist:
-        print "No society with ID %s in database, skipping" % soc_id
+        logging.warn("No society with ID %s in database, skipping" % soc_id)
