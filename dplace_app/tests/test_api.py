@@ -186,7 +186,7 @@ class FindSocietiesTestCase(APITestCase):
         return self.assertNotIn(society.id, response_society_ids)
     def test_find_societies_by_language(self):
         # Find the societies that use language1
-        classifications = LanguageSerializer(Society.objects.all().filter(language=self.languageA1),many=True)
+        classifications = SocietySerializer(Society.objects.all().filter(language=self.languageA1),many=True)
         data = {'language_classifications' : classifications.data }
         response = self.client.post(self.url,data,format='json')
         self.assertSocietyInResponse(self.society1,response)
@@ -215,7 +215,7 @@ class FindSocietiesTestCase(APITestCase):
         # Society 3 is not coded for any variables, so it should not appear in the list.
         serialized_vcs = VariableCodeDescriptionSerializer([self.code1, self.code2], many=True).data
         language_classifications = Language.objects.filter(id__in=[self.languageA1.id, self.languageB3.id])
-        serialized_lcs = LanguageClassificationSerializer(language_classifications, many=True).data
+        serialized_lcs = LanguageSerializer(language_classifications, many=True).data
         data = {'variable_codes': serialized_vcs,
                 'language_classifications' : serialized_lcs}
         response = self.client.post(self.url,data,format='json')
