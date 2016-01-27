@@ -18,8 +18,13 @@ DPLACE_PATH="${BASEDIR}"
 
 # Clone the repository
 if [ ! -d "$REPO_DEST" ]; then
-    mkdir -p "$REPO_DEST"
-    git clone $REPO_SRC $REPO_DEST
+	mkdir -p "$REPO_DEST"
+	git clone $REPO_SRC $REPO_DEST
+else
+	orig=`pwd`
+	cd $REPO_DEST && git pull && cd "$orig"
+	mkdir -p "$REPO_DEST"
+	git clone $REPO_SRC $REPO_DEST
 fi
 
 ## import the data
