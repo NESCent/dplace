@@ -1,4 +1,4 @@
-function LanguageCtrl($scope, searchModelService, Language, LanguageClass, LanguageClassification, LanguageFamily) {
+function LanguageCtrl($scope, searchModelService, Language, LanguageFamily) {
     var linkModel = function() {
         // Get a reference to the language classifications from the model
         $scope.languageClassifications = searchModelService.getModel().getLanguageClassifications();
