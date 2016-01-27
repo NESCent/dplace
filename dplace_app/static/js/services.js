@@ -18,6 +18,34 @@ angular.module('dplaceServices', ['ngResource'])
                 }
             });
     })
+    .factory('LanguageFamily', function($resource) {
+        return $resource(
+            '/api/v1/language_families/:id',
+            {page_size: 1000}, {
+                query: {
+                    method: 'GET',
+                    isArray: true,
+                    transformResponse: function(data, headers) {
+                        return JSON.parse(data).results;
+                    }
+                }
+            }
+        )
+    })
+    .factory('Language', function($resource) {
+        return $resource(
+            '/api/v1/languages/:id',
+            {page_size: 1000}, {
+                query: {
+                    method: 'GET',
+                    isArray: true,
+                    transformResponse: function(data, headers) {
+                        return JSON.parse(data).results;
+                    }
+                }
+            }
+        )
+    })
     .factory('Source', function ($resource) {
         return $resource (
             '/api/v1/sources/:id',

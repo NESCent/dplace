@@ -98,7 +98,7 @@ class LanguageClassificationViewSet(viewsets.ReadOnlyModelViewSet):
 
 class LanguageViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = LanguageSerializer
-    filter_fields = ('name', 'iso_code', 'societies',)
+    filter_fields = ('name', 'iso_code', 'societies', 'family',)
     queryset = Language.objects.all()
     
 class LanguageFamilyViewSet(viewsets.ReadOnlyModelViewSet):
