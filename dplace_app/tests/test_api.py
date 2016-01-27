@@ -186,7 +186,7 @@ class FindSocietiesTestCase(APITestCase):
         return self.assertNotIn(society.id, response_society_ids)
     def test_find_societies_by_language(self):
         # Find the societies that use language1
-        classifications = LanguageClassificationSerializer(self.languageA1.languageclassification_set.all(),many=True)
+        classifications = LanguageSerializer(Society.objects.all().filter(language=self.languageA1),many=True)
         data = {'language_classifications' : classifications.data }
         response = self.client.post(self.url,data,format='json')
         self.assertSocietyInResponse(self.society1,response)
@@ -272,33 +272,32 @@ class FindSocietiesTestCase(APITestCase):
         '''
         verify the API returns language classifications ordered by language name
         '''
-
-        url = reverse('languageclassification-list')
+        url = reverse('languagefamilies-list')
         response = self.client.get(url,format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         response_dict = response.data
         index_of_A = index_of_B = index_of_C = index =0
         for result in response_dict['results']:
-            if result['language']['name'] == self.languageA1.name:
+            if result['name'] == self.lf1.name:
                 index_of_A = index
-            elif result['language']['name'] == self.languageC2.name:
+            elif result['name'] == self.lf3.name:
                 index_of_C = index
-            elif result['language']['name'] == self.languageB3.name:
+            elif result['name'] == self.lf2.name:
                 index_of_B = index
             index += 1
         self.assertLess(index_of_A, index_of_B)
         self.assertLess(index_of_B, index_of_C)
-    def test_language_class_order(self):
-        '''
-        language classes should be ordered by level then name
-        '''
-        url = reverse('languageclass-list')
-        response = self.client.get(url,format='json')
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        response_dict = response.data
-        results = response_dict['results']
-        def getkey(item):
-            return item['level'], item['name'],
-        sorted_results = sorted(results, key=getkey)
-        self.assertEquals(results,sorted_results)
+    #def test_language_class_order(self):
+    #    '''
+    #    language classes should be ordered by level then name
+    #    '''
+    #    url = reverse('languageclass-list')
+    #    response = self.client.get(url,format='json')
+    #    self.assertEqual(response.status_code, status.HTTP_200_OK)
+    #    response_dict = response.data
+    #    results = response_dict['results']
+    #    def getkey(item):
+    #        return item['level'], item['name'],
+    #    sorted_results = sorted(results, key=getkey)
+    #    self.assertEquals(results,sorted_results)
 
