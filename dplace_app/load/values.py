@@ -53,20 +53,17 @@ def load_val_references(val_row):
     if val_row['Dataset'].strip() == 'EA':
         source = get_source("EA")
         label = eavar_number_to_label(variable_id)
-
     elif val_row['Dataset'].strip() == 'LRB':
         source = get_source("Binford")
         label = bfvar_number_to_label(variable_id)
-        
     else:
-        source = None
         logging.warn("Could not determine dataset source for row %s, skipping" % str(val_row))
         return
-
+        
     variable = get_variable(variable_id, label)
     value = val_row['Code'].strip()
     comment = val_row['Comment'].strip()
-    references = val_row['References'].strip().split(";")   
+    references = val_row['References'].strip().split(";")
     focal_year = val_row['Year'].strip()
     subcase = val_row['SpecRef'].strip()
 
@@ -142,30 +139,26 @@ def load_data(val_row):
         source = None
         logging.warn("Could not determine dataset source for row %s, skipping" % str(val_row))
         return
-
+    
     variable = get_variable(variable_id, label)
-    value = val_row['Code'].strip()
-    comment = val_row['Comment'].strip()
-    references = val_row['References'].strip().split(";")   
-    focal_year = val_row['Year'].strip()
-    subcase = val_row['SpecRef'].strip()
-
+    
     if variable is None:
         logging.warn("Could not find variable %s for society %s" % (variable_id, society))
         return
-
-    code = get_description(variable, value)
+        
+    code = get_description(variable, val_row['Code'].strip())
     
-    v, created = VariableCodedValue.objects.get_or_create(
+    vcv, created = VariableCodedValue.objects.get_or_create(
         variable=variable,
         society=society,
         source=source,
-        coded_value=value,
+        coded_value=val_row['Code'].strip(),
         code=code,
-        focal_year=focal_year,
-        comment=comment,
-        subcase=subcase
+        focal_year=val_row['Year'].strip(),
+        comment=val_row['Comment'].strip(),
+        subcase=val_row['SpecRef'].strip()
     )
-    v.save()
-    logging.info("Saved data for Society %s Variable ID %s" % (ext_id, variable.label))
-
+    
+    if created:
+        logging.info("Saved data for Society %s Variable ID %s" % (ext_id, variable.label))
+        
