@@ -12,6 +12,5 @@ admin.site.register(VariableDescription)
 admin.site.register(VariableCodeDescription)
 admin.site.register(VariableCodedValue)
 
-admin.site.register(LanguageClass)
-admin.site.register(LanguageClassification)
 admin.site.register(Language)
+admin.site.register(LanguageFamily)

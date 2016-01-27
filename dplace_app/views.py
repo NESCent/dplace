@@ -1,7 +1,7 @@
 from __builtin__ import dict
 from django.http import Http404
 from django.shortcuts import render, get_object_or_404
-from dplace_app.models import Society, Language, LanguageClassification
+from dplace_app.models import Society, Language, LanguageFamily
 
 def view_society(request, society_id):
     society = get_object_or_404(Society, pk=society_id)
@@ -10,7 +10,7 @@ def view_society(request, society_id):
     cultural_traits = society.get_cultural_trait_data()
     references = society.get_data_references()
     if society.language:
-        language_classification = LanguageClassification.objects.filter(language=society.language, scheme='G') #just glottolog at the moment
+        language_classification = LanguageFamily.objects.filter(name=society.language.family.name, scheme='G') #just glottolog at the moment
     return render(request,'society.html', {'society': society,
                                             'xd_id': xd_id,
                                             'language_classification':language_classification,

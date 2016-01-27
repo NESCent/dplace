@@ -73,10 +73,6 @@ class EnvironmentalSerializer(gis_serializers.GeoModelSerializer):
         model = Environmental
 
 # Languages
-class LanguageClassSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = LanguageClass
-
 class LanguageFamilySerializer(serializers.ModelSerializer):
     class Meta:
         model = LanguageFamily
@@ -87,11 +83,6 @@ class LanguageSerializer(serializers.ModelSerializer):
     family = LanguageFamilySerializer(source='family')
     class Meta:
         model = Language
-
-class LanguageClassificationSerializer(serializers.ModelSerializer):
-    language = LanguageSerializer(source='language')
-    class Meta:
-        model = LanguageClassification
         
 # Societies
 class SocietySerializer(gis_serializers.GeoModelSerializer):
