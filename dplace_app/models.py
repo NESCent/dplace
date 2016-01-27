@@ -359,6 +359,11 @@ class LanguageFamily(models.Model):
         max_length=1, choices=CLASSIFICATION_SCHEMES, default='G'
     )
     name = models.CharField(max_length=50, db_index=True)
+    language_count = models.IntegerField(default=0, null=False)
+    
+    def update_counts(self):
+        self.language_count = Language.objects.all().filter(family=self).count()
+        self.save()
 
 class Language(models.Model):
     name = models.CharField(max_length=200, db_index=True)
