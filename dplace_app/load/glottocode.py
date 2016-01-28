@@ -64,9 +64,9 @@ def xd_to_language(dict_row):
             family_language = Language.objects.get(glotto_code=family)
             lang_fam, created = LanguageFamily.objects.get_or_create(scheme='G', name=family_language.name)
             if created:
-                print "Language Family %s created" % (lang_fam.name)
+                logging.info ("Language Family %s created" % (lang_fam.name))
         except ObjectDoesNotExist:
-            print "No language found for family glottocode %s, skipping" % family_glottocode
+            logging.warning("No language found for family glottocode %s, skipping" % family_glottocode)
             lang_fam = None
             
         try:
@@ -83,7 +83,6 @@ def xd_to_language(dict_row):
                 if lang_fam:
                     language.family = lang_fam
                     language.save()
-                    logging.info("Mapped isocode %s to glottocode %s" % (isocode, glottocode))
                 for s in societies:
                     s.language = language
                     s.save()
@@ -92,38 +91,3 @@ def xd_to_language(dict_row):
                     "No language found for isocode %s and glottocode %s, skipping" % (isocode, glottocode)
                 )
                 return
-            
-    try:
-        language = Language.objects.get(glotto_code=glotto, iso_code=iso)
-    except ObjectDoesNotExist:
-        logging.warning(
-            "No language found for glottocode %s and isocode %s, skipping" % (glottocode, isocode)
-        )
-        return
-    try:
-        family_language = Language.objects.get(glotto_code=family)
-    except ObjectDoesNotExist:
-        logging.warning("No language found for family glottocode %s, skipping" % family_glottocode)
-        return
-        
-    class_level = 1
-    lang_class, created = LanguageClass.objects.get_or_create(
-        scheme=classification_scheme,
-        level=class_level,
-        name=family_language.name
-    )
-    if created:
-         logging.info(
-             "Created language class for family %s" % family_language.name.encode("UTF-8", "ignore")
-         )
-    
-    classification, created = LanguageClassification.objects.get_or_create(
-        scheme=classification_scheme,
-        language=language,
-        class_family=lang_class,
-    )
-    classification.save()
-    if created:
-        logging.info("Saved classification %s, %s" % (xd_id, glotto))
-                                                            
-                                                            
