@@ -222,7 +222,7 @@ def result_set_from_query_dict(query_dict):
         geographic_region_ids = [int(x['id']) for x in query_dict['geographic_regions']]
         regions = GeographicRegion.objects.filter(pk__in=geographic_region_ids) # returns a queryset
         for region in regions:
-            for society in Society.objects.filter(location__intersects=region.geom):
+            for society in Society.objects.filter(location__intersects=region.geom).prefetch_related('source'):
                 result_set.add_geographic_region(society, region)
     # Filter the results to those that matched all criteria
     result_set.finalize(criteria)
@@ -235,6 +235,7 @@ def result_set_from_query_dict(query_dict):
     trees = trees_from_languages_array(language_ids)
     for t in trees:
         result_set.add_language_tree(t)
+
     return result_set
 
 # search/filter APIs
@@ -248,8 +249,17 @@ def find_societies(request):
 
     Returns serialized collection of SocietyResult objects
     """
+    from time import time
+    from django.db import connection
+
+    start = time()
+    nstart = len(connection.queries)
     result_set = result_set_from_query_dict(request.data)
-    return Response(SocietyResultSetSerializer(result_set).data)
+    print '-->', len(connection.queries) - nstart, time() - start
+    d = SocietyResultSetSerializer(result_set).data
+    print '==>', len(connection.queries) - nstart, time() - start
+    print connection.queries[-1]
+    return Response(d)
 
 @api_view(['GET'])
 @permission_classes((AllowAny,))
@@ -257,7 +267,7 @@ def get_categories(request):
     """
     Filters categories for sources, as some categories are empty for some sources
     """
-    query_string = request.QUERY_PARAMS['query']
+    query_string = request.query_params['query']
     query_dict = json.loads(query_string)
     categories = VariableCategory.objects.all()
     source_categories = []
@@ -287,7 +297,7 @@ class GeographicRegionViewSet(viewsets.ReadOnlyModelViewSet):
 @permission_classes((AllowAny,))
 @renderer_classes((JSONRenderer,))
 def get_min_and_max(request):
-    query_string = request.QUERY_PARAMS['query']
+    query_string = request.query_params['query']
     query_dict = json.loads(query_string)
     if 'environmental_id' in query_dict:
         values = EnvironmentalValue.objects.filter(variable__id=query_dict['environmental_id'])
@@ -307,7 +317,7 @@ def get_min_and_max(request):
 @permission_classes((AllowAny,))
 @renderer_classes((JSONRenderer,))
 def bin_cont_data(request): #MAKE THIS GENERIC
-    query_string = request.QUERY_PARAMS['query']
+    query_string = request.query_params['query']
     query_dict = json.loads(query_string)
     if 'bf_id' in query_dict:
         bf_variable = VariableDescription.objects.filter(id=query_dict['bf_id'])
