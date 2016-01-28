@@ -90,11 +90,10 @@ angular.module('languagePhylogenyDirective', [])
                     if (society.society.language) society_name += " (" + society.society.language.glotto_code + ")"; //formerly isocode
                     
                     if (!variable) {
+                        if (!global) return;
                         if (scope.query.language_classifications) {
-                        
                             for (var i = 0; i < society.languages.length; i++) {
-                                var classification = scope.query.language_classifications.filter(function(l) { return l.language.id == society.languages[i].id });
-                                if (classification[0].class_subfamily || classification[0].class_sub_subfamily || global) {
+                                var classification = scope.query.language_classifications.filter(function(l) { return l.id == society.languages[i].id });
                                 selected.append("svg:circle")
                                     .attr("r", function() {
                                         if (global) return 1.5;
@@ -104,12 +103,12 @@ angular.module('languagePhylogenyDirective', [])
                                     .attr("stroke-width", "0.5")
                                     .attr("fill", function(n) {
                                         if (classification.length > 0) {
-                                            value = classification[0].class_subfamily ? classification[0].class_subfamily : classification[0].class_family;
-                                            hue = value * 240 / scope.results.classifications['NumClassifications'];
+                                            value = classification[0].family.id;
+                                            hue = value * 240 / scope.results.classifications.length;
                                             return 'hsl('+hue+',100%, 50%)';
                                         }
                                     });
-                                }
+                                
                             }
                         
                         }
@@ -422,7 +421,7 @@ angular.module('languagePhylogenyDirective', [])
                         addMarkers(langTree, scope.results, null, node, false, translate);
                     }
                 }
-                console.log(scope.query);
+                console.log(scope.query);                
                 scope.results.societies.forEach(function(society) {
                     if (society.society.language) to_match = langTree.name.indexOf("glotto") == -1 ? society.society.language.iso_code : society.society.language.glotto_code;
                     else to_match = society.society.name;
@@ -455,6 +454,9 @@ angular.module('languagePhylogenyDirective', [])
                             }); 
                             }
                 });
+                d3.selectAll(".inner-node").select("circle").remove();
+                d3.selectAll(".inner-node").select("text").remove();
+                
                 //Time Scale
                 if (langTree.name.indexOf("glotto") == -1 && langTree.name.indexOf("global") == -1) {
                     line_svg= d3.select('language-phylogeny').append("svg:svg")

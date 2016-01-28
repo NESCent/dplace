@@ -73,22 +73,17 @@ class EnvironmentalSerializer(gis_serializers.GeoModelSerializer):
         model = Environmental
 
 # Languages
-class LanguageClassSerializer(serializers.ModelSerializer):
+class LanguageFamilySerializer(serializers.ModelSerializer):
     class Meta:
-        model = LanguageClass
+        model = LanguageFamily
 
 class LanguageSerializer(serializers.ModelSerializer):
-    language_family = LanguageClassSerializer(source='languageclassification_set.first.class_family')
     glotto_code = serializers.CharField(source='glotto_code.glotto_code')
     iso_code = serializers.CharField(source='iso_code.iso_code')
+    family = LanguageFamilySerializer(source='family')
     class Meta:
         model = Language
 
-class LanguageClassificationSerializer(serializers.ModelSerializer):
-    language = LanguageSerializer()
-    class Meta:
-        model = LanguageClassification
-        
 # Societies
 class SocietySerializer(gis_serializers.GeoModelSerializer):
     language = LanguageSerializer()
@@ -132,7 +127,9 @@ class SocietyResult(object):
         self.languages.add(language)
     def add_geographic_region(self,geographic_region):
         self.geographic_regions.add(geographic_region)
-    def includes_criteria(self,criteria=[]):
+    def includes_criteria(self,criteria=None):
+        if criteria is None:
+            criteria = []
         result = True
         if SEARCH_VARIABLES in criteria and len(self.variable_coded_values) == 0:
             result = False

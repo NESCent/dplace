@@ -1,11 +1,10 @@
 import re
+import logging
 from os.path import basename
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.core.files import File
 from nexus import NexusReader
 from dplace_app.models import LanguageTree, Language, ISOCode
-
-__author__ = 'dan'
 
 def get_language(taxon_name):
     # taxon name may be an iso code, language name, or glotto code
@@ -54,7 +53,7 @@ def load_tree(file_name, verbose=False):
         newick = newick
         
     if verbose:
-        print "Formatting newick string %s" % (newick)
+        logging.info("Formatting newick string %s" % (newick))
         
     tree.newick_string = str(newick)
     for taxon_name in reader.trees.taxa:
@@ -64,7 +63,7 @@ def load_tree(file_name, verbose=False):
         try:
             language = get_language(taxon_name)
         except ValueError:
-            print("load_tree: Error with taxon - `%s`" % taxon_name)
+            logging.warn("load_tree: Error with taxon - `%s`" % taxon_name)
             
         if language:
             if len(language) > 1:

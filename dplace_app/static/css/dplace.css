@@ -174,8 +174,13 @@ label.light {
     font-size: 1.5rem;
 }
 
-.variable-label {
+.variable-label, .language-label {
     text-align: right;
+    margin-left: 5px;
+}
+
+.language-label {
+    vertical-align: middle;
 }
 
 .variable-description {
