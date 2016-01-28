@@ -63,7 +63,7 @@ def load_tree(file_name, verbose=False):
         try:
             language = get_language(taxon_name)
         except ValueError:
-            logging.warn("load_tree: Error with taxon - `%s`" % taxon_name)
+            logging.warn("load_tree: Error with taxon - `%s` %s" % (taxon_name, file_name))
             
         if language:
             if len(language) > 1:

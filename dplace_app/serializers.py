@@ -80,7 +80,7 @@ class LanguageFamilySerializer(serializers.ModelSerializer):
 class LanguageSerializer(serializers.ModelSerializer):
     glotto_code = serializers.CharField(source='glotto_code.glotto_code')
     iso_code = serializers.CharField(source='iso_code.iso_code')
-    family = LanguageFamilySerializer(source='family')
+    family = LanguageFamilySerializer()
     class Meta:
         model = Language
 
