@@ -123,13 +123,17 @@ class VariableCodeDescriptionAPITestCase(APITestCase):
         self.source_binford = Source.objects.create(year='2016', author='Russell Gray', reference='Gray (2016). Title.', name='BF Test Dataset')
         self.category1 = VariableCategory.objects.create(name='Economy')
         self.category2 = VariableCategory.objects.create(name='Demography')
+        self.category3 = VariableCategory.objects.create(name='Empty Category')
         
         self.variable = VariableDescription.objects.create(label='EA001',name='Variable 1', source=self.source_ea, codebook_info='Variable 1', data_type='Categorical')
         self.variable2 = VariableDescription.objects.create(label='B002', name='Variable 2', source=self.source_binford, codebook_info='Variable 2', data_type='Continuous')
+        self.variable3 = VariableDescription.objects.create(label='EA002', name='EA Variable 2', source=self.source_ea, codebook_info='EA Variable 2', data_type='Categorical')
         self.variable.save()
         self.variable2.save()
+        self.variable3.save()
         self.variable.index_categories.add(self.category1, self.category2)
         self.variable2.index_categories.add(self.category2)
+        self.variable3.index_categories.add(self.category1)
         self.code1 = VariableCodeDescription.objects.create(variable=self.variable, code='1', description='Code 1')
         self.code10 = VariableCodeDescription.objects.create(variable=self.variable, code='10', description='Code 10')
         self.code2 = VariableCodeDescription.objects.create(variable=self.variable, code='2', description='Code 2')
@@ -140,6 +144,13 @@ class VariableCodeDescriptionAPITestCase(APITestCase):
     def assertVariableNotInResponse(self,variable,response):
         response_variable_ids = [x['id'] for x in response['results']]
         return self.assertNotIn(variable.id, response_variable_ids)
+        
+    def assertCategoryInResponse(self,category,response):
+        response_category_ids = [x['id'] for x in response]
+        return self.assertIn(category.id, response_category_ids)
+    def assertCategoryNotInResponse(self,category,response):
+        response_category_ids = [x['id'] for x in response]
+        return self.assertNotIn(category.id, response_category_ids)
     
     def test_code_description_order(self):
         '''
@@ -167,9 +178,20 @@ class VariableCodeDescriptionAPITestCase(APITestCase):
         response = self.client.get(url,format='json')
         self.assertEqual(response.status_code,status.HTTP_200_OK)
         response_dict = response.data
-        self.assertEqual(response_dict['count'],2)
+        self.assertEqual(response_dict['count'],3)
         self.assertVariableInResponse(self.variable, response_dict)
         self.assertVariableInResponse(self.variable2, response_dict)
+        self.assertVariableInResponse(self.variable3, response_dict)
+        
+    def test_empty_category(self):#tests get_categories API
+        url = reverse('get_categories')
+        data = {'query': json.dumps({'source': self.source_ea.id})}
+        response = self.client.get(url,data,format='json')
+        self.assertEqual(response.status_code,status.HTTP_200_OK)
+        self.assertEqual(len(response.data),2)
+        self.assertCategoryInResponse(self.category1, response.data)
+        self.assertCategoryInResponse(self.category2, response.data)
+        self.assertCategoryNotInResponse(self.category3, response.data)
         
     def test_filter_source(self):
         url = reverse('variabledescription-list')
@@ -177,8 +199,9 @@ class VariableCodeDescriptionAPITestCase(APITestCase):
         response = self.client.get(url, data, format='json')
         self.assertEqual(response.status_code,status.HTTP_200_OK)
         response_dict = response.data
-        self.assertEqual(response_dict['count'],1)
+        self.assertEqual(response_dict['count'],2)
         self.assertVariableInResponse(self.variable, response_dict)
+        self.assertVariableInResponse(self.variable3, response_dict)
         self.assertVariableNotInResponse(self.variable2, response_dict)
         
     def test_category1_variables(self):
@@ -187,8 +210,9 @@ class VariableCodeDescriptionAPITestCase(APITestCase):
         response = self.client.get(url,data,format='json')
         self.assertEqual(response.status_code,status.HTTP_200_OK)
         response_dict = response.data
-        self.assertEqual(response_dict['count'],1)
-        self.assertEqual(response_dict['results'][0]['name'], self.variable.name)
+        self.assertEqual(response_dict['count'],2)
+        self.assertVariableInResponse(self.variable, response_dict)
+        self.assertVariableInResponse(self.variable3, response_dict)
         self.assertVariableNotInResponse(self.variable2, response_dict)
         
     def test_category2_variables(self):
