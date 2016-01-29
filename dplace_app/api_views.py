@@ -130,7 +130,11 @@ class SourceViewSet(viewsets.ReadOnlyModelViewSet):
 #maybe needs cleaning up in the future 
 def trees_from_languages_array(language_ids):
     from ete2 import Tree
-    trees = LanguageTree.objects.filter(languages__pk__in=language_ids).distinct()
+    trees = LanguageTree.objects\
+        .filter(languages__pk__in=language_ids)\
+        .prefetch_related(
+            'languages__family', 'languages__glotto_code', 'languages__iso_code')\
+        .distinct()
     for t in trees:
         if 'glotto' in t.name:
             langs_in_tree = [str(l.glotto_code.glotto_code) for l in t.languages.all() if l.id in language_ids]
@@ -240,7 +244,13 @@ def result_set_from_query_dict(query_dict):
         geographic_region_ids = [int(x['id']) for x in query_dict['geographic_regions']]
         regions = GeographicRegion.objects.filter(pk__in=geographic_region_ids) # returns a queryset
         for region in regions:
-            for society in Society.objects.filter(location__intersects=region.geom).prefetch_related('source'):
+            for society in Society.objects\
+                    .filter(location__intersects=region.geom)\
+                    .select_related(
+                        'language__family',
+                        'language__glotto_code',
+                        'language__iso_code')\
+                    .prefetch_related('source').all():
                 result_set.add_geographic_region(society, region)
     # Filter the results to those that matched all criteria
     result_set.finalize(criteria)
@@ -276,7 +286,7 @@ def find_societies(request):
     print '-->', len(connection.queries) - nstart, time() - start
     d = SocietyResultSetSerializer(result_set).data
     print '==>', len(connection.queries) - nstart, time() - start
-    #for q in connection.queries[-5:]:
+    #for q in connection.queries[-550:-500]:
     #    print q['sql'][:1000]
     return Response(d)
 
