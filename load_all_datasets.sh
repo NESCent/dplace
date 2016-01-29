@@ -57,9 +57,6 @@ python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/BinfordVariableList
 echo "Loading Binford Variable Codes"
 python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/BinfordVariableListCodeDescription_18Nov2015.csv" codes
 
-echo "Loading Binford Variable Codes" 
-python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/BinfordVariableListCodeDescription_18Nov2015.csv" codes
-
 echo "Loading EA Societies"
 python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/EA_Society_HeaderData.csv" ea_soc
 

@@ -283,8 +283,8 @@ class FindSocietiesTestCase(Test):
             geom=poly13
         )
 
-    def get_results(self, **data):
-        return self.client.post(reverse('find_societies'), data or {}, format='json')
+    def get_results(self, urlname='find_societies', **data):
+        return self.client.post(reverse(urlname), data or {}, format='json')
 
     def society_in_results(self, society, response):
         return society.id in [x['society']['id'] for x in response.data['societies']]
@@ -392,3 +392,13 @@ class FindSocietiesTestCase(Test):
         self.assertTrue(self.society_in_results(self.society1, response))
         self.assertTrue(self.society_in_results(self.society3, response))
         self.assertFalse(self.society_in_results(self.society2, response))
+
+    def test_csv_download(self):
+        response = self.client.get(reverse('csv_download'))
+        self.assertEqual(response.content.split()[0], '"Research')
+
+        response = self.get_results(
+            urlname='csv_download',
+            geographic_regions=[GeographicRegionSerializer(self.geographic_region13).data]
+        )
+        self.assertIn('Region13', response.content)

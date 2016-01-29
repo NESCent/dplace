@@ -24,7 +24,8 @@ except ImportError:
 IS_ISOCODE = re.compile(r"""'.* <\w{4}\d{4}><(\w{3})>'$""")
 IS_GLOTTOCODE = re.compile(r"""'.* <(\w{4}\d{4})>.*'$""")
 
-def clean_tree(tree):
+
+def clean_tree(tree):  # pragma: no cover
     """Previously, removed taxa with no ISO-639 codes.
     Now renames taxa to Glottocodes."""
     to_keep = []
@@ -50,7 +51,7 @@ def clean_tree(tree):
 
 GLOTTOLOG_FAMILIES = "http://glottolog.org/glottolog/language.atom?type=families&sSearch_1=Top-level+unit"
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     urls = {}
     
     for entry in bs(requests.get(GLOTTOLOG_FAMILIES).text).find_all('entry'):

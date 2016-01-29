@@ -111,6 +111,7 @@ class LanguageFamilyViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = LanguageFamilySerializer
     filter_fields = ('name', 'scheme',)
     queryset = LanguageFamily.objects.all()
+    renderer_classes = (ResultsRenderer,)
 
 
 class LanguageTreeViewSet(viewsets.ReadOnlyModelViewSet):
@@ -400,17 +401,17 @@ def newick_tree(key):
     except ValueError:
         tree = tree
     return tree
-    
+
 #NEW CSV DOWNLOAD CODE
 @api_view(['POST'])
 @permission_classes((AllowAny,))
 @renderer_classes((DPLACECsvRenderer,))
 def csv_download(request):
     import datetime
-    result_set = result_set_from_query_dict(request.DATA)
+    result_set = result_set_from_query_dict(request.data)
     response = Response(SocietyResultSetSerializer(result_set).data)
     filename = "dplace-societies-%s.csv" % datetime.datetime.now().strftime("%Y-%m-%d")
-    response['Content-Disposition']  = 'attachment; filename="%s"' % filename
+    response['Content-Disposition'] = 'attachment; filename="%s"' % filename
     return response
 
 #OLD CSV DOWNLOAD CODE

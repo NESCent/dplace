@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
 import logging
+
 from django.contrib.gis.geos import Point
 from django.core.exceptions import ObjectDoesNotExist
 from dplace_app.models import *
@@ -130,6 +132,7 @@ ENVIRONMENTAL_MAP = {
     },
 }
 
+
 def iso_from_code(code):
     if code == 'NA' or len(code) == 0:
         return None
@@ -138,25 +141,25 @@ def iso_from_code(code):
     except ObjectDoesNotExist:
         return None
 
+
 def create_environmental_variables():
-    for k in ENVIRONMENTAL_MAP:
-        var_dict = ENVIRONMENTAL_MAP[k]
+    for k, var_dict in ENVIRONMENTAL_MAP.items():
         if 'category' in var_dict:
             env_category, created = EnvironmentalCategory.objects.get_or_create(name=var_dict['category'])
             if created:
                 logging.info("Created environmental category %s" % env_category)
-            obj, created = EnvironmentalVariable.objects.get_or_create(name=var_dict['name'])
-            obj.category = env_category
-            obj.units = var_dict['units'].decode('utf-8').strip()
-            obj.codebook_info = var_dict['description']
-            obj.save()
-            logging.info("Saved environmental variable %s" % obj)
         else:
-            EnvironmentalVariable.objects.get_or_create(
-                name=var_dict['name'],units=var_dict['units'].decode('utf-8').strip()
-            )
-            logging.info("Saved environmental variable %s" % var_dict['name'])
-    
+            env_category = None
+
+        obj, created = EnvironmentalVariable.objects.get_or_create(
+            name=var_dict['name'],
+            units=var_dict['units'],
+            category=env_category)
+        obj.codebook_info = var_dict['description']
+        obj.save()
+        logging.info("Saved environmental variable %s" % obj)
+
+
 def load_environmental(env_dict):
     ext_id = env_dict['ID']
     source = get_source(env_dict['Source'])
@@ -169,15 +172,17 @@ def load_environmental(env_dict):
         society = Society.objects.get(ext_id=ext_id, source=source)
     except ObjectDoesNotExist:
         logging.warn(
-            "Unable to find a Society object with ext_id %s and source %s, skipping..." % (ext_id, source)
-        )
+            "Unable to find a Society object with ext_id %s and source %s, skipping..." %
+            (ext_id, source))
         return
     
     # This limits the environmental data to one record per society record
-    found_environmentals = Environmental.objects.filter(society=society)
+    found_environmentals = Environmental.objects.filter(society=society).all()
     if len(found_environmentals) == 0:
-        reported_latlon =  Point(float(env_dict['Orig.longitude']),float(env_dict['Orig.latitude']))
-        actual_latlon = Point(float(env_dict['longitude']), float(env_dict['latitude']))
+        reported_latlon = Point(
+            float(env_dict['Orig.longitude']), float(env_dict['Orig.latitude']))
+        actual_latlon = Point(
+            float(env_dict['longitude']), float(env_dict['latitude']))
         iso_code = iso_from_code(env_dict['iso'])
         
         # Create the base Environmental
@@ -188,7 +193,7 @@ def load_environmental(env_dict):
             source=source,
             iso_code=iso_code
         )
-        for k in ENVIRONMENTAL_MAP: # keys are the columns in the CSV file
+        for k in ENVIRONMENTAL_MAP:  # keys are the columns in the CSV file
             var_dict = ENVIRONMENTAL_MAP[k]
             try:
                 # Get the variable
@@ -204,3 +209,6 @@ def load_environmental(env_dict):
             logging.info(
                 "Created environmental value for variable %s and society %s" % (var_dict['name'], society)
             )
+    else:
+        environmental = found_environmentals[0]
+    return environmental

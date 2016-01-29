@@ -4,22 +4,19 @@ from os.path import basename
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.core.files import File
 from nexus import NexusReader
-from dplace_app.models import LanguageTree, Language, ISOCode
+from dplace_app.models import LanguageTree, Language
+
 
 def get_language(taxon_name):
     # taxon name may be an iso code, language name, or glotto code
-    language = None
     try:
         language = [Language.objects.get(iso_code__iso_code=taxon_name)]
-        
     except MultipleObjectsReturned:
-        language = Language.objects.filter(iso_code__iso_code=taxon_name)
-    
+        language = Language.objects.filter(iso_code__iso_code=taxon_name).all()
     except ObjectDoesNotExist:
         # Not found by ISO Code, try by glotto code
         try:
             language = [Language.objects.get(glotto_code__glotto_code=taxon_name)]
-            
         except ObjectDoesNotExist:
             # Not found by Glotto Code either, try by name
             try:
@@ -35,10 +32,11 @@ def get_language(taxon_name):
         raise ValueError("Error: multiple languages returned for %s" % (taxon_name))
     return language
 
+
 def load_tree(file_name, verbose=False):
     # make a tree if not exists. Use the name of the tree
     tree_name = basename(file_name)
-    with open(file_name,'r') as f:
+    with open(file_name, 'r') as f:
         tree, created = LanguageTree.objects.get_or_create(name=tree_name)
         if created:
             tree.file = File(f)
@@ -64,7 +62,7 @@ def load_tree(file_name, verbose=False):
             language = get_language(taxon_name)
         except ValueError:
             logging.warn("load_tree: Error with taxon - `%s` %s" % (taxon_name, file_name))
-            
+
         if language:
             if len(language) > 1:
                 for l in language:
@@ -72,5 +70,3 @@ def load_tree(file_name, verbose=False):
             else:
                 tree.languages.add(language[0])
     tree.save()
-
-load_glotto_tree = load_tree

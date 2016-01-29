@@ -63,8 +63,8 @@ class DPLACECSVResults(object):
         self.field_names = [field.encode("utf-8") for field in self.field_names]
 
     def flatten(self):
-    # data is a dictionary with a list of societies
-        for item in self.data['societies']:
+        # data is a dictionary with a list of societies
+        for item in self.data.get('societies', []):
             row = dict()
             # Merge in society data
             society = item['society']
@@ -130,7 +130,6 @@ class DPLACECsvRenderer(renderers.BaseRenderer):
         if data is None:
             return ''
         results = DPLACECSVResults(data)
-
         csv_buffer = StringIO()
         csv_writer = csv.DictWriter(csv_buffer, results.field_names)
         cite_writer = csv.writer(csv_buffer)
