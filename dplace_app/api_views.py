@@ -258,7 +258,7 @@ def get_categories(request):
 
 @api_view(['GET'])
 @permission_classes((AllowAny,))
-def get_dataset_sources(requesy):
+def get_dataset_sources(request):
     return Response(SourceSerializer(Source.objects.all().exclude(name=""), many=True).data)
     
 class GeographicRegionViewSet(viewsets.ReadOnlyModelViewSet):
