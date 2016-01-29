@@ -4,6 +4,7 @@ import sys
 import django
 from django.db import transaction
 
+from dplace_app.models import Society, Source
 from load.util import configure_logging, csv_dict_reader, stream
 from load.isocode import load_isocode
 from load.environmental import load_environmental, create_environmental_variables
@@ -34,8 +35,18 @@ LOAD_BY_ROW = {
 }
 
 
+def prefetched(mode):
+    res = {}
+    if mode in ['ea_vals', 'bf_vals']:
+        res['societies'] = {s.ext_id: s for s in Society.objects.all()}
+        res['sources'] = {(s.author, s.year): s for s in Source.objects.all()}
+    return res
+
+
 def run(file_name, mode):
     configure_logging()
+
+    _prefetched = prefetched(mode)
 
     if mode == 'geo':
         load_regions(file_name)
@@ -47,7 +58,10 @@ def run(file_name, mode):
         row_loader = LOAD_BY_ROW.get(mode)
         if row_loader:
             for dict_row in csv_dict_reader(file_name):
-                row_loader(dict_row)
+                if _prefetched:
+                    row_loader(dict_row, **_prefetched)
+                else:
+                    row_loader(dict_row)
         elif mode == 'glotto':
             load_glottocode(csv_dict_reader(file_name))
         elif mode == 'refs':
@@ -56,10 +70,11 @@ def run(file_name, mode):
             load_codes(stream(file_name))
         elif mode == 'env_vars':
             create_environmental_variables()
-        elif mode == 'langs' or mode == 'xd_lang':
-            update_language_counts()
         else:
             raise ValueError(mode)
+
+        if mode == 'langs' or mode == 'xd_lang':
+            update_language_counts()
 
     if len(MISSING_CODES) > 0:
         print "Missing ISO Codes:"

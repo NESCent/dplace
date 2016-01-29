@@ -99,7 +99,7 @@ class GeographicRegionSerializer(serializers.ModelSerializer):
         fields = ('id','level_2_re','count','region_nam','continent','tdwg_code')
 
 class LanguageTreeSerializer(serializers.ModelSerializer):
-   languages = LanguageSerializer(source='languages', many=True)   
+   languages = LanguageSerializer(many=True)
    class Meta:
         model = LanguageTree
         fields = ('id','name','languages', 'newick_string')

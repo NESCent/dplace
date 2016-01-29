@@ -10,12 +10,10 @@ _VAL_CACHE, _VCD_CACHE = {}, {}
 
 
 def get_variable(label):
-    if label not in _VAL_CACHE:
-        try:
-            _VAL_CACHE[label] = VariableDescription.objects.get(label=label)
-        except ObjectDoesNotExist:
-            _VAL_CACHE[label] = None
-    return _VAL_CACHE[label]
+    global _VAL_CACHE
+    if not _VAL_CACHE:
+        _VAL_CACHE = {vd.label: vd for vd in VariableDescription.objects.all()}
+    return _VAL_CACHE.get(label)
 
 
 def get_description(variable, value):
@@ -29,20 +27,19 @@ def get_description(variable, value):
     return _VCD_CACHE[key]
 
 
-#soooooooooooooooooooooooooo slow 
-def load_data(val_row):
+# soooooooooooooooooooooooooo slow
+def load_data(val_row, societies=None, sources=None):
+    societies = societies or {}
+    sources = sources or {}
+
     ext_id = val_row.get('soc_id')
-    if not ext_id:
-        return
-
-    try:
-        society = Society.objects.get(ext_id=ext_id)
-    except ObjectDoesNotExist:
+    if ext_id not in societies:
         logging.warn(
-            "Attempting to load EA values for %s but did not find an existing Society object, skipping" % ext_id
-        )
+            "Attempting to load values for %s but no Society object exists, skipping"
+            % ext_id)
         return
 
+    society = societies[ext_id]
     variable_id = val_row['VarID']
 
     if val_row['Dataset'] == 'EA':
@@ -80,12 +77,11 @@ def load_data(val_row):
         if len(ref_short) == 2:
             author = ref_short[0].strip()
             year = ref_short[1].strip()
-            try:
-                ref = Source.objects.get(author=author, year=year)
-                if ref not in v.references.all():
-                    v.references.add(ref)
-                    logging.info("Adding reference %s (%s) to %s" % (author, year, v))
-            except ObjectDoesNotExist:
+            ref = sources.get((author, year))
+            if ref and ref not in v.references.all():
+                v.references.add(ref)
+                logging.info("Adding reference %s (%s) to %s" % (author, year, v))
+            else:
                 logging.warn(
                     "Could not find reference %s (%s) in database, skipping reference"
                     % (author, year))

@@ -17,7 +17,7 @@ def _load_glottocode(dict_row):
     language.name = name
     language.save()
     logging.info("Saved Glottocode %s, %s" % (name, glotto))
-    return language
+    return language, dict_row['level']
 
 
 class Tree(dict):
@@ -36,8 +36,11 @@ def load_glottocode(reader):
         tree[item['id']] = item['parent_id']
         languoids[item['id']] = _load_glottocode(item)
 
-    for id_, languoid in languoids.items():
-        fid = tree.get_family(id_)
+    #for id_, (languoid, level) in languoids.items():
+    #    if level == 'language':
+    #        fid = tree.get_family(id_)
+    #        lang = languoids[fid][0]
+    #        languoid.family, _ = LanguageFamily.objects.get_or_create(name=lang.name)
 
 
 def map_isocodes(dict_row):
@@ -88,11 +91,11 @@ def xd_to_language(dict_row):
             family_language = Language.objects.get(glotto_code=family)
             lang_fam, created = LanguageFamily.objects.get_or_create(scheme='G', name=family_language.name)
             if created:
-                print "Language Family %s created" % (lang_fam.name)
+                logging.info("Language Family %s created" % (lang_fam.name))
         except ObjectDoesNotExist:
-            print "No language found for family glottocode %s, skipping" % family_glottocode
+            logging.warning("No language found for family glottocode %s, skipping" % family_glottocode)
             lang_fam = None
-            
+
         try:
             language = Language.objects.get(iso_code=iso, glotto_code=glotto)
             if lang_fam:
@@ -107,7 +110,6 @@ def xd_to_language(dict_row):
                 if lang_fam:
                     language.family = lang_fam
                     language.save()
-                    logging.info("Mapped isocode %s to glottocode %s" % (isocode, glottocode))
                 for s in societies:
                     s.language = language
                     s.save()
@@ -116,16 +118,3 @@ def xd_to_language(dict_row):
                     "No language found for isocode %s and glottocode %s, skipping" % (isocode, glottocode)
                 )
                 return
-            
-    try:
-        _ = Language.objects.get(glotto_code=glotto, iso_code=iso)
-    except ObjectDoesNotExist:
-        logging.warning(
-            "No language found for glottocode %s and isocode %s, skipping" % (glottocode, isocode)
-        )
-        return
-    try:
-        _ = Language.objects.get(glotto_code=family)
-    except ObjectDoesNotExist:
-        logging.warning("No language found for family glottocode %s, skipping" % family_glottocode)
-        return

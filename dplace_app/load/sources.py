@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
 import logging
 from dplace_app.models import Source
 
@@ -60,7 +61,7 @@ def load_references(file_name):
                     year=ref_short[1].strip(),
                     reference=row[COMPLETE_REF_COLUMN])
                 if created:
-                    logging.info("Saved new reference %s" % reference)
+                    logging.info("Saved new reference %s (%s)" % (reference.author, reference.year))
             except IndexError:
                 logging.warn("No author and/or year for %s" % str(row))
         except Exception as e:
