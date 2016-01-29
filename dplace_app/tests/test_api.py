@@ -1,5 +1,6 @@
 __author__ = 'dan'
 
+import json
 from dplace_app.models import *
 from dplace_app.serializers import *
 from django.contrib.gis.geos import Polygon, Point, MultiPolygon
@@ -218,6 +219,96 @@ class GeographicRegionAPITestCase(APITestCase):
         response_dict = response.data
         self.assertEqual(response_dict['count'],1)
         self.assertEqual(response_dict['results'][0]['region_nam'],self.geographic_region.region_nam)
+        
+class MinAndMaxTestCase(APITestCase):
+    '''
+    Tests the min and max API.
+    This is used to get min and max values for environmental variables.
+    '''
+    
+    def setUp(self):
+    
+        # make ISO codes
+        iso_code1 = ISOCode.objects.create(iso_code='abc',location=Point(1.0,1.0))
+        iso_code2 = ISOCode.objects.create(iso_code='def',location=Point(2.0,2.0))
+        
+        # make Glotto codes
+        glotto_code1 = GlottoCode.objects.create(glotto_code='abcc1234')
+        glotto_code2 = GlottoCode.objects.create(glotto_code='defg1234')
+        
+        # Make language families
+        lf1 = LanguageFamily.objects.create(name='family1')
+        lf2 = LanguageFamily.objects.create(name='family2')
+        
+        # Make languages
+        self.languageA1 = Language.objects.create(name='languageA1',iso_code=iso_code1, glotto_code=glotto_code1, family=lf1)
+        self.languageC2 = Language.objects.create(name='languageC2',iso_code=iso_code2, glotto_code=glotto_code2, family=lf2)
+        
+        # Make source
+        self.source = Source.objects.create(year="2014", author="Greenhill", reference="Great paper")
+
+        # Make societies
+        self.society1 = Society.objects.create(
+            ext_id='society1',
+            xd_id='xd1',
+            name='Society1',
+            location=Point(1.0,1.0),
+            source=self.source,
+            language=self.languageA1,
+            focal_year='2016',
+            alternate_names='Society 1')
+        self.society2 = Society.objects.create(
+            ext_id='society2',
+            xd_id='xd2',
+            name='Society2',
+            location=Point(2.0,2.0),
+            source=self.source,
+            language=self.languageC2)
+    
+        # Make environmental variables and values
+        self.environmental1 = Environmental.objects.create(society=self.society1,reported_location=Point(0,0),
+                                                           actual_location=Point(0,0),source=self.source)
+        self.environmental2 = Environmental.objects.create(society=self.society2,reported_location=Point(0,0),
+                                                           actual_location=Point(0,0),source=self.source)
+        self.environmental3 = Environmental.objects.create(society=self.society1,reported_location=Point(0,0),
+                                                           actual_location=Point(0,0),source = self.source)
+        self.environmental4 = Environmental.objects.create(society=self.society2,reported_location=Point(0,0),
+                                                           actual_location=Point(0,0),source=self.source)
+        
+        self.category1 = EnvironmentalCategory(name='Climate')
+        
+        self.environmental_variable1 = EnvironmentalVariable.objects.create(name='precipitation',category=self.category1,units='mm')
+        self.environmental_variable2 = EnvironmentalVariable.objects.create(name='temperature',category=self.category1,units='C')
+        
+        self.environmental_value1 = EnvironmentalValue.objects.create(variable=self.environmental_variable1,
+                                                                      value=1.0, source=self.source,
+                                                                      environmental=self.environmental1)
+        self.environmental_value2 = EnvironmentalValue.objects.create(variable=self.environmental_variable1,
+                                                                      value=17.0, source=self.source,
+                                                                      environmental=self.environmental2)
+        self.environmental_value3 = EnvironmentalValue.objects.create(variable=self.environmental_variable2,
+                                                                      value=-23.5, source=self.source,
+                                                                      environmental=self.environmental3)
+        self.environmental_value4 = EnvironmentalValue.objects.create(variable=self.environmental_variable2,
+                                                                      value=22.65423, source=self.source,
+                                                                      environmental=self.environmental4)
+        
+    def test_min_max(self):
+        url = reverse('min_and_max')
+        data = {'query': json.dumps({'environmental_id': self.environmental_variable1.id})}
+        response = self.client.get(url,data,format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['min'], '1.0000')
+        self.assertEqual(response.data['max'], '17.0000')
+        self.assertLess(float(response.data['min']), float(response.data['max']))
+        
+        data = {'query': json.dumps({'environmental_id': self.environmental_variable2.id})}
+        response = self.client.get(url,data,format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['min'], '-23.5000')
+        self.assertEqual(response.data['max'], '22.6542')
+        self.assertLess(float(response.data['min']), float(response.data['max']))
+        
 
 class FindSocietiesTestCase(APITestCase):
     '''
