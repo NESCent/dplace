@@ -1,6 +1,7 @@
 import json
 import re
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Prefetch
 from nexus import NexusReader
 from rest_framework import viewsets
 from serializers import *
@@ -180,9 +181,16 @@ def result_set_from_query_dict(query_dict):
         criteria.append(SEARCH_VARIABLES)
         ids = [x['id'] for x in query_dict['variable_codes'] if 'id' in x]
 
+        variables = {
+            v.id: (v, v.codes.all()) for v in VariableDescription.objects
+            .filter(id__in=[x['variable'] for x in query_dict['variable_codes']])
+            .prefetch_related(Prefetch(
+                'codes', queryset=VariableCodeDescription.objects.filter(id__in=ids)))
+        }
+
         for x in query_dict['variable_codes']:
-            variable = VariableDescription.objects.get(id=x['variable'])
-            
+            variable, codes = variables[x['variable']]
+
             if variable.data_type and variable.data_type.lower() == 'continuous':
                 values = VariableCodedValue.objects.filter(variable__id=x['variable'])
                 if 'min' in x:
@@ -193,7 +201,6 @@ def result_set_from_query_dict(query_dict):
                 else: #NA selected
                     values.filter(coded_value=x['code'])
             else:
-                codes = VariableCodeDescription.objects.filter(id=x['id'])
                 coded_value_ids = []
                 # Aggregate all the coded values for each selected code
                 for code in codes:
@@ -201,9 +208,11 @@ def result_set_from_query_dict(query_dict):
                 # Coded values have a FK to society.  Aggregate the societies from each value
                 values = VariableCodedValue.objects.filter(id__in=coded_value_ids)
 
-            for value in values.select_related('society', 'variable'):
-                var_codes = VariableCodeDescription.objects.filter(variable=value.variable).filter(id__in=ids)
-                result_set.add_cultural(value.society, value.variable, var_codes, value)
+            for value in values\
+                    .select_related('society')\
+                    .prefetch_related('references', 'society__source'):
+                var_codes = [code for code in codes if code.id in ids]
+                result_set.add_cultural(value.society, variable, var_codes, value)
 
     if 'environmental_filters' in query_dict:
         criteria.append(SEARCH_ENVIRONMENTAL)
@@ -266,7 +275,7 @@ def find_societies(request):
     print '-->', len(connection.queries) - nstart, time() - start
     d = SocietyResultSetSerializer(result_set).data
     print '==>', len(connection.queries) - nstart, time() - start
-    #for q in connection.queries[-150:-145]:
+    #for q in connection.queries[-5:]:
     #    print q['sql'][:1000]
     return Response(d)
 
@@ -292,14 +301,16 @@ def get_categories(request):
 
 @api_view(['GET'])
 @permission_classes((AllowAny,))
-def get_dataset_sources(requesy):
+def get_dataset_sources(request):
     return Response(SourceSerializer(Source.objects.all().exclude(name=""), many=True).data)
-    
+
+
 class GeographicRegionViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = GeographicRegionSerializer
     model = GeographicRegion
     filter_class = GeographicRegionFilter
     queryset = GeographicRegion.objects.all()
+    renderer_classes = (ResultsRenderer,)
 
     
 @api_view(['GET'])
