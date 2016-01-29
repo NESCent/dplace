@@ -16,7 +16,7 @@ from renderers import *
 class ResultsRenderer(renderers.JSONRenderer):
     def render(self, data, accepted_media_type=None, renderer_context=None):
         if isinstance(data, list):
-            data = dict(headers={}, results=data)
+            data = dict(headers={}, results=data, count=len(data))
         return renderers.JSONRenderer.render(
             self,
             data,

@@ -135,7 +135,6 @@ class EnvironmentalVariable(models.Model):
     category = models.ForeignKey('EnvironmentalCategory', null=True)
     units = models.CharField(max_length=10, choices=UNIT_CHOICES)
     codebook_info = models.CharField(max_length=500, default='None')
-    category = models.ForeignKey('EnvironmentalCategory', null=True)
     
     def __unicode__(self):
         if self.units:

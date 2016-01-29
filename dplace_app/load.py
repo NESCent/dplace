@@ -2,6 +2,7 @@
 import csv
 import sys
 
+from six import BytesIO
 import django
 import codecs
 import logging
@@ -27,6 +28,14 @@ from load.glottocode import *
 #bf_vals = 
 #vars = load (EA or BF) variables
 #ea_stacked = load EA stacked
+
+
+def _csvfile(fname):
+    with open(fname, 'rb') as fp:
+        stream = BytesIO(fp.read().replace(b'\x90', '').replace(b'\x8b', ' '))
+        stream.seek(0)
+        return stream
+
 
 LOAD_BY_ROW=('iso', 'env_vals',
              'langs','soc_lat_long',
@@ -59,7 +68,8 @@ def run(file_name=None, mode=None):
         load_glotto_tree(file_name)
     else:
         # read the csv file
-        with open(file_name, 'r') as csvfile:
+        csvfile = _csvfile(file_name)
+        if True:
             mode = mode.strip()
             if mode in LOAD_BY_ROW:
                 csv_reader = csv.DictReader(csvfile)
