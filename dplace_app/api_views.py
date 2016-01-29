@@ -255,10 +255,11 @@ def find_societies(request):
     start = time()
     nstart = len(connection.queries)
     result_set = result_set_from_query_dict(request.data)
-    print '-->', len(connection.queries) - nstart, time() - start
+    #print '-->', len(connection.queries) - nstart, time() - start
     d = SocietyResultSetSerializer(result_set).data
-    print '==>', len(connection.queries) - nstart, time() - start
-    print connection.queries[-1]
+    #print '==>', len(connection.queries) - nstart, time() - start
+    #for q in connection.queries[-5:]:
+    #    print q['sql'][:1000]
     return Response(d)
 
 @api_view(['GET'])
