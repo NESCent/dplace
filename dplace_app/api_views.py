@@ -275,9 +275,11 @@ def get_min_and_max(request):
     query_dict = json.loads(query_string)
     if 'environmental_id' in query_dict:
         values = EnvironmentalValue.objects.filter(variable__id=query_dict['environmental_id'])
-        min_value = 0
+        min_value = None
         max_value = 0
         for v in values:
+            if not min_value and min_value != 0:
+                min_value = v.value
             if v.value < min_value:
                 min_value = v.value
             elif v.value > max_value:
