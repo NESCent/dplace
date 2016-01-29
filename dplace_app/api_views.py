@@ -3,6 +3,7 @@ import re
 from django.core.exceptions import ObjectDoesNotExist
 from nexus import NexusReader
 from rest_framework import viewsets
+from rest_framework import renderers
 from serializers import *
 from rest_framework.decorators import api_view, permission_classes, renderer_classes
 from rest_framework.permissions import *
@@ -12,11 +13,24 @@ from filters import *
 from renderers import *
 
 
+class ResultsRenderer(renderers.JSONRenderer):
+    def render(self, data, accepted_media_type=None, renderer_context=None):
+        if isinstance(data, list):
+            data = dict(headers={}, results=data)
+        return renderers.JSONRenderer.render(
+            self,
+            data,
+            accepted_media_type=accepted_media_type,
+            renderer_context=renderer_context)
+
+
 # Resource routes
 class VariableDescriptionViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = VariableDescriptionSerializer
     filter_fields = ('label', 'name', 'index_categories', 'niche_categories', 'source')
     queryset = VariableDescription.objects.all()
+    renderer_classes = (ResultsRenderer,)
+
     # Override retrieve to use the detail serializer, which includes categories
     def retrieve(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -72,12 +86,14 @@ class EnvironmentalCategoryViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = EnvironmentalCategorySerializer
     filter_fields = ('name',)
     queryset = EnvironmentalCategory.objects.all()
+    renderer_classes = (ResultsRenderer,)
 
 
 class EnvironmentalVariableViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = EnvironmentalVariableSerializer
     filter_fields = ('name', 'category', 'units',)
     queryset = EnvironmentalVariable.objects.all()
+    renderer_classes = (ResultsRenderer,)
 
 
 class EnvironmentalValueViewSet(viewsets.ReadOnlyModelViewSet):
@@ -182,7 +198,6 @@ def result_set_from_query_dict(query_dict):
                     values = values.filter(coded_value__gt=min).filter(coded_value__lt=max)
                 else: #NA selected
                     values.filter(coded_value=x['code'])
-                values.select_related('society', 'variable')
             else:
                 codes = VariableCodeDescription.objects.filter(id=x['id'])
                 coded_value_ids = []
@@ -191,13 +206,11 @@ def result_set_from_query_dict(query_dict):
                     coded_value_ids += code.variablecodedvalue_set.values_list('id', flat=True)
                 # Coded values have a FK to society.  Aggregate the societies from each value
                 values = VariableCodedValue.objects.filter(id__in=coded_value_ids)
-                values = values.select_related('society','variable')  
 
-            for value in values:
+            for value in values.select_related('society', 'variable'):
                 var_codes = VariableCodeDescription.objects.filter(variable=value.variable).filter(id__in=ids)
                 result_set.add_cultural(value.society, value.variable, var_codes, value)
 
-        
     if 'environmental_filters' in query_dict:
         criteria.append(SEARCH_ENVIRONMENTAL)
         environmental_filters = query_dict['environmental_filters']
@@ -217,6 +230,7 @@ def result_set_from_query_dict(query_dict):
             # get the societies from the values
             for value in values:
                 result_set.add_environmental(value.society(), value.variable, value)
+
     if 'geographic_regions' in query_dict:
         criteria.append(SEARCH_GEOGRAPHIC)
         geographic_region_ids = [int(x['id']) for x in query_dict['geographic_regions']]
@@ -255,10 +269,10 @@ def find_societies(request):
     start = time()
     nstart = len(connection.queries)
     result_set = result_set_from_query_dict(request.data)
-    #print '-->', len(connection.queries) - nstart, time() - start
+    print '-->', len(connection.queries) - nstart, time() - start
     d = SocietyResultSetSerializer(result_set).data
-    #print '==>', len(connection.queries) - nstart, time() - start
-    #for q in connection.queries[-5:]:
+    print '==>', len(connection.queries) - nstart, time() - start
+    #for q in connection.queries[-150:-145]:
     #    print q['sql'][:1000]
     return Response(d)
 
