@@ -34,7 +34,49 @@ class GlottoCodeAPITestCase(APITestCase):
         response_dict = response.data
         self.assertEqual(response_dict['count'],1)
         self.assertEqual(response_dict['results'][0]['glotto_code'],self.code.glotto_code)
-
+        
+class LanguageAPITestCase(APITestCase):
+    '''Tests rest-framework API for languages'''
+    def setUp(self):
+        self.family = LanguageFamily.objects.create(name='family1')
+        self.family2 = LanguageFamily.objects.create(name='family2')
+        self.glotto_codeA = GlottoCode.objects.create(glotto_code='aaaa1234')
+        self.glotto_codeD = GlottoCode.objects.create(glotto_code='dddd1234')
+        self.glotto_codeC = GlottoCode.objects.create(glotto_code='cccc1234')
+        
+        self.iso_code = ISOCode.objects.create(iso_code='abc')
+        self.language1 = Language.objects.create(name='language1', family=self.family, glotto_code=self.glotto_codeA, iso_code=self.iso_code)
+        self.language2 = Language.objects.create(name='language2', family=self.family2, glotto_code=self.glotto_codeD)
+        self.language3 = Language.objects.create(name='language3', family=self.family2, glotto_code=self.glotto_codeC, iso_code=self.iso_code)
+        
+    def assertLanguageInResponse(self,variable,response):
+        response_variable_ids = [x['id'] for x in response['results']]
+        return self.assertIn(variable.id, response_variable_ids)
+    def assertLanguageNotInResponse(self,variable,response):
+        response_variable_ids = [x['id'] for x in response['results']]
+        return self.assertNotIn(variable.id, response_variable_ids)
+    
+    def test_all_languages(self):
+        url = reverse('language-list')
+        response = self.client.get(url,format='json')
+        self.assertEqual(response.status_code,status.HTTP_200_OK)
+        response_dict = response.data
+        self.assertEqual(response_dict['count'],3)
+        self.assertLanguageInResponse(self.language1,response_dict)
+        self.assertLanguageInResponse(self.language2,response_dict)
+        self.assertLanguageInResponse(self.language3,response_dict)
+        
+    def test_family2_languages(self):
+        url = reverse('language-list')
+        data = {'family': self.family2.id};
+        response = self.client.get(url,data,format='json')
+        self.assertEqual(response.status_code,status.HTTP_200_OK)
+        response_dict = response.data
+        self.assertEqual(response_dict['count'],2)
+        self.assertLanguageNotInResponse(self.language1,response_dict)
+        self.assertLanguageInResponse(self.language2,response_dict)
+        self.assertLanguageInResponse(self.language3,response_dict)
+        
 class EnvironmentalVariableAPITestCase(APITestCase):
     '''Tests rest-framework API for Environmental Variables'''
     def setUp(self):
@@ -128,6 +170,16 @@ class VariableCodeDescriptionAPITestCase(APITestCase):
         self.assertVariableInResponse(self.variable, response_dict)
         self.assertVariableInResponse(self.variable2, response_dict)
         
+    def test_filter_source(self):
+        url = reverse('variabledescription-list')
+        data = {'source': self.source_ea.id};
+        response = self.client.get(url, data, format='json')
+        self.assertEqual(response.status_code,status.HTTP_200_OK)
+        response_dict = response.data
+        self.assertEqual(response_dict['count'],1)
+        self.assertVariableInResponse(self.variable, response_dict)
+        self.assertVariableNotInResponse(self.variable2, response_dict)
+        
     def test_category1_variables(self):
         url = reverse('variabledescription-list')
         data = {'index_categories': [self.category1.id]}
@@ -147,6 +199,7 @@ class VariableCodeDescriptionAPITestCase(APITestCase):
         self.assertEqual(response_dict['count'],2)
         self.assertVariableInResponse(self.variable, response_dict)
         self.assertVariableInResponse(self.variable2, response_dict)
+
 
 class GeographicRegionAPITestCase(APITestCase):
     def setUp(self):
@@ -177,47 +230,48 @@ class FindSocietiesTestCase(APITestCase):
         iso_code2 = ISOCode.objects.create(iso_code='def',location=Point(2.0,2.0))
         iso_code3 = ISOCode.objects.create(iso_code='ghi',location=Point(3.0,3.0))
         
+        # make Glotto codes
+        glotto_code1 = GlottoCode.objects.create(glotto_code='abcc1234')
+        glotto_code2 = GlottoCode.objects.create(glotto_code='defg1234')
+        glotto_code3 = GlottoCode.objects.create(glotto_code='ghij1234')
+        
         # Make language families
         lf1 = LanguageFamily.objects.create(name='family1')
         lf2 = LanguageFamily.objects.create(name='family2')
         lf3 = LanguageFamily.objects.create(name='family3')
         
         # Make languages
-        self.languageA1 = Language.objects.create(name='languageA1',iso_code=iso_code1, family=lf1)
-        self.languageC2 = Language.objects.create(name='languageC2',iso_code=iso_code2, family=lf2)
-        self.languageB3 = Language.objects.create(name='languageB3',iso_code=iso_code3, family=lf3)
+        self.languageA1 = Language.objects.create(name='languageA1',iso_code=iso_code1, glotto_code=glotto_code1, family=lf1)
+        self.languageC2 = Language.objects.create(name='languageC2',iso_code=iso_code2, glotto_code=glotto_code2, family=lf2)
+        self.languageB3 = Language.objects.create(name='languageB3',iso_code=iso_code3, glotto_code=glotto_code3, family=lf3)
+        
         # Make source
         self.source = Source.objects.create(year="2014", author="Greenhill", reference="Great paper")
+        
         self.society1 = Society.objects.create(
-            ext_id='society1',name='Society1',location=Point(1.0,1.0),source=self.source,language=self.languageA1)
+            ext_id='society1',
+            xd_id='xd1',
+            name='Society1',
+            location=Point(1.0,1.0),
+            source=self.source,
+            language=self.languageA1,
+            focal_year='2016',
+            alternate_names='Society 1')
         self.society2 = Society.objects.create(
-            ext_id='society2',name='Society2',location=Point(2.0,2.0),source=self.source,language=self.languageC2)
+            ext_id='society2',
+            xd_id='xd2',
+            name='Society2',
+            location=Point(2.0,2.0),
+            source=self.source,
+            language=self.languageC2)
         # Society 3 has the same language characteristics as society 1 but different EA Vars
         self.society3 = Society.objects.create(
-            ext_id='society3',name='Society3',location=Point(3.0,3.0),source=self.source,language=self.languageB3)
-        
-        # make a language class tree
-        #self.root_language_class = LanguageClass.objects.create(name='root',level=1,parent=None)
-        #self.parent_language_class_1 = LanguageClass.objects.create(name='parent1',level=2,parent=self.root_language_class)
-        #self.child_language_class_1a = LanguageClass.objects.create(name='child1',level=3,parent=self.parent_language_class_1)
-        #self.child_language_class_1b = LanguageClass.objects.create(name='child1',level=3,parent=self.parent_language_class_1)
-        #self.parent_language_class_2 = LanguageClass.objects.create(name='parent2',level=2,parent=self.root_language_class)
-        #self.child_language_class_2 = LanguageClass.objects.create(name='child2',level=3,parent=self.parent_language_class_2)
-
-        # make language classifications to link a language to its class tree
-        #lc1 = LanguageClassification.objects.create(language=self.languageA1,
-        #                                            class_family=self.root_language_class,
-        #                                            class_subfamily=self.parent_language_class_1,
-        #                                            class_subsubfamily=self.child_language_class_1a)
-        #lc2 = LanguageClassification.objects.create(language=self.languageC2,
-        #                                            class_family=self.root_language_class,
-        #                                            class_subfamily=self.parent_language_class_2,
-        #                                            class_subsubfamily=self.child_language_class_2)
-        #lc3 = LanguageClassification.objects.create(language=self.languageB3,
-        #                                            class_family=self.root_language_class,
-        #                                            class_subfamily=self.parent_language_class_1,
-        #                                            class_subsubfamily=self.child_language_class_1b)
-                                                  
+            ext_id='society3',
+            xd_id='xd1',
+            name='Society3',
+            location=Point(3.0,3.0),
+            source=self.source,
+            language=self.languageB3)
         
         # Make an EA Variable, code, and value
         variable = VariableDescription.objects.create(label='EA001',name='Variable 1')
@@ -226,6 +280,7 @@ class FindSocietiesTestCase(APITestCase):
         self.code3 = VariableCodeDescription.objects.create(variable=variable, code='3', description='Code 3')
         value1 = VariableCodedValue.objects.create(variable=variable,society=self.society1,coded_value='1',code=self.code1, source=self.source)
         value2 = VariableCodedValue.objects.create(variable=variable,society=self.society2,coded_value='2',code=self.code2, source=self.source)
+        
         # Setup environmentals
         self.environmental1 = Environmental.objects.create(society=self.society1,
                                                            reported_location=Point(0,0),
@@ -362,39 +417,4 @@ class FindSocietiesTestCase(APITestCase):
         self.assertSocietyInResponse(self.society1,response)
         self.assertSocietyInResponse(self.society3,response)
         self.assertSocietyNotInResponse(self.society2,response)
-        
-    # PROBLEMATIC CODE NEEDS FIXING :(
-    
-    #def test_language_classification_order(self):
-    #    '''
-    #    verify the API returns language classifications ordered by language name
-    #    '''
-    #    url = reverse('languagefamilies')
-    #    response = self.client.get(url,format='json')
-    #    self.assertEqual(response.status_code, status.HTTP_200_OK)
-    #    response_dict = response.data
-    #    index_of_A = index_of_B = index_of_C = index =0
-    #    for result in response_dict['results']:
-    #        if result['name'] == self.lf1.name:
-    #            index_of_A = index
-    #        elif result['name'] == self.lf3.name:
-    #            index_of_C = index
-    #        elif result['name'] == self.lf2.name:
-    #            index_of_B = index
-    #        index += 1
-    #    self.assertLess(index_of_A, index_of_B)
-    #    self.assertLess(index_of_B, index_of_C)
-    #def test_language_class_order(self):
-    #    '''
-    #    language classes should be ordered by level then name
-    #    '''
-    #    url = reverse('languageclass-list')
-    #    response = self.client.get(url,format='json')
-    #    self.assertEqual(response.status_code, status.HTTP_200_OK)
-    #    response_dict = response.data
-    #    results = response_dict['results']
-    #    def getkey(item):
-    #        return item['level'], item['name'],
-    #    sorted_results = sorted(results, key=getkey)
-    #    self.assertEquals(results,sorted_results)
 
