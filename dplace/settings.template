@@ -127,6 +127,7 @@ INSTALLED_APPS = (
     'bootstrap3',
     'django.contrib.humanize',
     'rest_framework',
+    'rest_framework_gis',
     'dplace_app',
 )
 

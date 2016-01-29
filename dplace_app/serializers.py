@@ -1,5 +1,4 @@
 from rest_framework.relations import RelatedField
-from rest_framework_gis import serializers as gis_serializers
 from models import *
 from rest_framework import serializers
 
@@ -47,7 +46,7 @@ class VariableCodedValueSerializer(serializers.ModelSerializer):
         fields = ('id', 'variable', 'society', 'coded_value', 'code_description', 'source', 'references', 'subcase', 'focal_year', 'comment')
 
 # ISO Codes
-class ISOCodeSerializer(gis_serializers.GeoModelSerializer):
+class ISOCodeSerializer(serializers.ModelSerializer):
     class Meta:
         model = ISOCode
         
@@ -69,7 +68,7 @@ class EnvironmentalValueSerializer(serializers.ModelSerializer):
     class Meta:
         model = EnvironmentalValue
 
-class EnvironmentalSerializer(gis_serializers.GeoModelSerializer):
+class EnvironmentalSerializer(serializers.ModelSerializer):
     class Meta:
         model = Environmental
 
@@ -86,7 +85,7 @@ class LanguageSerializer(serializers.ModelSerializer):
         model = Language
 
 # Societies
-class SocietySerializer(gis_serializers.GeoModelSerializer):
+class SocietySerializer(serializers.ModelSerializer):
     language = LanguageSerializer()
     source = SourceSerializer()
     class Meta:
@@ -94,7 +93,7 @@ class SocietySerializer(gis_serializers.GeoModelSerializer):
         fields = ('id', 'ext_id', 'xd_id', 'name', 'location','language', 'focal_year', 'source')
 
 # Geographic Regions
-class GeographicRegionSerializer(gis_serializers.GeoModelSerializer):
+class GeographicRegionSerializer(serializers.ModelSerializer):
     class Meta:
         model = GeographicRegion
         fields = ('id','level_2_re','count','region_nam','continent','tdwg_code')
