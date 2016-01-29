@@ -3,25 +3,13 @@ import re
 from django.core.exceptions import ObjectDoesNotExist
 from nexus import NexusReader
 from rest_framework import viewsets
-from rest_framework import renderers
 from serializers import *
 from rest_framework.decorators import api_view, permission_classes, renderer_classes
 from rest_framework.permissions import *
-from rest_framework.views import Request, Response
+from rest_framework.views import Response
 from rest_framework.renderers import JSONRenderer
 from filters import *
-from renderers import *
-
-
-class ResultsRenderer(renderers.JSONRenderer):
-    def render(self, data, accepted_media_type=None, renderer_context=None):
-        if isinstance(data, list):
-            data = dict(headers={}, results=data, count=len(data))
-        return renderers.JSONRenderer.render(
-            self,
-            data,
-            accepted_media_type=accepted_media_type,
-            renderer_context=renderer_context)
+from renderers import ResultsRenderer, DPLACECsvRenderer, ZipRenderer
 
 
 # Resource routes
@@ -55,6 +43,7 @@ class VariableCodeDescriptionViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = VariableCodeDescriptionSerializer
     filter_class = VariableCodeDescriptionFilter
     queryset = VariableCodeDescription.objects.all()
+    renderer_classes = (ResultsRenderer,)
 
 
 # Can filter by code, code__variable, or society
@@ -74,12 +63,14 @@ class ISOCodeViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = ISOCodeSerializer
     filter_fields = ('iso_code',)
     queryset = ISOCode.objects.all()
+    renderer_classes = (ResultsRenderer,)
 
 
 class GlottoCodeViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = GlottoCodeSerializer
     filter_fields = ('glotto_code',)
     queryset = GlottoCode.objects.all()
+    renderer_classes = (ResultsRenderer,)
 
 
 class EnvironmentalCategoryViewSet(viewsets.ReadOnlyModelViewSet):
@@ -107,11 +98,14 @@ class EnvironmentalViewSet(viewsets.ReadOnlyModelViewSet):
     filter_fields = ('society', 'iso_code',)
     queryset = Environmental.objects.all()
 
+
 class LanguageViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = LanguageSerializer
     filter_fields = ('name', 'iso_code', 'societies', 'family',)
     queryset = Language.objects.all()
-    
+    renderer_classes = (ResultsRenderer,)
+
+
 class LanguageFamilyViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = LanguageFamilySerializer
     filter_fields = ('name', 'scheme',)

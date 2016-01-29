@@ -1,41 +1,50 @@
 from __future__ import unicode_literals
+import json
 
-from dplace_app.models import *
 from dplace_app.serializers import *
 from django.contrib.gis.geos import Polygon, Point, MultiPolygon
 from rest_framework import status
-from rest_framework.test import APIRequestFactory, APITestCase
+from rest_framework.test import APITestCase
 from django.core.urlresolvers import reverse
 
 
-class ISOCodeAPITestCase(APITestCase):
+class Test(APITestCase):
+    def get_json(self, urlname, *args, **kw):
+        kw.setdefault('format', 'json')
+        response = self.client.get(reverse(urlname), *args, **kw)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        return json.loads(response.content)
+
+    def obj_in_results(self, obj, response):
+        return getattr(obj, 'id', obj) in [x['id'] for x in response['results']]
+
+
+class ISOCodeAPITestCase(Test):
     '''
     Tests rest-framework API.  Verifies a single ISO code created can be fetched with
     HTTP 200
     '''
     def setUp(self):
         self.code = ISOCode.objects.create(iso_code='abc',location=Point(5.0,5.0))
+
     def test_isocode_api(self):
-        url = reverse('isocode-list')
-        response = self.client.get(url,format='json')
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        response_dict = response.data
+        response_dict = self.get_json('isocode-list')
         self.assertEqual(response_dict['count'],1)
         self.assertEqual(response_dict['results'][0]['iso_code'],self.code.iso_code)
-        
-class GlottoCodeAPITestCase(APITestCase):
+
+
+class GlottoCodeAPITestCase(Test):
     '''Tests rest-framework API for Glottocodes'''
     def setUp(self):
         self.code = GlottoCode.objects.create(glotto_code='abcd1234')
+
     def test_glottocode_api(self):
-        url = reverse('glottocode-list')
-        response = self.client.get(url,format='json')
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        response_dict = response.data
+        response_dict = self.get_json('glottocode-list')
         self.assertEqual(response_dict['count'],1)
         self.assertEqual(response_dict['results'][0]['glotto_code'],self.code.glotto_code)
-        
-class LanguageAPITestCase(APITestCase):
+
+
+class LanguageAPITestCase(Test):
     '''Tests rest-framework API for languages'''
     def setUp(self):
         self.family = LanguageFamily.objects.create(name='family1')
@@ -48,36 +57,23 @@ class LanguageAPITestCase(APITestCase):
         self.language1 = Language.objects.create(name='language1', family=self.family, glotto_code=self.glotto_codeA, iso_code=self.iso_code)
         self.language2 = Language.objects.create(name='language2', family=self.family2, glotto_code=self.glotto_codeD)
         self.language3 = Language.objects.create(name='language3', family=self.family2, glotto_code=self.glotto_codeC, iso_code=self.iso_code)
-        
-    def assertLanguageInResponse(self,variable,response):
-        response_variable_ids = [x['id'] for x in response['results']]
-        return self.assertIn(variable.id, response_variable_ids)
-    def assertLanguageNotInResponse(self,variable,response):
-        response_variable_ids = [x['id'] for x in response['results']]
-        return self.assertNotIn(variable.id, response_variable_ids)
-    
+
     def test_all_languages(self):
-        url = reverse('language-list')
-        response = self.client.get(url,format='json')
-        self.assertEqual(response.status_code,status.HTTP_200_OK)
-        response_dict = response.data
+        response_dict = self.get_json('language-list')
         self.assertEqual(response_dict['count'],3)
-        self.assertLanguageInResponse(self.language1,response_dict)
-        self.assertLanguageInResponse(self.language2,response_dict)
-        self.assertLanguageInResponse(self.language3,response_dict)
-        
+        self.assertTrue(self.obj_in_results(self.language1, response_dict))
+        self.assertTrue(self.obj_in_results(self.language2, response_dict))
+        self.assertTrue(self.obj_in_results(self.language3, response_dict))
+
     def test_family2_languages(self):
-        url = reverse('language-list')
-        data = {'family': self.family2.id};
-        response = self.client.get(url,data,format='json')
-        self.assertEqual(response.status_code,status.HTTP_200_OK)
-        response_dict = response.data
-        self.assertEqual(response_dict['count'],2)
-        self.assertLanguageNotInResponse(self.language1,response_dict)
-        self.assertLanguageInResponse(self.language2,response_dict)
-        self.assertLanguageInResponse(self.language3,response_dict)
-        
-class EnvironmentalVariableAPITestCase(APITestCase):
+        response_dict = self.get_json('language-list', {'family': self.family2.id})
+        self.assertEqual(response_dict['count'], 2)
+        self.assertFalse(self.obj_in_results(self.language1, response_dict))
+        self.assertTrue(self.obj_in_results(self.language2, response_dict))
+        self.assertTrue(self.obj_in_results(self.language3, response_dict))
+
+
+class EnvironmentalVariableAPITestCase(Test):
     '''Tests rest-framework API for Environmental Variables'''
     def setUp(self):
         self.category1 = EnvironmentalCategory.objects.create(name='Climate')
@@ -85,35 +81,22 @@ class EnvironmentalVariableAPITestCase(APITestCase):
         self.variable1 = EnvironmentalVariable.objects.create(name='Rainfall', category=self.category1, units='mm', codebook_info='Precipitation')
         self.variable2 = EnvironmentalVariable.objects.create(name='Temperature', category=self.category1, units='C', codebook_info='Temperature')
         self.variable3 = EnvironmentalVariable.objects.create(name='Ecology1', category=self.category2, units='', codebook_info='')
-        
-    def assertVariableInResponse(self,variable,response):
-        response_variable_ids = [x['id'] for x in response['results']]
-        return self.assertIn(variable.id, response_variable_ids)
-    def assertVariableNotInResponse(self,variable,response):
-        response_variable_ids = [x['id'] for x in response['results']]
-        return self.assertNotIn(variable.id, response_variable_ids)
-    
-    def test_all_environmental_variables(self):
-        url = reverse('environmentalvariable-list')
-        response = self.client.get(url,format='json')
-        self.assertEqual(response.status_code,status.HTTP_200_OK)
-        response_dict = response.data
-        self.assertEqual(response_dict['count'],3)
-        self.assertVariableInResponse(self.variable1, response_dict)
-        self.assertVariableInResponse(self.variable2, response_dict)
-        self.assertVariableInResponse(self.variable3, response_dict)
-        
-    def test_category1_variables(self):
-        url = reverse('environmentalvariable-list')
-        data = {'category': self.category1.id}
-        response = self.client.get(url,data,format='json')
-        self.assertEqual(response.status_code,status.HTTP_200_OK)
-        response_dict = response.data
-        self.assertVariableInResponse(self.variable1, response_dict)
-        self.assertVariableInResponse(self.variable2, response_dict)
-        self.assertVariableNotInResponse(self.variable3, response_dict)        
 
-class VariableCodeDescriptionAPITestCase(APITestCase):
+    def test_all_environmental_variables(self):
+        response_dict = self.get_json('environmentalvariable-list')
+        self.assertEqual(response_dict['count'],3)
+        self.assertTrue(self.obj_in_results(self.variable1, response_dict))
+        self.assertTrue(self.obj_in_results(self.variable2, response_dict))
+        self.assertTrue(self.obj_in_results(self.variable3, response_dict))
+
+    def test_category1_variables(self):
+        response_dict = self.get_json('environmentalvariable-list', {'category': self.category1.id})
+        self.assertTrue(self.obj_in_results(self.variable1, response_dict))
+        self.assertTrue(self.obj_in_results(self.variable2, response_dict))
+        self.assertFalse(self.obj_in_results(self.variable3, response_dict))
+
+
+class VariableCodeDescriptionAPITestCase(Test):
     '''
     tests rest-framework api for Variable Code Descriptions
     '''
@@ -132,25 +115,14 @@ class VariableCodeDescriptionAPITestCase(APITestCase):
         self.code1 = VariableCodeDescription.objects.create(variable=self.variable, code='1', description='Code 1')
         self.code10 = VariableCodeDescription.objects.create(variable=self.variable, code='10', description='Code 10')
         self.code2 = VariableCodeDescription.objects.create(variable=self.variable, code='2', description='Code 2')
-    
-    def assertVariableInResponse(self,variable,response):
-        response_variable_ids = [x['id'] for x in response['results']]
-        return self.assertIn(variable.id, response_variable_ids)
-    def assertVariableNotInResponse(self,variable,response):
-        response_variable_ids = [x['id'] for x in response['results']]
-        return self.assertNotIn(variable.id, response_variable_ids)
-    
+
     def test_code_description_order(self):
         '''
         Make sure 2 comes before 10
         '''
-        url = reverse('variablecodedescription-list')
-        data = {'variable': self.variable.id }
-        response = self.client.get(url,data,format='json')
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        response_dict = response.data
+        response_dict = self.get_json('variablecodedescription-list', {'variable': self.variable.id})
         index_of_1 = index_of_2 = index_of_10 = index = 0
-        for result in response.data:
+        for result in response_dict['results']:
             if result['code'] == self.code1.code:
                 index_of_1 = index
             elif result['code'] == self.code2.code:
@@ -162,43 +134,28 @@ class VariableCodeDescriptionAPITestCase(APITestCase):
         self.assertLess(index_of_2, index_of_10)
         
     def test_all_variables(self):
-        url = reverse('variabledescription-list')
-        response = self.client.get(url,format='json')
-        self.assertEqual(response.status_code,status.HTTP_200_OK)
-        response_dict = response.data
+        response_dict = self.get_json('variabledescription-list')
         self.assertEqual(response_dict['count'],2)
-        self.assertVariableInResponse(self.variable, response_dict)
-        self.assertVariableInResponse(self.variable2, response_dict)
-        
+        self.assertTrue(self.obj_in_results(self.variable, response_dict))
+        self.assertTrue(self.obj_in_results(self.variable2, response_dict))
+
     def test_filter_source(self):
-        url = reverse('variabledescription-list')
-        data = {'source': self.source_ea.id};
-        response = self.client.get(url, data, format='json')
-        self.assertEqual(response.status_code,status.HTTP_200_OK)
-        response_dict = response.data
+        response_dict = self.get_json('variabledescription-list', {'source': self.source_ea.id})
         self.assertEqual(response_dict['count'],1)
-        self.assertVariableInResponse(self.variable, response_dict)
-        self.assertVariableNotInResponse(self.variable2, response_dict)
-        
+        self.assertTrue(self.obj_in_results(self.variable, response_dict))
+        self.assertFalse(self.obj_in_results(self.variable2, response_dict))
+
     def test_category1_variables(self):
-        url = reverse('variabledescription-list')
-        data = {'index_categories': [self.category1.id]}
-        response = self.client.get(url,data,format='json')
-        self.assertEqual(response.status_code,status.HTTP_200_OK)
-        response_dict = response.data
+        response_dict = self.get_json('variabledescription-list', {'index_categories': [self.category1.id]})
         self.assertEqual(response_dict['count'],1)
         self.assertEqual(response_dict['results'][0]['name'], self.variable.name)
-        self.assertVariableNotInResponse(self.variable2, response_dict)
-        
+        self.assertFalse(self.obj_in_results(self.variable2, response_dict))
+
     def test_category2_variables(self):
-        url = reverse('variabledescription-list')
-        data = {'index_categories': [self.category2.id]}
-        response = self.client.get(url,data,format='json')
-        self.assertEqual(response.status_code,status.HTTP_200_OK)
-        response_dict = response.data
+        response_dict = self.get_json('variabledescription-list', {'index_categories': [self.category2.id]})
         self.assertEqual(response_dict['count'],2)
-        self.assertVariableInResponse(self.variable, response_dict)
-        self.assertVariableInResponse(self.variable2, response_dict)
+        self.assertTrue(self.obj_in_results(self.variable, response_dict))
+        self.assertTrue(self.obj_in_results(self.variable2, response_dict))
 
 
 class GeographicRegionAPITestCase(APITestCase):
@@ -211,14 +168,15 @@ class GeographicRegionAPITestCase(APITestCase):
             continent='Continent1',
             tdwg_code=0,
             geom=poly)
+
     def test_geo_api(self):
-        url = reverse('geographicregion-list')
-        response = self.client.get(url,format='json')
+        response = self.client.get(reverse('geographicregion-list'), format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data),1)
         self.assertEqual(response.data[0]['region_nam'],self.geographic_region.region_nam)
 
-class FindSocietiesTestCase(APITestCase):
+
+class FindSocietiesTestCase(Test):
     '''
     Tests the find societies API
     Responses will be serialized SocietyResult objects
@@ -325,36 +283,38 @@ class FindSocietiesTestCase(APITestCase):
             geom=poly13
         )
 
-        self.url = reverse('find_societies')
-    def assertSocietyInResponse(self,society,response):
-        response_society_ids = [x['society']['id'] for x in response.data['societies']]
-        return self.assertIn(society.id, response_society_ids)
-    def assertSocietyNotInResponse(self,society,response):
-        response_society_ids = [x['society']['id'] for x in response.data['societies']]
-        return self.assertNotIn(society.id, response_society_ids)
+    def get_results(self, **data):
+        return self.client.post(reverse('find_societies'), data or {}, format='json')
+
+    def society_in_results(self, society, response):
+        return society.id in [x['society']['id'] for x in response.data['societies']]
+
     def test_find_societies_by_language(self):
         # Find the societies that use language1
-        classifications = LanguageSerializer([l for l in Language.objects.all().filter(name=self.languageA1.name)],many=True)
-        data = {'language_classifications' : classifications.data }
-        response = self.client.post(self.url,data,format='json')
-        self.assertSocietyInResponse(self.society1,response)
-        self.assertSocietyNotInResponse(self.society2,response)
-        self.assertSocietyNotInResponse(self.society3,response)
+        classifications = LanguageSerializer(
+            [l for l in Language.objects.all().filter(name=self.languageA1.name)],
+            many=True)
+        response = self.get_results(language_classifications=classifications.data)
+        self.assertTrue(self.society_in_results(self.society1, response))
+        self.assertFalse(self.society_in_results(self.society2, response))
+        self.assertFalse(self.society_in_results(self.society3, response))
+
     def test_find_society_by_var(self):
-        data = {'variable_codes': VariableCodeDescriptionSerializer([self.code1],many=True).data}
-        response = self.client.post(self.url,data,format='json')
-        self.assertSocietyInResponse(self.society1,response)
-        self.assertSocietyNotInResponse(self.society2,response)
+        response = self.get_results(variable_codes=VariableCodeDescriptionSerializer(
+            [self.code1], many=True).data)
+        self.assertTrue(self.society_in_results(self.society1, response))
+        self.assertFalse(self.society_in_results(self.society2, response))
+
     def test_find_societies_by_var(self):
         serialized_codes = VariableCodeDescriptionSerializer([self.code1,self.code2],many=True).data
-        data = {'variable_codes': serialized_codes}
-        response = self.client.post(self.url,data,format='json')
-        self.assertSocietyInResponse(self.society1,response)
-        self.assertSocietyInResponse(self.society2,response)
+        response = self.get_results(variable_codes=serialized_codes)
+        self.assertTrue(self.society_in_results(self.society1, response))
+        self.assertTrue(self.society_in_results(self.society2, response))
+
     def test_find_no_societies(self):
-        data = {'variable_codes': VariableCodeDescriptionSerializer([self.code3],many=True).data }
-        response = self.client.post(self.url,data,format='json')
+        response = self.get_results(variable_codes=VariableCodeDescriptionSerializer([self.code3],many=True).data)
         self.assertEqual(len(response.data['societies']),0)
+
     def test_find_society_by_language_and_var(self):
         # Search for societies with language 1 and language 3
         # Coded with variable codes 1 and 2
@@ -364,55 +324,71 @@ class FindSocietiesTestCase(APITestCase):
         serialized_vcs = VariableCodeDescriptionSerializer([self.code1, self.code2], many=True).data
         language_classifications = Language.objects.filter(id__in=[self.languageA1.id, self.languageB3.id])
         serialized_lcs = LanguageSerializer(language_classifications, many=True).data
-        data = {'variable_codes': serialized_vcs,
-                'language_classifications' : serialized_lcs}
-        response = self.client.post(self.url,data,format='json')
-        self.assertSocietyInResponse(self.society1,response)
-        self.assertSocietyNotInResponse(self.society2,response)
-        self.assertSocietyNotInResponse(self.society3,response)
+        response = self.get_results(
+            variable_codes=serialized_vcs, language_classifications=serialized_lcs)
+        self.assertTrue(self.society_in_results(self.society1, response))
+        self.assertFalse(self.society_in_results(self.society2, response))
+        self.assertFalse(self.society_in_results(self.society3, response))
+
     def test_empty_response(self):
-        response = self.client.post(self.url,{},format='json')
+        response = self.get_results()
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data['societies']),0)
+
     def test_find_by_environmental_filter_gt(self):
-        data = {'environmental_filters': [{'id': str(self.environmental_variable1.pk),
-                                           'operator': 'gt', 'params': ['1.5']}]}
-        response = self.client.post(self.url,data,format='json')
-        self.assertSocietyNotInResponse(self.society1,response)
-        self.assertSocietyInResponse(self.society2,response)
+        response = self.get_results(
+            environmental_filters=[
+                {'id': str(self.environmental_variable1.pk),
+                 'operator': 'gt',
+                 'params': ['1.5']}])
+        self.assertTrue(self.society_in_results(self.society2, response))
+        self.assertFalse(self.society_in_results(self.society1, response))
+
     def test_find_by_environmental_filter_lt(self):
-        data = {'environmental_filters': [{'id': str(self.environmental_variable1.pk),
-                                           'operator': 'lt', 'params': ['1.5']}]}
-        response = self.client.post(self.url,data,format='json')
-        self.assertSocietyInResponse(self.society1,response)
-        self.assertSocietyNotInResponse(self.society2,response)
+        response = self.get_results(
+            environmental_filters=[
+                {'id': str(self.environmental_variable1.pk),
+                 'operator': 'lt',
+                 'params': ['1.5']}])
+        self.assertTrue(self.society_in_results(self.society1, response))
+        self.assertFalse(self.society_in_results(self.society2, response))
+
     def test_find_by_environmental_filter_inrange(self):
-        data = {'environmental_filters': [{'id': str(self.environmental_variable1.pk),
-                                           'operator': 'inrange', 'params': ['0.0','1.5']}]}
-        response = self.client.post(self.url,data,format='json')
-        self.assertSocietyInResponse(self.society1,response)
-        self.assertSocietyNotInResponse(self.society2,response)
+        response = self.get_results(
+            environmental_filters=[
+                {'id': str(self.environmental_variable1.pk),
+                 'operator': 'inrange',
+                 'params': ['0.0','1.5']}])
+        self.assertTrue(self.society_in_results(self.society1, response))
+        self.assertFalse(self.society_in_results(self.society2, response))
+
     def test_find_by_environmental_filter_outrange(self):
         data = {'environmental_filters': [{'id': str(self.environmental_variable1.pk),
                                            'operator': 'outrange', 'params': ['0.0','3.0']}]}
-        response = self.client.post(self.url,data,format='json')
-        self.assertSocietyNotInResponse(self.society1,response)
-        self.assertSocietyNotInResponse(self.society2,response)
+        response = self.get_results(
+            environmental_filters=[
+                {'id': str(self.environmental_variable1.pk),
+                 'operator': 'outrange',
+                 'params': ['0.0','3.0']}])
+        self.assertFalse(self.society_in_results(self.society1, response))
+        self.assertFalse(self.society_in_results(self.society2, response))
+
     def test_find_by_geographic_region(self):
         '''
         This uses a region that contains a single polygon around society 2
         '''
-        data = {'geographic_regions': [GeographicRegionSerializer(self.geographic_region2).data]}
-        response = self.client.post(self.url,data,format='json')
-        self.assertSocietyInResponse(self.society2,response)
-        self.assertSocietyNotInResponse(self.society1,response)
-        self.assertSocietyNotInResponse(self.society3,response)
+        response = self.get_results(
+            geographic_regions=[GeographicRegionSerializer(self.geographic_region2).data])
+        self.assertFalse(self.society_in_results(self.society1, response))
+        self.assertTrue(self.society_in_results(self.society2, response))
+        self.assertFalse(self.society_in_results(self.society3, response))
+
     def test_find_by_geographic_region_mpoly(self):
         '''
         This uses a region that contains two polygons that should overlap societies 1 and 3
         '''
-        data = {'geographic_regions': [GeographicRegionSerializer(self.geographic_region13).data]}
-        response = self.client.post(self.url,data,format='json')
-        self.assertSocietyInResponse(self.society1,response)
-        self.assertSocietyInResponse(self.society3,response)
-        self.assertSocietyNotInResponse(self.society2,response)
+        response = self.get_results(
+            geographic_regions=[GeographicRegionSerializer(self.geographic_region13).data])
+        self.assertTrue(self.society_in_results(self.society1, response))
+        self.assertTrue(self.society_in_results(self.society3, response))
+        self.assertFalse(self.society_in_results(self.society2, response))

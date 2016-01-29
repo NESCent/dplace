@@ -3,6 +3,18 @@ import csv
 from six import StringIO, text_type
 from models import *
 
+
+class ResultsRenderer(renderers.JSONRenderer):
+    def render(self, data, accepted_media_type=None, renderer_context=None):
+        if isinstance(data, list):
+            data = dict(headers={}, results=data, count=len(data))
+        return renderers.JSONRenderer.render(
+            self,
+            data,
+            accepted_media_type=accepted_media_type,
+            renderer_context=renderer_context)
+
+
 class DPLACECSVResults(object):
     def __init__(self,data):
         self.data = data
