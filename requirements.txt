@@ -9,7 +9,7 @@ djangorestframework-gis==0.2
 ete2==2.2.1072
 numpy==1.7.1
 psycopg2==2.5.2
-python-nexus==0.87
+python-nexus==1.32
 six==1.6.1
 wsgiref==0.1.2
 requests==2.5.3
