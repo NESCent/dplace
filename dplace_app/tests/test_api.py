@@ -87,10 +87,10 @@ class EnvironmentalVariableAPITestCase(APITestCase):
         self.variable2 = EnvironmentalVariable.objects.create(name='Temperature', category=self.category1, units='C', codebook_info='Temperature')
         self.variable3 = EnvironmentalVariable.objects.create(name='Ecology1', category=self.category2, units='', codebook_info='')
         
-    def assertVariableInResponse(self,variable,response):
+    def assertInResponse(self,variable,response):
         response_variable_ids = [x['id'] for x in response['results']]
         return self.assertIn(variable.id, response_variable_ids)
-    def assertVariableNotInResponse(self,variable,response):
+    def assertNotInResponse(self,variable,response):
         response_variable_ids = [x['id'] for x in response['results']]
         return self.assertNotIn(variable.id, response_variable_ids)
     
@@ -100,9 +100,9 @@ class EnvironmentalVariableAPITestCase(APITestCase):
         self.assertEqual(response.status_code,status.HTTP_200_OK)
         response_dict = response.data
         self.assertEqual(response_dict['count'],3)
-        self.assertVariableInResponse(self.variable1, response_dict)
-        self.assertVariableInResponse(self.variable2, response_dict)
-        self.assertVariableInResponse(self.variable3, response_dict)
+        self.assertInResponse(self.variable1, response_dict)
+        self.assertInResponse(self.variable2, response_dict)
+        self.assertInResponse(self.variable3, response_dict)
         
     def test_category1_variables(self):
         url = reverse('environmentalvariable-list')
@@ -110,9 +110,9 @@ class EnvironmentalVariableAPITestCase(APITestCase):
         response = self.client.get(url,data,format='json')
         self.assertEqual(response.status_code,status.HTTP_200_OK)
         response_dict = response.data
-        self.assertVariableInResponse(self.variable1, response_dict)
-        self.assertVariableInResponse(self.variable2, response_dict)
-        self.assertVariableNotInResponse(self.variable3, response_dict)        
+        self.assertInResponse(self.variable1, response_dict)
+        self.assertInResponse(self.variable2, response_dict)
+        self.assertNotInResponse(self.variable3, response_dict)        
 
 class VariableCodeDescriptionAPITestCase(APITestCase):
     '''
@@ -121,6 +121,7 @@ class VariableCodeDescriptionAPITestCase(APITestCase):
     def setUp(self):
         self.source_ea = Source.objects.create(year='2016', author='Simon Greenhill', reference='Greenhill (2016). Title.', name='EA Test Dataset')
         self.source_binford = Source.objects.create(year='2016', author='Russell Gray', reference='Gray (2016). Title.', name='BF Test Dataset')
+        self.reference1 = Source.objects.create(year='2000', author='Kate Kirby', reference='No name reference.')
         self.category1 = VariableCategory.objects.create(name='Economy')
         self.category2 = VariableCategory.objects.create(name='Demography')
         self.category3 = VariableCategory.objects.create(name='Empty Category')
@@ -138,17 +139,17 @@ class VariableCodeDescriptionAPITestCase(APITestCase):
         self.code10 = VariableCodeDescription.objects.create(variable=self.variable, code='10', description='Code 10')
         self.code2 = VariableCodeDescription.objects.create(variable=self.variable, code='2', description='Code 2')
     
-    def assertVariableInResponse(self,variable,response):
+    def assertInResponse(self,variable,response):
         response_variable_ids = [x['id'] for x in response['results']]
         return self.assertIn(variable.id, response_variable_ids)
-    def assertVariableNotInResponse(self,variable,response):
+    def assertNotInResponse(self,variable,response):
         response_variable_ids = [x['id'] for x in response['results']]
         return self.assertNotIn(variable.id, response_variable_ids)
         
-    def assertCategoryInResponse(self,category,response):
+    def assertInResponseArray(self,category,response):
         response_category_ids = [x['id'] for x in response]
         return self.assertIn(category.id, response_category_ids)
-    def assertCategoryNotInResponse(self,category,response):
+    def assertNotInResponseArray(self,category,response):
         response_category_ids = [x['id'] for x in response]
         return self.assertNotIn(category.id, response_category_ids)
     
@@ -173,15 +174,23 @@ class VariableCodeDescriptionAPITestCase(APITestCase):
         self.assertLess(index_of_1, index_of_2)
         self.assertLess(index_of_2, index_of_10)
         
+    def test_get_dataset_sources(self): #tests get_dataset_sources
+        url = reverse('get_dataset_sources')
+        response = self.client.get(url,format='json')
+        self.assertEqual(response.status_code,status.HTTP_200_OK)
+        self.assertInResponseArray(self.source_ea, response.data)
+        self.assertInResponseArray(self.source_binford, response.data)
+        self.assertNotInResponseArray(self.reference1, response.data)
+        
     def test_all_variables(self):
         url = reverse('variabledescription-list')
         response = self.client.get(url,format='json')
         self.assertEqual(response.status_code,status.HTTP_200_OK)
         response_dict = response.data
         self.assertEqual(response_dict['count'],3)
-        self.assertVariableInResponse(self.variable, response_dict)
-        self.assertVariableInResponse(self.variable2, response_dict)
-        self.assertVariableInResponse(self.variable3, response_dict)
+        self.assertInResponse(self.variable, response_dict)
+        self.assertInResponse(self.variable2, response_dict)
+        self.assertInResponse(self.variable3, response_dict)
         
     def test_empty_category(self):#tests get_categories API
         url = reverse('get_categories')
@@ -189,9 +198,9 @@ class VariableCodeDescriptionAPITestCase(APITestCase):
         response = self.client.get(url,data,format='json')
         self.assertEqual(response.status_code,status.HTTP_200_OK)
         self.assertEqual(len(response.data),2)
-        self.assertCategoryInResponse(self.category1, response.data)
-        self.assertCategoryInResponse(self.category2, response.data)
-        self.assertCategoryNotInResponse(self.category3, response.data)
+        self.assertInResponseArray(self.category1, response.data)
+        self.assertInResponseArray(self.category2, response.data)
+        self.assertNotInResponseArray(self.category3, response.data)
         
     def test_filter_source(self):
         url = reverse('variabledescription-list')
@@ -200,9 +209,9 @@ class VariableCodeDescriptionAPITestCase(APITestCase):
         self.assertEqual(response.status_code,status.HTTP_200_OK)
         response_dict = response.data
         self.assertEqual(response_dict['count'],2)
-        self.assertVariableInResponse(self.variable, response_dict)
-        self.assertVariableInResponse(self.variable3, response_dict)
-        self.assertVariableNotInResponse(self.variable2, response_dict)
+        self.assertInResponse(self.variable, response_dict)
+        self.assertInResponse(self.variable3, response_dict)
+        self.assertNotInResponse(self.variable2, response_dict)
         
     def test_category1_variables(self):
         url = reverse('variabledescription-list')
@@ -211,9 +220,9 @@ class VariableCodeDescriptionAPITestCase(APITestCase):
         self.assertEqual(response.status_code,status.HTTP_200_OK)
         response_dict = response.data
         self.assertEqual(response_dict['count'],2)
-        self.assertVariableInResponse(self.variable, response_dict)
-        self.assertVariableInResponse(self.variable3, response_dict)
-        self.assertVariableNotInResponse(self.variable2, response_dict)
+        self.assertInResponse(self.variable, response_dict)
+        self.assertInResponse(self.variable3, response_dict)
+        self.assertNotInResponse(self.variable2, response_dict)
         
     def test_category2_variables(self):
         url = reverse('variabledescription-list')
@@ -222,8 +231,8 @@ class VariableCodeDescriptionAPITestCase(APITestCase):
         self.assertEqual(response.status_code,status.HTTP_200_OK)
         response_dict = response.data
         self.assertEqual(response_dict['count'],2)
-        self.assertVariableInResponse(self.variable, response_dict)
-        self.assertVariableInResponse(self.variable2, response_dict)
+        self.assertInResponse(self.variable, response_dict)
+        self.assertInResponse(self.variable2, response_dict)
 
 
 class GeographicRegionAPITestCase(APITestCase):
