@@ -258,7 +258,7 @@ def get_categories(request):
 
 @api_view(['GET'])
 @permission_classes((AllowAny,))
-def get_dataset_sources(requesy):
+def get_dataset_sources(request):
     return Response(SourceSerializer(Source.objects.all().exclude(name=""), many=True).data)
     
 class GeographicRegionViewSet(viewsets.ReadOnlyModelViewSet):
@@ -275,9 +275,11 @@ def get_min_and_max(request):
     query_dict = json.loads(query_string)
     if 'environmental_id' in query_dict:
         values = EnvironmentalValue.objects.filter(variable__id=query_dict['environmental_id'])
-        min_value = 0
+        min_value = None
         max_value = 0
         for v in values:
+            if not min_value and min_value != 0:
+                min_value = v.value
             if v.value < min_value:
                 min_value = v.value
             elif v.value > max_value:
@@ -316,7 +318,8 @@ def bin_cont_data(request): #MAKE THIS GENERIC
                     min_value = float(v.coded_value)
                 elif float(v.coded_value) < min_value:
                     min_value = float(v.coded_value)
-                elif float(v.coded_value) > max_value:
+                
+                if float(v.coded_value) > max_value:
                     max_value = float(v.coded_value)
         
         data_range = max_value - min_value
