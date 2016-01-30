@@ -172,8 +172,9 @@ class GeographicRegionAPITestCase(APITestCase):
     def test_geo_api(self):
         response = self.client.get(reverse('geographicregion-list'), format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data),1)
-        self.assertEqual(response.data[0]['region_nam'],self.geographic_region.region_nam)
+        self.assertEqual(len(response.data['results']), 1)
+        self.assertEqual(
+            response.data['results'][0]['region_nam'], self.geographic_region.region_nam)
 
 
 class FindSocietiesTestCase(Test):

@@ -10,7 +10,7 @@ from rest_framework.permissions import *
 from rest_framework.views import Response
 from rest_framework.renderers import JSONRenderer
 from filters import *
-from renderers import ResultsRenderer, DPLACECsvRenderer, ZipRenderer
+from renderers import DPLACECsvRenderer, ZipRenderer
 
 
 # Resource routes
@@ -18,7 +18,6 @@ class VariableDescriptionViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = VariableDescriptionSerializer
     filter_fields = ('label', 'name', 'index_categories', 'niche_categories', 'source')
     queryset = VariableDescription.objects.all()
-    renderer_classes = (ResultsRenderer,)
 
     # Override retrieve to use the detail serializer, which includes categories
     def retrieve(self, request, *args, **kwargs):
@@ -32,6 +31,7 @@ class VariableCategoryViewSet(viewsets.ReadOnlyModelViewSet):
     filter_fields = ('name', 'index_variables', 'niche_variables',)
     queryset = VariableCategory.objects.all()
     # Override retrieve to use the detail serializer, which includes variables
+
     def retrieve(self, request, *args, **kwargs):
         self.object = self.get_object()
         serializer = VariableCategoryDetailSerializer(self.object)
@@ -39,12 +39,9 @@ class VariableCategoryViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class VariableCodeDescriptionViewSet(viewsets.ReadOnlyModelViewSet):
-    # Model ordering is ignored when filter_fields enabled, requires FilterSet subclass
-    # see https://github.com/tomchristie/django-rest-framework/issues/1432
     serializer_class = VariableCodeDescriptionSerializer
-    filter_class = VariableCodeDescriptionFilter
+    filter_fields = ('variable',)
     queryset = VariableCodeDescription.objects.all()
-    renderer_classes = (ResultsRenderer,)
 
 
 # Can filter by code, code__variable, or society
@@ -57,35 +54,32 @@ class VariableCodedValueViewSet(viewsets.ReadOnlyModelViewSet):
 
 class SocietyViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = SocietySerializer
-    queryset = Society.objects.all()
-
+    queryset = Society.objects.all().select_related(
+        'source', 'language__iso_code', 'language__glotto_code', 'language__family')
+    
 
 class ISOCodeViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = ISOCodeSerializer
     filter_fields = ('iso_code',)
     queryset = ISOCode.objects.all()
-    renderer_classes = (ResultsRenderer,)
 
 
 class GlottoCodeViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = GlottoCodeSerializer
     filter_fields = ('glotto_code',)
     queryset = GlottoCode.objects.all()
-    renderer_classes = (ResultsRenderer,)
 
 
 class EnvironmentalCategoryViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = EnvironmentalCategorySerializer
     filter_fields = ('name',)
     queryset = EnvironmentalCategory.objects.all()
-    renderer_classes = (ResultsRenderer,)
 
 
 class EnvironmentalVariableViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = EnvironmentalVariableSerializer
     filter_fields = ('name', 'category', 'units',)
     queryset = EnvironmentalVariable.objects.all()
-    renderer_classes = (ResultsRenderer,)
 
 
 class EnvironmentalValueViewSet(viewsets.ReadOnlyModelViewSet):
@@ -104,14 +98,12 @@ class LanguageViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = LanguageSerializer
     filter_fields = ('name', 'iso_code', 'societies', 'family',)
     queryset = Language.objects.all()
-    renderer_classes = (ResultsRenderer,)
 
 
 class LanguageFamilyViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = LanguageFamilySerializer
     filter_fields = ('name', 'scheme',)
     queryset = LanguageFamily.objects.all()
-    renderer_classes = (ResultsRenderer,)
 
 
 class LanguageTreeViewSet(viewsets.ReadOnlyModelViewSet):
@@ -126,8 +118,8 @@ class SourceViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Source.objects.all()
 
 
-#returns trees that contain the societies from the SocietyResultSet 
-#maybe needs cleaning up in the future 
+# returns trees that contain the societies from the SocietyResultSet
+# maybe needs cleaning up in the future
 def trees_from_languages_array(language_ids):
     from ete2 import Tree
     trees = LanguageTree.objects\
@@ -321,7 +313,7 @@ class GeographicRegionViewSet(viewsets.ReadOnlyModelViewSet):
     model = GeographicRegion
     filter_class = GeographicRegionFilter
     queryset = GeographicRegion.objects.all()
-    renderer_classes = (ResultsRenderer,)
+    
 
     
 @api_view(['GET'])
