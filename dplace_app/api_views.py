@@ -318,7 +318,8 @@ def bin_cont_data(request): #MAKE THIS GENERIC
                     min_value = float(v.coded_value)
                 elif float(v.coded_value) < min_value:
                     min_value = float(v.coded_value)
-                elif float(v.coded_value) > max_value:
+                
+                if float(v.coded_value) > max_value:
                     max_value = float(v.coded_value)
         
         data_range = max_value - min_value

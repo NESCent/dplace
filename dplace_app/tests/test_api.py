@@ -119,6 +119,7 @@ class VariableCodeDescriptionAPITestCase(APITestCase):
     tests rest-framework api for Variable Code Descriptions
     '''
     def setUp(self):
+    
         self.source_ea = Source.objects.create(year='2016', author='Simon Greenhill', reference='Greenhill (2016). Title.', name='EA Test Dataset')
         self.source_binford = Source.objects.create(year='2016', author='Russell Gray', reference='Gray (2016). Title.', name='BF Test Dataset')
         self.reference1 = Source.objects.create(year='2000', author='Kate Kirby', reference='No name reference.')
@@ -135,10 +136,28 @@ class VariableCodeDescriptionAPITestCase(APITestCase):
         self.variable.index_categories.add(self.category1, self.category2)
         self.variable2.index_categories.add(self.category2)
         self.variable3.index_categories.add(self.category1)
+        
         self.code1 = VariableCodeDescription.objects.create(variable=self.variable, code='1', description='Code 1')
         self.code10 = VariableCodeDescription.objects.create(variable=self.variable, code='10', description='Code 10')
         self.code2 = VariableCodeDescription.objects.create(variable=self.variable, code='2', description='Code 2')
-    
+        self.codeNA = VariableCodeDescription.objects.create(variable=self.variable2,code='NA', description='Missing data')
+        
+        self.society1 = Society.objects.create(
+            ext_id='society1',
+            xd_id='xd1',
+            name='Society1',
+            location=Point(1.0,1.0),
+            source=self.source_binford)
+        self.society2 = Society.objects.create(
+            ext_id='society2',
+            xd_id='xd2',
+            name='Society2',
+            location=Point(2.0,2.0),
+            source=self.source_binford)
+        self.bfcode1 = VariableCodedValue.objects.create(variable=self.variable2,society=self.society1,coded_value='23',source=self.source_binford,subcase='Winter')
+        self.bfcode2 = VariableCodedValue.objects.create(variable=self.variable2,society=self.society2,coded_value='1000',source=self.source_binford)
+        self.bfcodeNA = VariableCodedValue.objects.create(variable=self.variable2,society=self.society1,coded_value='NA',code=self.codeNA,source=self.source_binford,subcase='Summer')
+        
     def assertInResponse(self,variable,response):
         response_variable_ids = [x['id'] for x in response['results']]
         return self.assertIn(variable.id, response_variable_ids)
@@ -233,7 +252,30 @@ class VariableCodeDescriptionAPITestCase(APITestCase):
         self.assertEqual(response_dict['count'],2)
         self.assertInResponse(self.variable, response_dict)
         self.assertInResponse(self.variable2, response_dict)
-
+        
+    def test_continuous_binford_variable(self):
+        url = reverse('cont_variable')
+        data = {'query': json.dumps({'bf_id': self.variable2.id})}
+        response = self.client.get(url,data,format='json')
+        self.assertEqual(response.status_code,status.HTTP_200_OK)
+        response_dict = response.data
+        bin_size = (1000 - 23) / 5.0
+        min_value = 23.0
+        self.assertEqual(len(response_dict), 6) #check if split into 5 bins + NA option
+        prev_min = None
+        for x in range(0, 5):
+            bin = response_dict[x]
+            if bin['code'] == 'NA':
+                continue
+            max_value = float(min_value) + float(bin_size)
+            description = '%s - %s' % (min_value, max_value)
+            self.assertEqual(bin['description'], description)
+            min_value += bin_size + 1
+            if not prev_min and prev_min != 0:
+                prev_min = bin['min']
+                continue
+            self.assertLess(prev_min, bin['min']) #check that bins are in order
+            
 
 class GeographicRegionAPITestCase(APITestCase):
     def setUp(self):
