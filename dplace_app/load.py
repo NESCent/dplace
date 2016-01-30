@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 import sys
+from itertools import chain
 
 import django
 from django.db import transaction
 
-from dplace_app.models import Society, Source
 from load.util import configure_logging, csv_dict_reader, stream
 from load.isocode import load_isocode
 from load.environmental import load_environmental, create_environmental_variables
@@ -21,59 +21,46 @@ from load.glottocode import load_glottocode, map_isocodes, xd_to_language
 
 LOAD_BY_ROW = {
     'iso': load_isocode,
-    'env_vals': load_environmental,
     #'langs': ,
     'soc_lat_long': society_locations,
     'ea_soc': load_ea_society,
     'bf_soc': load_bf_society,
-    'bf_vals': load_data,
     'vars': load_vars,
-    'ea_vals': load_data,
     'glotto_iso': map_isocodes,
     'xd_lang': xd_to_language,
     #'ea_refs': ,
 }
 
 
-def prefetched(mode):
-    res = {}
-    if mode in ['ea_vals', 'bf_vals']:
-        res['societies'] = {s.ext_id: s for s in Society.objects.all()}
-        res['sources'] = {(s.author, s.year): s for s in Source.objects.all()}
-    return res
-
-
-def run(file_name, mode):
+def run(mode, *fnames):
     configure_logging()
-
-    _prefetched = prefetched(mode)
+    file_name = fnames[0]
 
     if mode == 'geo':
         load_regions(file_name)
     elif mode == 'tree':
         load_tree(file_name)
-    elif mode == 'glottotree':
-        load_tree(file_name)
     else:
         row_loader = LOAD_BY_ROW.get(mode)
         if row_loader:
             for dict_row in csv_dict_reader(file_name):
-                if _prefetched:
-                    row_loader(dict_row, **_prefetched)
-                else:
-                    row_loader(dict_row)
+                row_loader(dict_row)
+        elif mode == 'vals':
+            # coded values can only be created al at once now, so we must make sure to
+            # pass in all csv files with values.
+            load_data(chain(*map(csv_dict_reader, fnames)))
         elif mode == 'glotto':
             load_glottocode(csv_dict_reader(file_name))
         elif mode == 'refs':
             load_references(file_name)
         elif mode == 'codes':
             load_codes(stream(file_name))
-        elif mode == 'env_vars':
-            create_environmental_variables()
+        elif mode == 'env_vals':
+            load_environmental(csv_dict_reader(file_name))
         else:
             raise ValueError(mode)
 
-        if mode == 'langs' or mode == 'xd_lang':
+        if mode == 'xd_lang':
             update_language_counts()
 
     if len(MISSING_CODES) > 0:
@@ -81,12 +68,12 @@ def run(file_name, mode):
         print '\n'.join(MISSING_CODES)
 
 if __name__ == '__main__':
-    if len(sys.argv) != 3:
+    if len(sys.argv) < 3:
         print "\nUsage: %s source_file mode" % sys.argv[0]
         print "You should run load_all_datasets.sh instead of this script directly."
         print
         sys.exit(1)
     django.setup()
     with transaction.atomic():
-        run(sys.argv[1], sys.argv[2].strip())
+        run(sys.argv[-1], *[arg.strip() for arg in sys.argv[1:-1]])
     sys.exit(0)

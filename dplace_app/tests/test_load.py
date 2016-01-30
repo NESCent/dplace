@@ -56,8 +56,8 @@ class LoadISOCodeTestCase(TestCase):
         self.assertEqual(society.source.author, 'Binford', '! Binford')
 
     def test_load_data(self):
-        self.assertIsNone(load_data(self.get_dict()))
-        self.assertIsNone(load_data(self.get_dict(soc_id='notknown')))
+        self.assertEqual(load_data([self.get_dict()]), 0)
+        self.assertEqual(load_data([self.get_dict(soc_id='notknown')]), 0)
         row_dict = self.get_dict(**{
             'soc_id': 'socid',
             'soc_name': 'socname',
@@ -68,22 +68,21 @@ class LoadISOCodeTestCase(TestCase):
             'LangNam': 'Language2, Test'
         })
         load_bf_society(row_dict)
-        res = load_data(self.get_dict(soc_id='socid'))
-        self.assertIsNone(res)
-        res = load_data(self.get_dict(soc_id='socid', Dataset='LRB'))
-        self.assertIsNone(res)
+        res = load_data([self.get_dict(soc_id='socid')])
+        self.assertEqual(res, 0)
+        res = load_data([self.get_dict(soc_id='socid', Dataset='LRB')])
+        self.assertEqual(res, 0)
         load_vars(self.get_dict(Dataset='LRB', VarId='5'))
-        res = load_data(self.get_dict(soc_id='socid', Dataset='LRB', VarId='5'))
-        self.assertIsNone(res)
+        res = load_data([self.get_dict(soc_id='socid', Dataset='LRB', VarId='5')])
+        self.assertEqual(res, 1)
 
     def test_environmental(self):
         from dplace_app.load.environmental import (
             create_environmental_variables, load_environmental,
         )
 
-        create_environmental_variables()
-        res = load_environmental(self.get_dict(Source='EA'))
-        self.assertIsNone(res)
+        res = load_environmental([self.get_dict(Source='EA')])
+        self.assertEqual(res, 0)
         row_dict = self.get_dict(
             dataset='EA',
             soc_id='EA12',
@@ -92,12 +91,12 @@ class LoadISOCodeTestCase(TestCase):
             alternate_names='Example',
             main_focal_year='2016')
         load_ea_society(row_dict)
-        res = load_environmental(self.get_dict(**{
+        res = load_environmental([self.get_dict(**{
             'Source': 'EA',
             'ID': 'EA12',
             'Orig.longitude': 1,
             'Orig.latitude': 1,
             'longitude': 1,
             'latitude': 1,
-        }))
-        self.assertIsNotNone(res)
+        })])
+        self.assertEqual(res, 1)

@@ -1,46 +1,28 @@
 # -*- coding: utf-8 -*-
 import logging
 
+from django.db import connection
 from django.core.exceptions import ObjectDoesNotExist
 
 from dplace_app.models import Language, GlottoCode, ISOCode, Society, LanguageFamily
 
 
-def _load_glottocode(dict_row):
-    """
-    Reads file glottolog_mapping.csv
-    """
-    glotto_code = dict_row['id'].strip()
-    name = dict_row['name'].strip()
-    glotto, created = GlottoCode.objects.get_or_create(glotto_code=glotto_code)
-    language, created = Language.objects.get_or_create(glotto_code=glotto)
-    language.name = name
-    language.save()
-    logging.info("Saved Glottocode %s, %s" % (name, glotto))
-    return language, dict_row['level']
-
-
-class Tree(dict):
-    def get_family(self, code):
-        parent = self[code]
-        while parent:
-            code, parent = parent, self[parent]
-        return code
-
-
 def load_glottocode(reader):
-    tree = Tree()
-    languoids = {}
+    Language.objects.all().delete()
+    GlottoCode.objects.all().delete()
+    with connection.cursor() as c:
+        for table in ['language', 'glottocode']:
+            c.execute("ALTER SEQUENCE dplace_app_%s_id_seq RESTART WITH 1" % table)
 
-    for item in reader:
-        tree[item['id']] = item['parent_id']
-        languoids[item['id']] = _load_glottocode(item)
+    glottocodes = []
+    languages = []
 
-    #for id_, (languoid, level) in languoids.items():
-    #    if level == 'language':
-    #        fid = tree.get_family(id_)
-    #        lang = languoids[fid][0]
-    #        languoid.family, _ = LanguageFamily.objects.get_or_create(name=lang.name)
+    for i, item in enumerate(reader):
+        glottocodes.append(GlottoCode(glotto_code=item['id'].strip()))
+        languages.append(Language(name=item['name'].strip(), glotto_code_id=i + 1))
+
+    GlottoCode.objects.bulk_create(glottocodes, batch_size=1000)
+    Language.objects.bulk_create(languages, batch_size=1000)
 
 
 def map_isocodes(dict_row):

@@ -37,10 +37,9 @@ export PYTHONPATH=$DPLACE_PATH
 #python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/Revised_Ethnologue_families-Feb_10_2014-17th_Ed-ISO693-3-current.csv" iso
 #python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/Revised_Ethnologue_families-Feb_10_2014-17th_Ed_Missing_ISO_codes.csv" iso
 
-echo "Loading Languages from Ethnologue"
-python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/Revised_Ethnologue_families-Feb_10_2014-17th_Ed-ISO693-3-current.csv" langs
-python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/Revised_Ethnologue_families-Feb_10_2014-17th_Ed_Missing_ISO_codes.csv" langs
-
+#echo "Loading Languages from Ethnologue"
+#python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/Revised_Ethnologue_families-Feb_10_2014-17th_Ed-ISO693-3-current.csv" langs
+#python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/Revised_Ethnologue_families-Feb_10_2014-17th_Ed_Missing_ISO_codes.csv" langs
 
 echo "Loading Glottolog Languages"
 python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/glottolog_mapping_11Dec2015.csv" glotto
@@ -50,6 +49,9 @@ python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/glottolog_mapping.c
 
 echo "Loading EA Variables"
 python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/EAVariableList_17Nov2015.csv" vars
+
+echo "Loading EA Variable Codes"
+python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/EACodeDescriptions_17Nov2015.csv" codes
 
 echo "Loading Binford Variables"
 python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/BinfordVariableList_18Nov2015.csv" vars
@@ -72,29 +74,21 @@ python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/xd_id_to_language_2
 echo "Loading References"
 python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/ReferenceMapping_11Nov2015.csv" refs
 
-echo "Loading EA Data"
-python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/EA_DATA_Stacked_17Nov2015.csv" ea_vals
-
-echo "Loading Binford Data"
-python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/Binford_merged_18Nov2015.csv" bf_vals
-
 # TODO -- check?
-#echo "Loading References for Binford data" DO THIS!!
+#echo "Loading References for EA data"
 #python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/EA_DATA_Stacked_17Nov2015.csv" ea_refs
 
+echo "Loading Data"
+python "${DPLACE_PATH}/dplace_app/load.py" \
+ "${REPO_DEST}/csv/EA_DATA_Stacked_17Nov2015.csv" \
+ "${REPO_DEST}/csv/Binford_merged_18Nov2015.csv" \
+ vals
+
 echo "Loading Environmental Data"
-python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/EcologicalData.DBASE.07Mar14.csv" "env_vars"
 python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/EcologicalData.DBASE.07Mar14.csv" "env_vals"
 
 echo "Loading Geographic regions from shapefile"
 python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/geo/level2-shape/level2.shp" geo
 
-TREE_FILES="${REPO_DEST}/trees/*.trees"
-for tree_file in $TREE_FILES; do
-    if [[ $tree_file == *"glotto"* ]]
-    then
-        python "${DPLACE_PATH}/dplace_app/load.py" "$tree_file" glottotree
-    else
-        python "${DPLACE_PATH}/dplace_app/load.py" "$tree_file" tree
-    fi
-done
+echo "Loading Trees"
+python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/trees/" tree

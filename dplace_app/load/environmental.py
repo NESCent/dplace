@@ -133,13 +133,14 @@ ENVIRONMENTAL_MAP = {
 }
 
 
+_ISO_CODES = None
+
+
 def iso_from_code(code):
-    if code == 'NA' or len(code) == 0:
-        return None
-    try:
-        return ISOCode.objects.get(iso_code=code)
-    except ObjectDoesNotExist:
-        return None
+    global _ISO_CODES
+    if _ISO_CODES is None:
+        _ISO_CODES = {c.iso_code: c for c in ISOCode.objects.all()}
+    return _ISO_CODES.get(code)
 
 
 def create_environmental_variables():
@@ -158,19 +159,30 @@ def create_environmental_variables():
         obj.codebook_info = var_dict['description']
         obj.save()
         logging.info("Saved environmental variable %s" % obj)
+        yield obj.name, obj
 
 
-def load_environmental(env_dict):
+def load_environmental(items):
+    variables = dict(list(create_environmental_variables()))
+    societies = {(s.ext_id, s.source_id): s for s in Society.objects.all()}
+
+    res = 0
+    for item in items:
+        if _load_environmental(item, variables, societies):
+            res += 1
+    return res
+
+
+def _load_environmental(env_dict, variables, societies):
     ext_id = env_dict['ID']
     source = get_source(env_dict['Source'])
 
     # hack for B109 vs. 109
     if source.author == 'Binford' and ext_id.find('B') == -1:
         ext_id = 'B' + ext_id
-    
-    try:
-        society = Society.objects.get(ext_id=ext_id, source=source)
-    except ObjectDoesNotExist:
+
+    society = societies.get((ext_id, source.id))
+    if society is None:
         logging.warn(
             "Unable to find a Society object with ext_id %s and source %s, skipping..." %
             (ext_id, source))
@@ -184,7 +196,7 @@ def load_environmental(env_dict):
         actual_latlon = Point(
             float(env_dict['longitude']), float(env_dict['latitude']))
         iso_code = iso_from_code(env_dict['iso'])
-        
+
         # Create the base Environmental
         environmental, created = Environmental.objects.get_or_create(
             society=society,
@@ -195,17 +207,17 @@ def load_environmental(env_dict):
         )
         for k in ENVIRONMENTAL_MAP:  # keys are the columns in the CSV file
             var_dict = ENVIRONMENTAL_MAP[k]
-            try:
-                # Get the variable
-                variable = EnvironmentalVariable.objects.get(name=var_dict['name'])
-            except ObjectDoesNotExist:
+            variable = variables.get(var_dict['name'])
+            if variable is None:
                 logging.warn("Did not find an EnvironmentalVariable with name %s" % var_dict['name'])
                 continue
             if env_dict[k] and env_dict[k] != 'NA':
                 value = float(env_dict[k])
-                EnvironmentalValue.objects.get_or_create(variable=variable,value=value,
-                    environmental=environmental, source=source
-                )
+                EnvironmentalValue.objects.get_or_create(
+                    variable=variable,
+                    value=value,
+                    environmental=environmental,
+                    source=source)
             logging.info(
                 "Created environmental value for variable %s and society %s" % (var_dict['name'], society)
             )
