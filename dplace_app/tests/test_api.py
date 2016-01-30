@@ -465,7 +465,7 @@ class FindSocietiesTestCase(APITestCase):
         value3 = VariableCodedValue.objects.create(variable=self.variableB,society=self.society2,coded_value='24.00',source=self.source)
         #value4 has same society and variable as valueBNA - used to test same society and variable but different subcase
         value4 = VariableCodedValue.objects.create(variable=self.variableB,society=self.society1,coded_value='100.234',source=self.source,subcase='Winter')
-        
+        value5 = VariableCodedValue.objects.create(variable=self.variableB,society=self.society3,coded_value='NA',code=self.codeBNA,source=self.source)
         # Setup environmentals
         self.environmental1 = Environmental.objects.create(society=self.society1,
                                                            reported_location=Point(0,0),
@@ -563,7 +563,7 @@ class FindSocietiesTestCase(APITestCase):
         self.assertEqual(len(response.data['language_trees']),2)
         self.assertSocietyInResponse(self.society1,response)
         self.assertSocietyInResponse(self.society2,response)
-        self.assertSocietyNotInResponse(self.society3,response)
+        self.assertSocietyInResponse(self.society3,response)
         response_dict = response.data
         for society in response_dict['societies']:
             if society['society']['id'] == self.society1.id:
@@ -637,4 +637,14 @@ class FindSocietiesTestCase(APITestCase):
         self.assertSocietyInResponse(self.society1,response)
         self.assertSocietyInResponse(self.society3,response)
         self.assertSocietyNotInResponse(self.society2,response)
+
+    def test_csv_download(self):
+        serialized_codes = VariableCodeDescriptionSerializer([self.code1,self.code2, self.codeBNA],many=True).data
+        data = {'variable_codes': serialized_codes}
+        response = self.client.post(self.url,data,format='json')
+        self.assertSocietyInResponse(self.society1,response)
+        self.assertSocietyInResponse(self.society2,response)
+        self.assertSocietyInResponse(self.society3,response)
+        #Need to test CSV download!
+
 
