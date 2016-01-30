@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+from collections import defaultdict
 
 from django.contrib.gis.db import models
-from collections import defaultdict
 
 UNIT_CHOICES = (
     ('mm', 'mm'),
@@ -44,7 +44,8 @@ class ISOCode(models.Model):
     
     class Meta:
         verbose_name = "ISO Code"
-        
+
+
 class GlottoCode(models.Model):
     glotto_code = models.CharField('Glotto Code', db_index=True, max_length=10)
     
@@ -93,11 +94,11 @@ class Society(models.Model):
                 valueDict[str(c)].append({
                     'label': value.variable.label,
                     'name': value.variable.name,
-                    'code':value.coded_value,
-                    'description':value.get_description(),
-                    'year':value.focal_year,
-                    'comment':value.comment,
-                    'sources':value.references.all(),
+                    'code': value.coded_value,
+                    'description': value.get_description(),
+                    'year': value.focal_year,
+                    'comment': value.comment,
+                    'sources': value.references.all(),
                 })
         return valueDict
         
@@ -146,13 +147,9 @@ class EnvironmentalVariable(models.Model):
 
 
 class EnvironmentalValue(models.Model):
-    variable = models.ForeignKey(
-        'EnvironmentalVariable', related_name="values"
-    )
+    variable = models.ForeignKey('EnvironmentalVariable', related_name="values")
     value = models.FloatField(db_index=True)
-    environmental = models.ForeignKey(
-        'Environmental', related_name="values"
-    )
+    environmental = models.ForeignKey('Environmental', related_name="values")
     source = models.ForeignKey('Source', null=True)
     
     def society(self):
@@ -163,24 +160,16 @@ class EnvironmentalValue(models.Model):
     
     class Meta:
         ordering = ("variable",)
-        unique_together = (
-            ('variable', 'environmental')
-        )
-        index_together = [
-            ['variable', 'value']
-        ]
+        unique_together = (('variable', 'environmental'))
+        index_together = [['variable', 'value']]
+
 
 class Environmental(models.Model):
-    society = models.ForeignKey(
-        'Society', null=True, related_name="environmentals"
-    )
+    society = models.ForeignKey('Society', null=True, related_name="environmentals")
     reported_location = models.PointField()
     actual_location = models.PointField()
-    iso_code = models.ForeignKey(
-        'ISOCode', null=True, related_name="environmentals"
-    )
+    iso_code = models.ForeignKey('ISOCode', null=True, related_name="environmentals")
     source = models.ForeignKey('Source', null=True)
-    
     objects = models.GeoManager()   # For GeoDjango, must override the manager
     
     def __unicode__(self):
@@ -203,11 +192,9 @@ class VariableDescription(models.Model):
     name = models.CharField(max_length=200, db_index=True, default='Unknown')
     source = models.ForeignKey('Source', null=True)
     index_categories = models.ManyToManyField(
-        'VariableCategory', related_name='index_variables'
-    )
+        'VariableCategory', related_name='index_variables')
     niche_categories = models.ManyToManyField(
-        'VariableCategory', related_name='niche_variables'
-    )
+        'VariableCategory', related_name='niche_variables')
     codebook_info = models.TextField(default='None')
     data_type = models.CharField(max_length=200, null=True)
     
@@ -248,30 +235,26 @@ class VariableCodeDescription(models.Model):
 
     """
     variable = models.ForeignKey(
-        'VariableDescription', related_name="codes", db_index=True
-    )
+        'VariableDescription', related_name="codes", db_index=True)
     code = models.CharField(
-        max_length=20, db_index=True, null=False, default='.'
-    )
+        max_length=20, db_index=True, null=False, default='.')
     code_number = models.IntegerField(null=True, db_index=True)
     description = models.CharField(max_length=500, default='Unknown')
     short_description = models.CharField(max_length=500, default="")
     n = models.IntegerField(null=True, default=0)
-    
+
     def save(self, *args, **kwargs):
         self.read_code_number()
         super(VariableCodeDescription, self).save(*args, **kwargs)
-    
+
     def read_code_number(self):
         try:
             self.code_number = int(self.code)
         except ValueError:
             pass
-            
+
     def coded_societies(self):
-        return Society.objects.filter(
-            variablecodedvalue__coded_value=self.code
-        )
+        return Society.objects.filter(variablecodedvalue__coded_value=self.code)
     
     def __unicode__(self):
         return "%s - %s" % (self.code, self.description)
@@ -298,24 +281,17 @@ class VariableCodedValue(models.Model):
     """
     variable = models.ForeignKey('VariableDescription', related_name="values")
     society = models.ForeignKey('Society', null=True)
-    coded_value = models.CharField(
-        max_length=100, db_index=True, null=False, default='.'
-    )
-    code = models.ForeignKey(
-        'VariableCodeDescription', db_index=True, null=True
-    )
+    coded_value = models.CharField(max_length=100, db_index=True, null=False, default='.')
+    code = models.ForeignKey('VariableCodeDescription', db_index=True, null=True)
     source = models.ForeignKey('Source', null=True)
     comment = models.TextField(default="")
     references = models.ManyToManyField('Source', related_name='references')
     subcase = models.TextField(default="")
     focal_year = models.CharField(max_length=10, default="")
-    
+
     def get_description(self):
-        if self.code is not None:
-            return self.code.description
-        else:
-            return u''
-    
+        return self.code.description if self.code else ''
+
     def __unicode__(self):
         return "%s" % self.coded_value
     
@@ -329,9 +305,8 @@ class VariableCodedValue(models.Model):
             ['society', 'coded_value'],
             ['society', 'code'],
         ]
-        unique_together = (
-            ('variable', 'society', 'coded_value'),
-        )
+        unique_together = (('variable', 'society', 'coded_value'),)
+
 
 class Source(models.Model):
     """
@@ -351,14 +326,11 @@ class Source(models.Model):
         return "%s (%s)" % (self.author, self.year)
 
     class Meta:
-        unique_together = (
-            ('year', 'author')
-        )
-        
+        unique_together = (('year', 'author'))
+
+
 class LanguageFamily(models.Model):
-    scheme = models.CharField(
-        max_length=1, choices=CLASSIFICATION_SCHEMES, default='G'
-    )
+    scheme = models.CharField(max_length=1, choices=CLASSIFICATION_SCHEMES, default='G')
     name = models.CharField(max_length=50, db_index=True)
     language_count = models.IntegerField(default=0, null=False)
     
@@ -366,24 +338,21 @@ class LanguageFamily(models.Model):
         self.language_count = Language.objects.all().filter(family=self).count()
         self.save()
 
+
 class Language(models.Model):
     name = models.CharField(max_length=200, db_index=True)
     glotto_code = models.ForeignKey('GlottoCode', null=True, unique=True)
-    #needs to be null=True because some glottolog languages do not have
-    # isocodes
+    # needs to be null=True because some glottolog languages do not have isocodes
     iso_code = models.ForeignKey('ISOCode', null=True)
     family = models.ForeignKey('LanguageFamily', null=True)
     
     def __unicode__(self):
         return "Language: %s, ISO Code %s, Glotto Code %s" % (
-            self.name, self.iso_code, self.glotto_code
-        )
+            self.name, self.iso_code, self.glotto_code)
         
     class Meta:
         verbose_name = "Language"
-        unique_together = (
-            ('iso_code', 'glotto_code')
-        )
+        unique_together = (('iso_code', 'glotto_code'))
 
 
 class GeographicRegion(models.Model):
@@ -405,4 +374,3 @@ class LanguageTree(models.Model):
     file = models.FileField(upload_to='language_trees', null=True)
     newick_string = models.TextField(default='')
     source = models.ForeignKey('Source', null=True)
-    
