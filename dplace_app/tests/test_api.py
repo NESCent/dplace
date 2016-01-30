@@ -411,6 +411,15 @@ class FindSocietiesTestCase(APITestCase):
         self.languageC2 = Language.objects.create(name='languageC2',iso_code=iso_code2, glotto_code=glotto_code2, family=lf2)
         self.languageB3 = Language.objects.create(name='languageB3',iso_code=iso_code3, glotto_code=glotto_code3, family=lf3)
         
+        # Make language tree
+        self.tree1 = LanguageTree.objects.create(name='tree1', newick_string='((abun1253:1,abun1255:1,abun1254:1)abun1252:1);')
+        self.tree1.save()
+        self.tree1.languages.add(self.languageA1, self.languageB3)
+        
+        self.tree2 = LanguageTree.objects.create(name='tree2', newick_string='(baib1251:1,(east2524:1,west2605:1)fass1245:1);')
+        self.tree2.save()
+        self.tree2.languages.add(self.languageC2)
+        
         # Make source
         self.source = Source.objects.create(year="2014", author="Greenhill", reference="Great paper")
         
@@ -515,6 +524,7 @@ class FindSocietiesTestCase(APITestCase):
         classifications = LanguageSerializer([l for l in Language.objects.all().filter(name=self.languageA1.name)],many=True)
         data = {'language_classifications' : classifications.data }
         response = self.client.post(self.url,data,format='json')
+        self.assertEqual(len(response.data['language_trees']),1)
         self.assertSocietyInResponse(self.society1,response)
         self.assertSocietyNotInResponse(self.society2,response)
         self.assertSocietyNotInResponse(self.society3,response)
@@ -522,15 +532,19 @@ class FindSocietiesTestCase(APITestCase):
     def test_find_society_by_var(self):
         data = {'variable_codes': VariableCodeDescriptionSerializer([self.code1],many=True).data}
         response = self.client.post(self.url,data,format='json')
+        self.assertEqual(len(response.data['language_trees']),1)
         self.assertSocietyInResponse(self.society1,response)
         self.assertSocietyNotInResponse(self.society2,response)
+        self.assertSocietyNotInResponse(self.society3,response)
         
     def test_find_societies_by_var(self):
         serialized_codes = VariableCodeDescriptionSerializer([self.code1,self.code2],many=True).data
         data = {'variable_codes': serialized_codes}
         response = self.client.post(self.url,data,format='json')
+        self.assertEqual(len(response.data['language_trees']),2)
         self.assertSocietyInResponse(self.society1,response)
         self.assertSocietyInResponse(self.society2,response)
+        self.assertSocietyNotInResponse(self.society3,response)
         
     def test_continuous_binford_variable_find_societies(self):
         #get and bin variable
@@ -546,6 +560,7 @@ class FindSocietiesTestCase(APITestCase):
         data = {'variable_codes': response_dict}
         response = self.client.post(self.url,data,format='json')
         self.assertEqual(response.status_code,status.HTTP_200_OK)
+        self.assertEqual(len(response.data['language_trees']),2)
         self.assertSocietyInResponse(self.society1,response)
         self.assertSocietyInResponse(self.society2,response)
         self.assertSocietyNotInResponse(self.society3,response)
