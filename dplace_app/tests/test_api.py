@@ -440,12 +440,22 @@ class FindSocietiesTestCase(APITestCase):
             language=self.languageB3)
         
         # Make an EA Variable, code, and value
-        variable = VariableDescription.objects.create(label='EA001',name='Variable 1')
+        variable = VariableDescription.objects.create(label='EA001',name='Variable 1',data_type='Categorical')
         self.code1 = VariableCodeDescription.objects.create(variable=variable, code='1', description='Code 1')
         self.code2 = VariableCodeDescription.objects.create(variable=variable, code='2', description='Code 2')
+        self.codeNA = VariableCodeDescription.objects.create(variable=variable, code='NA', description='Code NA')
         self.code3 = VariableCodeDescription.objects.create(variable=variable, code='3', description='Code 3')
+        valueNA = VariableCodedValue.objects.create(variable=variable,society=self.society3,coded_value='NA',code=self.codeNA,source=self.source)
         value1 = VariableCodedValue.objects.create(variable=variable,society=self.society1,coded_value='1',code=self.code1, source=self.source)
         value2 = VariableCodedValue.objects.create(variable=variable,society=self.society2,coded_value='2',code=self.code2, source=self.source)
+        
+        # Make a Binford Variable, code, and value (continuous)
+        self.variableB = VariableDescription.objects.create(label='B002',name='Variable 2', data_type='Continuous')
+        self.codeBNA = VariableCodeDescription.objects.create(variable=self.variableB, code='NA', description='Missing data')
+        valueBNA = VariableCodedValue.objects.create(variable=self.variableB,society=self.society1,coded_value='NA',code=self.codeBNA,source=self.source,subcase='Summer')
+        value3 = VariableCodedValue.objects.create(variable=self.variableB,society=self.society2,coded_value='24.00',source=self.source)
+        #value4 has same society and variable as valueBNA - used to test same society and variable but different subcase
+        value4 = VariableCodedValue.objects.create(variable=self.variableB,society=self.society1,coded_value='100.234',source=self.source,subcase='Winter')
         
         # Setup environmentals
         self.environmental1 = Environmental.objects.create(society=self.society1,
@@ -499,6 +509,7 @@ class FindSocietiesTestCase(APITestCase):
     def assertSocietyNotInResponse(self,society,response):
         response_society_ids = [x['society']['id'] for x in response.data['societies']]
         return self.assertNotIn(society.id, response_society_ids)
+        
     def test_find_societies_by_language(self):
         # Find the societies that use language1
         classifications = LanguageSerializer([l for l in Language.objects.all().filter(name=self.languageA1.name)],many=True)
@@ -507,21 +518,49 @@ class FindSocietiesTestCase(APITestCase):
         self.assertSocietyInResponse(self.society1,response)
         self.assertSocietyNotInResponse(self.society2,response)
         self.assertSocietyNotInResponse(self.society3,response)
+        
     def test_find_society_by_var(self):
         data = {'variable_codes': VariableCodeDescriptionSerializer([self.code1],many=True).data}
         response = self.client.post(self.url,data,format='json')
         self.assertSocietyInResponse(self.society1,response)
         self.assertSocietyNotInResponse(self.society2,response)
+        
     def test_find_societies_by_var(self):
         serialized_codes = VariableCodeDescriptionSerializer([self.code1,self.code2],many=True).data
         data = {'variable_codes': serialized_codes}
         response = self.client.post(self.url,data,format='json')
         self.assertSocietyInResponse(self.society1,response)
         self.assertSocietyInResponse(self.society2,response)
+        
+    def test_continuous_binford_variable_find_societies(self):
+        #get and bin variable
+        continuous_url = reverse('cont_variable')
+        data = {'query': json.dumps({'bf_id': self.variableB.id})}
+        response = self.client.get(continuous_url,data,format='json')
+        self.assertEqual(response.status_code,status.HTTP_200_OK)
+        response_dict = response.data
+        self.assertEqual(len(response_dict), 6) #check if split into 5 bins + NA option
+        self.assertEqual(response_dict[0]['variable'], self.variableB.id)
+        
+        #then perform the search
+        data = {'variable_codes': response_dict}
+        response = self.client.post(self.url,data,format='json')
+        self.assertEqual(response.status_code,status.HTTP_200_OK)
+        self.assertSocietyInResponse(self.society1,response)
+        self.assertSocietyInResponse(self.society2,response)
+        self.assertSocietyNotInResponse(self.society3,response)
+        response_dict = response.data
+        for society in response_dict['societies']:
+            if society['society']['id'] == self.society1.id:
+                self.assertEqual(len(society['variable_coded_values']),2) #check if 2 variable coded values for society 1
+            else:
+                self.assertEqual(len(society['variable_coded_values']),1)
+        
     def test_find_no_societies(self):
         data = {'variable_codes': VariableCodeDescriptionSerializer([self.code3],many=True).data }
         response = self.client.post(self.url,data,format='json')
         self.assertEqual(len(response.data['societies']),0)
+        
     def test_find_society_by_language_and_var(self):
         # Search for societies with language 1 and language 3
         # Coded with variable codes 1 and 2
