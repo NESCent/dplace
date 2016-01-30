@@ -457,7 +457,7 @@ def zip_legends(request):
     if 'name' in result_set:
         to_download.name = str(result_set['name'])
     if 'tree' in result_set:
-        to_download.add_tree(str(result_set['tree']))
+        to_download.tree = str(result_set['tree'])
     if 'legends' in result_set:
         for l in result_set['legends']:
             legend = Legend(l['name'], l['svg'])
