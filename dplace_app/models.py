@@ -36,40 +36,36 @@ class ISOCode(models.Model):
     iso_code = models.CharField('ISO Code', db_index=True, max_length=3)
     # only have locations for ISO codes in 16th ed ethnologue
     location = models.PointField(null=True)
-    
     objects = models.GeoManager()   # For GeoDjango, must override the manager
-    
+
     def __unicode__(self):
         return "%s (%s)" % (self.iso_code, self.location)
-    
-    class Meta:
+
+    class Meta(object):
         verbose_name = "ISO Code"
 
 
 class GlottoCode(models.Model):
     glotto_code = models.CharField('Glotto Code', db_index=True, max_length=10)
-    
+
     def __unicode__(self):
         return "%s" % self.glotto_code
-    
+
 
 class Society(models.Model):
     ext_id = models.CharField('External ID', unique=True, max_length=10)
     xd_id = models.CharField(
-        'Cross ID', default=None, null=True, max_length=10
-    )
+        'Cross ID', default=None, null=True, max_length=10)
     name = models.CharField('Name', db_index=True, max_length=200)
     location = models.PointField('Location', null=True)
     source = models.ForeignKey('Source', null=True)
     language = models.ForeignKey(
-        'Language', null=True, related_name="societies"
-    )
+        'Language', null=True, related_name="societies")
     objects = models.GeoManager()
     focal_year = models.CharField(
-        'Focal Year', null=True, blank=True, max_length=100
-    )
+        'Focal Year', null=True, blank=True, max_length=100)
     alternate_names = models.TextField(default="")
-    
+
     def get_environmental_data(self):
         """Returns environmental data for the given society"""
         valueDict = defaultdict(list)
@@ -101,7 +97,7 @@ class Society(models.Model):
                     'sources': value.references.all(),
                 })
         return valueDict
-        
+
     def get_data_references(self):
         """Returns the references for the cultural trait data"""
         refs = []
@@ -114,18 +110,18 @@ class Society(models.Model):
 
     def __unicode__(self):
         return "%s - %s (%s)" % (self.ext_id, self.name, self.source)
-    
-    class Meta:
+
+    class Meta(object):
         verbose_name_plural = "Societies"
 
 
 class EnvironmentalCategory(models.Model):
     name = models.CharField(max_length=30, db_index=True, unique=True)
-    
+
     def __unicode__(self):
         return self.name
-    
-    class Meta:
+
+    class Meta(object):
         verbose_name = "Category"
         verbose_name_plural = "Categories"
         ordering = ("name",)
@@ -136,14 +132,14 @@ class EnvironmentalVariable(models.Model):
     category = models.ForeignKey('EnvironmentalCategory', null=True)
     units = models.CharField(max_length=10, choices=UNIT_CHOICES)
     codebook_info = models.CharField(max_length=500, default='None')
-    
+
     def __unicode__(self):
         if self.units:
             return "%s (%s)" % (self.name, self.units)
         return self.name
-        
-    class Meta:
-        ordering = ("name",)
+
+    class Meta(object):
+        ordering = ["name"]
 
 
 class EnvironmentalValue(models.Model):
@@ -151,17 +147,17 @@ class EnvironmentalValue(models.Model):
     value = models.FloatField(db_index=True)
     environmental = models.ForeignKey('Environmental', related_name="values")
     source = models.ForeignKey('Source', null=True)
-    
+
     def society(self):
         return self.environmental.society
-    
+
     def __unicode__(self):
         return "%f" % self.value
-    
-    class Meta:
-        ordering = ("variable",)
-        unique_together = (('variable', 'environmental'))
-        index_together = [['variable', 'value']]
+
+    class Meta(object):
+        ordering = ["variable"]
+        unique_together = ('variable', 'environmental')
+        index_together = ['variable', 'value']
 
 
 class Environmental(models.Model):
@@ -171,11 +167,11 @@ class Environmental(models.Model):
     iso_code = models.ForeignKey('ISOCode', null=True, related_name="environmentals")
     source = models.ForeignKey('Source', null=True)
     objects = models.GeoManager()   # For GeoDjango, must override the manager
-    
+
     def __unicode__(self):
         return "%d Society: %d" % (self.id, self.society_id)
-    
-    class Meta:
+
+    class Meta(object):
         verbose_name = "Environmental"
 
 
@@ -197,28 +193,28 @@ class VariableDescription(models.Model):
         'VariableCategory', related_name='niche_variables')
     codebook_info = models.TextField(default='None')
     data_type = models.CharField(max_length=200, null=True)
-    
+
     def coded_societies(self):
         return Society.objects.filter(variablecodedvalue__in=self.values.all())
-    
+
     def __unicode__(self):
         return "%s - %s" % (self.label, self.name)
-    
-    class Meta:
+
+    class Meta(object):
         verbose_name = "Variable"
-        ordering = ("label",)
+        ordering = ["label"]
 
 
 class VariableCategory(models.Model):
     name = models.CharField(max_length=30, db_index=True, unique=True)
-    
+
     def __unicode__(self):
         return self.name
-    
-    class Meta:
+
+    class Meta(object):
         verbose_name = "Category"
         verbose_name_plural = "Categories"
-        ordering = ("name",)
+        ordering = ["name"]
 
 
 class VariableCodeDescription(models.Model):
@@ -255,11 +251,11 @@ class VariableCodeDescription(models.Model):
 
     def coded_societies(self):
         return Society.objects.filter(variablecodedvalue__coded_value=self.code)
-    
+
     def __unicode__(self):
         return "%s - %s" % (self.code, self.description)
-    
-    class Meta:
+
+    class Meta(object):
         verbose_name = "Code"
         ordering = ("variable", "code_number", "code")
 
@@ -294,8 +290,8 @@ class VariableCodedValue(models.Model):
 
     def __unicode__(self):
         return "%s" % self.coded_value
-    
-    class Meta:
+
+    class Meta(object):
         verbose_name = "Value"
         ordering = ("variable", "coded_value")
         index_together = [
@@ -305,7 +301,7 @@ class VariableCodedValue(models.Model):
             ['society', 'coded_value'],
             ['society', 'code'],
         ]
-        unique_together = (('variable', 'society', 'coded_value'),)
+        unique_together = ('variable', 'society', 'coded_value')
 
 
 class Source(models.Model):
@@ -315,25 +311,25 @@ class Source(models.Model):
     # Not really sure if we should separate dataset sources from references (I
     # think we should), but since all the code has already been written with
     # this model, I won't change it yet.
-    
+
     # text, because might be '1996', '1999-2001', or 'ND'
     year = models.CharField(max_length=30)
     author = models.CharField(max_length=50)
     reference = models.CharField(max_length=500)
     name = models.CharField(max_length=100, default="")
-    
+
     def __unicode__(self):
         return "%s (%s)" % (self.author, self.year)
 
-    class Meta:
-        unique_together = (('year', 'author'))
+    class Meta(object):
+        unique_together = ('year', 'author')
 
 
 class LanguageFamily(models.Model):
     scheme = models.CharField(max_length=1, choices=CLASSIFICATION_SCHEMES, default='G')
     name = models.CharField(max_length=50, db_index=True)
     language_count = models.IntegerField(default=0, null=False)
-    
+
     def update_counts(self):
         self.language_count = Language.objects.all().filter(family=self).count()
         self.save()
@@ -345,14 +341,14 @@ class Language(models.Model):
     # needs to be null=True because some glottolog languages do not have isocodes
     iso_code = models.ForeignKey('ISOCode', null=True)
     family = models.ForeignKey('LanguageFamily', null=True)
-    
+
     def __unicode__(self):
         return "Language: %s, ISO Code %s, Glotto Code %s" % (
             self.name, self.iso_code, self.glotto_code)
-        
-    class Meta:
+
+    class Meta(object):
         verbose_name = "Language"
-        unique_together = (('iso_code', 'glotto_code'))
+        unique_together = ('iso_code', 'glotto_code')
 
 
 class GeographicRegion(models.Model):
@@ -363,7 +359,7 @@ class GeographicRegion(models.Model):
     tdwg_code = models.IntegerField()
     geom = models.MultiPolygonField(srid=4326)
     objects = models.GeoManager()
-    
+
     def __unicode__(self):
         return "Region: %s, Continent %s" % (self.region_nam, self.continent)
 

@@ -7,7 +7,7 @@ from django.db import transaction
 
 from load.util import configure_logging, csv_dict_reader, stream
 from load.isocode import load_isocode
-from load.environmental import load_environmental, create_environmental_variables
+from load.environmental import load_environmental
 from load.language import update_language_counts, MISSING_CODES
 from load.society_ea import load_ea_society, society_locations
 from load.society_binford import load_bf_society
@@ -21,14 +21,12 @@ from load.glottocode import load_glottocode, map_isocodes, xd_to_language
 
 LOAD_BY_ROW = {
     'iso': load_isocode,
-    #'langs': ,
     'soc_lat_long': society_locations,
     'ea_soc': load_ea_society,
     'bf_soc': load_bf_society,
     'vars': load_vars,
     'glotto_iso': map_isocodes,
     'xd_lang': xd_to_language,
-    #'ea_refs': ,
 }
 
 

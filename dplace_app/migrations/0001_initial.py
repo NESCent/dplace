@@ -42,7 +42,7 @@ class Migration(migrations.Migration):
                 ('environmental', models.ForeignKey(related_name='values', to='dplace_app.Environmental')),
             ],
             options={
-                'ordering': ('variable',),
+                'ordering': ['variable'],
             },
         ),
         migrations.CreateModel(
@@ -55,7 +55,7 @@ class Migration(migrations.Migration):
                 ('category', models.ForeignKey(to='dplace_app.EnvironmentalCategory', null=True)),
             ],
             options={
-                'ordering': ('name',),
+                'ordering': ['name'],
             },
         ),
         migrations.CreateModel(
@@ -150,7 +150,7 @@ class Migration(migrations.Migration):
                 ('name', models.CharField(unique=True, max_length=30, db_index=True)),
             ],
             options={
-                'ordering': ('name',),
+                'ordering': ['name'],
                 'verbose_name': 'Category',
                 'verbose_name_plural': 'Categories',
             },
@@ -201,7 +201,7 @@ class Migration(migrations.Migration):
                 ('source', models.ForeignKey(to='dplace_app.Source', null=True)),
             ],
             options={
-                'ordering': ('label',),
+                'ordering': ['label'],
                 'verbose_name': 'Variable',
             },
         ),

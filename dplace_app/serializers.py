@@ -4,19 +4,19 @@ from dplace_app import models
 
 
 class SourceSerializer(serializers.ModelSerializer):
-    class Meta:
+    class Meta(object):
         model = models.Source
 
 
 # Cultural Trait Variables
 class VariableCodeDescriptionSerializer(serializers.ModelSerializer):
-    class Meta:
+    class Meta(object):
         model = models.VariableCodeDescription
         fields = ('id', 'code', 'description', 'short_description', 'variable')
 
 
 class VariableDescriptionSerializer(serializers.ModelSerializer):
-    class Meta:
+    class Meta(object):
         model = models.VariableDescription
         fields = (
             'id',
@@ -29,7 +29,7 @@ class VariableDescriptionSerializer(serializers.ModelSerializer):
 
 
 class VariableCategorySerializer(serializers.ModelSerializer):
-    class Meta:
+    class Meta(object):
         model = models.VariableCategory
         fields = ('id', 'name',)
 
@@ -38,7 +38,7 @@ class VariableDescriptionDetailSerializer(serializers.ModelSerializer):
     index_categories = VariableCategorySerializer(many=True)
     niche_categories = VariableCategorySerializer(many=True)
 
-    class Meta:
+    class Meta(object):
         model = models.VariableDescription
         fields = ('id', 'label', 'name', 'index_categories', 'niche_categories')
 
@@ -48,7 +48,7 @@ class VariableCategoryDetailSerializer(serializers.ModelSerializer):
     index_variables = VariableDescriptionSerializer(many=True)
     niche_variables = VariableDescriptionSerializer(many=True)
 
-    class Meta:
+    class Meta(object):
         model = models.VariableCategory
         fields = ('id', 'name', 'index_variables', 'niche_variables')
 
@@ -57,7 +57,7 @@ class VariableCodedValueSerializer(serializers.ModelSerializer):
     code_description = VariableCodeDescriptionSerializer(source='code')
     references = SourceSerializer(many=True)
 
-    class Meta:
+    class Meta(object):
         model = models.VariableCodedValue
         fields = (
             'id',
@@ -73,37 +73,37 @@ class VariableCodedValueSerializer(serializers.ModelSerializer):
 
 
 class ISOCodeSerializer(serializers.ModelSerializer):
-    class Meta:
+    class Meta(object):
         model = models.ISOCode
         
 
 class GlottoCodeSerializer(serializers.ModelSerializer):
-    class Meta:
+    class Meta(object):
         model = models.GlottoCode
 
 
 class EnvironmentalCategorySerializer(serializers.ModelSerializer):
-    class Meta:
+    class Meta(object):
         model = models.EnvironmentalCategory
 
 
 class EnvironmentalVariableSerializer(serializers.ModelSerializer):
-    class Meta:
+    class Meta(object):
         model = models.EnvironmentalVariable
 
 
 class EnvironmentalValueSerializer(serializers.ModelSerializer):
-    class Meta:
+    class Meta(object):
         model = models.EnvironmentalValue
 
 
 class EnvironmentalSerializer(serializers.ModelSerializer):
-    class Meta:
+    class Meta(object):
         model = models.Environmental
 
 
 class LanguageFamilySerializer(serializers.ModelSerializer):
-    class Meta:
+    class Meta(object):
         model = models.LanguageFamily
 
 
@@ -112,7 +112,7 @@ class LanguageSerializer(serializers.ModelSerializer):
     iso_code = serializers.CharField(source='iso_code.iso_code')
     family = LanguageFamilySerializer()
 
-    class Meta:
+    class Meta(object):
         model = models.Language
 
 
@@ -120,7 +120,7 @@ class SocietySerializer(serializers.ModelSerializer):
     language = LanguageSerializer()
     source = SourceSerializer()
 
-    class Meta:
+    class Meta(object):
         model = models.Society
         fields = (
             'id',
@@ -134,7 +134,7 @@ class SocietySerializer(serializers.ModelSerializer):
 
 
 class GeographicRegionSerializer(serializers.ModelSerializer):
-    class Meta:
+    class Meta(object):
         model = models.GeographicRegion
         fields = ('id', 'level_2_re', 'count', 'region_nam', 'continent', 'tdwg_code')
 
@@ -142,7 +142,7 @@ class GeographicRegionSerializer(serializers.ModelSerializer):
 class LanguageTreeSerializer(serializers.ModelSerializer):
     languages = LanguageSerializer(many=True)
 
-    class Meta:
+    class Meta(object):
         model = models.LanguageTree
         fields = ('id', 'name', 'languages', 'newick_string')
 
@@ -153,9 +153,9 @@ SEARCH_GEOGRAPHIC = 'g'
 
 
 class SocietyResult(object):
-    '''
+    """
     Encapsulates societies and their related search values for serializing
-    '''
+    """
     def __init__(self, society):
         self.society = society
         self.variable_coded_values = set()
@@ -176,34 +176,33 @@ class SocietyResult(object):
         self.geographic_regions.add(geographic_region)
 
     def includes_criteria(self, criteria=None):
-        if criteria is None:
-            criteria = []
-        result = True
+        if not criteria:
+            return True
         if SEARCH_VARIABLES in criteria and len(self.variable_coded_values) == 0:
-            result = False
+            return False
         if SEARCH_ENVIRONMENTAL in criteria and len(self.environmental_values) == 0:
-            result = False
+            return False
         if SEARCH_LANGUAGE in criteria and len(self.languages) == 0:
-            result = False
+            return False
         if SEARCH_GEOGRAPHIC in criteria and len(self.geographic_regions) == 0:
-            result = False
-        return result
+            return False
+        return True
 
 
 class VariableCode(object):
-    '''
+    """
     Encapsulates societies and their related search values for serializing
-    '''
+    """
     def __init__(self, codes, variable):
         self.codes = codes
         self.variable = variable
 
 
 class SocietyResultSet(object):
-    '''
+    """
     Provides a mapping of Societies to SocietyResult objects
     Used in building the search response
-    '''
+    """
 
     def __init__(self):
         # Use a dictionary to map society_id -> SocietyResult
@@ -257,9 +256,9 @@ class VariableCodeSerializer(serializers.Serializer):
 
 
 class SocietyResultSerializer(serializers.Serializer):
-    '''
+    """
     Serializer for the SocietyResult object
-    '''
+    """
     society = SocietySerializer()
     variable_coded_values = VariableCodedValueSerializer(many=True)
     environmental_values = EnvironmentalValueSerializer(many=True)
@@ -268,9 +267,9 @@ class SocietyResultSerializer(serializers.Serializer):
 
 
 class SocietyResultSetSerializer(serializers.Serializer):
-    '''
+    """
     Serialize a set of society results and the search criteria
-    '''
+    """
     # Results contains a society and variable values that matched
     societies = SocietyResultSerializer(many=True)
     # These contain the search parameters

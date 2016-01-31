@@ -1,16 +1,16 @@
 from django.contrib.gis import admin
 
-from models import *
+from dplace_app import models
 
-admin.site.register(Society)
-admin.site.register(Environmental, admin.GeoModelAdmin)
-admin.site.register(EnvironmentalVariable)
-admin.site.register(EnvironmentalValue)
-admin.site.register(ISOCode, admin.GeoModelAdmin)
+admin.site.register(models.Society)
+admin.site.register(models.Environmental, admin.GeoModelAdmin)
+admin.site.register(models.EnvironmentalVariable)
+admin.site.register(models.EnvironmentalValue)
+admin.site.register(models.ISOCode, admin.GeoModelAdmin)
 
-admin.site.register(VariableDescription)
-admin.site.register(VariableCodeDescription)
-admin.site.register(VariableCodedValue)
+admin.site.register(models.VariableDescription)
+admin.site.register(models.VariableCodeDescription)
+admin.site.register(models.VariableCodedValue)
 
-admin.site.register(Language)
-admin.site.register(LanguageFamily)
+admin.site.register(models.Language)
+admin.site.register(models.LanguageFamily)

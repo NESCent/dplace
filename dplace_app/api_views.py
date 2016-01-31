@@ -309,17 +309,17 @@ def find_societies(request):
 
     Returns serialized collection of SocietyResult objects
     """
-    #from time import time
-    #from django.db import connection
+    # from time import time
+    # from django.db import connection
 
-    #start = time()
-    #nstart = len(connection.queries)
+    # start = time()
+    # nstart = len(connection.queries)
     result_set = result_set_from_query_dict(request.data)
-    #print '-->', len(connection.queries) - nstart, time() - start
+    # print '-->', len(connection.queries) - nstart, time() - start
     d = serializers.SocietyResultSetSerializer(result_set).data
-    #print '==>', len(connection.queries) - nstart, time() - start
-    #for q in connection.queries[-10:]:
-    #    print q['sql'][:1000]
+    # print '==>', len(connection.queries) - nstart, time() - start
+    # for q in connection.queries[-10:]:
+    #     print q['sql'][:1000]
     return Response(d)
 
 
@@ -338,7 +338,7 @@ def get_categories(request):
         variables = models.VariableDescription.objects.filter(source=source)
         for c in categories:
             if variables.filter(index_categories=c.id):
-                source_categories.append(c)     
+                source_categories.append(c)
         return Response(
             serializers.VariableCategorySerializer(source_categories, many=True).data)
     return Response(serializers.VariableCategorySerializer(categories, many=True).data)
@@ -358,7 +358,7 @@ class GeographicRegionViewSet(viewsets.ReadOnlyModelViewSet):
     filter_class = GeographicRegionFilter
     queryset = models.GeographicRegion.objects.all()
 
-    
+
 @api_view(['GET'])
 @permission_classes((AllowAny,))
 @renderer_classes((JSONRenderer,))
@@ -412,7 +412,7 @@ def bin_cont_data(request):  # MAKE THIS GENERIC
                     min_value = float(v.coded_value)
                 elif float(v.coded_value) > max_value:
                     max_value = float(v.coded_value)
-        
+
         data_range = max_value - min_value
         bin_size = data_range / 5
         min_bin = min_value
