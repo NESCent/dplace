@@ -1,22 +1,23 @@
-from models import *
 from rest_framework import serializers
+
+from dplace_app import models
 
 
 class SourceSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Source
+        model = models.Source
 
 
 # Cultural Trait Variables
 class VariableCodeDescriptionSerializer(serializers.ModelSerializer):
     class Meta:
-        model = VariableCodeDescription
+        model = models.VariableCodeDescription
         fields = ('id', 'code', 'description', 'short_description', 'variable')
 
 
 class VariableDescriptionSerializer(serializers.ModelSerializer):
     class Meta:
-        model = VariableDescription
+        model = models.VariableDescription
         fields = (
             'id',
             'label',
@@ -29,7 +30,7 @@ class VariableDescriptionSerializer(serializers.ModelSerializer):
 
 class VariableCategorySerializer(serializers.ModelSerializer):
     class Meta:
-        model = VariableCategory
+        model = models.VariableCategory
         fields = ('id', 'name',)
 
 
@@ -38,7 +39,7 @@ class VariableDescriptionDetailSerializer(serializers.ModelSerializer):
     niche_categories = VariableCategorySerializer(many=True)
 
     class Meta:
-        model = VariableDescription
+        model = models.VariableDescription
         fields = ('id', 'label', 'name', 'index_categories', 'niche_categories')
 
 
@@ -48,7 +49,7 @@ class VariableCategoryDetailSerializer(serializers.ModelSerializer):
     niche_variables = VariableDescriptionSerializer(many=True)
 
     class Meta:
-        model = VariableCategory
+        model = models.VariableCategory
         fields = ('id', 'name', 'index_variables', 'niche_variables')
 
 
@@ -57,7 +58,7 @@ class VariableCodedValueSerializer(serializers.ModelSerializer):
     references = SourceSerializer(many=True)
 
     class Meta:
-        model = VariableCodedValue
+        model = models.VariableCodedValue
         fields = (
             'id',
             'variable',
@@ -73,37 +74,37 @@ class VariableCodedValueSerializer(serializers.ModelSerializer):
 
 class ISOCodeSerializer(serializers.ModelSerializer):
     class Meta:
-        model = ISOCode
+        model = models.ISOCode
         
 
 class GlottoCodeSerializer(serializers.ModelSerializer):
     class Meta:
-        model = GlottoCode
+        model = models.GlottoCode
 
 
 class EnvironmentalCategorySerializer(serializers.ModelSerializer):
     class Meta:
-        model = EnvironmentalCategory
+        model = models.EnvironmentalCategory
 
 
 class EnvironmentalVariableSerializer(serializers.ModelSerializer):
     class Meta:
-        model = EnvironmentalVariable
+        model = models.EnvironmentalVariable
 
 
 class EnvironmentalValueSerializer(serializers.ModelSerializer):
     class Meta:
-        model = EnvironmentalValue
+        model = models.EnvironmentalValue
 
 
 class EnvironmentalSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Environmental
+        model = models.Environmental
 
 
 class LanguageFamilySerializer(serializers.ModelSerializer):
     class Meta:
-        model = LanguageFamily
+        model = models.LanguageFamily
 
 
 class LanguageSerializer(serializers.ModelSerializer):
@@ -112,7 +113,7 @@ class LanguageSerializer(serializers.ModelSerializer):
     family = LanguageFamilySerializer()
 
     class Meta:
-        model = Language
+        model = models.Language
 
 
 class SocietySerializer(serializers.ModelSerializer):
@@ -120,7 +121,7 @@ class SocietySerializer(serializers.ModelSerializer):
     source = SourceSerializer()
 
     class Meta:
-        model = Society
+        model = models.Society
         fields = (
             'id',
             'ext_id',
@@ -134,7 +135,7 @@ class SocietySerializer(serializers.ModelSerializer):
 
 class GeographicRegionSerializer(serializers.ModelSerializer):
     class Meta:
-        model = GeographicRegion
+        model = models.GeographicRegion
         fields = ('id', 'level_2_re', 'count', 'region_nam', 'continent', 'tdwg_code')
 
 
@@ -142,7 +143,7 @@ class LanguageTreeSerializer(serializers.ModelSerializer):
     languages = LanguageSerializer(many=True)
 
     class Meta:
-        model = LanguageTree
+        model = models.LanguageTree
         fields = ('id', 'name', 'languages', 'newick_string')
 
 SEARCH_LANGUAGE = 'l'

@@ -1,11 +1,15 @@
 from __future__ import unicode_literals
 import json
 
-from dplace_app.serializers import *
 from django.contrib.gis.geos import Polygon, Point, MultiPolygon
+from django.core.urlresolvers import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
-from django.core.urlresolvers import reverse
+
+from dplace_app.serializers import (
+    GeographicRegionSerializer, LanguageSerializer, VariableCodeDescriptionSerializer,
+)
+from dplace_app import models
 
 
 class Test(APITestCase):
@@ -26,7 +30,7 @@ class ISOCodeAPITestCase(Test):
     """
 
     def setUp(self):
-        self.code = ISOCode.objects.create(iso_code='abc', location=Point(5.0, 5.0))
+        self.code = models.ISOCode.objects.create(iso_code='abc', location=Point(5.0, 5.0))
 
     def test_isocode_api(self):
         response_dict = self.get_json('isocode-list')
@@ -38,7 +42,7 @@ class GlottoCodeAPITestCase(Test):
     """Tests rest-framework API for Glottocodes"""
 
     def setUp(self):
-        self.code = GlottoCode.objects.create(glotto_code='abcd1234')
+        self.code = models.GlottoCode.objects.create(glotto_code='abcd1234')
 
     def test_glottocode_api(self):
         response_dict = self.get_json('glottocode-list')
@@ -51,23 +55,23 @@ class LanguageAPITestCase(Test):
     """Tests rest-framework API for languages"""
 
     def setUp(self):
-        self.family = LanguageFamily.objects.create(name='family1')
-        self.family2 = LanguageFamily.objects.create(name='family2')
-        self.glotto_codeA = GlottoCode.objects.create(glotto_code='aaaa1234')
-        self.glotto_codeD = GlottoCode.objects.create(glotto_code='dddd1234')
-        self.glotto_codeC = GlottoCode.objects.create(glotto_code='cccc1234')
+        self.family = models.LanguageFamily.objects.create(name='family1')
+        self.family2 = models.LanguageFamily.objects.create(name='family2')
+        self.glotto_codeA = models.GlottoCode.objects.create(glotto_code='aaaa1234')
+        self.glotto_codeD = models.GlottoCode.objects.create(glotto_code='dddd1234')
+        self.glotto_codeC = models.GlottoCode.objects.create(glotto_code='cccc1234')
 
-        self.iso_code = ISOCode.objects.create(iso_code='abc')
-        self.language1 = Language.objects.create(
+        self.iso_code = models.ISOCode.objects.create(iso_code='abc')
+        self.language1 = models.Language.objects.create(
             name='language1',
             family=self.family,
             glotto_code=self.glotto_codeA,
             iso_code=self.iso_code)
-        self.language2 = Language.objects.create(
+        self.language2 = models.Language.objects.create(
             name='language2',
             family=self.family2,
             glotto_code=self.glotto_codeD)
-        self.language3 = Language.objects.create(
+        self.language3 = models.Language.objects.create(
             name='language3',
             family=self.family2,
             glotto_code=self.glotto_codeC,
@@ -92,19 +96,19 @@ class EnvironmentalVariableAPITestCase(Test):
     """Tests rest-framework API for Environmental Variables"""
 
     def setUp(self):
-        self.category1 = EnvironmentalCategory.objects.create(name='Climate')
-        self.category2 = EnvironmentalCategory.objects.create(name='Ecology')
-        self.variable1 = EnvironmentalVariable.objects.create(
+        self.category1 = models.EnvironmentalCategory.objects.create(name='Climate')
+        self.category2 = models.EnvironmentalCategory.objects.create(name='Ecology')
+        self.variable1 = models.EnvironmentalVariable.objects.create(
             name='Rainfall',
             category=self.category1,
             units='mm',
             codebook_info='Precipitation')
-        self.variable2 = EnvironmentalVariable.objects.create(
+        self.variable2 = models.EnvironmentalVariable.objects.create(
             name='Temperature',
             category=self.category1,
             units='C',
             codebook_info='Temperature')
-        self.variable3 = EnvironmentalVariable.objects.create(
+        self.variable3 = models.EnvironmentalVariable.objects.create(
             name='Ecology1',
             category=self.category2,
             units='',
@@ -131,26 +135,26 @@ class VariableCodeDescriptionAPITestCase(Test):
     """
 
     def setUp(self):
-        self.source_ea = Source.objects.create(
+        self.source_ea = models.Source.objects.create(
             year='2016',
             author='Simon Greenhill',
             reference='Greenhill (2016). Title.',
             name='EA Test Dataset')
-        self.source_binford = Source.objects.create(
+        self.source_binford = models.Source.objects.create(
             year='2016',
             author='Russell Gray',
             reference='Gray (2016). Title.',
             name='BF Test Dataset')
-        self.category1 = VariableCategory.objects.create(name='Economy')
-        self.category2 = VariableCategory.objects.create(name='Demography')
+        self.category1 = models.VariableCategory.objects.create(name='Economy')
+        self.category2 = models.VariableCategory.objects.create(name='Demography')
 
-        self.variable = VariableDescription.objects.create(
+        self.variable = models.VariableDescription.objects.create(
             label='EA001',
             name='Variable 1',
             source=self.source_ea,
             codebook_info='Variable 1',
             data_type='Categorical')
-        self.variable2 = VariableDescription.objects.create(
+        self.variable2 = models.VariableDescription.objects.create(
             label='B002',
             name='Variable 2',
             source=self.source_binford,
@@ -160,15 +164,15 @@ class VariableCodeDescriptionAPITestCase(Test):
         self.variable2.save()
         self.variable.index_categories.add(self.category1, self.category2)
         self.variable2.index_categories.add(self.category2)
-        self.code1 = VariableCodeDescription.objects.create(
+        self.code1 = models.VariableCodeDescription.objects.create(
             variable=self.variable,
             code='1',
             description='Code 1')
-        self.code10 = VariableCodeDescription.objects.create(
+        self.code10 = models.VariableCodeDescription.objects.create(
             variable=self.variable,
             code='10',
             description='Code 10')
-        self.code2 = VariableCodeDescription.objects.create(
+        self.code2 = models.VariableCodeDescription.objects.create(
             variable=self.variable,
             code='2',
             description='Code 2')
@@ -223,7 +227,7 @@ class GeographicRegionAPITestCase(APITestCase):
     def setUp(self):
         poly = MultiPolygon(
             Polygon(((4.0, 4.0), (6.0, 4.0), (6.0, 6.0), (4.0, 6.0), (4.0, 4.0))))
-        self.geographic_region = GeographicRegion.objects.create(
+        self.geographic_region = models.GeographicRegion.objects.create(
             level_2_re=0,
             count=1,
             region_nam='Region1',
@@ -247,44 +251,44 @@ class FindSocietiesTestCase(Test):
 
     def setUp(self):
         # make ISO codes
-        iso_code1 = ISOCode.objects.create(iso_code='abc', location=Point(1.0, 1.0))
-        iso_code2 = ISOCode.objects.create(iso_code='def', location=Point(2.0, 2.0))
-        iso_code3 = ISOCode.objects.create(iso_code='ghi', location=Point(3.0, 3.0))
+        iso_code1 = models.ISOCode.objects.create(iso_code='abc', location=Point(1.0, 1.0))
+        iso_code2 = models.ISOCode.objects.create(iso_code='def', location=Point(2.0, 2.0))
+        iso_code3 = models.ISOCode.objects.create(iso_code='ghi', location=Point(3.0, 3.0))
 
         # make Glotto codes
-        glotto_code1 = GlottoCode.objects.create(glotto_code='abcc1234')
-        glotto_code2 = GlottoCode.objects.create(glotto_code='defg1234')
-        glotto_code3 = GlottoCode.objects.create(glotto_code='ghij1234')
+        glotto_code1 = models.GlottoCode.objects.create(glotto_code='abcc1234')
+        glotto_code2 = models.GlottoCode.objects.create(glotto_code='defg1234')
+        glotto_code3 = models.GlottoCode.objects.create(glotto_code='ghij1234')
 
         # Make language families
-        lf1 = LanguageFamily.objects.create(name='family1')
-        lf2 = LanguageFamily.objects.create(name='family2')
-        lf3 = LanguageFamily.objects.create(name='family3')
+        lf1 = models.LanguageFamily.objects.create(name='family1')
+        lf2 = models.LanguageFamily.objects.create(name='family2')
+        lf3 = models.LanguageFamily.objects.create(name='family3')
 
         # Make languages
-        self.languageA1 = Language.objects.create(
+        self.languageA1 = models.Language.objects.create(
             name='languageA1',
             iso_code=iso_code1,
             glotto_code=glotto_code1,
             family=lf1)
-        self.languageC2 = Language.objects.create(
+        self.languageC2 = models.Language.objects.create(
             name='languageC2',
             iso_code=iso_code2,
             glotto_code=glotto_code2,
             family=lf2)
-        self.languageB3 = Language.objects.create(
+        self.languageB3 = models.Language.objects.create(
             name='languageB3',
             iso_code=iso_code3,
             glotto_code=glotto_code3,
             family=lf3)
 
         # Make source
-        self.source = Source.objects.create(
+        self.source = models.Source.objects.create(
             year="2014",
             author="Greenhill",
             reference="Great paper")
 
-        self.society1 = Society.objects.create(
+        self.society1 = models.Society.objects.create(
             ext_id='society1',
             xd_id='xd1',
             name='Society1',
@@ -293,7 +297,7 @@ class FindSocietiesTestCase(Test):
             language=self.languageA1,
             focal_year='2016',
             alternate_names='Society 1')
-        self.society2 = Society.objects.create(
+        self.society2 = models.Society.objects.create(
             ext_id='society2',
             xd_id='xd2',
             name='Society2',
@@ -302,7 +306,7 @@ class FindSocietiesTestCase(Test):
             language=self.languageC2)
         # Society 3 has the same language characteristics as society 1
         # but different EA Vars
-        self.society3 = Society.objects.create(
+        self.society3 = models.Society.objects.create(
             ext_id='society3',
             xd_id='xd1',
             name='Society3',
@@ -311,26 +315,26 @@ class FindSocietiesTestCase(Test):
             language=self.languageB3)
 
         # Make an EA Variable, code, and value
-        variable = VariableDescription.objects.create(label='EA001', name='Variable 1')
-        self.code1 = VariableCodeDescription.objects.create(
+        variable = models.VariableDescription.objects.create(label='EA001', name='Variable 1')
+        self.code1 = models.VariableCodeDescription.objects.create(
             variable=variable,
             code='1',
             description='Code 1')
-        self.code2 = VariableCodeDescription.objects.create(
+        self.code2 = models.VariableCodeDescription.objects.create(
             variable=variable,
             code='2',
             description='Code 2')
-        self.code3 = VariableCodeDescription.objects.create(
+        self.code3 = models.VariableCodeDescription.objects.create(
             variable=variable,
             code='3',
             description='Code 3')
-        VariableCodedValue.objects.create(
+        models.VariableCodedValue.objects.create(
             variable=variable,
             society=self.society1,
             coded_value='1',
             code=self.code1,
             source=self.source)
-        VariableCodedValue.objects.create(
+        models.VariableCodedValue.objects.create(
             variable=variable,
             society=self.society2,
             coded_value='2',
@@ -338,27 +342,27 @@ class FindSocietiesTestCase(Test):
             source=self.source)
 
         # Setup environmentals
-        self.environmental1 = Environmental.objects.create(
+        self.environmental1 = models.Environmental.objects.create(
             society=self.society1,
             reported_location=Point(0, 0),
             actual_location=Point(0, 0),
             source=self.source,
             iso_code=iso_code1)
-        self.environmental2 = Environmental.objects.create(
+        self.environmental2 = models.Environmental.objects.create(
             society=self.society2,
             reported_location=Point(1, 1),
             actual_location=Point(1, 1),
             source=self.source,
             iso_code=iso_code2)
 
-        self.environmental_variable1 = EnvironmentalVariable.objects.create(
+        self.environmental_variable1 = models.EnvironmentalVariable.objects.create(
             name='precipitation',
             units='mm')
-        self.environmental_value1 = EnvironmentalValue.objects.create(
+        self.environmental_value1 = models.EnvironmentalValue.objects.create(
             variable=self.environmental_variable1,
             value=1.0, source=self.source,
             environmental=self.environmental1)
-        self.environmental_value2 = EnvironmentalValue.objects.create(
+        self.environmental_value2 = models.EnvironmentalValue.objects.create(
             variable=self.environmental_variable1,
             value=2.0, source=self.source,
             environmental=self.environmental2)
@@ -366,7 +370,7 @@ class FindSocietiesTestCase(Test):
         poly2 = MultiPolygon(
             Polygon(((1.5, 1.5), (1.5, 2.5), (2.5, 2.5), (2.5, 1.5), (1.5, 1.5))),
         )
-        self.geographic_region2 = GeographicRegion.objects.create(
+        self.geographic_region2 = models.GeographicRegion.objects.create(
             level_2_re=2,
             count=1,
             region_nam='Region2',
@@ -378,7 +382,7 @@ class FindSocietiesTestCase(Test):
             Polygon(((0.5, 0.5), (0.5, 1.5), (1.5, 1.5), (1.5, 0.5), (0.5, 0.5))),
             Polygon(((2.5, 2.5), (2.5, 3.5), (3.5, 3.5), (3.5, 2.5), (2.5, 2.5))),
         )
-        self.geographic_region13 = GeographicRegion.objects.create(
+        self.geographic_region13 = models.GeographicRegion.objects.create(
             level_2_re=3,
             count=2,
             region_nam='Region13',
@@ -396,7 +400,7 @@ class FindSocietiesTestCase(Test):
     def test_find_societies_by_language(self):
         # Find the societies that use language1
         classifications = LanguageSerializer(
-            [l for l in Language.objects.all().filter(name=self.languageA1.name)],
+            [l for l in models.Language.objects.all().filter(name=self.languageA1.name)],
             many=True)
         response = self.get_results(language_classifications=classifications.data)
         self.assertTrue(self.society_in_results(self.society1, response))
@@ -430,7 +434,7 @@ class FindSocietiesTestCase(Test):
         # Society 3 is not coded for any variables, so it should not appear in the list.
         serialized_vcs = VariableCodeDescriptionSerializer(
             [self.code1, self.code2], many=True).data
-        language_classifications = Language.objects.filter(
+        language_classifications = models.Language.objects.filter(
             id__in=[self.languageA1.id, self.languageB3.id])
         serialized_lcs = LanguageSerializer(language_classifications, many=True).data
         response = self.get_results(

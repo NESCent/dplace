@@ -1,97 +1,101 @@
 import json
 import re
+
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Prefetch
+from django.http import Http404
 from nexus import NexusReader
 from rest_framework import viewsets
 from rest_framework.pagination import PageNumberPagination
-from serializers import *
 from rest_framework.decorators import api_view, permission_classes, renderer_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.views import Response
 from rest_framework.renderers import JSONRenderer
-from filters import *
-from renderers import DPLACECsvRenderer, ZipRenderer
+
+from dplace_app.filters import GeographicRegionFilter
+from dplace_app.renderers import DPLACECsvRenderer, ZipRenderer
+from dplace_app import serializers
+from dplace_app import models
 
 
 # Resource routes
 class VariableDescriptionViewSet(viewsets.ReadOnlyModelViewSet):
-    serializer_class = VariableDescriptionSerializer
+    serializer_class = serializers.VariableDescriptionSerializer
     filter_fields = ('label', 'name', 'index_categories', 'niche_categories', 'source')
-    queryset = VariableDescription.objects.all()
+    queryset = models.VariableDescription.objects.all()
 
     # Override retrieve to use the detail serializer, which includes categories
     def retrieve(self, request, *args, **kwargs):
         self.object = self.get_object()
-        serializer = VariableDescriptionDetailSerializer(self.object)
+        serializer = serializers.VariableDescriptionDetailSerializer(self.object)
         return Response(serializer.data)
 
 
 class VariableCategoryViewSet(viewsets.ReadOnlyModelViewSet):
-    serializer_class = VariableCategorySerializer
+    serializer_class = serializers.VariableCategorySerializer
     filter_fields = ('name', 'index_variables', 'niche_variables',)
-    queryset = VariableCategory.objects.all()
+    queryset = models.VariableCategory.objects.all()
     # Override retrieve to use the detail serializer, which includes variables
 
     def retrieve(self, request, *args, **kwargs):
         self.object = self.get_object()
-        serializer = VariableCategoryDetailSerializer(self.object)
+        serializer = serializers.VariableCategoryDetailSerializer(self.object)
         return Response(serializer.data)
 
 
 class VariableCodeDescriptionViewSet(viewsets.ReadOnlyModelViewSet):
-    serializer_class = VariableCodeDescriptionSerializer
+    serializer_class = serializers.VariableCodeDescriptionSerializer
     filter_fields = ('variable',)
-    queryset = VariableCodeDescription.objects.all()
+    queryset = models.VariableCodeDescription.objects.all()
 
 
 class VariableCodedValueViewSet(viewsets.ReadOnlyModelViewSet):
-    serializer_class = VariableCodedValueSerializer
+    serializer_class = serializers.VariableCodedValueSerializer
     filter_fields = ('variable', 'coded_value', 'code', 'society',)
     # Avoid additional database trips by select_related for foreign keys
-    queryset = VariableCodedValue.objects.select_related('variable').select_related('code').all()
+    queryset = models.VariableCodedValue.objects.select_related('variable', 'code').all()
 
 
 class SocietyViewSet(viewsets.ReadOnlyModelViewSet):
-    serializer_class = SocietySerializer
-    queryset = Society.objects.all().select_related(
+    serializer_class = serializers.SocietySerializer
+    queryset = models.Society.objects.all().select_related(
         'source', 'language__iso_code', 'language__glotto_code', 'language__family')
 
 
 class ISOCodeViewSet(viewsets.ReadOnlyModelViewSet):
-    serializer_class = ISOCodeSerializer
+    serializer_class = serializers.ISOCodeSerializer
     filter_fields = ('iso_code',)
-    queryset = ISOCode.objects.all()
+    queryset = models.ISOCode.objects.all()
 
 
 class GlottoCodeViewSet(viewsets.ReadOnlyModelViewSet):
-    serializer_class = GlottoCodeSerializer
+    serializer_class = serializers.GlottoCodeSerializer
     filter_fields = ('glotto_code',)
-    queryset = GlottoCode.objects.all()
+    queryset = models.GlottoCode.objects.all()
 
 
 class EnvironmentalCategoryViewSet(viewsets.ReadOnlyModelViewSet):
-    serializer_class = EnvironmentalCategorySerializer
+    serializer_class = serializers.EnvironmentalCategorySerializer
     filter_fields = ('name',)
-    queryset = EnvironmentalCategory.objects.all()
+    queryset = models.EnvironmentalCategory.objects.all()
 
 
 class EnvironmentalVariableViewSet(viewsets.ReadOnlyModelViewSet):
-    serializer_class = EnvironmentalVariableSerializer
+    serializer_class = serializers.EnvironmentalVariableSerializer
     filter_fields = ('name', 'category', 'units',)
-    queryset = EnvironmentalVariable.objects.all()
+    queryset = models.EnvironmentalVariable.objects.all()
 
 
 class EnvironmentalValueViewSet(viewsets.ReadOnlyModelViewSet):
-    serializer_class = EnvironmentalValueSerializer
+    serializer_class = serializers.EnvironmentalValueSerializer
     filter_fields = ('variable', 'environmental',)
-    queryset = EnvironmentalValue.objects.all()
+    queryset = models.EnvironmentalValue.objects.all()
 
 
 class EnvironmentalViewSet(viewsets.ReadOnlyModelViewSet):
-    serializer_class = EnvironmentalSerializer
+    serializer_class = serializers.EnvironmentalSerializer
     filter_fields = ('society', 'iso_code',)
-    queryset = Environmental.objects.all()
+    queryset = models.Environmental.objects.all()
 
 
 class LargeResultsSetPagination(PageNumberPagination):
@@ -101,16 +105,16 @@ class LargeResultsSetPagination(PageNumberPagination):
 
 
 class LanguageViewSet(viewsets.ReadOnlyModelViewSet):
-    serializer_class = LanguageSerializer
+    serializer_class = serializers.LanguageSerializer
     filter_fields = ('name', 'iso_code', 'societies', 'family',)
-    queryset = Language.objects.all()
+    queryset = models.Language.objects.all()
     pagination_class = LargeResultsSetPagination
 
 
 class LanguageFamilyViewSet(viewsets.ReadOnlyModelViewSet):
-    serializer_class = LanguageFamilySerializer
+    serializer_class = serializers.LanguageFamilySerializer
     filter_fields = ('name', 'scheme',)
-    queryset = LanguageFamily.objects.all().order_by('name')
+    queryset = models.LanguageFamily.objects.all().order_by('name')
 
 
 class TreeResultsSetPagination(PageNumberPagination):
@@ -124,23 +128,23 @@ class TreeResultsSetPagination(PageNumberPagination):
 
 
 class LanguageTreeViewSet(viewsets.ReadOnlyModelViewSet):
-    serializer_class = LanguageTreeSerializer
+    serializer_class = serializers.LanguageTreeSerializer
     filter_fields = ('name',)
-    queryset = LanguageTree.objects.all()
+    queryset = models.LanguageTree.objects.all()
     pagination_class = TreeResultsSetPagination
 
 
 class SourceViewSet(viewsets.ReadOnlyModelViewSet):
-    serializer_class = SourceSerializer
+    serializer_class = serializers.SourceSerializer
     filter_fields = ('author', 'name')
-    queryset = Source.objects.all()
+    queryset = models.Source.objects.all()
 
 
 # returns trees that contain the societies from the SocietyResultSet
 # maybe needs cleaning up in the future
 def trees_from_languages_array(language_ids):
     from ete2 import Tree
-    trees = LanguageTree.objects\
+    trees = models.LanguageTree.objects\
         .filter(languages__pk__in=language_ids)\
         .prefetch_related(
             'languages__family', 'languages__glotto_code', 'languages__iso_code')\
@@ -179,15 +183,15 @@ def trees_from_languages_array(language_ids):
 
 
 def result_set_from_query_dict(query_dict):
-    result_set = SocietyResultSet()
+    result_set = serializers.SocietyResultSet()
     # Criteria keeps track of what types of data were searched on, so that we can
     # AND them together
     criteria = []
 
     if 'language_classifications' in query_dict:
-        criteria.append(SEARCH_LANGUAGE)
+        criteria.append(serializers.SEARCH_LANGUAGE)
         language_ids = [int(c['id']) for c in query_dict['language_classifications']]
-        for society in Society.objects\
+        for society in models.Society.objects\
                 .filter(language_id__in=language_ids)\
                 .select_related(
                     'source',
@@ -197,14 +201,15 @@ def result_set_from_query_dict(query_dict):
             result_set.add_language(society, society.language)
 
     if 'variable_codes' in query_dict:
-        criteria.append(SEARCH_VARIABLES)
+        criteria.append(serializers.SEARCH_VARIABLES)
         ids = [x['id'] for x in query_dict['variable_codes'] if 'id' in x]
 
         variables = {
-            v.id: v for v in VariableDescription.objects
+            v.id: v for v in models.VariableDescription.objects
             .filter(id__in=[x['variable'] for x in query_dict['variable_codes']])
             .prefetch_related(Prefetch(
-                'codes', queryset=VariableCodeDescription.objects.filter(id__in=ids)))
+                'codes',
+                queryset=models.VariableCodeDescription.objects.filter(id__in=ids)))
         }
 
         for x in query_dict['variable_codes']:
@@ -214,7 +219,8 @@ def result_set_from_query_dict(query_dict):
                 == set(c.id for c in variable.codes.all())
 
             if variable.data_type and variable.data_type.lower() == 'continuous':
-                values = VariableCodedValue.objects.filter(variable__id=x['variable'])
+                values = models.VariableCodedValue.objects.filter(
+                    variable__id=x['variable'])
                 if 'min' in x:
                     values = values\
                         .exclude(coded_value='NA')\
@@ -227,7 +233,7 @@ def result_set_from_query_dict(query_dict):
                 for code in variable.codes.all():
                     coded_value_ids.extend(
                         code.variablecodedvalue_set.values_list('id', flat=True))
-                values = VariableCodedValue.objects.filter(id__in=coded_value_ids)
+                values = models.VariableCodedValue.objects.filter(id__in=coded_value_ids)
 
             for value in values\
                     .select_related('society__language__family') \
@@ -238,11 +244,11 @@ def result_set_from_query_dict(query_dict):
                 result_set.add_cultural(value.society, variable, variable.codes, value)
 
     if 'environmental_filters' in query_dict:
-        criteria.append(SEARCH_ENVIRONMENTAL)
+        criteria.append(serializers.SEARCH_ENVIRONMENTAL)
         environmental_filters = query_dict['environmental_filters']
         # There can be multiple filters, so we must aggregate the results.
         for environmental_filter in environmental_filters:
-            values = EnvironmentalValue.objects\
+            values = models.EnvironmentalValue.objects\
                 .filter(variable=environmental_filter['id'])
 
             operator = environmental_filter['operator']
@@ -265,11 +271,11 @@ def result_set_from_query_dict(query_dict):
                 result_set.add_environmental(value.society(), value.variable, value)
 
     if 'geographic_regions' in query_dict:
-        criteria.append(SEARCH_GEOGRAPHIC)
+        criteria.append(serializers.SEARCH_GEOGRAPHIC)
         geographic_region_ids = [int(x['id']) for x in query_dict['geographic_regions']]
-        regions = GeographicRegion.objects.filter(pk__in=geographic_region_ids)
+        regions = models.GeographicRegion.objects.filter(pk__in=geographic_region_ids)
         for region in regions:
-            for society in Society.objects\
+            for society in models.Society.objects\
                     .filter(location__intersects=region.geom)\
                     .select_related(
                         'language__family',
@@ -310,7 +316,7 @@ def find_societies(request):
     #nstart = len(connection.queries)
     result_set = result_set_from_query_dict(request.data)
     #print '-->', len(connection.queries) - nstart, time() - start
-    d = SocietyResultSetSerializer(result_set).data
+    d = serializers.SocietyResultSetSerializer(result_set).data
     #print '==>', len(connection.queries) - nstart, time() - start
     #for q in connection.queries[-10:]:
     #    print q['sql'][:1000]
@@ -325,31 +331,32 @@ def get_categories(request):
     """
     query_string = request.query_params['query']
     query_dict = json.loads(query_string)
-    categories = VariableCategory.objects.all()
+    categories = models.VariableCategory.objects.all()
     source_categories = []
     if 'source' in query_dict:
-        source = Source.objects.filter(id=query_dict['source'])
-        variables = VariableDescription.objects.filter(source=source)
+        source = models.Source.objects.filter(id=query_dict['source'])
+        variables = models.VariableDescription.objects.filter(source=source)
         for c in categories:
             if variables.filter(index_categories=c.id):
                 source_categories.append(c)     
-        return Response(VariableCategorySerializer(source_categories, many=True).data)
-    else:
-        return Response(VariableCategorySerializer(categories, many=True).data)
+        return Response(
+            serializers.VariableCategorySerializer(source_categories, many=True).data)
+    return Response(serializers.VariableCategorySerializer(categories, many=True).data)
 
 
 @api_view(['GET'])
 @permission_classes((AllowAny,))
 def get_dataset_sources(request):
     return Response(
-        SourceSerializer(Source.objects.all().exclude(name=""), many=True).data)
+        serializers.SourceSerializer(
+            models.Source.objects.all().exclude(name=""), many=True).data)
 
 
 class GeographicRegionViewSet(viewsets.ReadOnlyModelViewSet):
-    serializer_class = GeographicRegionSerializer
-    model = GeographicRegion
+    serializer_class = serializers.GeographicRegionSerializer
+    model = models.GeographicRegion
     filter_class = GeographicRegionFilter
-    queryset = GeographicRegion.objects.all()
+    queryset = models.GeographicRegion.objects.all()
 
     
 @api_view(['GET'])
@@ -359,7 +366,7 @@ def get_min_and_max(request):
     query_string = request.query_params['query']
     query_dict = json.loads(query_string)
     if 'environmental_id' in query_dict:
-        values = EnvironmentalValue.objects.filter(
+        values = models.EnvironmentalValue.objects.filter(
             variable__id=query_dict['environmental_id'])
         min_value = 0
         max_value = 0
@@ -380,13 +387,13 @@ def get_min_and_max(request):
 def bin_cont_data(request):  # MAKE THIS GENERIC
     query_string = request.query_params['query']
     query_dict = json.loads(query_string)
+    bins = []
     if 'bf_id' in query_dict:
-        bf_variable = VariableDescription.objects.filter(id=query_dict['bf_id'])
-        values = VariableCodedValue.objects.filter(variable__id=query_dict['bf_id'])
+        values = models.VariableCodedValue.objects.filter(
+            variable__id=query_dict['bf_id'])
         min_value = None
         max_value = 0.0
         missing_data_option = False
-        bins = []        
         for v in values:
             if re.search('[a-zA-Z]', v.coded_value):
                 if not missing_data_option:
@@ -420,9 +427,6 @@ def bin_cont_data(request):  # MAKE THIS GENERIC
                 'variable': query_dict['bf_id'],
             })
             min_bin = min_bin + bin_size + 1
-    else:
-        min_value = None
-        max_value = None
     return Response(bins)
 
 
@@ -430,7 +434,7 @@ def newick_tree(key):
     # Get a newick format tree from a language tree id
     language_tree_id = key
     try:
-        language_tree = LanguageTree.objects.get(pk=language_tree_id)
+        language_tree = models.LanguageTree.objects.get(pk=language_tree_id)
     except ObjectDoesNotExist:
         raise Http404
     n = NexusReader(language_tree.file.path)
@@ -438,7 +442,7 @@ def newick_tree(key):
     tree = re.sub(r'\[.*?\]', '', n.trees.trees[0])
     # Remove data before the =
     try:
-        tree = tree[tree.index('=')+1:]
+        tree = tree[tree.index('=') + 1:]
     except ValueError:
         tree = tree
     return tree
@@ -450,7 +454,7 @@ def newick_tree(key):
 def csv_download(request):
     import datetime
     result_set = result_set_from_query_dict(request.data)
-    response = Response(SocietyResultSetSerializer(result_set).data)
+    response = Response(serializers.SocietyResultSetSerializer(result_set).data)
     filename = "dplace-societies-%s.csv" % datetime.datetime.now().strftime("%Y-%m-%d")
     response['Content-Disposition'] = 'attachment; filename="%s"' % filename
     return response
@@ -463,16 +467,16 @@ def zip_legends(request):
     import datetime
     # query_string = request.QUERY_PARAMS['query']
     result_set = request.data  # json.loads(query_string)
-    to_download = ZipResultSet()
+    to_download = serializers.ZipResultSet()
     if 'name' in result_set:
         to_download.name = str(result_set['name'])
     if 'tree' in result_set:
         to_download.tree = str(result_set['tree'])
     if 'legends' in result_set:
         for l in result_set['legends']:
-            legend = Legend(l['name'], l['svg'])
+            legend = serializers.Legend(l['name'], l['svg'])
             to_download.legends.append(legend)
-    response = Response(ZipResultSetSerializer(to_download).data)
+    response = Response(serializers.ZipResultSetSerializer(to_download).data)
     filename = "dplace-trees-%s.zip" % datetime.datetime.now().strftime("%Y-%m-%d")
     response['Content-Disposition'] = 'attachment; filename="%s"' % filename
     return response
