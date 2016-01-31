@@ -25,7 +25,7 @@ angular.module('dplaceFilters', [])
                 return rgb;
             }
         }
-    }])
+    })
     .filter('formatVariableCodeValues', function() {
         return function(values, variable_id) {
             return values.map( function(code_value) {   
