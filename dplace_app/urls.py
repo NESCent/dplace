@@ -28,7 +28,7 @@ router.register(r'sources', api_views.SourceViewSet)
 # Additionally, we include login URLs for the browseable API.
 
 urlpatterns = patterns('dplace_app.views',
-    url(r'^$', RedirectView.as_view(url='angular/'), name='home'),
+    url(r'^$', RedirectView.as_view(url='angular/', permanent=True), name='home'),
     url(r'^society/(?P<society_id>\d+)/$', 'view_society', name='view_society'),
     url(r'^language/(?P<language_id>\d+)/$', 'view_language', name='view_language'),
     url(r'^angular/$', 'angular', name='angular'),

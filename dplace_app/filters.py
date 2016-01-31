@@ -1,9 +1,9 @@
-__author__ = 'dan'
 from rest_framework_gis.filterset import GeoFilterSet
 from rest_framework_gis.filters import GeometryFilter
 import django_filters
 
-from models import *
+from models import GeographicRegion
+
 
 class GeographicRegionFilter(GeoFilterSet):
     region_nam = django_filters.CharFilter(name='region_nam', lookup_type='icontains')
@@ -12,9 +12,3 @@ class GeographicRegionFilter(GeoFilterSet):
 
     class Meta:
         model = GeographicRegion
-
-class VariableCodeDescriptionFilter(django_filters.FilterSet):
-    class Meta:
-        model = VariableCodeDescription
-        fields = ['variable', 'code', 'description']
-

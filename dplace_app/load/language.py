@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
-import logging
-from django.core.exceptions import ObjectDoesNotExist
-from dplace_app.models import *
-from isocode import get_isocode, get_value
-from environmental import iso_from_code
+from dplace_app.models import LanguageFamily
 
 MISSING_CODES = []
+
+
 def add_missing_isocode(isocode):
     MISSING_CODES.append(isocode)
+
 
 def update_language_counts():
     print "Updating language counts"

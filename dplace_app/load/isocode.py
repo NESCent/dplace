@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 import logging
-from django.contrib.gis.geos import Point
-from django.core.exceptions import ObjectDoesNotExist
-from dplace_app.models import *
+from dplace_app.models import ISOCode
 
 ISOCODE_UPDATE = {}
 ISOCODE_UPDATE['mld'] = 'oru'
@@ -42,29 +40,29 @@ ISOCODE_IGNORE = [
 ]
 
 
-
-def get_value(dict,possible_keys):
+def get_value(dict, *possible_keys):
     '''
     Get a value from a dictionary, searching the possible keys in order
     '''
     for key in possible_keys:
-        if key in dict.keys():
+        if key in dict:
             return dict[key]
-    return None
+
 
 def get_isocode(dict):
     '''
     ISO Code may appear in 'ISO' column (17th Ed Missing ISO codes)
     or the 'ISO 693-3 code' column (17th Ed - ISO 693-3 - current)
     '''
-    return get_value(dict,('ISO','ISO 693-3 code','ISO693_3'))
+    return get_value(dict, 'ISO', 'ISO 693-3 code', 'ISO693_3')
+
 
 def load_isocode(iso_dict):
     code = get_isocode(iso_dict)
     if code is None:
         logging.warn("ISO Code not found in row, skipping")
-        return None
+        return
     if len(code) > 3:
         logging.warn("ISO Code '%s' too long, skipping" % code)
-        return None
+        return
     return ISOCode.objects.get_or_create(iso_code=code)

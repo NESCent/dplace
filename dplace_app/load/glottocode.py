@@ -1,27 +1,36 @@
 # -*- coding: utf-8 -*-
 import logging
-from django.contrib.gis.geos import Point
-from django.core.exceptions import ObjectDoesNotExist
-from dplace_app.models import *
 
-def load_glottocode(dict_row):
-    """
-    Reads file glottolog_mapping.csv
-    """
-    glotto_code = dict_row['id'].strip()
-    name = dict_row['name'].strip()
-    glotto, created = GlottoCode.objects.get_or_create(glotto_code=glotto_code)
-    language, created = Language.objects.get_or_create(glotto_code=glotto)
-    language.name = name
-    language.save()
-    logging.info("Saved Glottocode %s, %s" % (name, glotto))
+from django.db import connection
+from django.core.exceptions import ObjectDoesNotExist
+
+from dplace_app.models import Language, GlottoCode, ISOCode, Society, LanguageFamily
+
+
+def load_glottocode(reader):
+    Language.objects.all().delete()
+    GlottoCode.objects.all().delete()
+    with connection.cursor() as c:
+        for table in ['language', 'glottocode']:
+            c.execute("ALTER SEQUENCE dplace_app_%s_id_seq RESTART WITH 1" % table)
+
+    glottocodes = []
+    languages = []
+
+    for i, item in enumerate(reader):
+        glottocodes.append(GlottoCode(glotto_code=item['id'].strip()))
+        languages.append(Language(name=item['name'].strip(), glotto_code_id=i + 1))
+
+    GlottoCode.objects.bulk_create(glottocodes, batch_size=1000)
+    Language.objects.bulk_create(languages, batch_size=1000)
+
 
 def map_isocodes(dict_row):
     """
     Matches isocodes to glottocodes.
     """
-    glotto_code = dict_row['id'].strip()
-    iso_code = dict_row['iso_693-3'].strip()
+    glotto_code = dict_row['id']
+    iso_code = dict_row['iso_693-3']
     if not iso_code:
         return
         
@@ -45,11 +54,11 @@ def xd_to_language(dict_row):
     """
     Reads file xd_id_to_language.csv
     """
-    classification_scheme = 'G' # for Glottolog
-    xd_id = dict_row['xd_id'].strip()
-    isocode = dict_row['iso_6933'].strip()
-    glottocode = dict_row['DialectLanguageGlottocode'].strip()
-    family_glottocode = dict_row['FamilyGlottocode'].strip()
+    classification_scheme = 'G'  # for Glottolog
+    xd_id = dict_row['xd_id']
+    isocode = dict_row['iso_6933']
+    glottocode = dict_row['DialectLanguageGlottocode']
+    family_glottocode = dict_row['FamilyGlottocode']
     
     iso, created = ISOCode.objects.get_or_create(iso_code=isocode)
     glotto, created = GlottoCode.objects.get_or_create(glotto_code=glottocode)
@@ -64,11 +73,11 @@ def xd_to_language(dict_row):
             family_language = Language.objects.get(glotto_code=family)
             lang_fam, created = LanguageFamily.objects.get_or_create(scheme='G', name=family_language.name)
             if created:
-                logging.info ("Language Family %s created" % (lang_fam.name))
+                logging.info("Language Family %s created" % (lang_fam.name))
         except ObjectDoesNotExist:
             logging.warning("No language found for family glottocode %s, skipping" % family_glottocode)
             lang_fam = None
-            
+
         try:
             language = Language.objects.get(iso_code=iso, glotto_code=glotto)
             if lang_fam:

@@ -127,7 +127,7 @@ INSTALLED_APPS = (
     'bootstrap3',
     'django.contrib.humanize',
     'rest_framework',
-    'south',
+    'rest_framework_gis',
     'dplace_app',
 )
 
@@ -182,6 +182,7 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.BrowsableAPIRenderer',
         'rest_framework_csv.renderers.CSVRenderer',
     ],
-    'PAGINATE_BY': 100,
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 100,
     'PAGINATE_BY_PARAM': 'page_size',
 }

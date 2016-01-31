@@ -1,123 +1,77 @@
 # -*- coding: utf-8 -*-
-import csv
 import sys
-import codecs
-import logging
+from itertools import chain
+
+import django
 from django.db import transaction
-from load.isocode import *
-from load.environmental import *
-from load.language import *
-from load.society_ea import *
-from load.society_binford import *
-from load.geographic import *
-from load.tree import *
-from load.variables import *
-from load.values import *
-from load.sources import *
-from load.glottocode import *
 
-#iso = load isocodes
-#env_vals = load environmental values
-#langs =
-#soc_lat_long = load locations for societies
-#ea_soc = load EA societies
-#bf_soc = 
-#bf_vals = 
-#vars = load (EA or BF) variables
-#ea_stacked = load EA stacked
+from load.util import configure_logging, csv_dict_reader, stream
+from load.isocode import load_isocode
+from load.environmental import load_environmental
+from load.language import update_language_counts, MISSING_CODES
+from load.society_ea import load_ea_society, society_locations
+from load.society_binford import load_bf_society
+from load.geographic import load_regions
+from load.tree import load_tree
+from load.variables import load_vars, load_codes
+from load.values import load_data
+from load.sources import load_references
+from load.glottocode import load_glottocode, map_isocodes, xd_to_language
 
-LOAD_BY_ROW=('iso', 'env_vals',
-             'langs','soc_lat_long',
-             'ea_soc','bf_soc', 'bf_vals',
-             'vars', 'ea_vals', 'glotto', 'glotto_iso',
-             'xd_lang', 'ea_refs')
 
-def run(file_name=None, mode=None):
-    logger = logging.getLogger()
-    logger.setLevel(logging.INFO)
-    # file load.log gets everything
-    fh = logging.FileHandler('load.log')
-    fh.setLevel(logging.INFO)
-    # create console handler with a higher log level
-    ch = logging.StreamHandler()
-    ch.setLevel(logging.WARN)
-    # create formatter and add it to the handlers
-    formatter = logging.Formatter('%(levelname)s:%(message)s')
-    fh.setFormatter(formatter)
-    ch.setFormatter(formatter)
-    # add the handlers to the logger
-    logger.addHandler(fh)
-    logger.addHandler(ch)
-    
+LOAD_BY_ROW = {
+    'iso': load_isocode,
+    'soc_lat_long': society_locations,
+    'ea_soc': load_ea_society,
+    'bf_soc': load_bf_society,
+    'vars': load_vars,
+    'glotto_iso': map_isocodes,
+    'xd_lang': xd_to_language,
+}
+
+
+def run(mode, *fnames):
+    configure_logging()
+    file_name = fnames[0]
+
     if mode == 'geo':
         load_regions(file_name)
     elif mode == 'tree':
         load_tree(file_name)
-    elif mode == 'glottotree':
-        load_glotto_tree(file_name)
     else:
-        # read the csv file
-        with open(file_name, 'r') as csvfile:
-            mode = mode.strip()
-            if mode in LOAD_BY_ROW:
-                csv_reader = csv.DictReader(csvfile)
-                for dict_row in csv_reader:
-                    
-                    for k in dict_row:
-                        if dict_row[k] is None:
-                            continue
-                        try:
-                            dict_row[k] = dict_row[k].decode('utf8')
-                        except UnicodeDecodeError:
-                            print("Non UTF8 in %r" % dict_row)
-                            raise
-                            
-                    if mode == 'iso':
-                        load_isocode(dict_row)
-                    elif mode == 'vars':
-                        load_vars(dict_row)
-                    elif mode == 'ea_soc':
-                        load_ea_society(dict_row)
-                    elif mode == 'soc_lat_long':
-                        society_locations(dict_row)
-                    elif mode == 'env_vals':
-                        load_environmental(dict_row)
-                    elif mode == 'ea_vals':
-                        load_data(dict_row)
-                    elif mode == 'bf_vals':
-                        load_data(dict_row)
-                    elif mode == 'langs':
-                        load_lang(dict_row)
-                    elif mode == 'bf_soc':
-                        load_bf_society(dict_row)
-                    elif mode == 'glotto':
-                        load_glottocode(dict_row)
-                    elif mode == 'glotto_iso':
-                        map_isocodes(dict_row)
-                    elif mode == 'xd_lang':
-                        xd_to_language(dict_row)
-            elif mode == 'refs': #load references
-                load_references(csvfile)
-            elif mode == 'codes': #load codes for variables
-                load_codes(csvfile)
-        if len(MISSING_CODES) > 0:
-            print "Missing ISO Codes:"
-            print '\n'.join(MISSING_CODES)
-        elif mode == 'env_vars':
-            create_environmental_variables()
-        elif mode == 'langs' or mode == 'xd_lang':
+        row_loader = LOAD_BY_ROW.get(mode)
+        if row_loader:
+            for dict_row in csv_dict_reader(file_name):
+                row_loader(dict_row)
+        elif mode == 'vals':
+            # coded values can only be created al at once now, so we must make sure to
+            # pass in all csv files with values.
+            load_data(chain(*map(csv_dict_reader, fnames)))
+        elif mode == 'glotto':
+            load_glottocode(csv_dict_reader(file_name))
+        elif mode == 'refs':
+            load_references(file_name)
+        elif mode == 'codes':
+            load_codes(stream(file_name))
+        elif mode == 'env_vals':
+            load_environmental(csv_dict_reader(file_name))
+        else:
+            raise ValueError(mode)
+
+        if mode == 'xd_lang':
             update_language_counts()
 
+    if len(MISSING_CODES) > 0:
+        print "Missing ISO Codes:"
+        print '\n'.join(MISSING_CODES)
+
 if __name__ == '__main__':
-    if len(sys.argv) != 3:
+    if len(sys.argv) < 3:
         print "\nUsage: %s source_file mode" % sys.argv[0]
         print "You should run load_all_datasets.sh instead of this script directly."
         print
-    else:
-        try:
-            transaction.enter_transaction_management()
-            transaction.managed(True)
-            run(sys.argv[1], sys.argv[2])
-        finally:
-            transaction.commit()
-            
+        sys.exit(1)
+    django.setup()
+    with transaction.atomic():
+        run(sys.argv[-1], *[arg.strip() for arg in sys.argv[1:-1]])
+    sys.exit(0)
