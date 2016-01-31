@@ -94,10 +94,17 @@ class EnvironmentalViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Environmental.objects.all()
 
 
+class LargeResultsSetPagination(PageNumberPagination):
+    page_size = 1000
+    page_size_query_param = 'page_size'
+    max_page_size = 1000
+
+
 class LanguageViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = LanguageSerializer
     filter_fields = ('name', 'iso_code', 'societies', 'family',)
     queryset = Language.objects.all()
+    pagination_class = LargeResultsSetPagination
 
 
 class LanguageFamilyViewSet(viewsets.ReadOnlyModelViewSet):
