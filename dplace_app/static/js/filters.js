@@ -8,7 +8,7 @@ angular.module('dplaceFilters', [])
             }
         }
     })    
-    .filter('colorNode', function() {
+    .filter('colorNode', ['colorMapService', function(colorMapService) {
         return function(value, codes) {
             var missingData = false;
             var missingDataValue;
@@ -25,7 +25,7 @@ angular.module('dplaceFilters', [])
                 return rgb;
             }
         }
-    })
+    }])
     .filter('formatVariableCodeValues', function() {
         return function(values, variable_id) {
             return values.map( function(code_value) {   

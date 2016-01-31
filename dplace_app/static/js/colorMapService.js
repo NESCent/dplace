@@ -1,7 +1,6 @@
 function ColorMapService() {
     //an array of colors for coded values
     this.colorMap = [
-        'rgb(0,0,0)', //need some sort of placeholder here because 0 is missing data...
         'rgb(228,26,28)',
         'rgb(69,117,180)',
         'rgb(77,146,33)',
@@ -83,6 +82,7 @@ function ColorMapService() {
 
     //normal gradient
     this.mapColor = function(index, count) {  
+        if (index == 'NA') {console.log("Missign"); return 'rgb(255,255,255)'; }
         hue = (index / count)*240;
         rgb = hslToRgb(hue, 1, 0.5);
         return 'rgb('+rgb[0]+','+rgb[1]+','+rgb[2]+')';
@@ -92,12 +92,10 @@ function ColorMapService() {
         var lum = (((value-min)/(max-min))) * 78; lum = 100 - lum; 
         rgb = hslToRgb(color, 0.65, lum/100);
         return 'rgb('+rgb[0]+','+rgb[1]+','+rgb[2]+')';
-
     }
 
     this.generateColorMap = function(results) {
         var colors = {};
-        var missing = false;
         for (var i = 0; i < results.societies.length; i++) {
             var society = results.societies[i];
             
@@ -129,23 +127,15 @@ function ColorMapService() {
                     return variable.variable.id == society.variable_coded_values[j].variable;
                 });
                 
-                for (var c = 0; c < variable_description[0].codes.length; c++) {
-                    if (parseInt(variable_description[0].codes[c].code) == 0 && variable_description[0].codes[c].description.indexOf("Missing data") != -1) { missing = true; break; }
-                }
-                console.log(missing);
-                
                 if (variable_description[0].variable.data_type.toUpperCase() == 'CONTINUOUS') {
                     var color = this.mapColorMonochrome(variable_description[0].variable.min, variable_description[0].variable.max, society.variable_coded_values[j].coded_value, 0);
                     colors[society.society.id] = color;
                 } else {
-                    
-                    if (society.variable_coded_values[j].code_description && (society.variable_coded_values[j].code_description.description.indexOf("Missing data") != -1))
+                    if (society.variable_coded_values[j].code_description && society.variable_coded_values[j].code_description.description.indexOf("Missing data") != -1) {
                         colors[society.society.id] = 'rgb(255,255,255)';
-                    else {
-                            colors[society.society.id] = this.colorMap[parseInt(society.variable_coded_values[j].coded_value)];
+                    } else {
+                        colors[society.society.id] = this.colorMap[parseInt(society.variable_coded_values[j].coded_value)];
                     }
-
-                
                 }
 
                 /*if (society.variable_coded_values[j].code_description && (society.variable_coded_values[j].code_description.description.indexOf("Missing data") != -1))
