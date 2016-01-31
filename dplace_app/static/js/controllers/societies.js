@@ -199,8 +199,8 @@ function SocietiesCtrl($scope, $timeout, $http, searchModelService, colorMapServ
                     .attr("stroke-width", "0.5")
                     .attr("fill", function() {
                         var value = $scope.results.geographic_regions[i].tdwg_code;
-                        var hue = value * 240 / $scope.results.geographic_regions.length;
-                        return 'hsl('+hue+',100%,50%)';
+                        rgb = colorMapService.mapColor(value, $scope.results.geographic_regions.length);
+                        return rgb;
                     });
                 g.append("svg:text")
                     .attr("x", "20")

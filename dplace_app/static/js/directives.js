@@ -101,8 +101,8 @@ angular.module('languagePhylogenyDirective', [])
                                     .attr("fill", function(n) {
                                         if (classification.length > 0) {
                                             value = classification[0].family.id;
-                                            hue = value * 240 / scope.results.classifications.length;
-                                            return 'hsl('+hue+',100%, 50%)';
+                                            rgb = colorMapService.mapColor(value, results.classifications.length);
+                                            return rgb;
                                         }
                                     });
                                 
