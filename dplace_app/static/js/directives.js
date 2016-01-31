@@ -95,10 +95,7 @@ angular.module('languagePhylogenyDirective', [])
                             for (var i = 0; i < society.languages.length; i++) {
                                 var classification = scope.query.language_classifications.filter(function(l) { return l.id == society.languages[i].id });
                                 selected.append("svg:circle")
-                                    .attr("r", function() {
-                                        if (global) return 1.5;
-                                        else return 4.5;
-                                    })
+                                    .attr("r", 1.5)
                                     .attr("stroke", "#000")
                                     .attr("stroke-width", "0.5")
                                     .attr("fill", function(n) {
@@ -111,6 +108,18 @@ angular.module('languagePhylogenyDirective', [])
                                 
                             }
                         
+                        } else if (scope.query.geographic_regions) {
+                            for (var i = 0; i < society.geographic_regions.length; i++) {
+                                selected.append("svg:circle")
+                                    .attr("r", 1.5)
+                                    .attr("stroke", "#000")
+                                    .attr("stroke-width", "0.5")
+                                    .attr("fill", function(n) {
+                                        value = society.geographic_regions[i].tdwg_code;
+                                        rgb = colorMapService.mapColor(value, results.geographic_regions.length);
+                                        return rgb;
+                                    });
+                            }
                         }
                     
                     }
@@ -373,14 +382,13 @@ angular.module('languagePhylogenyDirective', [])
                 translate = 0;
                 //changes markers for global tree
                 if (langTree.name.indexOf("global") != -1) {
-                    if (scope.query.language_classifications && !scope.query.environmental_filters && !scope.query.variable_codes) {
+                    if ((scope.query.language_classifications || scope.query.geographic_regions) && !scope.query.environmental_filters && !scope.query.variable_codes) {
                             addMarkers(langTree, scope.results, null, node, true, translate);
-
                     }
                 
                 
                     scope.$watch('results.chosenTVariable', function(oldValue, newvalue) {
-                        if (scope.results.chosenTVariable.id) {
+                        if (scope.results.chosenTVariable) {
                             chosen_var_id = scope.results.variable_descriptions.filter(function(variable) { return variable.variable.id == scope.results.chosenTVariable.id });
                             if (chosen_var_id.length > 0)
                                 addMarkers(langTree, scope.results, chosen_var_id[0], node, true, translate);
@@ -469,10 +477,11 @@ angular.module('languagePhylogenyDirective', [])
                 
                 if (langTree.name.indexOf("global") == -1) addLogo(h/2);
                 
-                
+               
                 phyloWidth = d3.select("language-phylogeny").select("g").node().getBBox().width;
                 d3.select("#legend")
                     .attr("style", "width:"+($(window).width()-phyloWidth-100)+"px; position:absolute; right:20px; z-index:1;");
+                    
             };
 
             scope.$on('treeSelected', function(event, args) {
