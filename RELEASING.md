@@ -16,3 +16,15 @@ coverage run --source='dplace_app' manage.py test
 coverage report
 ```
 
+- Destroy database, upgrade and reload data:
+
+```
+#!/bin/bash
+dropdb dplace 
+createdb dplace
+psql -d dplace -c "CREATE EXTENSION postgis;"
+psql -d dplace -c "CREATE EXTENSION postgis_topology;"
+pip install --upgrade -r requirements.txt
+python manage.py migrate
+./load_all_datasets.sh
+```
