@@ -24,7 +24,7 @@ function ColorMapService() {
     // converts hsl to rgb
     function hslToRgb(h, s, l) {
         if (h < 0) h += 360;
-        if (h > 360) h = h % 360;
+        if (h >= 360) h = h % 360;
         var r, g, b;
         var r1, g1, b1;
         chroma = (1 - Math.abs(2*l - 1)) * s;
