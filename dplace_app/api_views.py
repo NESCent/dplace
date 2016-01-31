@@ -103,7 +103,7 @@ class LanguageViewSet(viewsets.ReadOnlyModelViewSet):
 class LanguageFamilyViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = LanguageFamilySerializer
     filter_fields = ('name', 'scheme',)
-    queryset = LanguageFamily.objects.all()
+    queryset = LanguageFamily.objects.all().order_by('name')
 
 
 class TreeResultsSetPagination(PageNumberPagination):
@@ -179,14 +179,15 @@ def result_set_from_query_dict(query_dict):
 
     if 'language_classifications' in query_dict:
         criteria.append(SEARCH_LANGUAGE)
-        classifications = query_dict['language_classifications']
-        for classification in classifications:
-            language_ids = [int(classification['id'])]
-            languages = Language.objects.filter(pk__in=language_ids)  # Returns a queryset
-            languages.select_related('societies')
-            for language in languages:
-                for society in language.societies.all():
-                    result_set.add_language(society, language)
+        language_ids = [int(c['id']) for c in query_dict['language_classifications']]
+        for society in Society.objects\
+                .filter(language_id__in=language_ids)\
+                .select_related(
+                    'source',
+                    'language__family',
+                    'language__glotto_code',
+                    'language__iso_code'):
+            result_set.add_language(society, society.language)
 
     if 'variable_codes' in query_dict:
         criteria.append(SEARCH_VARIABLES)
@@ -201,7 +202,9 @@ def result_set_from_query_dict(query_dict):
 
         for x in query_dict['variable_codes']:
             variable = variables[x['variable']]
-            assert set(ids) == set(c.id for c in variable.codes.all())
+            assert set(x['id'] for x in query_dict['variable_codes']
+                       if 'id' in x and x['variable'] == variable.id) \
+                == set(c.id for c in variable.codes.all())
 
             if variable.data_type and variable.data_type.lower() == 'continuous':
                 values = VariableCodedValue.objects.filter(variable__id=x['variable'])
@@ -269,7 +272,7 @@ def result_set_from_query_dict(query_dict):
                 result_set.add_geographic_region(society, region)
     # Filter the results to those that matched all criteria
     result_set.finalize(criteria)
-    
+
     # search for language trees
     language_ids = []
     for s in result_set.societies:
