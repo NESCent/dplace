@@ -65,9 +65,9 @@ class DPLACECSVResults(object):
             row['Society name'] = society['name']
             row['Society source'] = society['source']['name']
             row['Longitude'] = "" if society['location'] is None \
-                else society['location']['coordinates'][0]
+                else society['location'][0]
             row['Latitude'] = "" if society['location'] is None \
-                else society['location']['coordinates'][1]
+                else society['location'][1]
             if society['language'] is not None and 'name' in society['language']:
                 row['ISO code'] = society['language']['iso_code']
                 row['Language name'] = society['language']['name']

@@ -1,5 +1,5 @@
 angular.module('languagePhylogenyDirective', [])
-    .directive('languagePhylogeny', function() {
+    .directive('languagePhylogeny', function(colorMapService) {
         function link(scope, element, attrs) {
             var rightAngleDiagonal = function() {
                 var projection = function(d) { return [d.y, d.x]; }
@@ -129,17 +129,9 @@ angular.module('languagePhylogenyDirective', [])
                                     .attr("fill", function(n) {
                                         value = society.environmental_values[0].value; //only 1 environmental value at a time so we can do this
                                         min = scope.results.environmental_variables[0].min;
-                                        max = scope.results.environmental_variables[0].max;
-                                        if (scope.results.environmental_variables[0].name == 'Net Primary Production' || scope.results.environmental_variables[0].name == ' Mean Growing Season NPP') {
-                                            hue = 30 + (((value - min) / (max - min))*88)
-                                        }  else if (scope.results.environmental_variables[0].name == 'Annual Mean Precipitation') {
-                                            lum = 100 - (((value - min) / (max - min))*95);
-                                            return 'hsl(252,65%,'+lum+'%)';
-                                        }
-                                        else {
-                                            hue = 240 - (((value-min)/(max-min))*240);
-                                        }
-                                        return 'hsl('+hue+',100%, 50%)';
+                                        max = scope.results.environmental_variables[0].max;                                        
+                                        rgb = colorMapService.tempColor(value, min, max, scope.results.environmental_variables[0].name);
+                                        return rgb;
                                     })
                                     .on("mouseover", function() { 
                                                      d3.select("body").append("div")
@@ -170,19 +162,17 @@ angular.module('languagePhylogenyDirective', [])
                                         .attr("transform", "translate("+translate+", 0)")
                                         .attr("fill", function(n) {
                                             if (society.variable_coded_values[i].code_description && society.variable_coded_values[i].code_description.description.indexOf("Missing data") != -1) {
-                                                   return 'hsl(360, 100%, 100%)';
+                                                   return 'rgb(255, 255, 255)';
                                                 }
-                                                value = society.variable_coded_values[i].coded_value;
-                                                
-                                                
+                                                value = society.variable_coded_values[i].coded_value;     
                                                 if (variable.variable.data_type.toUpperCase() == 'CONTINUOUS') {
                                                     var min = variable.variable.min;
                                                     var max = variable.variable.max;
-                                                    var lum = 100 - ((value-min)/(max-min) * 78);
-                                                    return 'hsl(0, 65%,'+lum+'%)';
-                                                }                                               
-                                                hue = value * 240 / variable.codes.length;
-                                                return 'hsl('+hue+',100%, 50%)';
+                                                    rgb = colorMapService.mapColorMonochrome(min, max, value, 0);
+                                                    return rgb;
+                                                }
+                                                rgb = colorMapService.colorMap[parseInt(value)];
+                                                return  rgb;
                                         })
                                         .on("mouseover", function() { 
                                                  d3.select("body").append("div")
@@ -630,7 +620,7 @@ angular.module('dplaceMapDirective', [])
                     scope.results.societies.forEach(function(societyResult) {
                         var society = societyResult.society;
                         // Add a marker for each point
-                        var marker = {latLng: [society.location.coordinates[1], society.location.coordinates[0]], name: society.name}
+                        var marker = {latLng: [society.location[1], society.location[0]], name: society.name}
                         scope.map.addMarker(society.id, marker); 
                          if (!scope.chosen) {   
                             results = scope.results;
