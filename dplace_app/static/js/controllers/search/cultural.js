@@ -27,6 +27,18 @@ function CulturalCtrl($scope, searchModelService, Variable, CodeDescription, Con
             trait.codes = ContinuousVariable.query({query: {bf_id: trait.selectedVariable.id}});
         } else
             trait.codes = CodeDescription.query({variable: trait.selectedVariable.id });
+        
+        //make select all the default
+        trait.codes.isSelected = true;
+        trait.codes.$promise.then(function(result) {
+            result.forEach(function(code) {
+               code.isSelected = true;
+                if (trait.selected.indexOf(code) == -1) {
+                    trait.selected.push(code);
+                }
+            });
+            trait.badgeValue = trait.selected.filter(function(code) { return code.isSelected; }).length;
+        });
     };
 
     // used before searching to extract the codes from the search selection
@@ -43,6 +55,8 @@ function CulturalCtrl($scope, searchModelService, Variable, CodeDescription, Con
 
     $scope.traitCodeSelectionChanged = function(trait) {
 		currentSelection = $scope.getSelectedTraitCodes();
+        if (currentSelection.length == trait.codes.length) trait.codes.isSelected = true;
+        else trait.codes.isSelected = false;
 		currentSelection.forEach(function(code) {
 			if (trait.selected.indexOf(code) == -1) {
 			//if selected trait code is not already in the array of selected codes, add it to the array

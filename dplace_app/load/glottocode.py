@@ -1,34 +1,41 @@
 # -*- coding: utf-8 -*-
-# __author__ = 'dan'
-from django.contrib.gis.geos import Point
+import logging
+
+from django.db import connection
 from django.core.exceptions import ObjectDoesNotExist
-from dplace_app.models import *
 
-def load_glottocode(dict_row):
-    """
-    Reads file glottolog_mapping.csv
-    """
+from dplace_app.models import Language, GlottoCode, ISOCode, Society, LanguageFamily
 
-    glotto_code = dict_row['id'].strip()
-    name = dict_row['name'].strip()
-    glotto, created = GlottoCode.objects.get_or_create(glotto_code=glotto_code)
-    language, created = Language.objects.get_or_create(glotto_code=glotto)
-    language.name = name
-    language.save()
-    print "Saved Glottocode %s, %s" % (name, glotto)
+
+def load_glottocode(reader):
+    Language.objects.all().delete()
+    GlottoCode.objects.all().delete()
+    with connection.cursor() as c:
+        for table in ['language', 'glottocode']:
+            c.execute("ALTER SEQUENCE dplace_app_%s_id_seq RESTART WITH 1" % table)
+
+    glottocodes = []
+    languages = []
+
+    for i, item in enumerate(reader):
+        glottocodes.append(GlottoCode(glotto_code=item['id'].strip()))
+        languages.append(Language(name=item['name'].strip(), glotto_code_id=i + 1))
+
+    GlottoCode.objects.bulk_create(glottocodes, batch_size=1000)
+    Language.objects.bulk_create(languages, batch_size=1000)
+
 
 def map_isocodes(dict_row):
     """
     Matches isocodes to glottocodes.
     """
-
-    glotto_code = dict_row['id'].strip()
-    iso_code = dict_row['iso_693-3'].strip()
+    glotto_code = dict_row['id']
+    iso_code = dict_row['iso_693-3']
     if not iso_code:
         return
         
     if len(iso_code) > 3:
-        print "ISOCode too long, skipping %s" % iso_code
+        logging.warning("ISOCode too long, skipping %s" % iso_code)
         return
         
     iso, created = ISOCode.objects.get_or_create(iso_code=iso_code)
@@ -38,17 +45,16 @@ def map_isocodes(dict_row):
         language = Language.objects.get(glotto_code=glotto)
         language.iso_code = iso
         language.save()
-        print "Mapped isocode %s to glottocode %s" % (iso_code, glotto_code)
+        logging.info("Mapped isocode %s to glottocode %s" % (iso_code, glotto_code))
     except ObjectDoesNotExist:
-        print "No language found with glottocode %s" % glotto_code
+        logging.warning("No language found with glottocode %s" % glotto_code)
     
     
 def xd_to_language(dict_row):
     """
     Reads file xd_id_to_language.csv
     """
-    
-    classification_scheme = 'G' # for Glottolog
+    classification_scheme = 'G'  # for Glottolog
     xd_id = dict_row['xd_id']
     isocode = dict_row['iso_6933']
     glottocode = dict_row['DialectLanguageGlottocode']
@@ -60,49 +66,37 @@ def xd_to_language(dict_row):
     
     societies = Society.objects.all().filter(xd_id=xd_id)
     if len(societies) == 0:
-        print "No societies found with xd_id %s" % (xd_id)
+        logging.warning("No societies found with xd_id %s" % (xd_id))
     else:
+        #get or create language family
+        try:
+            family_language = Language.objects.get(glotto_code=family)
+            lang_fam, created = LanguageFamily.objects.get_or_create(scheme='G', name=family_language.name)
+            if created:
+                logging.info("Language Family %s created" % (lang_fam.name))
+        except ObjectDoesNotExist:
+            logging.warning("No language found for family glottocode %s, skipping" % family_glottocode)
+            lang_fam = None
+
         try:
             language = Language.objects.get(iso_code=iso, glotto_code=glotto)
+            if lang_fam:
+                language.family = lang_fam
+                language.save()
             for s in societies:
                 s.language = language
                 s.save()
         except ObjectDoesNotExist:
             try:
                 language = Language.objects.get(glotto_code=glotto)
-                language.iso_code = iso
-                language.save()
-                print "Mapped isocode %s to glottocode %s" % (isocode, glottocode)
+                if lang_fam:
+                    language.family = lang_fam
+                    language.save()
                 for s in societies:
                     s.language = language
                     s.save()
             except ObjectDoesNotExist:
-                print "No language found for isocode %s and glottocode %s, skipping" % (isocode, glottocode)
+                logging.warning(
+                    "No language found for isocode %s and glottocode %s, skipping" % (isocode, glottocode)
+                )
                 return
-            
-    try:
-        language = Language.objects.get(glotto_code=glotto, iso_code=iso)
-    except ObjectDoesNotExist:
-        print "No language found for glottocode %s and isocode %s, skipping" % (glottocode, isocode)
-        return
-    try:
-        family_language = Language.objects.get(glotto_code=family)
-    except ObjectDoesNotExist:
-        print "No language found for family glottocode %s, skipping" % family_glottocode
-        return
-        
-    class_level = 1
-    lang_class, created = LanguageClass.objects.get_or_create(scheme=classification_scheme, level=class_level, name=family_language.name)
-    if created:
-        print "Created language class for family %s" % family_language.name.encode("UTF-8", "ignore")
-    lang_class.save()
-    classification, created = LanguageClassification.objects.get_or_create(
-                                                            scheme=classification_scheme,
-                                                            language=language,
-                                                            class_family=lang_class,
-                                                            )
-    classification.save()
-    if created:
-        print "Saved classification %s, %s" % (xd_id, glotto)
-                                                            
-                                                            

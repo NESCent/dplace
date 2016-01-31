@@ -20,24 +20,24 @@ function EnvironmentalCtrl($scope, searchModelService, EnvironmentalVariable, En
         $scope.environmentalData.vals[0] = '';
         $scope.environmentalData.vals[1] = '';
         $scope.EnvironmentalForm.$setPristine();
-        if ($scope.environmentalData.selectedFilter.operator == 'all') {
-            $scope.filterChanged();
-            values = MinAndMax.query({query: {environmental_id: $scope.environmentalData.selectedVariable.id}});
-            values.$promise.then(function(result) {
-                $scope.environmentalData.vals[0] = result.min;
-                $scope.environmentalData.vals[1] = result.max;
-            });
-        }
+        $scope.values = MinAndMax.query({query: {environmental_id: $scope.environmentalData.selectedVariable.id}});
+        $scope.filterChanged();
     };
     
     $scope.filterChanged = function() {
-        if ($scope.environmentalData.selectedFilter.operator != 'all') return;
-        else {
-            values = MinAndMax.query({query: {environmental_id: $scope.environmentalData.selectedVariable.id}});
-            values.$promise.then(function(result) {
+        if ($scope.environmentalData.selectedFilter.operator == 'all' || $scope.environmentalData.selectedFilter.operator == 'inrange') {
+            $scope.values.$promise.then(function(result) {
                 $scope.environmentalData.vals[0] = result.min;
                 $scope.environmentalData.vals[1] = result.max;
-            
+            });
+        } else if ($scope.environmentalData.selectedFilter.operator == 'lt') {
+            $scope.values.$promise.then(function(result) {
+                $scope.environmentalData.vals[0] = result.max;            
+            });
+        }
+        else if ($scope.environmentalData.selectedFilter.operator == 'gt') {
+            $scope.values.$promise.then(function(result) {
+                $scope.environmentalData.vals[0] = result.min;            
             });
         }
     };

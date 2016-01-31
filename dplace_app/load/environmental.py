@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
-# __author__ = 'dan'
+from __future__ import unicode_literals
+import logging
+
 from django.contrib.gis.geos import Point
 from django.core.exceptions import ObjectDoesNotExist
 from dplace_app.models import *
@@ -130,69 +132,95 @@ ENVIRONMENTAL_MAP = {
     },
 }
 
+
+_ISO_CODES = None
+
+
 def iso_from_code(code):
-    if code == 'NA' or len(code) == 0:
-        return None
-    try:
-        return ISOCode.objects.get(iso_code=code)
-    except ObjectDoesNotExist:
-        return None
+    global _ISO_CODES
+    if _ISO_CODES is None:
+        _ISO_CODES = {c.iso_code: c for c in ISOCode.objects.all()}
+    return _ISO_CODES.get(code)
+
 
 def create_environmental_variables():
-    for k in ENVIRONMENTAL_MAP:
-        var_dict = ENVIRONMENTAL_MAP[k]
+    for k, var_dict in ENVIRONMENTAL_MAP.items():
         if 'category' in var_dict:
             env_category, created = EnvironmentalCategory.objects.get_or_create(name=var_dict['category'])
             if created:
-                print "Created environmental category %s" % env_category
-            obj, created = EnvironmentalVariable.objects.get_or_create(name=var_dict['name'])
-            obj.category = env_category
-            obj.units = var_dict['units'].decode('utf-8').strip()
-            obj.codebook_info = var_dict['description']
-            obj.save()
-            print "Saved environmental variable %s" % obj
+                logging.info("Created environmental category %s" % env_category)
         else:
-            EnvironmentalVariable.objects.get_or_create(name=var_dict['name'],units=var_dict['units'].decode('utf-8').strip())
-            print "Saved environmental variable %s" % var_dict['name']
-    
-def load_environmental(env_dict):
+            env_category = None
+
+        obj, created = EnvironmentalVariable.objects.get_or_create(
+            name=var_dict['name'],
+            units=var_dict['units'],
+            category=env_category)
+        obj.codebook_info = var_dict['description']
+        obj.save()
+        logging.info("Saved environmental variable %s" % obj)
+        yield obj.name, obj
+
+
+def load_environmental(items):
+    variables = dict(list(create_environmental_variables()))
+    societies = {(s.ext_id, s.source_id): s for s in Society.objects.all()}
+
+    res = 0
+    for item in items:
+        if _load_environmental(item, variables, societies):
+            res += 1
+    return res
+
+
+def _load_environmental(env_dict, variables, societies):
     ext_id = env_dict['ID']
     source = get_source(env_dict['Source'])
 
     # hack for B109 vs. 109
     if source.author == 'Binford' and ext_id.find('B') == -1:
         ext_id = 'B' + ext_id
-    
-    try:
-        society = Society.objects.get(ext_id=ext_id, source=source)
-    except ObjectDoesNotExist:
-        print "Unable to find a Society object with ext_id %s and source %s, skipping..." % (ext_id, source)
+
+    society = societies.get((ext_id, source.id))
+    if society is None:
+        logging.warn(
+            "Unable to find a Society object with ext_id %s and source %s, skipping..." %
+            (ext_id, source))
         return
+    
     # This limits the environmental data to one record per society record
-    found_environmentals = Environmental.objects.filter(society=society)
+    found_environmentals = Environmental.objects.filter(society=society).all()
     if len(found_environmentals) == 0:
-        reported_latlon =  Point(float(env_dict['Orig.longitude']),float(env_dict['Orig.latitude']))
-        actual_latlon = Point(float(env_dict['longitude']), float(env_dict['latitude']))
+        reported_latlon = Point(
+            float(env_dict['Orig.longitude']), float(env_dict['Orig.latitude']))
+        actual_latlon = Point(
+            float(env_dict['longitude']), float(env_dict['latitude']))
         iso_code = iso_from_code(env_dict['iso'])
-        
+
         # Create the base Environmental
-        environmental, created = Environmental.objects.get_or_create(society=society,
-                                      reported_location=reported_latlon,
-                                      actual_location=actual_latlon,
-                                      source=source,
-                                      iso_code=iso_code)
-        environmental.save()
-        for k in ENVIRONMENTAL_MAP: # keys are the columns in the CSV file
+        environmental, created = Environmental.objects.get_or_create(
+            society=society,
+            reported_location=reported_latlon,
+            actual_location=actual_latlon,
+            source=source,
+            iso_code=iso_code
+        )
+        for k in ENVIRONMENTAL_MAP:  # keys are the columns in the CSV file
             var_dict = ENVIRONMENTAL_MAP[k]
-            try:
-                # Get the variable
-                variable = EnvironmentalVariable.objects.get(name=var_dict['name'])
-            except ObjectDoesNotExist:
-                print "Warning: Did not find an EnvironmentalVariable with name %s" % var_dict['name']
+            variable = variables.get(var_dict['name'])
+            if variable is None:
+                logging.warn("Did not find an EnvironmentalVariable with name %s" % var_dict['name'])
                 continue
             if env_dict[k] and env_dict[k] != 'NA':
                 value = float(env_dict[k])
-                EnvironmentalValue.objects.get_or_create(variable=variable,value=value,
-                    environmental=environmental, source=source
-                )
-            print "Created environmental value for variable %s and society %s" % (var_dict['name'], society)
+                EnvironmentalValue.objects.get_or_create(
+                    variable=variable,
+                    value=value,
+                    environmental=environmental,
+                    source=source)
+            logging.info(
+                "Created environmental value for variable %s and society %s" % (var_dict['name'], society)
+            )
+    else:
+        environmental = found_environmentals[0]
+    return environmental

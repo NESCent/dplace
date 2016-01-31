@@ -8,17 +8,7 @@ angular.module('dplaceFilters', [])
             }
         }
     })    
-    .filter('joinDictItems', function() {
-        return function(dict) {
-            items = []
-            for (var key in dict) {
-                if (key != 'NumClassifications')
-                    items = items.concat(dict[key]);
-            }
-            return items;
-        }
-    })
-    .filter('colorNode', ['colorMapService', function(colorMapService) {
+    .filter('colorNode', function() {
         return function(value, codes) {
             var missingData = false;
             var missingDataValue;

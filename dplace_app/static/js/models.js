@@ -3,7 +3,7 @@
  * Created by dan on 7/30/14.
  */
 
-function SearchModel(VariableCategory, GeographicRegion, EnvironmentalCategory, LanguageClass, DatasetSources) {
+function SearchModel(VariableCategory, GeographicRegion, EnvironmentalCategory, LanguageFamily, DatasetSources) {
     this.reset = function() {
         this.results = {}; // Populated after search is run
         this.params = {}; // state for individual controllers
@@ -14,7 +14,7 @@ function SearchModel(VariableCategory, GeographicRegion, EnvironmentalCategory, 
         this.params.culturalTraits = new CulturalTraitModel(VariableCategory, DatasetSources);
         this.params.geographicRegions = new GeographicRegionModel(GeographicRegion);
         this.params.environmentalData = new EnvironmentalDataModel(EnvironmentalCategory);
-        this.params.languageClassifications = new LanguageClassificationModel(LanguageClass)
+        this.params.languageClassifications = new LanguageClassificationModel(LanguageFamily)
     };
 
     // getters
@@ -85,26 +85,10 @@ function EnvironmentalDataModel(EnvironmentalCategory) {
     this.badgeValue = 0;
 }
 
-function LanguageClassificationModel(LanguageClass) {
-    var levels = [
-        {level: 1, name: 'Family',          tag: 'family'},
-        {level: 2, name: 'Subfamily',       tag: 'subfamily'},
-        {level: 3, name: 'Subsubfamily',    tag: 'subsubfamily'}
-    ];
-
-    var languageFilter = angular.copy(levels);
-    languageFilter.forEach(function (filterLevel) {
-        filterLevel.selectedItem = undefined;
-    });
+function LanguageClassificationModel(LanguageFamily) {
     
     /* List of all Language Classes - needed for language search */
-    this.allClasses = LanguageClass.query();
-    
-    /* Populate language family for first level */
-    var familyLevel = 1;
-    languageFilter[0].items = LanguageClass.query({level: familyLevel, scheme: 'G'});
+    this.allClasses = LanguageFamily.query();
     this.selected = [];
-    this.levels = levels;
-    this.languageFilters = [languageFilter];
     this.badgeValue = 0;
 }
