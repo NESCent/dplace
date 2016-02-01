@@ -23,16 +23,18 @@ angular.module('dplaceFilters', [])
         
             var missingData = false;
             var missingDataValue;
-            for (var i = 0; i < codes.length; i++) {
-                if (codes[i].description && codes[i].description.indexOf("Missing data") != -1) {
+            for (var i = 0; i < codes.codes.length; i++) {
+                if (codes.codes[i].description && codes.codes[i].description.indexOf("Missing data") != -1) {
                     missingData = true;
-                    missingDataValue = codes[i].code;
+                    missingDataValue = codes.codes[i].code;
                     break;
                 }
             }
             if (missingData && value == missingDataValue) return 'rgb(255, 255, 255)';
             else {
-                rgb = colorMapService.colorMap[parseInt(value)];
+                if (codes.variable.data_type.toUpperCase() == 'ORDINAL') {
+                    rgb = colorMapService.generateRandomHue(value, codes.codes.length,codes.variable.id,5);
+                } else rgb = colorMapService.colorMap[parseInt(value)];
                 return rgb;
             }
         }
