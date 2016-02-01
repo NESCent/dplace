@@ -35,11 +35,10 @@ CLASSIFICATION_SCHEMES = (
 class ISOCode(models.Model):
     iso_code = models.CharField('ISO Code', db_index=True, max_length=3)
     # only have locations for ISO codes in 16th ed ethnologue
-    # location = models.PointField(null=True)
     objects = models.GeoManager()   # For GeoDjango, must override the manager
 
     def __unicode__(self):
-        return "%s (%s)" % (self.iso_code, self.location)
+        return "%s" % (self.iso_code)
 
     class Meta(object):
         verbose_name = "ISO Code"
@@ -162,8 +161,6 @@ class EnvironmentalValue(models.Model):
 
 class Environmental(models.Model):
     society = models.ForeignKey('Society', null=True, related_name="environmentals")
-    reported_location = models.PointField()
-    actual_location = models.PointField()
     iso_code = models.ForeignKey('ISOCode', null=True, related_name="environmentals")
     source = models.ForeignKey('Source', null=True)
     objects = models.GeoManager()   # For GeoDjango, must override the manager
