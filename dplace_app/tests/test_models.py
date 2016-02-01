@@ -3,26 +3,6 @@ from django.contrib.gis.geos import Polygon, Point, MultiPolygon
 from django.test import TestCase
 
 
-class ISOCodeTestCase(TestCase):
-    """
-    Tests basic Geographic functionality of ISOCode models
-    """
-    def setUp(self):
-        ISOCode.objects.create(iso_code='abc', location=Point(5.0, 5.0))
-        ISOCode.objects.create(iso_code='def', location=Point(10.0, 10.0))
-
-    def test_isocodes(self):
-        poly = Polygon(((4.0, 4.0), (6.0, 4.0), (6.0, 6.0), (4.0, 6.0), (4.0, 4.0)))
-        self.assertIn(
-            ISOCode.objects.get(iso_code='abc'),
-            ISOCode.objects.filter(location__intersects=poly),
-            "ISO Code should be in region")
-        self.assertNotIn(
-            ISOCode.objects.get(iso_code='def'),
-            ISOCode.objects.filter(location__intersects=poly),
-            "ISO Code should not be in region")
-
-
 class GeographicRegionTestCase(TestCase):
     def setUp(self):
         poly = MultiPolygon(
@@ -56,7 +36,7 @@ class EATestCase(TestCase):
     """
 
     def setUp(self):
-        self.iso_code = ISOCode.objects.create(iso_code='abc', location=Point(5.0, 5.0))
+        self.iso_code = ISOCode.objects.create(iso_code='abc')
         self.source = Source.objects.create(
             year="2014",
             author="Greenhill",

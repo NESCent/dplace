@@ -30,7 +30,7 @@ class ISOCodeAPITestCase(Test):
     """
 
     def setUp(self):
-        self.code = models.ISOCode.objects.create(iso_code='abc', location=Point(5.0, 5.0))
+        self.code = models.ISOCode.objects.create(iso_code='abc')
 
     def test_isocode_api(self):
         response_dict = self.get_json('isocode-list')
@@ -251,9 +251,9 @@ class FindSocietiesTestCase(Test):
 
     def setUp(self):
         # make ISO codes
-        iso_code1 = models.ISOCode.objects.create(iso_code='abc', location=Point(1.0, 1.0))
-        iso_code2 = models.ISOCode.objects.create(iso_code='def', location=Point(2.0, 2.0))
-        iso_code3 = models.ISOCode.objects.create(iso_code='ghi', location=Point(3.0, 3.0))
+        iso_code1 = models.ISOCode.objects.create(iso_code='abc')
+        iso_code2 = models.ISOCode.objects.create(iso_code='def')
+        iso_code3 = models.ISOCode.objects.create(iso_code='ghi')
 
         # make Glotto codes
         glotto_code1 = models.GlottoCode.objects.create(glotto_code='abcc1234')
@@ -344,14 +344,10 @@ class FindSocietiesTestCase(Test):
         # Setup environmentals
         self.environmental1 = models.Environmental.objects.create(
             society=self.society1,
-            reported_location=Point(0, 0),
-            actual_location=Point(0, 0),
             source=self.source,
             iso_code=iso_code1)
         self.environmental2 = models.Environmental.objects.create(
             society=self.society2,
-            reported_location=Point(1, 1),
-            actual_location=Point(1, 1),
             source=self.source,
             iso_code=iso_code2)
 
