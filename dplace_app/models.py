@@ -192,7 +192,7 @@ class CulturalVariable(models.Model):
     data_type = models.CharField(max_length=200, null=True)
 
     def coded_societies(self):
-        return Society.objects.filter(variablecodedvalue__in=self.values.all())
+        return Society.objects.filter(culturalvalue__in=self.values.all())
 
     def __unicode__(self):
         return "%s - %s" % (self.label, self.name)
@@ -247,7 +247,7 @@ class CulturalCodeDescription(models.Model):
             pass
 
     def coded_societies(self):
-        return Society.objects.filter(variablecodedvalue__coded_value=self.code)
+        return Society.objects.filter(culturalvalue__coded_value=self.code)
 
     def __unicode__(self):
         return "%s - %s" % (self.code, self.description)

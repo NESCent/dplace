@@ -5,7 +5,7 @@ import re
 from django.db import connection
 
 from dplace_app.models import (
-    Society, Source, VariableCodedValue, VariableDescription, VariableCodeDescription,
+    Society, Source, CulturalValue, CulturalVariable, CulturalCodeDescription,
 )
 from sources import get_source
 from util import eavar_number_to_label, bfvar_number_to_label
@@ -20,9 +20,9 @@ def load_data(items):
     kw = dict(
         societies={s.ext_id: s for s in Society.objects.all()},
         sources={(s.author, s.year): s for s in Source.objects.all()},
-        variables={vd.label: vd for vd in VariableDescription.objects.all()},
+        variables={vd.label: vd for vd in CulturalVariable.objects.all()},
         descriptions={(vcd.variable_id, vcd.code): vcd
-                      for vcd in VariableCodeDescription.objects.all()})
+                      for vcd in CulturalCodeDescription.objects.all()})
 
     #
     # To speed up the data load, we first delete all relevant objects, and then recreate
@@ -31,7 +31,7 @@ def load_data(items):
     # as well, we must keep control over the inserted primary keys for values. To do so,
     # we reset the id sequence as well.
     #
-    VariableCodedValue.objects.all().delete()
+    CulturalValue.objects.all().delete()
     with connection.cursor() as c:
         for table in ['variablecodedvalue_references', 'variablecodedvalue']:
             c.execute("ALTER SEQUENCE dplace_app_%s_id_seq RESTART WITH 1" % table)
@@ -47,15 +47,15 @@ def load_data(items):
             else:
                 inserted.add(key)
                 pk += 1
-                objs.append(VariableCodedValue(**res[0]))
+                objs.append(CulturalValue(**res[0]))
                 refs.extend([(pk, sid) for sid in res[1] or []])
 
-    VariableCodedValue.objects.bulk_create(objs, batch_size=1000)
+    CulturalValue.objects.bulk_create(objs, batch_size=1000)
 
     with connection.cursor() as c:
         c.executemany(
             """\
-INSERT INTO dplace_app_variablecodedvalue_references (variablecodedvalue_id, source_id)
+INSERT INTO dplace_app_culturalvalue_references (culturalvalue_id, source_id)
 VALUES (%s, %s)""",
             refs)
     return pk

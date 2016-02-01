@@ -51,23 +51,23 @@ class EATestCase(TestCase):
             name='Binford Society',
             location=Point(0.0, 0.0),
             source=self.source)
-        self.variable = VariableDescription.objects.create(
+        self.variable = CulturalVariable.objects.create(
             label='EA001',
             name='Variable 1',
             source=self.source)
-        self.code10 = VariableCodeDescription.objects.create(
+        self.code10 = CulturalCodeDescription.objects.create(
             variable=self.variable,
             code='10',
             description='Code 10')
-        self.code1 = VariableCodeDescription.objects.create(
+        self.code1 = CulturalCodeDescription.objects.create(
             variable=self.variable,
             code='1',
             description='Code 1')
-        self.code2 = VariableCodeDescription.objects.create(
+        self.code2 = CulturalCodeDescription.objects.create(
             variable=self.variable,
             code='2',
             description='Code 2')
-        self.value = VariableCodedValue.objects.create(
+        self.value = CulturalValue.objects.create(
             variable=self.variable,
             society=self.ea_society,
             coded_value='1',
@@ -76,7 +76,7 @@ class EATestCase(TestCase):
 
     def test_society_coded_value(self):
         society = Society.objects.get(ext_id='easoc')
-        self.assertIn(self.value, society.variablecodedvalue_set.all())
+        self.assertIn(self.value, society.culturalvalue_set.all())
 
     def test_coded_variable(self):
         self.assertEqual(self.code1.variable, self.variable)
