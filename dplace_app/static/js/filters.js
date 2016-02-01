@@ -91,8 +91,8 @@ angular.module('dplaceFilters', [])
     .filter('formatLanguage', function () {
         return function(values) {
             return values.map( function(language) {
-                return language.name;
-            }).join(',');
+                return language.family.name;
+            }).join('; ');
         };
     })
     .filter('formatLanguageTrees', function () {
