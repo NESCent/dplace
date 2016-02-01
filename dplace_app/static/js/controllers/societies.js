@@ -1,4 +1,4 @@
-function SocietiesCtrl($scope, $timeout, $http, searchModelService) {
+function SocietiesCtrl($scope, $timeout, $http, searchModelService, colorMapService) {
     $scope.results = searchModelService.getModel().getResults();
     $scope.query = searchModelService.getModel().getQuery();
     $scope.variables = [];
@@ -126,10 +126,10 @@ function SocietiesCtrl($scope, $timeout, $http, searchModelService) {
                             .attr("stroke-width", "0.5")
                             .attr("fill", function() {
                                 if (variable[0].codes[c].description.indexOf("Missing data") != -1)
-                                    return 'hsl(0, 0%, 100%)';
+                                    return 'rgb(255,255,255)';
                                 var value = variable[0].codes[c].code;
-                                var hue = value * 240 / variable[0].codes.length;
-                                return 'hsl('+hue+',100%,50%)';
+                                rgb = colorMapService.colorMap[parseInt(value)];
+                                return rgb;
                             });
                         g.append("svg:text")
                             .attr("x", "20")
@@ -151,38 +151,36 @@ function SocietiesCtrl($scope, $timeout, $http, searchModelService) {
             var filename = $scope.results.chosenVariable.name.replace(/[\W]+/g, "-").toLowerCase()+"-map.svg";
         }
         
-        else if ($scope.results.classifications && $scope.results.languages.length > 0) {
+        else if ($scope.results.classifications) {
             count = 0;
-            for (var key in $scope.results.classifications) {
-                for (var i = 0; i < $scope.results.classifications[key].length; i++) {
-                    g = legend.append("svg:g")
-                        .attr("transform", function() {
-                            return 'translate(0,'+ count*25 + ')';
-                        });
-                    g.append("svg:circle")
-                        .attr("cx", "10")
-                        .attr("cy", "10")
-                        .attr("r", "4.5")
-                        .attr("stroke", "#000")
-                        .attr("stroke-width", "0.5")
-                        .attr("fill", function() {
-                            var value = $scope.results.classifications[key][i].id;
-                            var hue = value * 240 / $scope.results.classifications['NumClassifications'];
-                            return 'hsl('+hue+',100%,50%)';
-                        });
-                    g.append("svg:text")
-                        .attr("x", "20")
-                        .attr("y", "15")
-                        .text($scope.results.classifications[key][i].name);
-                    count++;
-                }
+            
+            for (var i = 0; i < $scope.results.classifications.length; i++) {
+                g = legend.append("svg:g")
+                    .attr("transform", function() {
+                        return 'translate(0,' + count*25 + ')';
+                    });
+                g.append("svg:circle")
+                    .attr("cx", "10")
+                    .attr("cy", "10")
+                    .attr("r", "4.5")
+                    .attr("stroke", "#000")
+                    .attr("stroke-width", "0.5")
+                    .attr("fill", function() {
+                        var value = $scope.results.classifications[i].id;
+                        rgb = colorMapService.mapColor(value, $scope.results.classifications.length);
+                        return rgb;
+                    });
+                g.append("svg:text")
+                    .attr("x", "20")
+                    .attr("y", "15")
+                    .text($scope.results.classifications[i].name);
+                count++;
                 
             }
             var legend_svg = "<g transform='translate(0,350)'>"+legend.node().innerHTML+"</g>";
             var map_svg = map_svg.substring(0, map_svg.indexOf("</svg>"));
             map_svg = map_svg.concat(legend_svg+"</svg>");
-            lang_family = $scope.results.languages[0].language_family.name;
-            var filename = $scope.results.languages[0].language_family.name.replace(/[\W]+/g, "-")+"-map.svg";
+            var filename = "language-classifications-map.svg";
 
         }
         
@@ -201,8 +199,8 @@ function SocietiesCtrl($scope, $timeout, $http, searchModelService) {
                     .attr("stroke-width", "0.5")
                     .attr("fill", function() {
                         var value = $scope.results.geographic_regions[i].tdwg_code;
-                        var hue = value * 240 / $scope.results.geographic_regions.length;
-                        return 'hsl('+hue+',100%,50%)';
+                        rgb = colorMapService.mapColor(value, $scope.results.geographic_regions.length);
+                        return rgb;
                     });
                 g.append("svg:text")
                     .attr("x", "20")

@@ -10,6 +10,17 @@ angular.module('dplaceFilters', [])
     })    
     .filter('colorNode', ['colorMapService', function(colorMapService) {
         return function(value, codes) {
+            if (codes.societies) {
+                if (codes.classifications) {
+                    rgb = colorMapService.mapColor(value, codes.classifications.length);
+                    return rgb;
+                }
+                if (codes.geographic_regions.length > 0) {
+                    rgb = colorMapService.mapColor(value, codes.geographic_regions.length);
+                    return rgb;
+                } 
+            }
+        
             var missingData = false;
             var missingDataValue;
             for (var i = 0; i < codes.length; i++) {

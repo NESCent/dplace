@@ -24,7 +24,7 @@ function ColorMapService() {
     // converts hsl to rgb
     function hslToRgb(h, s, l) {
         if (h < 0) h += 360;
-        if (h > 360) h = h % 360;
+        if (h >= 360) h = h % 360;
         var r, g, b;
         var r1, g1, b1;
         chroma = (1 - Math.abs(2*l - 1)) * s;
@@ -82,7 +82,6 @@ function ColorMapService() {
 
     //normal gradient
     this.mapColor = function(index, count) {  
-        if (index == 'NA') {console.log("Missign"); return 'rgb(255,255,255)'; }
         hue = (index / count)*240;
         rgb = hslToRgb(hue, 1, 0.5);
         return 'rgb('+rgb[0]+','+rgb[1]+','+rgb[2]+')';
@@ -101,13 +100,13 @@ function ColorMapService() {
             
             if (society.geographic_regions) {
                 for (var j = 0; j < society.geographic_regions.length; j++) {
-                    var color = this.mapColor(society.geographic_regions[0].tdwg_code, results.geographic_regions.length);
+                    var color = this.mapColor(society.geographic_regions[j].tdwg_code, results.geographic_regions.length);
                     colors[society.society.id] = color;
                 }
             }
             
             if (results.languages.length > 0 && society.environmental_values.length == 0 && society.variable_coded_values.length == 0) {
-                    var color = mapColor(society.society.language.family.id, results.classifications.length);
+                    var color = this.mapColor(society.society.language.family.id, results.classifications.length);
                     colors[society.society.id] = color;
                 
             }
