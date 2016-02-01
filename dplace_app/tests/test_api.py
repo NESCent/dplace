@@ -496,6 +496,7 @@ class FindSocietiesTestCase(Test):
         self.assertFalse(self.society_in_results(self.society1, response))
         self.assertTrue(self.society_in_results(self.society2, response))
         self.assertFalse(self.society_in_results(self.society3, response))
+        self.assertIn('coordinates', response.data['societies'][0]['society']['location'])
 
     def test_find_by_geographic_region_mpoly(self):
         """

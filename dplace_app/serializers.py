@@ -1,5 +1,4 @@
 from rest_framework import serializers
-from django.core.serializers import serialize
 
 from dplace_app import models
 
@@ -120,7 +119,6 @@ class LanguageSerializer(serializers.ModelSerializer):
 class SocietySerializer(serializers.ModelSerializer):
     language = LanguageSerializer()
     source = SourceSerializer()
-    location = serializers.SerializerMethodField()
 
     class Meta(object):
         model = models.Society
@@ -133,9 +131,6 @@ class SocietySerializer(serializers.ModelSerializer):
             'language',
             'focal_year',
             'source')
-            
-    def get_location(self, obj):
-        return obj.location.coords
 
 
 class GeographicRegionSerializer(serializers.ModelSerializer):
