@@ -64,7 +64,7 @@
     );
   </script>
 {% endif %}
-<h1><img height="60px" title="HOME" src="/static/images/D-PLACE_Logo.png">Society: {{ society.name }}</h1>
+<h1><img height="60px" title="HOME" src="{% static "images/D-PLACE_Logo.png" %}">Society: {{ society.name }}</h1>
     {% if society.language %}
         <h4>Language or dialect: {{ society.language.name }} </h4>
         <h5>{% if society.language.glotto_code %}Glottolog ID: <a href="http://glottolog.org/resource/languoid/id/{{society.language.glotto_code.glotto_code}}" target="_blank">{{ society.language.glotto_code.glotto_code }}</a>{% endif %}
