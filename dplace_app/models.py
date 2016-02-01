@@ -35,7 +35,7 @@ CLASSIFICATION_SCHEMES = (
 class ISOCode(models.Model):
     iso_code = models.CharField('ISO Code', db_index=True, max_length=3)
     # only have locations for ISO codes in 16th ed ethnologue
-    location = models.PointField(null=True)
+    # location = models.PointField(null=True)
     objects = models.GeoManager()   # For GeoDjango, must override the manager
 
     def __unicode__(self):
