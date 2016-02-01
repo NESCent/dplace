@@ -91,7 +91,7 @@
                         <div class="fields-inrange" ng-show="environmentalData.selectedFilter.operator == 'lt'">
                             <div class="form-group col-xs-6" ng-class="{'has-error':EnvironmentalForm.valslt.$invalid && EnvironmentalForm.valslt.$dirty}">
                                 <div class="input-group">
-                                    <input name="valslt" class="form-control input-xs" ng-pattern="/^(0|\-?[0-9][0-9]*\.?[0-9]*)$/" ng-model="environmentalData.vals[0]" />
+                                    <input name="valslt" class="form-control input-xs" ng-pattern="/^(0|\-?[0-9][0-9]*\.?[0-9]*)$/" ng-model="environmentalData.vals[1]" />
                                     <span class="input-group-addon">{{ environmentalData.selectedVariable.units }}</span>
                                 </div>
                             </div>

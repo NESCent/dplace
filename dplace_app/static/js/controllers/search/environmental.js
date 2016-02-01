@@ -25,21 +25,11 @@ function EnvironmentalCtrl($scope, searchModelService, EnvironmentalVariable, En
     };
     
     $scope.filterChanged = function() {
-        if ($scope.environmentalData.selectedFilter.operator == 'all' || $scope.environmentalData.selectedFilter.operator == 'inrange') {
-            $scope.values.$promise.then(function(result) {
-                $scope.environmentalData.vals[0] = result.min;
-                $scope.environmentalData.vals[1] = result.max;
-            });
-        } else if ($scope.environmentalData.selectedFilter.operator == 'lt') {
-            $scope.values.$promise.then(function(result) {
-                $scope.environmentalData.vals[0] = result.max;            
-            });
-        }
-        else if ($scope.environmentalData.selectedFilter.operator == 'gt') {
-            $scope.values.$promise.then(function(result) {
-                $scope.environmentalData.vals[0] = result.min;            
-            });
-        }
+        if ($scope.EnvironmentalForm.$dirty && $scope.environmentalData.selectedFilter.operator != 'all') return;
+        $scope.values.$promise.then(function(result) {
+            $scope.environmentalData.vals[0] = result.min;
+            $scope.environmentalData.vals[1] = result.max;
+        });
     };
     
     //gets the range of environmental values if the user selects 'all values'
