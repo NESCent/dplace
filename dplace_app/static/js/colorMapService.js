@@ -95,7 +95,7 @@ function ColorMapService() {
     
     this.generateRandomHue = function(value, codes, index, count) {
         hue = (index / count) * 300;
-        lum = 95 - ((value / codes) * 78)
+        lum = 85 - ((value / codes) * 90)
         rgb = hslToRgb(hue, 0.65, lum/100);
         return 'rgb('+rgb[0]+','+rgb[1]+','+rgb[2]+')';
     }
@@ -134,8 +134,7 @@ function ColorMapService() {
                 });
                 
                 if (variable_description[0].variable.data_type.toUpperCase() == 'ORDINAL') {
-                    // there are 10 ordinal variables in the database
-                    // should probably not hard-code this, but for now I think it is fine
+                    // there are 5 ordinal variables in the database
                     var color = this.generateRandomHue(society.variable_coded_values[j].coded_value, variable_description[0].codes.length, variable_description[0].variable.id, 5);
                     colors[society.society.id] = color;
                 } else if (variable_description[0].variable.data_type.toUpperCase() == 'CONTINUOUS') {
