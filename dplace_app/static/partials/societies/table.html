@@ -11,7 +11,7 @@
             <th>Trees</th>
             <th ng-repeat="variable in results.variable_descriptions">{{ variable.variable.name }}</th>
             <th ng-repeat="environmental in results.environmental_variables">{{ environmental.name }}</th>
-            <th ng-show="results.languages">Language</th>
+            <th ng-show="results.languages">Language Family</th>
             <th ng-show="results.geographic_regions">Geographic Region</th>
         </tr>
         <tr ng-repeat="society_result in results.societies | orderBy:columnSort.sortColumn:columnSort.reverse">
