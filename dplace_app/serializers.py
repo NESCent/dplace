@@ -9,15 +9,15 @@ class SourceSerializer(serializers.ModelSerializer):
 
 
 # Cultural Trait Variables
-class VariableCodeDescriptionSerializer(serializers.ModelSerializer):
+class CulturalCodeDescriptionSerializer(serializers.ModelSerializer):
     class Meta(object):
-        model = models.VariableCodeDescription
+        model = models.CulturalCodeDescription
         fields = ('id', 'code', 'description', 'short_description', 'variable')
 
 
-class VariableDescriptionSerializer(serializers.ModelSerializer):
+class CulturalVariableSerializer(serializers.ModelSerializer):
     class Meta(object):
-        model = models.VariableDescription
+        model = models.CulturalVariable
         fields = (
             'id',
             'label',
@@ -28,37 +28,37 @@ class VariableDescriptionSerializer(serializers.ModelSerializer):
             'index_categories')
 
 
-class VariableCategorySerializer(serializers.ModelSerializer):
+class CulturalCategorySerializer(serializers.ModelSerializer):
     class Meta(object):
-        model = models.VariableCategory
+        model = models.CulturalCategory
         fields = ('id', 'name',)
 
 
-class VariableDescriptionDetailSerializer(serializers.ModelSerializer):
-    index_categories = VariableCategorySerializer(many=True)
-    niche_categories = VariableCategorySerializer(many=True)
+class CulturalVariableDetailSerializer(serializers.ModelSerializer):
+    index_categories = CulturalCategorySerializer(many=True)
+    niche_categories = CulturalCategorySerializer(many=True)
 
     class Meta(object):
-        model = models.VariableDescription
+        model = models.CulturalVariable
         fields = ('id', 'label', 'name', 'index_categories', 'niche_categories')
 
 
-class VariableCategoryDetailSerializer(serializers.ModelSerializer):
+class CulturalCategoryDetailSerializer(serializers.ModelSerializer):
     # Use a Primary key related field or just get the variable
-    index_variables = VariableDescriptionSerializer(many=True)
-    niche_variables = VariableDescriptionSerializer(many=True)
+    index_variables = CulturalVariableSerializer(many=True)
+    niche_variables = CulturalVariableSerializer(many=True)
 
     class Meta(object):
-        model = models.VariableCategory
+        model = models.CulturalCategory
         fields = ('id', 'name', 'index_variables', 'niche_variables')
 
 
-class VariableCodedValueSerializer(serializers.ModelSerializer):
-    code_description = VariableCodeDescriptionSerializer(source='code')
+class CulturalValueSerializer(serializers.ModelSerializer):
+    code_description = CulturalCodeDescriptionSerializer(source='code')
     references = SourceSerializer(many=True)
 
     class Meta(object):
-        model = models.VariableCodedValue
+        model = models.CulturalValue
         fields = (
             'id',
             'variable',
@@ -251,8 +251,8 @@ class SocietyResultSet(object):
 
 
 class VariableCodeSerializer(serializers.Serializer):    
-    codes = VariableCodeDescriptionSerializer(many=True)
-    variable = VariableDescriptionSerializer()
+    codes = CulturalCodeDescriptionSerializer(many=True)
+    variable = CulturalVariableSerializer()
 
 
 class SocietyResultSerializer(serializers.Serializer):
@@ -260,7 +260,7 @@ class SocietyResultSerializer(serializers.Serializer):
     Serializer for the SocietyResult object
     """
     society = SocietySerializer()
-    variable_coded_values = VariableCodedValueSerializer(many=True)
+    variable_coded_values = CulturalValueSerializer(many=True)
     environmental_values = EnvironmentalValueSerializer(many=True)
     languages = LanguageSerializer(many=True)
     geographic_regions = GeographicRegionSerializer(many=True)

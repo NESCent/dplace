@@ -191,17 +191,11 @@ def _load_environmental(env_dict, variables, societies):
     # This limits the environmental data to one record per society record
     found_environmentals = Environmental.objects.filter(society=society).all()
     if len(found_environmentals) == 0:
-        reported_latlon = Point(
-            float(env_dict['Orig.longitude']), float(env_dict['Orig.latitude']))
-        actual_latlon = Point(
-            float(env_dict['longitude']), float(env_dict['latitude']))
         iso_code = iso_from_code(env_dict['iso'])
 
         # Create the base Environmental
         environmental, created = Environmental.objects.get_or_create(
             society=society,
-            reported_location=reported_latlon,
-            actual_location=actual_latlon,
             source=source,
             iso_code=iso_code
         )

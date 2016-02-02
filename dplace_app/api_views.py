@@ -19,41 +19,41 @@ from dplace_app import models
 
 
 # Resource routes
-class VariableDescriptionViewSet(viewsets.ReadOnlyModelViewSet):
-    serializer_class = serializers.VariableDescriptionSerializer
+class CulturalVariableViewSet(viewsets.ReadOnlyModelViewSet):
+    serializer_class = serializers.CulturalVariableSerializer
     filter_fields = ('label', 'name', 'index_categories', 'niche_categories', 'source')
-    queryset = models.VariableDescription.objects.all()
+    queryset = models.CulturalVariable.objects.all()
 
     # Override retrieve to use the detail serializer, which includes categories
     def retrieve(self, request, *args, **kwargs):
         self.object = self.get_object()
-        serializer = serializers.VariableDescriptionDetailSerializer(self.object)
+        serializer = serializers.CulturalVariableDetailSerializer(self.object)
         return Response(serializer.data)
 
 
-class VariableCategoryViewSet(viewsets.ReadOnlyModelViewSet):
-    serializer_class = serializers.VariableCategorySerializer
+class CulturalCategoryViewSet(viewsets.ReadOnlyModelViewSet):
+    serializer_class = serializers.CulturalCategorySerializer
     filter_fields = ('name', 'index_variables', 'niche_variables',)
-    queryset = models.VariableCategory.objects.all()
+    queryset = models.CulturalCategory.objects.all()
     # Override retrieve to use the detail serializer, which includes variables
 
     def retrieve(self, request, *args, **kwargs):
         self.object = self.get_object()
-        serializer = serializers.VariableCategoryDetailSerializer(self.object)
+        serializer = serializers.CulturalCategoryDetailSerializer(self.object)
         return Response(serializer.data)
 
 
-class VariableCodeDescriptionViewSet(viewsets.ReadOnlyModelViewSet):
-    serializer_class = serializers.VariableCodeDescriptionSerializer
+class CulturalCodeDescriptionViewSet(viewsets.ReadOnlyModelViewSet):
+    serializer_class = serializers.CulturalCodeDescriptionSerializer
     filter_fields = ('variable',)
-    queryset = models.VariableCodeDescription.objects.all()
+    queryset = models.CulturalCodeDescription.objects.all()
 
 
-class VariableCodedValueViewSet(viewsets.ReadOnlyModelViewSet):
-    serializer_class = serializers.VariableCodedValueSerializer
+class CulturalValueViewSet(viewsets.ReadOnlyModelViewSet):
+    serializer_class = serializers.CulturalValueSerializer
     filter_fields = ('variable', 'coded_value', 'code', 'society',)
     # Avoid additional database trips by select_related for foreign keys
-    queryset = models.VariableCodedValue.objects.select_related('variable', 'code').all()
+    queryset = models.CulturalValue.objects.select_related('variable', 'code').all()
 
 
 class SocietyViewSet(viewsets.ReadOnlyModelViewSet):
@@ -205,11 +205,11 @@ def result_set_from_query_dict(query_dict):
         ids = [x['id'] for x in query_dict['variable_codes'] if 'id' in x]
 
         variables = {
-            v.id: v for v in models.VariableDescription.objects
+            v.id: v for v in models.CulturalVariable.objects
             .filter(id__in=[x['variable'] for x in query_dict['variable_codes']])
             .prefetch_related(Prefetch(
                 'codes',
-                queryset=models.VariableCodeDescription.objects.filter(id__in=ids)))
+                queryset=models.CulturalCodeDescription.objects.filter(id__in=ids)))
         }
 
         for x in query_dict['variable_codes']:
@@ -219,7 +219,7 @@ def result_set_from_query_dict(query_dict):
                 == set(c.id for c in variable.codes.all())
 
             if variable.data_type and variable.data_type.lower() == 'continuous':
-                values = models.VariableCodedValue.objects.filter(
+                values = models.CulturalValue.objects.filter(
                     variable__id=x['variable'])
                 if 'min' in x:
                     values = values\
@@ -232,8 +232,8 @@ def result_set_from_query_dict(query_dict):
                 # Aggregate all the coded values for each selected code
                 for code in variable.codes.all():
                     coded_value_ids.extend(
-                        code.variablecodedvalue_set.values_list('id', flat=True))
-                values = models.VariableCodedValue.objects.filter(id__in=coded_value_ids)
+                        code.culturalvalue_set.values_list('id', flat=True))
+                values = models.CulturalValue.objects.filter(id__in=coded_value_ids)
 
             for value in values\
                     .select_related('society__language__family') \
@@ -331,17 +331,17 @@ def get_categories(request):
     """
     query_string = request.query_params['query']
     query_dict = json.loads(query_string)
-    categories = models.VariableCategory.objects.all()
+    categories = models.CulturalCategory.objects.all()
     source_categories = []
     if 'source' in query_dict:
         source = models.Source.objects.filter(id=query_dict['source'])
-        variables = models.VariableDescription.objects.filter(source=source)
+        variables = models.CulturalVariable.objects.filter(source=source)
         for c in categories:
             if variables.filter(index_categories=c.id):
                 source_categories.append(c)
         return Response(
-            serializers.VariableCategorySerializer(source_categories, many=True).data)
-    return Response(serializers.VariableCategorySerializer(categories, many=True).data)
+            serializers.CulturalCategorySerializer(source_categories, many=True).data)
+    return Response(serializers.CulturalCategorySerializer(categories, many=True).data)
 
 
 @api_view(['GET'])
@@ -392,7 +392,7 @@ def bin_cont_data(request):  # MAKE THIS GENERIC
     query_dict = json.loads(query_string)
     bins = []
     if 'bf_id' in query_dict:
-        values = models.VariableCodedValue.objects.filter(
+        values = models.CulturalValue.objects.filter(
             variable__id=query_dict['bf_id'])
         min_value = None
         max_value = 0.0

@@ -35,11 +35,10 @@ CLASSIFICATION_SCHEMES = (
 class ISOCode(models.Model):
     iso_code = models.CharField('ISO Code', db_index=True, max_length=3)
     # only have locations for ISO codes in 16th ed ethnologue
-    location = models.PointField(null=True)
     objects = models.GeoManager()   # For GeoDjango, must override the manager
 
     def __unicode__(self):
-        return "%s (%s)" % (self.iso_code, self.location)
+        return "%s" % (self.iso_code)
 
     class Meta(object):
         verbose_name = "ISO Code"
@@ -82,7 +81,7 @@ class Society(models.Model):
     def get_cultural_trait_data(self):
         """Returns the data for the given society"""
         valueDict = defaultdict(list)
-        qset = self.variablecodedvalue_set.select_related('code')
+        qset = self.culturalvalue_set.select_related('code')
         qset = qset.select_related('variable')
         for value in qset.order_by('variable__label').all():
             categories = value.variable.index_categories.all()
@@ -101,7 +100,7 @@ class Society(models.Model):
     def get_data_references(self):
         """Returns the references for the cultural trait data"""
         refs = []
-        qset = self.variablecodedvalue_set
+        qset = self.culturalvalue_set
         for value in qset.all():
             for r in value.references.all():
                 if r not in refs:
@@ -162,8 +161,6 @@ class EnvironmentalValue(models.Model):
 
 class Environmental(models.Model):
     society = models.ForeignKey('Society', null=True, related_name="environmentals")
-    reported_location = models.PointField()
-    actual_location = models.PointField()
     iso_code = models.ForeignKey('ISOCode', null=True, related_name="environmentals")
     source = models.ForeignKey('Source', null=True)
     objects = models.GeoManager()   # For GeoDjango, must override the manager
@@ -175,7 +172,7 @@ class Environmental(models.Model):
         verbose_name = "Environmental"
 
 
-class VariableDescription(models.Model):
+class CulturalVariable(models.Model):
     """
     Variables in the Ethnographic Atlas have a number and are accompanied
     by a description, e.g.
@@ -188,14 +185,14 @@ class VariableDescription(models.Model):
     name = models.CharField(max_length=200, db_index=True, default='Unknown')
     source = models.ForeignKey('Source', null=True)
     index_categories = models.ManyToManyField(
-        'VariableCategory', related_name='index_variables')
+        'CulturalCategory', related_name='index_variables')
     niche_categories = models.ManyToManyField(
-        'VariableCategory', related_name='niche_variables')
+        'CulturalCategory', related_name='niche_variables')
     codebook_info = models.TextField(default='None')
     data_type = models.CharField(max_length=200, null=True)
 
     def coded_societies(self):
-        return Society.objects.filter(variablecodedvalue__in=self.values.all())
+        return Society.objects.filter(culturalvalue__in=self.values.all())
 
     def __unicode__(self):
         return "%s - %s" % (self.label, self.name)
@@ -205,7 +202,7 @@ class VariableDescription(models.Model):
         ordering = ["label"]
 
 
-class VariableCategory(models.Model):
+class CulturalCategory(models.Model):
     name = models.CharField(max_length=30, db_index=True, unique=True)
 
     def __unicode__(self):
@@ -217,7 +214,7 @@ class VariableCategory(models.Model):
         ordering = ["name"]
 
 
-class VariableCodeDescription(models.Model):
+class CulturalCodeDescription(models.Model):
     """
     Most of the variables in the Ethnographic Atlas are coded with
     discrete values that map to a text description, e.g.
@@ -231,7 +228,7 @@ class VariableCodeDescription(models.Model):
 
     """
     variable = models.ForeignKey(
-        'VariableDescription', related_name="codes", db_index=True)
+        'CulturalVariable', related_name="codes", db_index=True)
     code = models.CharField(
         max_length=20, db_index=True, null=False, default='.')
     code_number = models.IntegerField(null=True, db_index=True)
@@ -241,7 +238,7 @@ class VariableCodeDescription(models.Model):
 
     def save(self, *args, **kwargs):
         self.read_code_number()
-        super(VariableCodeDescription, self).save(*args, **kwargs)
+        super(CulturalCodeDescription, self).save(*args, **kwargs)
 
     def read_code_number(self):
         try:
@@ -250,7 +247,7 @@ class VariableCodeDescription(models.Model):
             pass
 
     def coded_societies(self):
-        return Society.objects.filter(variablecodedvalue__coded_value=self.code)
+        return Society.objects.filter(culturalvalue__coded_value=self.code)
 
     def __unicode__(self):
         return "%s - %s" % (self.code, self.description)
@@ -260,7 +257,7 @@ class VariableCodeDescription(models.Model):
         ordering = ("variable", "code_number", "code")
 
 
-class VariableCodedValue(models.Model):
+class CulturalValue(models.Model):
     """
     The values coded in the EA are typically discrete codes
     that map to a description.  Some are not and
@@ -275,10 +272,10 @@ class VariableCodedValue(models.Model):
     This model is not used by every code
 
     """
-    variable = models.ForeignKey('VariableDescription', related_name="values")
+    variable = models.ForeignKey('CulturalVariable', related_name="values")
     society = models.ForeignKey('Society', null=True)
     coded_value = models.CharField(max_length=100, db_index=True, null=False, default='.')
-    code = models.ForeignKey('VariableCodeDescription', db_index=True, null=True)
+    code = models.ForeignKey('CulturalCodeDescription', db_index=True, null=True)
     source = models.ForeignKey('Source', null=True)
     comment = models.TextField(default="")
     references = models.ManyToManyField('Source', related_name='references')
