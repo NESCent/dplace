@@ -7,7 +7,7 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 from dplace_app.serializers import (
-    GeographicRegionSerializer, LanguageSerializer, VariableCodeDescriptionSerializer,
+    GeographicRegionSerializer, LanguageSerializer, CulturalCodeDescriptionSerializer,
 )
 from dplace_app import models
 
@@ -30,7 +30,7 @@ class ISOCodeAPITestCase(Test):
     """
 
     def setUp(self):
-        self.code = models.ISOCode.objects.create(iso_code='abc', location=Point(5.0, 5.0))
+        self.code = models.ISOCode.objects.create(iso_code='abc')
 
     def test_isocode_api(self):
         response_dict = self.get_json('isocode-list')
@@ -145,16 +145,16 @@ class VariableCodeDescriptionAPITestCase(Test):
             author='Russell Gray',
             reference='Gray (2016). Title.',
             name='BF Test Dataset')
-        self.category1 = models.VariableCategory.objects.create(name='Economy')
-        self.category2 = models.VariableCategory.objects.create(name='Demography')
+        self.category1 = models.CulturalCategory.objects.create(name='Economy')
+        self.category2 = models.CulturalCategory.objects.create(name='Demography')
 
-        self.variable = models.VariableDescription.objects.create(
+        self.variable = models.CulturalVariable.objects.create(
             label='EA001',
             name='Variable 1',
             source=self.source_ea,
             codebook_info='Variable 1',
             data_type='Categorical')
-        self.variable2 = models.VariableDescription.objects.create(
+        self.variable2 = models.CulturalVariable.objects.create(
             label='B002',
             name='Variable 2',
             source=self.source_binford,
@@ -164,15 +164,15 @@ class VariableCodeDescriptionAPITestCase(Test):
         self.variable2.save()
         self.variable.index_categories.add(self.category1, self.category2)
         self.variable2.index_categories.add(self.category2)
-        self.code1 = models.VariableCodeDescription.objects.create(
+        self.code1 = models.CulturalCodeDescription.objects.create(
             variable=self.variable,
             code='1',
             description='Code 1')
-        self.code10 = models.VariableCodeDescription.objects.create(
+        self.code10 = models.CulturalCodeDescription.objects.create(
             variable=self.variable,
             code='10',
             description='Code 10')
-        self.code2 = models.VariableCodeDescription.objects.create(
+        self.code2 = models.CulturalCodeDescription.objects.create(
             variable=self.variable,
             code='2',
             description='Code 2')
@@ -181,7 +181,7 @@ class VariableCodeDescriptionAPITestCase(Test):
         """
         Make sure 2 comes before 10
         """
-        response_dict = self.get_json('variablecodedescription-list',
+        response_dict = self.get_json('culturalcodedescription-list',
                                       {'variable': self.variable.id})
         index_of_1 = index_of_2 = index_of_10 = index = 0
         for result in response_dict['results']:
@@ -196,27 +196,27 @@ class VariableCodeDescriptionAPITestCase(Test):
         self.assertLess(index_of_2, index_of_10)
 
     def test_all_variables(self):
-        response_dict = self.get_json('variabledescription-list')
+        response_dict = self.get_json('culturalvariable-list')
         self.assertEqual(response_dict['count'], 2)
         self.assertTrue(self.obj_in_results(self.variable, response_dict))
         self.assertTrue(self.obj_in_results(self.variable2, response_dict))
 
     def test_filter_source(self):
-        response_dict = self.get_json('variabledescription-list',
+        response_dict = self.get_json('culturalvariable-list',
                                       {'source': self.source_ea.id})
         self.assertEqual(response_dict['count'], 1)
         self.assertTrue(self.obj_in_results(self.variable, response_dict))
         self.assertFalse(self.obj_in_results(self.variable2, response_dict))
 
     def test_category1_variables(self):
-        response_dict = self.get_json('variabledescription-list',
+        response_dict = self.get_json('culturalvariable-list',
                                       {'index_categories': [self.category1.id]})
         self.assertEqual(response_dict['count'], 1)
         self.assertEqual(response_dict['results'][0]['name'], self.variable.name)
         self.assertFalse(self.obj_in_results(self.variable2, response_dict))
 
     def test_category2_variables(self):
-        response_dict = self.get_json('variabledescription-list',
+        response_dict = self.get_json('culturalvariable-list',
                                       {'index_categories': [self.category2.id]})
         self.assertEqual(response_dict['count'], 2)
         self.assertTrue(self.obj_in_results(self.variable, response_dict))
@@ -251,9 +251,9 @@ class FindSocietiesTestCase(Test):
 
     def setUp(self):
         # make ISO codes
-        iso_code1 = models.ISOCode.objects.create(iso_code='abc', location=Point(1.0, 1.0))
-        iso_code2 = models.ISOCode.objects.create(iso_code='def', location=Point(2.0, 2.0))
-        iso_code3 = models.ISOCode.objects.create(iso_code='ghi', location=Point(3.0, 3.0))
+        iso_code1 = models.ISOCode.objects.create(iso_code='abc')
+        iso_code2 = models.ISOCode.objects.create(iso_code='def')
+        iso_code3 = models.ISOCode.objects.create(iso_code='ghi')
 
         # make Glotto codes
         glotto_code1 = models.GlottoCode.objects.create(glotto_code='abcc1234')
@@ -315,26 +315,26 @@ class FindSocietiesTestCase(Test):
             language=self.languageB3)
 
         # Make an EA Variable, code, and value
-        variable = models.VariableDescription.objects.create(label='EA001', name='Variable 1')
-        self.code1 = models.VariableCodeDescription.objects.create(
+        variable = models.CulturalVariable.objects.create(label='EA001', name='Variable 1')
+        self.code1 = models.CulturalCodeDescription.objects.create(
             variable=variable,
             code='1',
             description='Code 1')
-        self.code2 = models.VariableCodeDescription.objects.create(
+        self.code2 = models.CulturalCodeDescription.objects.create(
             variable=variable,
             code='2',
             description='Code 2')
-        self.code3 = models.VariableCodeDescription.objects.create(
+        self.code3 = models.CulturalCodeDescription.objects.create(
             variable=variable,
             code='3',
             description='Code 3')
-        models.VariableCodedValue.objects.create(
+        models.CulturalValue.objects.create(
             variable=variable,
             society=self.society1,
             coded_value='1',
             code=self.code1,
             source=self.source)
-        models.VariableCodedValue.objects.create(
+        models.CulturalValue.objects.create(
             variable=variable,
             society=self.society2,
             coded_value='2',
@@ -344,14 +344,10 @@ class FindSocietiesTestCase(Test):
         # Setup environmentals
         self.environmental1 = models.Environmental.objects.create(
             society=self.society1,
-            reported_location=Point(0, 0),
-            actual_location=Point(0, 0),
             source=self.source,
             iso_code=iso_code1)
         self.environmental2 = models.Environmental.objects.create(
             society=self.society2,
-            reported_location=Point(1, 1),
-            actual_location=Point(1, 1),
             source=self.source,
             iso_code=iso_code2)
 
@@ -408,13 +404,13 @@ class FindSocietiesTestCase(Test):
         self.assertFalse(self.society_in_results(self.society3, response))
 
     def test_find_society_by_var(self):
-        response = self.get_results(variable_codes=VariableCodeDescriptionSerializer(
+        response = self.get_results(variable_codes=CulturalCodeDescriptionSerializer(
             [self.code1], many=True).data)
         self.assertTrue(self.society_in_results(self.society1, response))
         self.assertFalse(self.society_in_results(self.society2, response))
 
     def test_find_societies_by_var(self):
-        serialized_codes = VariableCodeDescriptionSerializer([self.code1, self.code2],
+        serialized_codes = CulturalCodeDescriptionSerializer([self.code1, self.code2],
                                                              many=True).data
         response = self.get_results(variable_codes=serialized_codes)
         self.assertTrue(self.society_in_results(self.society1, response))
@@ -422,7 +418,7 @@ class FindSocietiesTestCase(Test):
 
     def test_find_no_societies(self):
         response = self.get_results(
-            variable_codes=VariableCodeDescriptionSerializer([self.code3],
+            variable_codes=CulturalCodeDescriptionSerializer([self.code3],
                                                              many=True).data)
         self.assertEqual(len(response.data['societies']), 0)
 
@@ -432,7 +428,7 @@ class FindSocietiesTestCase(Test):
         # this should return only 1 and not 2 or 3
         # This tests that results should be intersection (AND), not union (OR)
         # Society 3 is not coded for any variables, so it should not appear in the list.
-        serialized_vcs = VariableCodeDescriptionSerializer(
+        serialized_vcs = CulturalCodeDescriptionSerializer(
             [self.code1, self.code2], many=True).data
         language_classifications = models.Language.objects.filter(
             id__in=[self.languageA1.id, self.languageB3.id])

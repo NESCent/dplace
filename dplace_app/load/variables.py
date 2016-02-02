@@ -32,18 +32,18 @@ def load_vars(var_dict):
         logging.warn("Dataset %(Dataset)s not in database, skipping row" % var_dict)
         return
 
-    variable, created = VariableDescription.objects.get_or_create(
+    variable, created = CulturalVariable.objects.get_or_create(
         label=label, source=source)
     variable.name = var_dict['VarTitle']
     variable.codebook_info = var_dict['VarDefinition']
     variable.data_type = var_dict['VarType']
     for c in map(clean_category, var_dict['IndexCategory'].split(',')):
-        index_category, created = VariableCategory.objects.get_or_create(name=c)
-        logging.info("Created VariableCategory: %s" % c)
+        index_category, created = CulturalCategory.objects.get_or_create(name=c)
+        logging.info("Created CulturalCategory: %s" % c)
         if index_category not in variable.index_categories.all():
             variable.index_categories.add(index_category)
     variable.save()
-    logging.info("Created VariableDescription: %s" % label)
+    logging.info("Created CulturalVariable: %s" % label)
     logging.info("Saved variable %s - %s" % (label, variable.name))
 
 
@@ -69,12 +69,12 @@ def load_codes(csvfile=None):
             logging.warn("No dataset %s in database, skipping row %s" % (dataset, str(row)))
             continue
 
-        variable = VariableDescription.objects.get(label=label)
+        variable = CulturalVariable.objects.get(label=label)
         if variable:
-            code_description, created = VariableCodeDescription.objects.get_or_create(variable=variable, code=code)
+            code_description, created = CulturalCodeDescription.objects.get_or_create(variable=variable, code=code)
             code_description.description = description
             code_description.short_description = short_description
             code_description.save()
-            logging.info("Created VariableCodeDescription: %s" % code_description)
+            logging.info("Created CulturalCodeDescription: %s" % code_description)
         else:
             logging.warn("Missing variable in database: %s" % label)

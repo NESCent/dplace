@@ -3,26 +3,6 @@ from django.contrib.gis.geos import Polygon, Point, MultiPolygon
 from django.test import TestCase
 
 
-class ISOCodeTestCase(TestCase):
-    """
-    Tests basic Geographic functionality of ISOCode models
-    """
-    def setUp(self):
-        ISOCode.objects.create(iso_code='abc', location=Point(5.0, 5.0))
-        ISOCode.objects.create(iso_code='def', location=Point(10.0, 10.0))
-
-    def test_isocodes(self):
-        poly = Polygon(((4.0, 4.0), (6.0, 4.0), (6.0, 6.0), (4.0, 6.0), (4.0, 4.0)))
-        self.assertIn(
-            ISOCode.objects.get(iso_code='abc'),
-            ISOCode.objects.filter(location__intersects=poly),
-            "ISO Code should be in region")
-        self.assertNotIn(
-            ISOCode.objects.get(iso_code='def'),
-            ISOCode.objects.filter(location__intersects=poly),
-            "ISO Code should not be in region")
-
-
 class GeographicRegionTestCase(TestCase):
     def setUp(self):
         poly = MultiPolygon(
@@ -56,7 +36,7 @@ class EATestCase(TestCase):
     """
 
     def setUp(self):
-        self.iso_code = ISOCode.objects.create(iso_code='abc', location=Point(5.0, 5.0))
+        self.iso_code = ISOCode.objects.create(iso_code='abc')
         self.source = Source.objects.create(
             year="2014",
             author="Greenhill",
@@ -71,23 +51,23 @@ class EATestCase(TestCase):
             name='Binford Society',
             location=Point(0.0, 0.0),
             source=self.source)
-        self.variable = VariableDescription.objects.create(
+        self.variable = CulturalVariable.objects.create(
             label='EA001',
             name='Variable 1',
             source=self.source)
-        self.code10 = VariableCodeDescription.objects.create(
+        self.code10 = CulturalCodeDescription.objects.create(
             variable=self.variable,
             code='10',
             description='Code 10')
-        self.code1 = VariableCodeDescription.objects.create(
+        self.code1 = CulturalCodeDescription.objects.create(
             variable=self.variable,
             code='1',
             description='Code 1')
-        self.code2 = VariableCodeDescription.objects.create(
+        self.code2 = CulturalCodeDescription.objects.create(
             variable=self.variable,
             code='2',
             description='Code 2')
-        self.value = VariableCodedValue.objects.create(
+        self.value = CulturalValue.objects.create(
             variable=self.variable,
             society=self.ea_society,
             coded_value='1',
@@ -96,7 +76,7 @@ class EATestCase(TestCase):
 
     def test_society_coded_value(self):
         society = Society.objects.get(ext_id='easoc')
-        self.assertIn(self.value, society.variablecodedvalue_set.all())
+        self.assertIn(self.value, society.culturalvalue_set.all())
 
     def test_coded_variable(self):
         self.assertEqual(self.code1.variable, self.variable)

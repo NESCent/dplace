@@ -8,9 +8,9 @@ admin.site.register(models.EnvironmentalVariable)
 admin.site.register(models.EnvironmentalValue)
 admin.site.register(models.ISOCode, admin.GeoModelAdmin)
 
-admin.site.register(models.VariableDescription)
-admin.site.register(models.VariableCodeDescription)
-admin.site.register(models.VariableCodedValue)
+admin.site.register(models.CulturalVariable)
+admin.site.register(models.CulturalCodeDescription)
+admin.site.register(models.CulturalValue)
 
 admin.site.register(models.Language)
 admin.site.register(models.LanguageFamily)
