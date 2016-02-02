@@ -625,7 +625,7 @@ angular.module('dplaceMapDirective', [])
                     results.environmental_variables = scope.results.environmental_variables;
                     results.geographic_regions = scope.results.geographic_regions;
                     results.languages = scope.results.languages;
-                    results.variable_descriptions = scope.results.variable_descriptions
+                    results.variable_descriptions = scope.results.variable_descriptions;
                     scope.results.societies.forEach(function(societyResult) {
                         var society = societyResult.society;
                         // Add a marker for each point

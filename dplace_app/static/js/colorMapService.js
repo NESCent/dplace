@@ -116,7 +116,7 @@ function ColorMapService() {
                     return env_var.id == society.environmental_values[j].variable;
                 });
                 if (variable.length > 0) {
-                    var color = this.tempColor(society.environmental_values[0].value,  results.environmental_variables[0].min, results.environmental_variables[0].max, results.environmental_variables[0].name);
+                    var color = this.tempColor(society.environmental_values[j].value,  variable[0].min, variable[0].max, variable[0].name);
                     colors[society.society.id] = color;
                 }    
             }
@@ -136,17 +136,6 @@ function ColorMapService() {
                         colors[society.society.id] = this.colorMap[parseInt(society.variable_coded_values[j].coded_value)];
                     }
                 }
-
-                /*if (society.variable_coded_values[j].code_description && (society.variable_coded_values[j].code_description.description.indexOf("Missing data") != -1))
-                    colors[society.society.id] = 'rgb(255,255,255)';
-                else if (variable_description[0].variable.data_type.toUpperCase() == 'CONTINUOUS') {
-                    var color = this.mapColorMonochrome(variable_description[0].variable.min, variable_description[0].variable.max, society.variable_coded_values[j].coded_value, 0);
-                    colors[society.society.id] = color;
-                } 
-                else {
-                    //var color = this.mapColor(society.variable_coded_values[j].coded_value, variable_description[0].codes.length);
-                    colors[society.society.id] = color;
-                }*/
             }
 
         }

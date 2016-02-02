@@ -81,6 +81,7 @@ function EnvironmentalDataModel(EnvironmentalCategory) {
         { operator: 'all', name: 'all values'},
     ];
     this.selectedFilter = this.filters[0];
+    this.selectedVariables = [];
     this.vals = [];
     this.badgeValue = 0;
 }
