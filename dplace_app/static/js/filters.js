@@ -46,6 +46,14 @@ angular.module('dplaceFilters', [])
             }).join('');
         };
     })
+    .filter('formatEnvironmentalValues', function () {
+        return function(values, variable_id) {
+            return values.map( function(environmental_value) {
+                if (environmental_value.variable == variable_id) return environmental_value.value.toFixed(4);
+                else return ''
+            }).join('');
+        };
+    })
     .filter('formatValueSources', function() {
         return function(values, variable_id) {
             return values.map( function(code_value) {
@@ -79,13 +87,6 @@ angular.module('dplaceFilters', [])
                 } else return ''
 
             }).join('')
-        };
-    })
-    .filter('formatEnvironmentalValues', function () {
-        return function(values) {
-            return values.map( function(environmental_value) {
-                    return environmental_value.value.toFixed(4);
-            }).join(',');
         };
     })
     .filter('formatLanguage', function () {
