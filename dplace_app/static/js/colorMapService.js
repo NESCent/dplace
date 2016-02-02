@@ -92,6 +92,13 @@ function ColorMapService() {
         rgb = hslToRgb(color, 0.65, lum/100);
         return 'rgb('+rgb[0]+','+rgb[1]+','+rgb[2]+')';
     }
+    
+    this.generateRandomHue = function(value, codes, index, count) {
+        hue = (index / count) * 300;
+        lum = 85 - ((value / codes) * 90)
+        rgb = hslToRgb(hue, 0.65, lum/100);
+        return 'rgb('+rgb[0]+','+rgb[1]+','+rgb[2]+')';
+    }
 
     this.generateColorMap = function(results) {
         var colors = {};
@@ -126,7 +133,11 @@ function ColorMapService() {
                     return variable.variable.id == society.variable_coded_values[j].variable;
                 });
                 
-                if (variable_description[0].variable.data_type.toUpperCase() == 'CONTINUOUS') {
+                if (variable_description[0].variable.data_type.toUpperCase() == 'ORDINAL') {
+                    // there are 5 ordinal variables in the database
+                    var color = this.generateRandomHue(society.variable_coded_values[j].coded_value, variable_description[0].codes.length, variable_description[0].variable.id, 5);
+                    colors[society.society.id] = color;
+                } else if (variable_description[0].variable.data_type.toUpperCase() == 'CONTINUOUS') {
                     var color = this.mapColorMonochrome(variable_description[0].variable.min, variable_description[0].variable.max, society.variable_coded_values[j].coded_value, 0);
                     colors[society.society.id] = color;
                 } else {
@@ -136,17 +147,6 @@ function ColorMapService() {
                         colors[society.society.id] = this.colorMap[parseInt(society.variable_coded_values[j].coded_value)];
                     }
                 }
-
-                /*if (society.variable_coded_values[j].code_description && (society.variable_coded_values[j].code_description.description.indexOf("Missing data") != -1))
-                    colors[society.society.id] = 'rgb(255,255,255)';
-                else if (variable_description[0].variable.data_type.toUpperCase() == 'CONTINUOUS') {
-                    var color = this.mapColorMonochrome(variable_description[0].variable.min, variable_description[0].variable.max, society.variable_coded_values[j].coded_value, 0);
-                    colors[society.society.id] = color;
-                } 
-                else {
-                    //var color = this.mapColor(society.variable_coded_values[j].coded_value, variable_description[0].codes.length);
-                    colors[society.society.id] = color;
-                }*/
             }
 
         }

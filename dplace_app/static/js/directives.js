@@ -143,11 +143,11 @@ angular.module('languagePhylogenyDirective', [])
                                         return rgb;
                                     })
                                     .on("mouseover", function() { 
-                                                     d3.select("body").append("div")
-                                                        .attr("class", "tree-tooltip")
-                                                        .html("<b>"+society_name+":</b><br>"+hover_text_value)
-                                                        .style("left", (d3.event.pageX + 10)+"px")
-                                                        .style("top", (d3.event.pageY + 5)+"px");
+                                         d3.select("body").append("div")
+                                            .attr("class", "tree-tooltip")
+                                            .html("<b>"+society_name+":</b><br>"+hover_text_value)
+                                            .style("left", (d3.event.pageX + 10)+"px")
+                                            .style("top", (d3.event.pageY + 5)+"px");
                                     })
                                     .on("mouseout", function() {
                                         d3.select(".tree-tooltip").remove();
@@ -174,21 +174,26 @@ angular.module('languagePhylogenyDirective', [])
                                                    return 'rgb(255, 255, 255)';
                                                 }
                                                 value = society.variable_coded_values[i].coded_value;     
-                                                if (variable.variable.data_type.toUpperCase() == 'CONTINUOUS') {
+                                                 if (variable.variable.data_type.toUpperCase() == 'CONTINUOUS') {
                                                     var min = variable.variable.min;
                                                     var max = variable.variable.max;
                                                     rgb = colorMapService.mapColorMonochrome(min, max, value, 0);
                                                     return rgb;
+                                                } 
+                                                if (variable.variable.data_type.toUpperCase() == 'ORDINAL') {
+                                                    rgb = colorMapService.generateRandomHue(value, variable.codes.length, variable.variable.id, 5);
+                                                    return rgb;
                                                 }
+                                                
                                                 rgb = colorMapService.colorMap[parseInt(value)];
                                                 return  rgb;
                                         })
                                         .on("mouseover", function() { 
-                                                 d3.select("body").append("div")
-                                                    .attr("class", "tree-tooltip")
-                                                    .html("<b>"+society_name+":</b><br>"+hover_text_value)
-                                                    .style("left", (d3.event.pageX + 10)+"px")
-                                                    .style("top", (d3.event.pageY + 5)+"px");
+                                             d3.select("body").append("div")
+                                                .attr("class", "tree-tooltip")
+                                                .html("<b>"+society_name+":</b><br>"+hover_text_value)
+                                                .style("left", (d3.event.pageX + 10)+"px")
+                                                .style("top", (d3.event.pageY + 5)+"px");
                                         })
                                         .on("mouseout", function() {
                                             d3.select(".tree-tooltip").remove();
@@ -630,7 +635,7 @@ angular.module('dplaceMapDirective', [])
                         var society = societyResult.society;
                         // Add a marker for each point
                         var marker = {latLng: [society.location.coordinates[1], society.location.coordinates[0]], name: society.name}
-                        scope.map.addMarker(society.id, marker); 
+                        
                          if (!scope.chosen) {   
                             results = scope.results;
                         } else {
@@ -641,6 +646,9 @@ angular.module('dplaceMapDirective', [])
                             if (variable.length > 0) {
                                 societyResult.variable_coded_values.forEach(function(coded_value) {
                                     if (coded_value.variable == scope.chosen.id) {
+                                        if (coded_value.code_description && coded_value.code_description.description.indexOf("Missing data") != -1) {
+                                            return;
+                                        }
                                         if (scope.chosen.data_type.toUpperCase() == 'CONTINUOUS') {
                                             results.societies.push({
                                                 'variable_coded_values':[coded_value],
@@ -667,8 +675,10 @@ angular.module('dplaceMapDirective', [])
                                         });
                                     }
                                 });
+                                
                             } 
                         }
+                        scope.map.addMarker(society.id, marker); 
                     });
 
                     // Map IDs to colors
