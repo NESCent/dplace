@@ -635,7 +635,7 @@ angular.module('dplaceMapDirective', [])
                         var society = societyResult.society;
                         // Add a marker for each point
                         var marker = {latLng: [society.location.coordinates[1], society.location.coordinates[0]], name: society.name}
-                        scope.map.addMarker(society.id, marker); 
+                        
                          if (!scope.chosen) {   
                             results = scope.results;
                         } else {
@@ -646,6 +646,9 @@ angular.module('dplaceMapDirective', [])
                             if (variable.length > 0) {
                                 societyResult.variable_coded_values.forEach(function(coded_value) {
                                     if (coded_value.variable == scope.chosen.id) {
+                                        if (coded_value.code_description && coded_value.code_description.description.indexOf("Missing data") != -1) {
+                                            return;
+                                        }
                                         if (scope.chosen.data_type.toUpperCase() == 'CONTINUOUS') {
                                             results.societies.push({
                                                 'variable_coded_values':[coded_value],
@@ -672,8 +675,10 @@ angular.module('dplaceMapDirective', [])
                                         });
                                     }
                                 });
+                                
                             } 
                         }
+                        scope.map.addMarker(society.id, marker); 
                     });
 
                     // Map IDs to colors
