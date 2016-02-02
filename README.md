@@ -66,12 +66,11 @@ Be sure to update the following sections:
 
 #### Database installation
 
-D-PLACE uses South for managing database schemas. To install the database, run
+To install the database, run
 
-		python manage.py syncdb
-		python manage.py migrate dplace_app
+		python manage.py migrate
 
-Both require valid credentials in `settings.py`, and activation of your virtualenv if enabled.
+This requires valid database credentials in `settings.py`, and activation of your virtualenv if enabled.
 
 ## Development
 
@@ -103,9 +102,9 @@ As a best practice, avoid putting AngularJS code into Django templates. This cou
 
 ### Loading Data
 
-D-PLACE data is collected/curated by the Working Group, and periodic CSV exports have been stored in a [private BitBucket repository](http://bitbucket.org/nescent/dplace-datasets). 
+D-PLACE data is collected/curated by the Working Group, and periodic CSV exports have been stored in a [private Github repository](https://github.com/SimonGreenhill/dplace-data). 
 
-To load the data, run the `load_all_datasets.sh` script. This scripts clones the bitbucket repository, and runs `dplace_app/load.py` with appropriate parameters for each of the CSV files we import.  The python files in `dplace_app/load/` are tailored to each CSV file format - if the format changes, the scripts will need to be tweaked.
+To load the data, run the `load_all_datasets.sh` script. This scripts clones the repository, and runs `dplace_app/load.py` with appropriate parameters for each of the CSV files we import.  The python files in `dplace_app/load/` are tailored to each CSV file format.
 
 The [Vagrant+Ansible](https://github.com/dleehr/dplace-vagrant) configuration will perform the first data load, but this step can be repeated to load new data.
 
