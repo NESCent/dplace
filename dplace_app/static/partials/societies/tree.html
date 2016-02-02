@@ -68,11 +68,11 @@
         </table>
        
         <table ng-repeat="environmental in results.environmental_variables">
-            <tr ng-show="!globalTree" ng-click="legendArrow(environmental)" data-toggle="collapse" data-target="#E1" class="accordion-toggle" style="cursor:pointer;">
+            <tr ng-show="!globalTree" ng-click="legendArrow(environmental)" data-toggle="collapse" data-target="#{{environmental.CID}}" class="accordion-toggle" style="cursor:pointer;">
                 <td><span ng-show="!environmental.hidden" class="glyphicon glyphicon-chevron-right" aria-hidden="true" style="padding-right:3px;"></span><span ng-show="environmental.hidden" class="glyphicon glyphicon-chevron-down" aria-hidden="true" style="padding-right:3px;"></span><b>E1:</b> {{environmental.name}}</td>
             </tr>
             <tr><td class="hiddenRow">
-            <div ng-class="{'accordion-body collapse':!globalTree}" ng-hide="showOrHide(results.chosenTVariable.name, environmental.name)" class="accordion-body collapse" id="E1">
+            <div ng-class="{'accordion-body collapse':!globalTree}" ng-hide="showOrHide(results.chosenTVariable.name, environmental.name)" class="accordion-body collapse" id="{{environmental.CID}}">
                 <svg height="50" width="400" class="envLegend">
                     <rect class="envVar" height="30" width="250" x="20" />
                     <text x="0" y="45">{{environmental.min}} {{environmental.units}}</text>

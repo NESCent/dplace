@@ -125,35 +125,38 @@ angular.module('languagePhylogenyDirective', [])
                     }
                     
                     //if the marker is an environmental variable
-                    if (society.environmental_values.length > 0 && society.environmental_values[0].variable == variable)  { 
-                            var hover_text_value = society.environmental_values[0].value + ' ' + results.environmental_variables[0].units;
+                    
+                    if (society.environmental_values.length > 0) {
+                        for (var i = 0; i < society.environmental_values.length; i++) {
+                            if (society.environmental_values[i].variable == variable.id) {
+                                var hover_text_value = society.environmental_values[i].value;
                                 selected.append("svg:circle")
                                     .attr("r", function() {
                                         if (global) return 1.5;
-                                        else return 4.5;
+                                       else return 4.5;
                                     })
                                     .attr("stroke", "#000")
                                     .attr("stroke-width", "0.5")
-                                    .attr("transform", "translate("+translate+", 0)")
+                                    .attr("transform", "translate("+translate+",0)")
                                     .attr("fill", function(n) {
-                                        value = society.environmental_values[0].value; //only 1 environmental value at a time so we can do this
-                                        min = scope.results.environmental_variables[0].min;
-                                        max = scope.results.environmental_variables[0].max;                                        
-                                        rgb = colorMapService.tempColor(value, min, max, scope.results.environmental_variables[0].name);
+                                        rgb = colorMapService.tempColor(society.environmental_values[i].value, variable.min, variable.max, variable.name);
                                         return rgb;
-                                    })
-                                    .on("mouseover", function() { 
-                                                     d3.select("body").append("div")
-                                                        .attr("class", "tree-tooltip")
-                                                        .html("<b>"+society_name+":</b><br>"+hover_text_value)
-                                                        .style("left", (d3.event.pageX + 10)+"px")
-                                                        .style("top", (d3.event.pageY + 5)+"px");
+                                    }).on("mouseover", function() { 
+                                         d3.select("body").append("div")
+                                            .attr("class", "tree-tooltip")
+                                            .html("<b>"+society_name+":</b><br>"+hover_text_value)
+                                            .style("left", (d3.event.pageX + 10)+"px")
+                                            .style("top", (d3.event.pageY + 5)+"px");
                                     })
                                     .on("mouseout", function() {
                                         d3.select(".tree-tooltip").remove();
                                     });
-                            return;
-                        } else if (society.variable_coded_values.length > 0) {
+                            } 
+                        }
+                    
+                    }
+                    
+                    if (society.variable_coded_values.length > 0) {
                         for (var i = 0; i < society.variable_coded_values.length; i++) {
                             if (society.variable_coded_values[i].variable == variable.variable.id) {
                                 if (variable.variable.data_type.toUpperCase() == 'CONTINUOUS') {
@@ -274,14 +277,20 @@ angular.module('languagePhylogenyDirective', [])
                     }
                     
                     if (scope.query.environmental_filters) {
-                        vis.append("svg:text")
-                            .attr("dx", w+translate-9)
-                            .attr("dy", 10)
-                            .text("E1");
-                         labels.append("svg:text")
-                            .attr("dx", w+translate)
-                            .attr("dy", 15)
-                            .text("E1");
+                        keysWritten = 1;
+                        for (var r = 0; r < scope.results.environmental_variables.length; r++) {
+                            vis.append("svg:text")
+                                .attr("dx", w+translate-9)
+                                .attr("dy", 10)
+                                .text("E"+keysWritten);
+                             labels.append("svg:text")
+                                .attr("dx", w+translate)
+                                .attr("dy", 15)
+                                .text("E"+keysWritten);
+                                scope.results.environmental_variables[r].CID = "E"+keysWritten;
+                                keysWritten++;
+                                translate += 20;
+                        }
                     }
                     
                     //---------------------------------------//
@@ -393,10 +402,7 @@ angular.module('languagePhylogenyDirective', [])
                             if (chosen_var_id.length > 0)
                                 addMarkers(langTree, scope.results, chosen_var_id[0], node, true, translate);
                             else {
-                                if (scope.query.environmental_filters && scope.query.environmental_filters[0].id==scope.results.chosenTVariable.id) {
-                                    addMarkers(langTree, scope.results,scope.results.chosenTVariable.id, node, true, translate);
-                                }
-                            
+                                addMarkers(langTree, scope.results,scope.results.chosenTVariable, node, true, translate);
                             }
                         } 
                     });
@@ -404,15 +410,18 @@ angular.module('languagePhylogenyDirective', [])
                 else {
                 //markers for non-global trees
                     if (scope.query.variable_codes) {
-                        if (langTree.name.indexOf("global") == -1) {
-                            for (var r = 0; r < scope.results.variable_descriptions.length; r++) {
+                        //if (langTree.name.indexOf("global") == -1) {
+                            for (var r = 0; r < scope.results.variable_descriptions.length; r++) { 
                                 addMarkers(langTree, scope.results, scope.results.variable_descriptions[r], node, false, translate);
                                 translate += 20;
                             }
-                        }
+                       // }
                     }
                     if (scope.query.environmental_filters) {
-                        addMarkers(langTree, scope.results, scope.query.environmental_filters[0].id, node, false, translate);
+                        for (var r = 0; r < scope.results.environmental_variables.length; r++) {
+                            addMarkers(langTree, scope.results, scope.results.environmental_variables[r], node, false, translate);
+                            translate += 20;
+                        }
                     }
                     
                     if (scope.query.language_classifications && !scope.query.environmental_filters && !scope.query.variable_codes) {
