@@ -30,7 +30,7 @@
                             ng-model="variable.selectedCategory"
                             class="form-control"
                             ng-options="category.name for category in environmentalData.categories"
-                            ng-change="categoryChanged(variable.selectedCategory)"
+                            ng-change="categoryChanged(variable)"
                             >
                             <option value="">Select a category</option>
                         </select>
@@ -42,9 +42,9 @@
                         <select
                                 ng-model="variable.selectedVariable"
                                 class="form-control"
-                                ng-options="environmental.name for environmental in environmentalData.variables"
+                                ng-options="environmental.name for environmental in variable.variables"
                                 ng-change="variableChanged(variable)"
-                                ng-show="environmentalData.variables.length > 0"
+                                ng-show="variable.variables.length > 0"
                                 >
                             <option value="">Select an environmental variable</option>
                         </select>

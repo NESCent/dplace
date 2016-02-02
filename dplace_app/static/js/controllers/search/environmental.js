@@ -2,17 +2,18 @@ function EnvironmentalCtrl($scope, searchModelService, EnvironmentalVariable, En
     var linkModel = function() {
         // Get a reference to the environmental search params from the model
         $scope.environmentalData = searchModelService.getModel().getEnvironmentalData();
-        $scope.environmentalData.selectedVariables = [{'vals': ['', ''], 'selectedFilter': $scope.environmentalData.selectedFilter}];
+        if ($scope.environmentalData.selectedVariables.length == 0) 
+            $scope.environmentalData.selectedVariables.push({'vals': ['', ''], 'selectedFilter': $scope.environmentalData.selectedFilter, 'variables': []});
     };
     $scope.$on('searchModelReset', linkModel); // When model is reset, update our model
     linkModel();
     
-    $scope.categoryChanged = function(category) {
-        $scope.environmentalData.variables = EnvironmentalVariable.query({category: category.id});    
+    $scope.categoryChanged = function(variable) {
+        variable.variables = EnvironmentalVariable.query({category: variable.selectedCategory.id});    
     };
     
     $scope.addVariable = function() {
-        $scope.environmentalData.selectedVariables.push({'vals': ['', ''], 'selectedFilter': $scope.environmentalData.selectedFilter});
+        $scope.environmentalData.selectedVariables.push({'vals': ['', ''], 'selectedFilter': $scope.environmentalData.selectedFilter, 'variables': []});
     };
 
     $scope.variableChanged = function(variable) {
@@ -44,7 +45,6 @@ function EnvironmentalCtrl($scope, searchModelService, EnvironmentalVariable, En
     
     //gets the range of environmental values if the user selects 'all values'
     $scope.doSearch = function() {
-        console.log($scope.environmentalData);
         $scope.search();
     };
 }
