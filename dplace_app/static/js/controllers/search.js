@@ -75,7 +75,6 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties, 
                     }
                 }
             });
-            console.log(extractedValues);
             var min_value = null; var max_value = null;
            extractedValues.forEach(function(val) {
             if (!min_value) min_value = val;
@@ -84,7 +83,6 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties, 
             if (val < min_value) min_value = val;
             if (val > max_value) max_value = val;
            });
-            console.log(min_value);
             var range = max_value - min_value;
             results.environmental_variables[i]['range'] = range;
             results.environmental_variables[i]['min'] = Math.round(min_value*10000)/10000;
