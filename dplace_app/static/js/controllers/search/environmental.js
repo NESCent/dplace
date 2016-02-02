@@ -15,6 +15,12 @@ function EnvironmentalCtrl($scope, searchModelService, EnvironmentalVariable, En
     $scope.addVariable = function() {
         $scope.environmentalData.selectedVariables.push({'vals': ['', ''], 'selectedFilter': $scope.environmentalData.selectedFilter, 'variables': []});
     };
+    
+    $scope.removeVariable = function(variable) {
+        var index = $scope.environmentalData.selectedVariables.indexOf(variable);
+        $scope.environmentalData.selectedVariables.splice(index, 1);
+        $scope.environmentalData.badgeValue -= 1;
+    };
 
     $scope.variableChanged = function(variable) {
         if(variable.selectedVariable != null) {
