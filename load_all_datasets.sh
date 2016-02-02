@@ -23,8 +23,6 @@ if [ ! -d "$REPO_DEST" ]; then
 else
 	orig=`pwd`
 	cd $REPO_DEST && git pull && cd "$orig"
-	mkdir -p "$REPO_DEST"
-	git clone $REPO_SRC $REPO_DEST
 fi
 
 ## import the data
