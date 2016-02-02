@@ -1,5 +1,4 @@
 from django.conf.urls import patterns, url, include
-from django.shortcuts import redirect
 from django.views.generic.base import RedirectView
 
 from rest_framework import routers
@@ -16,7 +15,6 @@ router.register(r'environmental_variables', api_views.EnvironmentalVariableViewS
 router.register(r'environmentals', api_views.EnvironmentalViewSet)
 router.register(r'environmental_values', api_views.EnvironmentalValueViewSet)
 router.register(r'isocodes', api_views.ISOCodeViewSet)
-router.register(r'glottocodes', api_views.GlottoCodeViewSet)
 router.register(r'language_families', api_views.LanguageFamilyViewSet)
 router.register(r'languages', api_views.LanguageViewSet)
 router.register(r'language_trees', api_views.LanguageTreeViewSet)
@@ -27,7 +25,8 @@ router.register(r'sources', api_views.SourceViewSet)
 # Wire up our API using automatic URL routing.
 # Additionally, we include login URLs for the browseable API.
 
-urlpatterns = patterns('dplace_app.views',
+urlpatterns = patterns(
+    'dplace_app.views',
     url(r'^$', RedirectView.as_view(url='angular/', permanent=True), name='home'),
     url(r'^society/(?P<society_id>\d+)/$', 'view_society', name='view_society'),
     url(r'^language/(?P<language_id>\d+)/$', 'view_language', name='view_language'),

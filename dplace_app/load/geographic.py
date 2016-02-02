@@ -1,20 +1,17 @@
+import json
+
 from dplace_app.models import GeographicRegion
-from django.contrib.gis.utils import LayerMapping
 
-# Auto-generated `LayerMapping` dictionary for GeographicRegion model
-# via manage.py ogrinspect level2.shp GeographicRegion --srid=4326 --mapping --multi
-
-geographicregion_mapping = {
-    'level_2_re': 'LEVEL_2_RE',
-    'count': 'COUNT',
-    'region_nam': 'REGION_NAM',
-    'continent': 'CONTINENT',
-    'tdwg_code': 'TDWG_CODE',
-    'geom': 'MULTIPOLYGON',
-}
+from util import delete_all
 
 
-def load_regions(shapefile=None, verbose=False):
-    lm = LayerMapping(GeographicRegion, shapefile, geographicregion_mapping,
-                      transform=False, encoding='iso-8859-1')
-    lm.save(strict=True, verbose=verbose)
+def load_regions(geojson):
+    delete_all(GeographicRegion)
+
+    with open(geojson) as fp:
+        regions = json.load(fp)['features']
+
+    GeographicRegion.objects.bulk_create([
+        GeographicRegion(**{k.lower(): v for k, v in region['properties'].items()})
+        for region in regions])
+    return len(regions)

@@ -1,7 +1,6 @@
 from __future__ import unicode_literals
 import json
 
-from django.contrib.gis.geos import Polygon, Point, MultiPolygon
 from django.core.urlresolvers import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
@@ -38,43 +37,27 @@ class ISOCodeAPITestCase(Test):
         self.assertEqual(response_dict['results'][0]['iso_code'], self.code.iso_code)
 
 
-class GlottoCodeAPITestCase(Test):
-    """Tests rest-framework API for Glottocodes"""
-
-    def setUp(self):
-        self.code = models.GlottoCode.objects.create(glotto_code='abcd1234')
-
-    def test_glottocode_api(self):
-        response_dict = self.get_json('glottocode-list')
-        self.assertEqual(response_dict['count'], 1)
-        self.assertEqual(
-            response_dict['results'][0]['glotto_code'], self.code.glotto_code)
-
-
 class LanguageAPITestCase(Test):
     """Tests rest-framework API for languages"""
 
     def setUp(self):
         self.family = models.LanguageFamily.objects.create(name='family1')
         self.family2 = models.LanguageFamily.objects.create(name='family2')
-        self.glotto_codeA = models.GlottoCode.objects.create(glotto_code='aaaa1234')
-        self.glotto_codeD = models.GlottoCode.objects.create(glotto_code='dddd1234')
-        self.glotto_codeC = models.GlottoCode.objects.create(glotto_code='cccc1234')
 
         self.iso_code = models.ISOCode.objects.create(iso_code='abc')
         self.language1 = models.Language.objects.create(
             name='language1',
             family=self.family,
-            glotto_code=self.glotto_codeA,
+            glotto_code='aaaa1234',
             iso_code=self.iso_code)
         self.language2 = models.Language.objects.create(
             name='language2',
             family=self.family2,
-            glotto_code=self.glotto_codeD)
+            glotto_code='dddd1234')
         self.language3 = models.Language.objects.create(
             name='language3',
             family=self.family2,
-            glotto_code=self.glotto_codeC,
+            glotto_code='cccc1234',
             iso_code=self.iso_code)
 
     def test_all_languages(self):
@@ -225,15 +208,12 @@ class VariableCodeDescriptionAPITestCase(Test):
 
 class GeographicRegionAPITestCase(APITestCase):
     def setUp(self):
-        poly = MultiPolygon(
-            Polygon(((4.0, 4.0), (6.0, 4.0), (6.0, 6.0), (4.0, 6.0), (4.0, 4.0))))
         self.geographic_region = models.GeographicRegion.objects.create(
             level_2_re=0,
             count=1,
             region_nam='Region1',
             continent='Continent1',
-            tdwg_code=0,
-            geom=poly)
+            tdwg_code=0)
 
     def test_geo_api(self):
         response = self.client.get(reverse('geographicregion-list'), format='json')
@@ -255,11 +235,6 @@ class FindSocietiesTestCase(Test):
         iso_code2 = models.ISOCode.objects.create(iso_code='def')
         iso_code3 = models.ISOCode.objects.create(iso_code='ghi')
 
-        # make Glotto codes
-        glotto_code1 = models.GlottoCode.objects.create(glotto_code='abcc1234')
-        glotto_code2 = models.GlottoCode.objects.create(glotto_code='defg1234')
-        glotto_code3 = models.GlottoCode.objects.create(glotto_code='ghij1234')
-
         # Make language families
         lf1 = models.LanguageFamily.objects.create(name='family1')
         lf2 = models.LanguageFamily.objects.create(name='family2')
@@ -269,17 +244,17 @@ class FindSocietiesTestCase(Test):
         self.languageA1 = models.Language.objects.create(
             name='languageA1',
             iso_code=iso_code1,
-            glotto_code=glotto_code1,
+            glotto_code='abcc1234',
             family=lf1)
         self.languageC2 = models.Language.objects.create(
             name='languageC2',
             iso_code=iso_code2,
-            glotto_code=glotto_code2,
+            glotto_code='defg1234',
             family=lf2)
         self.languageB3 = models.Language.objects.create(
             name='languageB3',
             iso_code=iso_code3,
-            glotto_code=glotto_code3,
+            glotto_code='ghij1234',
             family=lf3)
 
         # Make source
@@ -288,11 +263,27 @@ class FindSocietiesTestCase(Test):
             author="Greenhill",
             reference="Great paper")
 
+        # Geographic regions that contain societies
+        self.geographic_region2 = models.GeographicRegion.objects.create(
+            level_2_re=2,
+            count=1,
+            region_nam='Region2',
+            continent='Continent2',
+            tdwg_code=2,
+        )
+        self.geographic_region13 = models.GeographicRegion.objects.create(
+            level_2_re=3,
+            count=2,
+            region_nam='Region13',
+            continent='Continent13',
+            tdwg_code=3,
+        )
+
         self.society1 = models.Society.objects.create(
             ext_id='society1',
             xd_id='xd1',
             name='Society1',
-            location=Point(1.0, 1.0),
+            region=self.geographic_region13,
             source=self.source,
             language=self.languageA1,
             focal_year='2016',
@@ -300,8 +291,8 @@ class FindSocietiesTestCase(Test):
         self.society2 = models.Society.objects.create(
             ext_id='society2',
             xd_id='xd2',
+            region=self.geographic_region2,
             name='Society2',
-            location=Point(2.0, 2.0),
             source=self.source,
             language=self.languageC2)
         # Society 3 has the same language characteristics as society 1
@@ -309,8 +300,8 @@ class FindSocietiesTestCase(Test):
         self.society3 = models.Society.objects.create(
             ext_id='society3',
             xd_id='xd1',
+            region=self.geographic_region13,
             name='Society3',
-            location=Point(3.0, 3.0),
             source=self.source,
             language=self.languageB3)
 
@@ -362,30 +353,6 @@ class FindSocietiesTestCase(Test):
             variable=self.environmental_variable1,
             value=2.0, source=self.source,
             environmental=self.environmental2)
-        # Geographic regions that contain societies
-        poly2 = MultiPolygon(
-            Polygon(((1.5, 1.5), (1.5, 2.5), (2.5, 2.5), (2.5, 1.5), (1.5, 1.5))),
-        )
-        self.geographic_region2 = models.GeographicRegion.objects.create(
-            level_2_re=2,
-            count=1,
-            region_nam='Region2',
-            continent='Continent2',
-            tdwg_code=2,
-            geom=poly2
-        )
-        poly13 = MultiPolygon(
-            Polygon(((0.5, 0.5), (0.5, 1.5), (1.5, 1.5), (1.5, 0.5), (0.5, 0.5))),
-            Polygon(((2.5, 2.5), (2.5, 3.5), (3.5, 3.5), (3.5, 2.5), (2.5, 2.5))),
-        )
-        self.geographic_region13 = models.GeographicRegion.objects.create(
-            level_2_re=3,
-            count=2,
-            region_nam='Region13',
-            continent='Continent13',
-            tdwg_code=3,
-            geom=poly13
-        )
 
     def get_results(self, urlname='find_societies', **data):
         return self.client.post(reverse(urlname), data or {}, format='json')

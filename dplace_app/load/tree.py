@@ -8,14 +8,14 @@ from nexus import NexusReader
 from dplace_app.models import LanguageTree, Language
 
 
-def load_tree(tree_dir, verbose=False):
+def load_trees(tree_dir, verbose=False):
     l_by_iso, l_by_glotto, l_by_name = \
         defaultdict(list), defaultdict(list), defaultdict(list)
 
-    for lang in Language.objects.all().select_related('iso_code', 'glotto_code'):
+    for lang in Language.objects.all().select_related('iso_code'):
         if lang.iso_code:
             l_by_iso[lang.iso_code.iso_code].append(lang)
-        l_by_glotto[lang.glotto_code.glotto_code].append(lang)
+        l_by_glotto[lang.glotto_code].append(lang)
         l_by_name[lang.name].append(lang)
 
     def get_language(taxon_name):
@@ -26,19 +26,24 @@ def load_tree(tree_dir, verbose=False):
         if taxon_name in l_by_name:
             return l_by_name[taxon_name]
 
+    count = 0
     for fname in os.listdir(tree_dir):
         if fname.endswith('.trees'):
-            _load_tree(os.path.join(tree_dir, fname), get_language)
+            if _load_tree(os.path.join(tree_dir, fname), get_language):
+                count += 1
+    return count
 
 
 def _load_tree(file_name, get_language, verbose=False):
     # make a tree if not exists. Use the name of the tree
-    tree_name = os.path.basename(file_name)
+    tree, created = LanguageTree.objects.get_or_create(name=os.path.basename(file_name))
+    if not created:
+        return False
+
     with open(file_name, 'r') as f:
-        tree, created = LanguageTree.objects.get_or_create(name=tree_name)
-        if created:
-            tree.file = File(f)
-            tree.save()
+        tree.file = File(f)
+        tree.save()
+
     # now add languages to the tree
     reader = NexusReader(file_name)
     #Remove '[&R]' from newick string
@@ -63,3 +68,4 @@ def _load_tree(file_name, get_language, verbose=False):
         for l in languages:
             tree.languages.add(l)
     tree.save()
+    return True

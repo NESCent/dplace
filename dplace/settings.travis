@@ -3,15 +3,13 @@
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
-ADMINS = (
-    # ('Admin Name', 'email@domain.com'),
-)
+ADMINS = ()
 
 MANAGERS = ADMINS
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.contrib.gis.db.backends.postgis',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'travis_postgis',
         'USER': 'postgres',
         'PASSWORD': '',
@@ -121,13 +119,9 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django.contrib.gis',
-    'django.contrib.admin',
-    'django.contrib.admindocs',
     'bootstrap3',
     'django.contrib.humanize',
     'rest_framework',
-    'rest_framework_gis',
     'dplace_app',
 )
 
@@ -162,6 +156,8 @@ LOGGING = {
         },
     }
 }
+
+TEST_RUNNER = 'django.test.runner.DiscoverRunner'
 
 REST_FRAMEWORK = {
     # Use hyperlinked styles by default.

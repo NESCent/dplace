@@ -75,11 +75,6 @@ class CulturalValueSerializer(serializers.ModelSerializer):
 class ISOCodeSerializer(serializers.ModelSerializer):
     class Meta(object):
         model = models.ISOCode
-        
-
-class GlottoCodeSerializer(serializers.ModelSerializer):
-    class Meta(object):
-        model = models.GlottoCode
 
 
 class EnvironmentalCategorySerializer(serializers.ModelSerializer):
@@ -108,7 +103,7 @@ class LanguageFamilySerializer(serializers.ModelSerializer):
 
 
 class LanguageSerializer(serializers.ModelSerializer):
-    glotto_code = serializers.CharField(source='glotto_code.glotto_code')
+    #glotto_code = serializers.CharField(source='glotto_code')
     iso_code = serializers.CharField(source='iso_code.iso_code')
     family = LanguageFamilySerializer()
 

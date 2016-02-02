@@ -4,8 +4,15 @@ import csv
 import logging
 
 from six import BytesIO
+from django.db import connection
 
-from dplace_app.models import Society
+from dplace_app.models import Society, GeographicRegion
+
+
+def delete_all(model):
+    model.objects.all().delete()
+    with connection.cursor() as c:
+        c.execute("ALTER SEQUENCE %s_id_seq RESTART WITH 1" % model._meta.db_table)
 
 
 def eavar_number_to_label(number):
@@ -14,19 +21,6 @@ def eavar_number_to_label(number):
 
 def bfvar_number_to_label(number):
     return "B{0:0>3}".format(number)
-
-
-def load_society(society_dict, source):
-    society, created = Society.objects.get_or_create(ext_id=society_dict['soc_id'])
-    society.xd_id = society_dict['xd_id']
-    society.name = society_dict['soc_name']
-    society.source = source
-    society.alternate_names = society_dict['alternate_names']
-    society.focal_year = society_dict['main_focal_year']
-
-    logging.info("Saving society %s" % society)
-    society.save()
-    return society
 
 
 def configure_logging():
