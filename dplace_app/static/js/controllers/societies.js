@@ -128,6 +128,11 @@ function SocietiesCtrl($scope, $timeout, $http, searchModelService, colorMapServ
                                 if (variable[0].codes[c].description.indexOf("Missing data") != -1)
                                     return 'rgb(255,255,255)';
                                 var value = variable[0].codes[c].code;
+                                if (variable[0].variable.data_type.toUpperCase() == 'ORDINAL') {
+                                    rgb = colorMapService.generateRandomHue(value, variable[0].codes.length, variable[0].variable.id, 5);
+                                    return rgb;
+                                }
+                                
                                 rgb = colorMapService.colorMap[parseInt(value)];
                                 return rgb;
                             });

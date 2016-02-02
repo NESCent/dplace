@@ -15,14 +15,14 @@
 <dplace-map results="results" map-div-id="result-map" visible="visible" query="query" chosen="results.chosenVariable"></dplace-map>
 <table class="map-legend" ng-show="results.chosenVariable.data_type !== 'Continuous'" ng-repeat="variable in results.variable_descriptions" ng-if="variable.variable.id==results.chosenVariable.id">
   
-    <tr ng-repeat="code in variable.codes">
+    <tr ng-repeat="code in variable.codes" ng-show="code.short_description !== 'Missing'">
         <td>
             <svg height="20" width="20">
                 <circle
                         cx="10"
                         cy="10"
                         r="4.5"
-                        fill="{{code.code|colorNode:variable.codes}}"
+                        fill="{{code.code|colorNode:variable}}"
                         stroke="#000"
                         stroke-width="0.5"
                         />
@@ -44,7 +44,7 @@
     <tr ng-show="results.chosenVariable.data_type == 'Continuous'">
         <td class="cont-gradient-td">
             <svg height="100" width="400">
-                <circle
+                <!--<circle
                         cx="10"
                         cy="13"
                         r="4.5"
@@ -52,7 +52,7 @@
                         stroke="#000"
                         stroke-width="0.5"
                         />
-                    <text x="20" y="18">Missing Data</text>
+                    <text x="20" y="18">Missing Data</text>-->
 
                 <rect x="10" y="25" fill="url(#grad1)" height="30" width="300" />
                 <text x="0" y="70">{{results.chosenVariable.min}} {{results.chosenVariable.units}}</text>
