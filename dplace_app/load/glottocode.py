@@ -7,88 +7,71 @@ from dplace_app.models import Language, ISOCode, Society, LanguageFamily
 from util import delete_all
 
 
-def load_languages(items):
+def xd_to_language(items, languoids):
     delete_all(Language)
-    Language.objects.bulk_create(
-        [Language(name=i['name'], glotto_code=i['id']) for i in items], batch_size=1000)
-    return Language.objects.count()
+    delete_all(LanguageFamily)
+    delete_all(ISOCode)
 
+    glottolog = {l['id']: l for l in languoids}
 
-def map_isocodes(items):
-    """
-    Matches isocodes to glottocodes.
-    """
-    languages = {l.glotto_code: l for l in Language.objects.all()}
-
-    count = 0
-    for dict_row in items:
-        glotto_code = dict_row['id']
-        iso_code = dict_row['iso_code']
-        if not iso_code:
-            continue
-
-        if len(iso_code) > 3:
-            logging.warning("ISOCode too long, skipping %s" % iso_code)
-            continue
-        
-        iso, created = ISOCode.objects.get_or_create(iso_code=iso_code)
-        language = languages.get(glotto_code)
-        if language:
-            language.iso_code = iso
-            language.save()
-            logging.info("Mapped isocode %s to glottocode %s" % (iso_code, glotto_code))
-            count += 1
-        else:
-            logging.warning("No language found with glottocode %s" % glotto_code)
-    return count
-
-
-def xd_to_language(items):
-    languages = {l.glotto_code: l for l in Language.objects.all()}
-    societies = defaultdict(list)
+    societies_ = defaultdict(list)
     for s in Society.objects.all():
-        societies[s.xd_id].append(s)
+        societies_[s.xd_id].append(s)
     families = {}
+    languages = {}
+    isocodes = {}
 
     count = 0
     for item in items:
-        if _xd_to_language(item, languages, societies, families):
-            count += 1
+        societies = societies_.get(item['xd_id'])
+        if not societies:
+            logging.warning("No societies found with xd_id %(xd_id)s" % item)
+            continue
+
+        ldata = glottolog.get(item['DialectLanguageGlottocode'])
+        if not ldata:
+            logging.warning("No language found for %s, skipping" % item)
+            continue
+
+        _xd_to_language(item, societies, ldata, languages, families, isocodes)
+        count += 1
+
     for language_family in LanguageFamily.objects.all():
         language_family.update_counts()
     return count
 
 
-def _xd_to_language(dict_row, languages, societies, families):
-    glottocode = dict_row['DialectLanguageGlottocode']
-    family_glottocode = dict_row['FamilyGlottocode']
+def _xd_to_language(dict_row, societies, ldata, languages, families, isocodes):
+    # get or create the language family:
+    # Note: If the related languoid is an isolate or a top-level family, we create a
+    # LanguageFamily object with the data of the languoid.
+    family_id = ldata['family_id'] or ldata['id']
+    family = families.get(family_id)
+    if not family:
+        family_name = ldata['family_name'] or ldata['name']
+        family = LanguageFamily.objects.create(name=family_name, scheme='G')
+        family.save()
+        families[family_id] = family
 
-    societies = societies.get(dict_row['xd_id'])
-    if not societies:
-        logging.warning("No societies found with xd_id %(xd_id)s" % dict_row)
-        return False
+    # get or create the language:
+    language = languages.get(ldata['id'])
+    if not language:
+        language = Language.objects.create(name=ldata['name'], glotto_code=ldata['id'])
+        language.family = family
 
-    # get or create language family
-    family_language = languages.get(family_glottocode)
-    if family_language:
-        lang_fam = families.get(family_language.name)
-        if not lang_fam:
-            lang_fam = families[family_language.name] = LanguageFamily.objects.create(
-                scheme='G', name=family_language.name)
-            logging.info("Language Family %s created" % (lang_fam.name))
-    else:
-        logging.warning("No language found for family glottocode %s, skipping"
-                        % family_glottocode)
-        lang_fam = None
+        if ldata['iso_code']:
+            if len(ldata['iso_code']) > 3:
+                logging.warning("ISOCode too long, skipping %s" % ldata['iso_code'])
+            else:
+                isocode = isocodes.get(ldata['iso_code'])
+                if not isocode:
+                    isocode = ISOCode.objects.create(iso_code=ldata['iso_code'])
+                    isocodes[ldata['iso_code']] = isocode
+                language.iso_code = isocode
 
-    language = languages.get(glottocode)
-    if language:
-        if lang_fam and not language.family:
-            language.family = lang_fam
-            language.save()
-        for s in societies:
-            s.language = language
-            s.save()
-        return True
-    logging.warning("No language found for glottocode %s, skipping" % glottocode)
-    return False
+        language.save()
+        languages[ldata['id']] = language
+
+    for soc in societies:
+        soc.language = language
+        soc.save()

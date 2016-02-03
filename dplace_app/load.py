@@ -14,14 +14,11 @@ from load.tree import load_trees
 from load.variables import load_vars, load_codes
 from load.values import load_data
 from load.sources import load_references
-from load.glottocode import load_languages, map_isocodes, xd_to_language
+from load.glottocode import xd_to_language
 
 
 ITEM_LOADER = dict(
     soc_lat_long=society_locations,
-    glotto=load_languages,
-    xd_lang=xd_to_language,
-    glotto_iso=map_isocodes,
     soc=load_societies,
     vars=load_vars,
     vals=load_data,
@@ -38,6 +35,8 @@ def run(mode, *fnames):
         return load_regions(fnames[0])
     if mode == 'tree':
         return load_trees(fnames[0])
+    if mode == 'xd_lang':
+        return xd_to_language(csv_dict_reader(fnames[0]), csv_dict_reader(fnames[1]))
     if mode in ITEM_LOADER:
         return ITEM_LOADER[mode](chain(*map(csv_dict_reader, fnames)))
     raise ValueError(mode)
