@@ -8,14 +8,27 @@ from dplace_app.load.isocode import load_isocode
 from dplace_app.load.society import load_societies
 from dplace_app.load.values import load_data
 from dplace_app.load.variables import load_vars
+from dplace_app.load.glottocode import xd_to_language
 
 
-class LoadISOCodeTestCase(TestCase):
+class LoadTestCase(TestCase):
     '''
     Tests loading
     '''
     def get_dict(self, **kw):
         return defaultdict(lambda: '', **kw)
+
+    def test_load_language(self):
+        soc = Society.objects.create(ext_id='socid', xd_id='socid', name='society')
+        soc.save()
+        res = xd_to_language(
+            [self.get_dict(xd_id='socid', DialectLanguageGlottocode='none1234')],
+            [self.get_dict(id='abcd1234', name='name', iso_code='iso')])
+        self.assertEqual(res, 0)
+        res = xd_to_language(
+            [self.get_dict(xd_id='socid', DialectLanguageGlottocode='abcd1234')],
+            [self.get_dict(id='abcd1234', name='name', iso_code='iso')])
+        self.assertEqual(res, 1)
 
     def test_load_isocode(self):
         isocode = load_isocode({'ISO 693-3 code': 'abc'})
