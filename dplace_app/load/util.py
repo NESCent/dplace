@@ -58,5 +58,8 @@ def csv_dict_reader(fname):
         for k in dict_row:
             if dict_row[k] is None:
                 continue
-            dict_row[k] = dict_row[k].decode('utf8').strip()
+            try:
+                dict_row[k] = dict_row[k].decode('utf8').strip()
+            except:
+                print k, dict_row
         yield dict_row

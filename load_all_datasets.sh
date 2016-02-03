@@ -15,14 +15,14 @@ REPO_SRC="git@github.com:SimonGreenhill/dplace-data.git"
 REPO_DEST="${BASEDIR}/datasets"
 DPLACE_PATH="${BASEDIR}"
 
-# Clone the repository
-if [ ! -d "$REPO_DEST" ]; then
-	mkdir -p "$REPO_DEST"
-	git clone $REPO_SRC $REPO_DEST
-else
-	orig=`pwd`
-	cd $REPO_DEST && git pull && cd "$orig"
-fi
+## Clone the repository
+#if [ ! -d "$REPO_DEST" ]; then
+#	mkdir -p "$REPO_DEST"
+#	git clone $REPO_SRC $REPO_DEST
+#else
+#	orig=`pwd`
+#	cd $REPO_DEST && git pull && cd "$orig"
+#fi
 
 ## import the data
 
@@ -41,12 +41,6 @@ python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/geo/level2.json" geo
 # Linking Societies to Locations
 python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/society_locations.csv" soc_lat_long
 
-# Loading Glottolog Languages
-python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/glottolog_mapping_11Dec2015.csv" glotto
-
-# Mapping ISOCodes to Glottolog Codes
-python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/glottolog_mapping_11Dec2015.csv" glotto_iso
-
 # Loading Variables
 python "${DPLACE_PATH}/dplace_app/load.py" \
  "${REPO_DEST}/csv/EAVariableList_17Nov2015.csv" \
@@ -59,8 +53,11 @@ python "${DPLACE_PATH}/dplace_app/load.py" \
  "${REPO_DEST}/csv/BinfordVariableListCodeDescription_18Nov2015.csv" \
  codes
 
-# Linking Societies to Glottocodes
-python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/xd_id_to_language_25Jan2016.csv" xd_lang
+# Linking Societies to Languoids
+python "${DPLACE_PATH}/dplace_app/load.py" \
+ "${REPO_DEST}/csv/xd_id_to_language.csv" \
+ "${REPO_DEST}/csv/glottolog.csv" \
+ xd_lang
 
 # Loading References
 python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/ReferenceMapping_11Nov2015.csv" refs
