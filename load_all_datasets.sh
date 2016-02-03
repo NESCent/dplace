@@ -15,14 +15,14 @@ REPO_SRC="git@github.com:SimonGreenhill/dplace-data.git"
 REPO_DEST="${BASEDIR}/datasets"
 DPLACE_PATH="${BASEDIR}"
 
-## Clone the repository
-#if [ ! -d "$REPO_DEST" ]; then
-#	mkdir -p "$REPO_DEST"
-#	git clone $REPO_SRC $REPO_DEST
-#else
-#	orig=`pwd`
-#	cd $REPO_DEST && git pull && cd "$orig"
-#fi
+# Clone the repository
+if [ ! -d "$REPO_DEST" ]; then
+	mkdir -p "$REPO_DEST"
+	git clone $REPO_SRC $REPO_DEST
+else
+	orig=`pwd`
+	cd $REPO_DEST && git pull && cd "$orig"
+fi
 
 ## import the data
 
