@@ -1,10 +1,12 @@
 import json
 import re
+import datetime
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Prefetch
 from django.http import Http404
 from nexus import NexusReader
+from ete2 import Tree
 from rest_framework import viewsets
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.decorators import api_view, permission_classes, renderer_classes
@@ -59,19 +61,13 @@ class CulturalValueViewSet(viewsets.ReadOnlyModelViewSet):
 class SocietyViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = serializers.SocietySerializer
     queryset = models.Society.objects.all().select_related(
-        'source', 'language__iso_code', 'language__glotto_code', 'language__family')
+        'source', 'language__iso_code', 'language__family')
 
 
 class ISOCodeViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = serializers.ISOCodeSerializer
     filter_fields = ('iso_code',)
     queryset = models.ISOCode.objects.all()
-
-
-class GlottoCodeViewSet(viewsets.ReadOnlyModelViewSet):
-    serializer_class = serializers.GlottoCodeSerializer
-    filter_fields = ('glotto_code',)
-    queryset = models.GlottoCode.objects.all()
 
 
 class EnvironmentalCategoryViewSet(viewsets.ReadOnlyModelViewSet):
@@ -143,15 +139,13 @@ class SourceViewSet(viewsets.ReadOnlyModelViewSet):
 # returns trees that contain the societies from the SocietyResultSet
 # maybe needs cleaning up in the future
 def trees_from_languages_array(language_ids):
-    from ete2 import Tree
     trees = models.LanguageTree.objects\
         .filter(languages__pk__in=language_ids)\
-        .prefetch_related(
-            'languages__family', 'languages__glotto_code', 'languages__iso_code')\
+        .prefetch_related('languages__family', 'languages__iso_code')\
         .distinct()
     for t in trees:
         if 'glotto' in t.name:
-            langs_in_tree = [str(l.glotto_code.glotto_code)
+            langs_in_tree = [str(l.glotto_code)
                              for l in t.languages.all() if l.id in language_ids]
         else:
             langs_in_tree = [str(l.iso_code.iso_code)
@@ -196,7 +190,6 @@ def result_set_from_query_dict(query_dict):
                 .select_related(
                     'source',
                     'language__family',
-                    'language__glotto_code',
                     'language__iso_code'):
             result_set.add_language(society, society.language)
 
@@ -238,7 +231,6 @@ def result_set_from_query_dict(query_dict):
             for value in values\
                     .select_related('society__language__family') \
                     .select_related('society__language__iso_code')\
-                    .select_related('society__language__glotto_code') \
                     .select_related('society__source')\
                     .prefetch_related('references'):
                 result_set.add_cultural(value.society, variable, variable.codes, value)
@@ -273,16 +265,14 @@ def result_set_from_query_dict(query_dict):
     if 'geographic_regions' in query_dict:
         criteria.append(serializers.SEARCH_GEOGRAPHIC)
         geographic_region_ids = [int(x['id']) for x in query_dict['geographic_regions']]
-        regions = models.GeographicRegion.objects.filter(pk__in=geographic_region_ids)
-        for region in regions:
-            for society in models.Society.objects\
-                    .filter(location__intersects=region.geom)\
-                    .select_related(
-                        'language__family',
-                        'language__glotto_code',
-                        'language__iso_code')\
-                    .prefetch_related('source').all():
-                result_set.add_geographic_region(society, region)
+        for society in models.Society.objects\
+                .filter(region_id__in=geographic_region_ids)\
+                .select_related(
+                    'region',
+                    'language__family',
+                    'language__iso_code')\
+                .prefetch_related('source').all():
+            result_set.add_geographic_region(society, society.region)
     # Filter the results to those that matched all criteria
     result_set.finalize(criteria)
 
@@ -309,15 +299,15 @@ def find_societies(request):
 
     Returns serialized collection of SocietyResult objects
     """
-    # from time import time
-    # from django.db import connection
+    from time import time
+    from django.db import connection
 
-    # start = time()
-    # nstart = len(connection.queries)
+    start = time()
+    nstart = len(connection.queries)
     result_set = result_set_from_query_dict(request.data)
-    # print '-->', len(connection.queries) - nstart, time() - start
+    print '-->', len(connection.queries) - nstart, time() - start
     d = serializers.SocietyResultSetSerializer(result_set).data
-    # print '==>', len(connection.queries) - nstart, time() - start
+    print '==>', len(connection.queries) - nstart, time() - start
     # for q in connection.queries[-10:]:
     #     print q['sql'][:1000]
     return Response(d)
@@ -455,7 +445,6 @@ def newick_tree(key):
 @permission_classes((AllowAny,))
 @renderer_classes((DPLACECsvRenderer,))
 def csv_download(request):
-    import datetime
     result_set = result_set_from_query_dict(request.data)
     response = Response(serializers.SocietyResultSetSerializer(result_set).data)
     filename = "dplace-societies-%s.csv" % datetime.datetime.now().strftime("%Y-%m-%d")
@@ -467,7 +456,6 @@ def csv_download(request):
 @permission_classes((AllowAny,))
 @renderer_classes((ZipRenderer,))
 def zip_legends(request):
-    import datetime
     # query_string = request.QUERY_PARAMS['query']
     result_set = request.data  # json.loads(query_string)
     to_download = serializers.ZipResultSet()

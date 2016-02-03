@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 from collections import defaultdict
 
-from django.contrib.gis.db import models
+from django.db import models
 
 UNIT_CHOICES = (
     ('mm', 'mm'),
@@ -25,45 +25,33 @@ CLASSIFICATION_SCHEMES = (
 )
 
 
-# Originally from 'iso lat long.xlsx'.  This spreadsheet contains ISO Codes and
-# their Locations.  Only iso codes from the 16th edition ethnologue were
-# present.  Other datasets references ISO Codes that were not present in 16th
-# ed, so now this is loaded from the ethnologue, and locations are annotated
-# later if known
-
-# We don't really need a location field here...
 class ISOCode(models.Model):
-    iso_code = models.CharField('ISO Code', db_index=True, max_length=3)
-    # only have locations for ISO codes in 16th ed ethnologue
-    objects = models.GeoManager()   # For GeoDjango, must override the manager
+    iso_code = models.CharField(
+        'ISO Code', db_index=True, max_length=3, unique=True, null=False)
 
     def __unicode__(self):
-        return "%s" % (self.iso_code)
+        return self.iso_code
 
     class Meta(object):
         verbose_name = "ISO Code"
 
 
-class GlottoCode(models.Model):
-    glotto_code = models.CharField('Glotto Code', db_index=True, max_length=10)
-
-    def __unicode__(self):
-        return "%s" % self.glotto_code
-
-
 class Society(models.Model):
     ext_id = models.CharField('External ID', unique=True, max_length=10)
-    xd_id = models.CharField(
-        'Cross ID', default=None, null=True, max_length=10)
+    xd_id = models.CharField('Cross ID', default=None, null=True, max_length=10)
     name = models.CharField('Name', db_index=True, max_length=200)
-    location = models.PointField('Location', null=True)
-    source = models.ForeignKey('Source', null=True)
-    language = models.ForeignKey(
-        'Language', null=True, related_name="societies")
-    objects = models.GeoManager()
-    focal_year = models.CharField(
-        'Focal Year', null=True, blank=True, max_length=100)
+    latitude = models.FloatField('Latitude', null=True)
+    longitude = models.FloatField('Longitude', null=True)
+    focal_year = models.CharField('Focal Year', null=True, blank=True, max_length=100)
     alternate_names = models.TextField(default="")
+
+    region = models.ForeignKey('GeographicRegion', null=True, related_name='societies')
+    source = models.ForeignKey('Source', null=True)
+    language = models.ForeignKey('Language', null=True, related_name="societies")
+
+    @property
+    def location(self):
+        return dict(coordinates=[self.longitude, self.latitude])
 
     def get_environmental_data(self):
         """Returns environmental data for the given society"""
@@ -163,7 +151,6 @@ class Environmental(models.Model):
     society = models.ForeignKey('Society', null=True, related_name="environmentals")
     iso_code = models.ForeignKey('ISOCode', null=True, related_name="environmentals")
     source = models.ForeignKey('Source', null=True)
-    objects = models.GeoManager()   # For GeoDjango, must override the manager
 
     def __unicode__(self):
         return "%d Society: %d" % (self.id, self.society_id)
@@ -334,7 +321,8 @@ class LanguageFamily(models.Model):
 
 class Language(models.Model):
     name = models.CharField(max_length=200, db_index=True)
-    glotto_code = models.ForeignKey('GlottoCode', null=True, unique=True)
+    glotto_code = models.CharField(max_length=8, null=False, unique=True)
+
     # needs to be null=True because some glottolog languages do not have isocodes
     iso_code = models.ForeignKey('ISOCode', null=True)
     family = models.ForeignKey('LanguageFamily', null=True)
@@ -354,8 +342,6 @@ class GeographicRegion(models.Model):
     region_nam = models.CharField(max_length=254)
     continent = models.CharField(max_length=254)
     tdwg_code = models.IntegerField()
-    geom = models.MultiPolygonField(srid=4326)
-    objects = models.GeoManager()
 
     def __unicode__(self):
         return "Region: %s, Continent %s" % (self.region_nam, self.continent)

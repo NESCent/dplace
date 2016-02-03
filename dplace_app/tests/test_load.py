@@ -3,9 +3,9 @@ from collections import defaultdict
 
 from django.test import TestCase
 
+from dplace_app.models import Society
 from dplace_app.load.isocode import load_isocode
-from dplace_app.load.society_binford import load_bf_society
-from dplace_app.load.society_ea import load_ea_society
+from dplace_app.load.society import load_societies
 from dplace_app.load.values import load_data
 from dplace_app.load.variables import load_vars
 
@@ -29,50 +29,27 @@ class LoadISOCodeTestCase(TestCase):
         isocode = load_isocode({'foo': 'bar'})
         self.assertIsNone(isocode, 'Should not load an isocode without iso code')
 
-    def test_load_ea_society(self):
-        row_dict = self.get_dict(
-            dataset='EA',
-            soc_id='EA12',
-            xd_id='xd1',
-            soc_name='Example EA Society',
-            alternate_names='Example',
-            main_focal_year='2016')
-        society = load_ea_society(row_dict)
-        self.assertIsNotNone(society, 'unable to load society')
-        self.assertEqual(society.source.author, 'Murdock et al.', '! Murdock et al.')
-
-    def test_load_bf_society(self):
-        row_dict = self.get_dict(**{
-            'soc_id': 'socid',
-            'soc_name': 'socname',
-            'xd_id': 'xdid',
-            'ID': 'BF34',
-            'STANDARD SOCIETY NAME Binford': 'Example Binford Society',
-            'ISO693_3': 'def',
-            'LangNam': 'Language2, Test'
-        })
-        society = load_bf_society(row_dict)
-        self.assertIsNotNone(society, 'unable to load society')
-        self.assertEqual(society.source.author, 'Binford', '! Binford')
+    def test_load_society(self):
+        def society(dataset):
+            return self.get_dict(
+                dataset=dataset,
+                soc_id='EA12' + dataset,
+                xd_id='xd1',
+                soc_name='Example Society',
+                alternate_names='Example',
+                main_focal_year='2016')
+        self.assertEqual(load_societies([society('EA'), society('LRB'), society('x')]), 2)
 
     def test_load_data(self):
         self.assertEqual(load_data([self.get_dict()]), 0)
         self.assertEqual(load_data([self.get_dict(soc_id='notknown')]), 0)
-        row_dict = self.get_dict(**{
-            'soc_id': 'socid',
-            'soc_name': 'socname',
-            'xd_id': 'xdid',
-            'ID': 'BF34',
-            'STANDARD SOCIETY NAME Binford': 'Example Binford Society',
-            'ISO693_3': 'def',
-            'LangNam': 'Language2, Test'
-        })
-        load_bf_society(row_dict)
+        soc = Society.objects.create(ext_id='socid', name='society')
+        soc.save()
         res = load_data([self.get_dict(soc_id='socid')])
         self.assertEqual(res, 0)
         res = load_data([self.get_dict(soc_id='socid', Dataset='LRB')])
         self.assertEqual(res, 0)
-        load_vars(self.get_dict(Dataset='LRB', VarId='5'))
+        load_vars([self.get_dict(Dataset='LRB', VarId='5')])
         res = load_data([self.get_dict(soc_id='socid', Dataset='LRB', VarId='5')])
         self.assertEqual(res, 1)
 
@@ -90,7 +67,7 @@ class LoadISOCodeTestCase(TestCase):
             soc_name='Example EA Society',
             alternate_names='Example',
             main_focal_year='2016')
-        load_ea_society(row_dict)
+        load_societies([row_dict])
         res = load_environmental([self.get_dict(**{
             'Source': 'EA',
             'ID': 'EA12',

@@ -33,7 +33,7 @@ def load_data(items):
     #
     CulturalValue.objects.all().delete()
     with connection.cursor() as c:
-        for table in ['variablecodedvalue_references', 'variablecodedvalue']:
+        for table in ['culturalvalue_references', 'culturalvalue']:
             c.execute("ALTER SEQUENCE dplace_app_%s_id_seq RESTART WITH 1" % table)
 
     inserted = set()
@@ -58,7 +58,7 @@ def load_data(items):
 INSERT INTO dplace_app_culturalvalue_references (culturalvalue_id, source_id)
 VALUES (%s, %s)""",
             refs)
-    return pk
+    return CulturalValue.objects.count()
 
 
 def _load_data(val_row, societies=None, sources=None, variables=None, descriptions=None):
