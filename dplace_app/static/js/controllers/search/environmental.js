@@ -27,7 +27,6 @@ function EnvironmentalCtrl($scope, searchModelService, EnvironmentalVariable, En
     };
 
     $scope.variableChanged = function(variable) {
-        
         if(variable.selectedVariable != null && $scope.environmentalData.badgeValue == 0) {
             $scope.environmentalData.badgeValue += 1;
         } 

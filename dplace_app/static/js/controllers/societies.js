@@ -101,7 +101,7 @@ function SocietiesCtrl($scope, $timeout, $http, searchModelService, colorMapServ
         
         //cultural and environmental variables
         if ($scope.results.chosenVariable) {
-            if ($scope.results.environmental_variables.length > 0 && $scope.results.chosenVariable == $scope.results.environmental_variables[0]) {
+            if ($scope.results.environmental_variables.length > 0 && $scope.results.environmental_variables.indexOf($scope.results.chosenVariable) != -1) {
                 //if the chosen map is an environmental variable
                     legend_svg = "<g transform='translate(0,350)'>"+d3.select(".env-legend-td").node().innerHTML+"</g>";
             }
