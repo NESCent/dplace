@@ -37,7 +37,7 @@
                     </div>
                     
                     <div class="pull-right"> 
-                        <button class="btn btn-default btn-sm" style="margin-right:10px;" ng-show="$index > 0" ng-click="removeVariable(variable)"><span class="glyphicon glyphicon-minus" style="padding-right:3px;" aria-hidden="true"></span>Remove this environmental variable</button>
+                        <button class="btn btn-default btn-sm" style="margin-right:10px;" ng-show="$index > 0" ng-click="removeVariable(variable)"><span class="glyphicon glyphicon-minus" style="padding-right:3px;" aria-hidden="true"></span>Remove this variable</button>
                     </div>
                 </div>
 			
@@ -129,7 +129,7 @@
         </div>
     </form>
     <div class="pull-right">
-        <button class="btn btn-default btn-sm" style="margin-right:10px;" ng-click="addVariable()"><span class="glyphicon glyphicon-plus" style="padding-right:3px;" aria-hidden="true"></span>Add another environmental variable</button>
+        <button class="btn btn-default btn-sm" style="margin-right:10px;" ng-click="addVariable()" ng-show="environmentalData.selectedVariables.length < 3"><span class="glyphicon glyphicon-plus" style="padding-right:3px;" aria-hidden="true"></span>Add another environmental variable</button>
     </div>
     <!-- <div class="pull-right">
             <button class="btn btn-primary form-control"

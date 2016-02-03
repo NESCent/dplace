@@ -2,8 +2,11 @@ function EnvironmentalCtrl($scope, searchModelService, EnvironmentalVariable, En
     var linkModel = function() {
         // Get a reference to the environmental search params from the model
         $scope.environmentalData = searchModelService.getModel().getEnvironmentalData();
-        if ($scope.environmentalData.selectedVariables.length == 0) 
+        if ($scope.environmentalData.selectedVariables.length == 0) {
             $scope.environmentalData.selectedVariables.push({'vals': ['', ''], 'selectedFilter': $scope.environmentalData.selectedFilter, 'variables': []});
+            $scope.environmentalData.badgeValue = 1;
+        }
+            
     };
     $scope.$on('searchModelReset', linkModel); // When model is reset, update our model
     linkModel();
@@ -14,6 +17,7 @@ function EnvironmentalCtrl($scope, searchModelService, EnvironmentalVariable, En
     
     $scope.addVariable = function() {
         $scope.environmentalData.selectedVariables.push({'vals': ['', ''], 'selectedFilter': $scope.environmentalData.selectedFilter, 'variables': []});
+        $scope.environmentalData.badgeValue += 1;
     };
     
     $scope.removeVariable = function(variable) {
@@ -23,12 +27,10 @@ function EnvironmentalCtrl($scope, searchModelService, EnvironmentalVariable, En
     };
 
     $scope.variableChanged = function(variable) {
-        if(variable.selectedVariable != null) {
+        
+        if(variable.selectedVariable != null && $scope.environmentalData.badgeValue == 0) {
             $scope.environmentalData.badgeValue += 1;
-        } else {
-            if ($scope.environmentalData.badgeValue != 0) 
-            $scope.environmentalData.badgeValue -= 1;
-        }
+        } 
 
         variable.EnvironmentalForm.$setPristine();
         $scope.values = MinAndMax.query({query: {environmental_id: variable.selectedVariable.id}});
