@@ -155,9 +155,8 @@ angular.module('languagePhylogenyDirective', [])
                             } 
                         }
                     
-                    }
-                    
-                    if (society.variable_coded_values.length > 0) {
+                    } 
+                    if (society.variable_coded_values.length > 0 && variable.variable) {
                         for (var i = 0; i < society.variable_coded_values.length; i++) {
                             if (society.variable_coded_values[i].variable == variable.variable.id) {
                                 if (variable.variable.data_type.toUpperCase() == 'CONTINUOUS') {
@@ -219,7 +218,7 @@ angular.module('languagePhylogenyDirective', [])
                 });
             
             }
-            
+                        
             var constructTree = function(langTree) {   
                 d3.select("language-phylogeny").html('');
                 var newick = Newick.parse(langTree.newick_string);
@@ -403,14 +402,14 @@ angular.module('languagePhylogenyDirective', [])
                 
                 
                     scope.$watch('results.chosenTVariable', function(oldValue, newvalue) {
-                        if (scope.results.chosenTVariable) {
+                    if (scope.results.chosenTVariable) {
                             chosen_var_id = scope.results.variable_descriptions.filter(function(variable) { return variable.variable.id == scope.results.chosenTVariable.id });
                             if (chosen_var_id.length > 0)
                                 addMarkers(langTree, scope.results, chosen_var_id[0], node, true, translate);
                             else {
-                                d3.select("."+scope.results.chosenTVariable.CID).attr("fill", function() {
-                                    console.log(scope.results.chosenTVariable);
-                                    if (scope.results.chosenTVariable.name == "Annual Mean Precipitation") return "url(#blue)";
+                                d3.select(".envVar").attr("fill", function() {
+                                    if (scope.results.chosenTVariable.name == "Annual Mean Precipitation") {console.log("blue"); return "url(#blue)";}
+                                    else if (scope.results.chosenTVariable.name == "Net Primary Production" || scope.results.chosenTVariable.name == "Mean Growing Season NPP") return "url(#earthy)";
                                     else return "url(#temp)";
                                 });
                                 addMarkers(langTree, scope.results,scope.results.chosenTVariable, node, true, translate);
@@ -421,22 +420,38 @@ angular.module('languagePhylogenyDirective', [])
                 else {
                 //markers for non-global trees
                     if (scope.query.variable_codes) {
-                        //if (langTree.name.indexOf("global") == -1) {
-                            for (var r = 0; r < scope.results.variable_descriptions.length; r++) { 
-                                addMarkers(langTree, scope.results, scope.results.variable_descriptions[r], node, false, translate);
-                                translate += 20;
-                            }
-                       // }
+                        for (var r = 0; r < scope.results.variable_descriptions.length; r++) { 
+                            addMarkers(langTree, scope.results, scope.results.variable_descriptions[r], node, false, translate);
+                            translate += 20;
+                        }
                     }
                     if (scope.query.environmental_filters) {
                         for (var r = 0; r < scope.results.environmental_variables.length; r++) {
-                           /*  d3.select("."+scope.results.environmental_variables[r].CID).attr("fill", function() {
-                                if (scope.results.environmental_variables[r].name == "Net Primary Production" || scope.results.environmental_variables[r].name == "Mean Growing Season NPP") {
-                                   return "url(#earthy)";}
-                               else if (scope.results.environmental_variables[r].name == "Annual Mean Precipitation") {console.log("PRECIP");
-                                    return "url(#blue)";}
-                                else {return "url(#temp)";}
-                             });*/
+                            if (!d3.select("#e"+scope.results.environmental_variables[r].id).select("svg")[0][0]) {
+                                legend = d3.select("#e"+scope.results.environmental_variables[r].id).append("svg:svg")
+                                    .attr("height", "50")
+                                    .attr("width", "400")
+                                    .attr("class", "envLegend");
+                                legend.append("svg:rect")
+                                    .attr("height", "30")
+                                    .attr("width", "250")
+                                    .attr("x", "20")
+                                    .attr("fill", function() {
+                                    if (scope.results.environmental_variables[r].name == "Net Primary Production" || scope.results.environmental_variables[r].name == "Mean Growing Season NPP") 
+                                       return "url(#earthy)";
+                                   else if (scope.results.environmental_variables[r].name == "Annual Mean Precipitation") 
+                                        return "url(#blue)";
+                                    else return "url(#temp)";
+                                    });
+                                legend.append("svg:text")
+                                    .attr("x", "0")
+                                    .attr("y", "45")
+                                    .text(scope.results.environmental_variables[r].min + ' ' + scope.results.environmental_variables[r].units);
+                                legend.append("svg:text")
+                                    .attr("x", "250")
+                                    .attr("y", "45")
+                                    .text(scope.results.environmental_variables[r].max + ' ' + scope.results.environmental_variables[r].units);
+                            }
                             addMarkers(langTree, scope.results, scope.results.environmental_variables[r], node, false, translate);
                             translate += 20;
                         }
@@ -506,6 +521,7 @@ angular.module('languagePhylogenyDirective', [])
 
             scope.$on('treeSelected', function(event, args) {
                 constructTree(args.tree);
+                //these lines throw an error :(
                 phyloWidth = d3.select("language-phylogeny").select("g").node().getBBox().width;
                 d3.select("#legend")
                     .attr("style", "width:"+($(window).width()-phyloWidth-100)+"px; position:absolute; right:20px; z-index:1;");
