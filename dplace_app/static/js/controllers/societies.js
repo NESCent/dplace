@@ -101,7 +101,7 @@ function SocietiesCtrl($scope, $timeout, $http, searchModelService, colorMapServ
         
         //cultural and environmental variables
         if ($scope.results.chosenVariable) {
-            if ($scope.results.environmental_variables.length > 0 && $scope.results.chosenVariable == $scope.results.environmental_variables[0]) {
+            if ($scope.results.environmental_variables.length > 0 && $scope.results.environmental_variables.indexOf($scope.results.chosenVariable) != -1) {
                 //if the chosen map is an environmental variable
                     legend_svg = "<g transform='translate(0,350)'>"+d3.select(".env-legend-td").node().innerHTML+"</g>";
             }
@@ -331,13 +331,20 @@ function SocietiesCtrl($scope, $timeout, $http, searchModelService, colorMapServ
             legends_list.push({'name': name.replace(/[\W]+/g, "-")+'-legend.svg', 'svg': svg_string});    
         }
         
-        if ($scope.results.environmental_variables.length > 0) {
+        for (var i = 0; i < $scope.results.environmental_variables.length; i++) {
+            env_svg = d3.select("#e"+$scope.results.environmental_variables[i].id).node().innerHTML;
+            env_svg = '<svg version="1.1" xmlns="http://www.w3.org/2000/svg" transform="translate(10, 10)">'+env_svg.substring(0, env_svg.indexOf("</svg>")) + '</svg>' + gradients_svg + '</svg>';
+            name = $scope.results.environmental_variables[i].CID + '-'+$scope.results.environmental_variables[i].name;
+            legends_list.push({'name': name.replace(/[\W]+/g, "-")+'-legend.svg', 'svg': env_svg});
+        }
+        
+        
+        /*if ($scope.results.environmental_variables.length > 0) {
             var env_svg = d3.select("#E1").node().innerHTML;
-            
             env_svg = '<svg version="1.1" xmlns="http://www.w3.org/2000/svg" transform="translate(10, 10)">'+env_svg.substring(0, env_svg.indexOf("</svg>")) + '</svg>' + gradients_svg + '</svg>';
             name = "E1-"+$scope.results.environmental_variables[0].name;
             legends_list.push({'name': name.replace(/[\W]+/g, "-")+'-legend.svg', 'svg': env_svg});
-        }
+        }*/
             
         query = {"legends": legends_list, "tree": tree_svg, "name": $scope.results.selectedTree.name+'.svg'};
         var date = new Date();

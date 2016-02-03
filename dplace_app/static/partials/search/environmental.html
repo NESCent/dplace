@@ -21,109 +21,117 @@
             </span> 
         </div>
     </span>
-    <form class="form-inline" style="margin-top:20px;" role="form" ng-submit="submit()" name="EnvironmentalForm" novalidate>
+    <form ng-repeat="variable in environmentalData.selectedVariables" class="form-inline" style="margin-top:20px;" role="form" ng-submit="submit()" name="variable.EnvironmentalForm" novalidate>
         <div class="panel panel-default">
             <div class="panel-heading">
                 <div class="row">
                     <div class="form-group col-xs-4">
                         <select
-                            ng-model="environmentalData.selectedCategory"
+                            ng-model="variable.selectedCategory"
                             class="form-control"
                             ng-options="category.name for category in environmentalData.categories"
-                            ng-change="categoryChanged(environmentalData.selectedCategory)"
+                            ng-change="categoryChanged(variable)"
                             >
                             <option value="">Select a category</option>
                         </select>
+                    </div>
+                    
+                    <div class="pull-right"> 
+                        <button class="btn btn-default btn-sm" style="margin-right:10px;" ng-show="$index > 0" ng-click="removeVariable(variable)"><span class="glyphicon glyphicon-minus" style="padding-right:3px;" aria-hidden="true"></span>Remove this variable</button>
                     </div>
                 </div>
 			
                 <div class="row row-margin-top">
                     <div class="form-group col-xs-4">
                         <select
-                                ng-model="environmentalData.selectedVariable"
+                                ng-model="variable.selectedVariable"
                                 class="form-control"
-                                ng-options="environmental.name for environmental in environmentalData.variables"
-                                ng-change="variableChanged(environmentalData.selectedVariable)"
-                                ng-show="environmentalData.variables.length > 0"
+                                ng-options="environmental.name for environmental in variable.variables"
+                                ng-change="variableChanged(variable)"
+                                ng-show="variable.variables.length > 0"
                                 >
                             <option value="">Select an environmental variable</option>
                         </select>
                     </div>
-                    <div ng-show="environmentalData.selectedVariable">
+                    <div ng-show="variable.selectedVariable">
                         <div class="form-group col-xs-2">
                             <div class="dropdown">
-                                <button class="btn btn-default dropdown-toggle form-control">{{ environmentalData.selectedFilter.name }} <span class="caret"></span></button>
+                                <button class="btn btn-default dropdown-toggle form-control">{{ variable.selectedFilter.name }} <span class="caret"></span></button>
                                 <ul class="dropdown-menu">
                                     <li ng-repeat="environmentalFilter in environmentalData.filters">
-                                        <a ng-click="environmentalData.selectedFilter = environmentalFilter; filterChanged();">{{ environmentalFilter.name }}</a>
+                                        <a ng-click="variable.selectedFilter = environmentalFilter; filterChanged(variable);">{{ environmentalFilter.name }}</a>
                                     </li>
                                 </ul>
                             </div>
                         </div>
-                        <div class="fields-inrange" ng-show="environmentalData.selectedFilter.operator == 'inrange'">
-                            <div class="form-group col-xs-3" ng-class="{'has-error':EnvironmentalForm.vals0inrange.$invalid && EnvironmentalForm.vals0inrange.$dirty}">
+                        <div class="fields-inrange" ng-show="variable.selectedFilter.operator == 'inrange'">
+                            <div class="form-group col-xs-3" ng-class="{'has-error':variable.EnvironmentalForm.vals0inrange.$invalid && variable.EnvironmentalForm.vals0inrange.$dirty}">
                                 <div class="input-group">
-                                    <input name="vals0inrange" class="form-control input-xs" ng-pattern="/^(0|\-?[0-9][0-9]*\.?[0-9]*)$/" ng-model="environmentalData.vals[0]" required/>
-                                    <span class="input-group-addon">{{ environmentalData.selectedVariable.units }}</span>
+                                    <input name="vals0inrange" class="form-control input-xs" ng-pattern="/^(0|\-?[0-9][0-9]*\.?[0-9]*)$/" ng-model="variable.vals[0]" required/>
+                                    <span class="input-group-addon">{{ variable.selectedVariable.units }}</span>
                                 </div>
                             </div>
-                            <div class="form-group col-xs-3" ng-class="{'has-error':EnvironmentalForm.vals1inrange.$invalid && EnvironmentalForm.vals1inrange.$dirty}">
+                            <div class="form-group col-xs-3" ng-class="{'has-error':variable.EnvironmentalForm.vals1inrange.$invalid && variable.EnvironmentalForm.vals1inrange.$dirty}">
                                 <div class="input-group">
-                                    <input name="vals1inrange" class="form-control" ng-pattern="/^(0|\-?[0-9][0-9]*\.?[0-9]*)$/" ng-model="environmentalData.vals[1]" required/>
-                                    <span class="input-group-addon">{{ environmentalData.selectedVariable.units }}</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="fields-inrange" ng-show="environmentalData.selectedFilter.operator == 'outrange'">
-                            <div class="form-group col-xs-3" ng-class="{'has-error':EnvironmentalForm.vals0outrange.$invalid && EnvironmentalForm.vals0outrange.$dirty}">
-                                <div class="input-group">
-                                    <input name="vals0outrange" class="form-control input-xs" ng-pattern="/^(0|\-?[0-9][0-9]*\.?[0-9]*)$/" ng-model="environmentalData.vals[0]" />
-                                    <span class="input-group-addon">{{ environmentalData.selectedVariable.units }}</span>
-                                </div>
-                            </div>
-                            <div class="form-group col-xs-3" ng-class="{'has-error':EnvironmentalForm.vals1outrange.$invalid && EnvironmentalForm.vals1outrange.$dirty}">
-                                <div class="input-group">
-                                    <input name="vals1outrange" class="form-control" ng-pattern="/^(0|\-?[0-9][0-9]*\.?[0-9]+)$/" ng-model="environmentalData.vals[1]" />
-                                    <span class="input-group-addon">{{ environmentalData.selectedVariable.units }}</span>
+                                    <input name="vals1inrange" class="form-control" ng-pattern="/^(0|\-?[0-9][0-9]*\.?[0-9]*)$/" ng-model="variable.vals[1]" required/>
+                                    <span class="input-group-addon">{{ variable.selectedVariable.units }}</span>
                                 </div>
                             </div>
                         </div>
-                        <div class="fields-inrange" ng-show="environmentalData.selectedFilter.operator == 'lt'">
-                            <div class="form-group col-xs-6" ng-class="{'has-error':EnvironmentalForm.valslt.$invalid && EnvironmentalForm.valslt.$dirty}">
+                        <div class="fields-inrange" ng-show="variable.selectedFilter.operator == 'outrange'">
+                            <div class="form-group col-xs-3" ng-class="{'has-error':variable.EnvironmentalForm.vals0outrange.$invalid && variable.EnvironmentalForm.vals0outrange.$dirty}">
                                 <div class="input-group">
-                                    <input name="valslt" class="form-control input-xs" ng-pattern="/^(0|\-?[0-9][0-9]*\.?[0-9]*)$/" ng-model="environmentalData.vals[1]" />
-                                    <span class="input-group-addon">{{ environmentalData.selectedVariable.units }}</span>
+                                    <input name="vals0outrange" class="form-control input-xs" ng-pattern="/^(0|\-?[0-9][0-9]*\.?[0-9]*)$/" ng-model="variable.vals[0]" />
+                                    <span class="input-group-addon">{{ variable.selectedVariable.units }}</span>
+                                </div>
+                            </div>
+                            <div class="form-group col-xs-3" ng-class="{'has-error':variable.EnvironmentalForm.vals1outrange.$invalid && variable.EnvironmentalForm.vals1outrange.$dirty}">
+                                <div class="input-group">
+                                    <input name="vals1outrange" class="form-control" ng-pattern="/^(0|\-?[0-9][0-9]*\.?[0-9]+)$/" ng-model="variable.vals[1]" />
+                                    <span class="input-group-addon">{{ variable.selectedVariable.units }}</span>
                                 </div>
                             </div>
                         </div>
-                        <div class="fields-inrange" ng-show="environmentalData.selectedFilter.operator == 'gt'">
-                            <div class="form-group col-xs-6" ng-class="{'has-error':EnvironmentalForm.valsgt.$invalid && EnvironmentalForm.valsgt.$dirty}">
+                        <div class="fields-inrange" ng-show="variable.selectedFilter.operator == 'lt'">
+                            <div class="form-group col-xs-6" ng-class="{'has-error':variable.EnvironmentalForm.valslt.$invalid && variable.EnvironmentalForm.valslt.$dirty}">
                                 <div class="input-group">
-                                    <input name="valsgt" class="form-control" ng-pattern="/^(0|\-?[0-9][0-9]*\.?[0-9]+)$/" ng-model="environmentalData.vals[0]" />
-                                    <span class="input-group-addon">{{ environmentalData.selectedVariable.units }}</span>
+                                    <input name="valslt" class="form-control input-xs" ng-pattern="/^(0|\-?[0-9][0-9]*\.?[0-9]*)$/" ng-model="variable.vals[1]" />
+                                    <span class="input-group-addon">{{ variable.selectedVariable.units }}</span>
                                 </div>
                             </div>
                         </div>
-                        <div class="fields-inrange" ng-show="environmentalData.selectedFilter.operator == 'all'">
-                            <div class="form-group col-xs-3" ng-class="{'has-error': EnvironmentalForm.vals0all.$invalid && EnvironmentalForm.vals0all.$dirty}">
+                        <div class="fields-inrange" ng-show="variable.selectedFilter.operator == 'gt'">
+                            <div class="form-group col-xs-6" ng-class="{'has-error':variable.EnvironmentalForm.valsgt.$invalid && variable.EnvironmentalForm.valsgt.$dirty}">
                                 <div class="input-group">
-                                    <input name="vals0all" class="form-control input-xs" ng-readonly="true" ng-model="environmentalData.vals[0]" />
-                                    <span class="input-group-addon"> {{ environmentalData.selectedVariable.units }} </span>
+                                    <input name="valsgt" class="form-control" ng-pattern="/^(0|\-?[0-9][0-9]*\.?[0-9]+)$/" ng-model="variable.vals[0]" />
+                                    <span class="input-group-addon">{{ variable.selectedVariable.units }}</span>
                                 </div>
                             </div>
-                            <div class="form-group col-xs-3" ng-class="{'has-error': EnvironmentalForm.vals0all.$invalid && EnvironmentalForm.vals1all.$dirty}">
+                        </div>
+                        <div class="fields-inrange" ng-show="variable.selectedFilter.operator == 'all'">
+                            <div class="form-group col-xs-3" ng-class="{'has-error': variable.EnvironmentalForm.vals0all.$invalid && variable.EnvironmentalForm.vals0all.$dirty}">
                                 <div class="input-group">
-                                    <input name="vals1all" class="form-control input-xs" ng-readonly="true" ng-model="environmentalData.vals[1]" />
-                                    <span class="input-group-addon"> {{ environmentalData.selectedVariable.units }} </span>
+                                    <input name="vals0all" class="form-control input-xs" ng-readonly="true" ng-model="variable.vals[0]" />
+                                    <span class="input-group-addon"> {{ variable.selectedVariable.units }} </span>
+                                </div>
+                            </div>
+                            <div class="form-group col-xs-3" ng-class="{'has-error': variable.EnvironmentalForm.vals0all.$invalid && variable.EnvironmentalForm.vals1all.$dirty}">
+                                <div class="input-group">
+                                    <input name="vals1all" class="form-control input-xs" ng-readonly="true" ng-model="variable.vals[1]" />
+                                    <span class="input-group-addon"> {{ variable.selectedVariable.units }} </span>
                                 </div>
                             </div>           
                         </div>
                     </div>
                 </div>
-                <div ng-show="environmentalData.selectedVariable">Further information: {{ environmentalData.selectedVariable.codebook_info }}</div>
+                <div ng-show="variable.selectedVariable">Further information: {{ variable.selectedVariable.codebook_info }}</div>
             </div>
         </div>
-        <!-- <div class="pull-right">
+    </form>
+    <div class="pull-right">
+        <button class="btn btn-default btn-sm" style="margin-right:10px;" ng-click="addVariable()" ng-show="environmentalData.selectedVariables.length < 3"><span class="glyphicon glyphicon-plus" style="padding-right:3px;" aria-hidden="true"></span>Add another environmental variable</button>
+    </div>
+    <!-- <div class="pull-right">
             <button class="btn btn-primary form-control"
                     ng-disabled="searchButton.disabled"
                     ng-click="doSearch()">{{ searchButton.text }}</button>
@@ -133,5 +141,4 @@
           {{ errors }}
         </span>
         </div> -->
-    </form>
 </div>

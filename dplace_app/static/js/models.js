@@ -72,7 +72,6 @@ function GeographicRegionModel(GeographicRegion) {
 function EnvironmentalDataModel(EnvironmentalCategory) {
     this.variables = [];
     this.categories = EnvironmentalCategory.query();
-    this.selectedVariable = null;
     this.filters = [
         { operator: 'inrange', name: 'between' },
         { operator: 'lt', name: 'less than'},
@@ -81,6 +80,7 @@ function EnvironmentalDataModel(EnvironmentalCategory) {
         { operator: 'all', name: 'all values'},
     ];
     this.selectedFilter = this.filters[0];
+    this.selectedVariables = [];
     this.vals = [];
     this.badgeValue = 0;
 }

@@ -2,34 +2,52 @@ function EnvironmentalCtrl($scope, searchModelService, EnvironmentalVariable, En
     var linkModel = function() {
         // Get a reference to the environmental search params from the model
         $scope.environmentalData = searchModelService.getModel().getEnvironmentalData();
+        if ($scope.environmentalData.selectedVariables.length == 0) {
+            $scope.environmentalData.selectedVariables.push({'vals': ['', ''], 'selectedFilter': $scope.environmentalData.selectedFilter, 'variables': []});
+            $scope.environmentalData.badgeValue = 1;
+        }
+            
     };
     $scope.$on('searchModelReset', linkModel); // When model is reset, update our model
     linkModel();
     
-    $scope.categoryChanged = function(category) {
-        $scope.environmentalData.variables = EnvironmentalVariable.query({category: category.id});    
-        $scope.environmentalData.selectedVariable = '';
+    $scope.categoryChanged = function(variable) {
+        variable.variables = EnvironmentalVariable.query({category: variable.selectedCategory.id});    
+    };
+    
+    $scope.addVariable = function() {
+        $scope.environmentalData.selectedVariables.push({'vals': ['', ''], 'selectedFilter': $scope.environmentalData.selectedFilter, 'variables': []});
+        $scope.environmentalData.badgeValue += 1;
+    };
+    
+    $scope.removeVariable = function(variable) {
+        var index = $scope.environmentalData.selectedVariables.indexOf(variable);
+        $scope.environmentalData.selectedVariables.splice(index, 1);
+        $scope.environmentalData.badgeValue -= 1;
     };
 
     $scope.variableChanged = function(variable) {
-        if(variable != null) {
-            $scope.environmentalData.badgeValue = 1;
-        } else {
-            $scope.environmentalData.badgeValue = 0;
-        }
-        $scope.environmentalData.vals[0] = '';
-        $scope.environmentalData.vals[1] = '';
-        $scope.EnvironmentalForm.$setPristine();
-        $scope.values = MinAndMax.query({query: {environmental_id: $scope.environmentalData.selectedVariable.id}});
-        $scope.filterChanged();
+        if(variable.selectedVariable != null && $scope.environmentalData.badgeValue == 0) {
+            $scope.environmentalData.badgeValue += 1;
+        } 
+
+        variable.EnvironmentalForm.$setPristine();
+        $scope.values = MinAndMax.query({query: {environmental_id: variable.selectedVariable.id}});
+        $scope.filterChanged(variable);
     };
     
-    $scope.filterChanged = function() {
-        if ($scope.EnvironmentalForm.$dirty && $scope.environmentalData.selectedFilter.operator != 'all') return;
-        $scope.values.$promise.then(function(result) {
-            $scope.environmentalData.vals[0] = result.min;
-            $scope.environmentalData.vals[1] = result.max;
+    $scope.filterChanged = function(variable) {
+        if (variable.EnvironmentalForm.$dirty && variable.selectedFilter.operator != 'all') return;
+        selected_variable = $scope.environmentalData.selectedVariables.filter(function(env_var) {
+            return env_var.selectedVariable.id == variable.selectedVariable.id;
         });
+        if (selected_variable.length == 1) {
+            MinAndMax.query({query: {environmental_id: variable.selectedVariable.id}}).$promise.then(function(result) {
+                selected_variable[0].vals[0] = result.min;
+                selected_variable[0].vals[1] = result.max;
+            });
+        }
+        
     };
     
     //gets the range of environmental values if the user selects 'all values'

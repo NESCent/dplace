@@ -32,7 +32,7 @@
                 </div>
             </td>
             <td ng-repeat="environmental in results.environmental_variables">
-                {{ society_result.environmental_values | formatEnvironmentalValues }}
+                {{ society_result.environmental_values | formatEnvironmentalValues:environmental.id }}
             </td>
             <td ng-show="results.languages">
                 {{ society_result.languages | formatLanguage}}
