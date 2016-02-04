@@ -10,7 +10,7 @@ install:
 before_script:
   - psql -c 'create database travis_postgis;' -U postgres
 # command to run tests
-script: "coverage run --source='.' manage.py test"
+script: "coverage run --source='dplace_app' manage.py test"
 after_success:
   - coverage report -m
   - codecov
