@@ -1,24 +1,21 @@
 from django.conf.urls import patterns, url, include
-from django.shortcuts import redirect
 from django.views.generic.base import RedirectView
 
 from rest_framework import routers
 from dplace_app import api_views
 
 router = routers.DefaultRouter()
-router.register(r'variables', api_views.VariableDescriptionViewSet)
-router.register(r'categories', api_views.VariableCategoryViewSet)
-router.register(r'codes', api_views.VariableCodeDescriptionViewSet)
-router.register(r'values', api_views.VariableCodedValueViewSet)
+router.register(r'variables', api_views.CulturalVariableViewSet)
+router.register(r'categories', api_views.CulturalCategoryViewSet)
+router.register(r'codes', api_views.CulturalCodeDescriptionViewSet)
+router.register(r'values', api_views.CulturalValueViewSet)
 router.register(r'societies', api_views.SocietyViewSet)
 router.register(r'environmental_categories', api_views.EnvironmentalCategoryViewSet)
 router.register(r'environmental_variables', api_views.EnvironmentalVariableViewSet)
 router.register(r'environmentals', api_views.EnvironmentalViewSet)
 router.register(r'environmental_values', api_views.EnvironmentalValueViewSet)
 router.register(r'isocodes', api_views.ISOCodeViewSet)
-router.register(r'glottocodes', api_views.GlottoCodeViewSet)
-router.register(r'language_classes', api_views.LanguageClassViewSet)
-router.register(r'language_classifications', api_views.LanguageClassificationViewSet)
+router.register(r'language_families', api_views.LanguageFamilyViewSet)
 router.register(r'languages', api_views.LanguageViewSet)
 router.register(r'language_trees', api_views.LanguageTreeViewSet)
 router.register(r'geographic_regions', api_views.GeographicRegionViewSet)
@@ -28,8 +25,9 @@ router.register(r'sources', api_views.SourceViewSet)
 # Wire up our API using automatic URL routing.
 # Additionally, we include login URLs for the browseable API.
 
-urlpatterns = patterns('dplace_app.views',
-    url(r'^$', RedirectView.as_view(url='angular/'), name='home'),
+urlpatterns = patterns(
+    'dplace_app.views',
+    url(r'^$', RedirectView.as_view(url='angular/', permanent=True), name='home'),
     url(r'^society/(?P<society_id>\d+)/$', 'view_society', name='view_society'),
     url(r'^language/(?P<language_id>\d+)/$', 'view_language', name='view_language'),
     url(r'^angular/$', 'angular', name='angular'),
@@ -43,5 +41,4 @@ urlpatterns = patterns('dplace_app.views',
     url(r'^api/v1/get_dataset_sources', api_views.get_dataset_sources, name="get_dataset_sources"),
     url(r'^api/v1/csv_download', api_views.csv_download, name='csv_download'),
     url(r'^api/v1/zip', api_views.zip_legends, name='zip_legends'),
-
 )

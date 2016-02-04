@@ -1,4 +1,4 @@
-function SocietiesCtrl($scope, $timeout, $http, searchModelService, LanguageClass, ZipTest) {
+function SocietiesCtrl($scope, $timeout, $http, searchModelService, colorMapService) {
     $scope.results = searchModelService.getModel().getResults();
     $scope.query = searchModelService.getModel().getQuery();
     $scope.variables = [];
@@ -101,7 +101,7 @@ function SocietiesCtrl($scope, $timeout, $http, searchModelService, LanguageClas
         
         //cultural and environmental variables
         if ($scope.results.chosenVariable) {
-            if ($scope.results.environmental_variables.length > 0 && $scope.results.chosenVariable == $scope.results.environmental_variables[0]) {
+            if ($scope.results.environmental_variables.length > 0 && $scope.results.environmental_variables.indexOf($scope.results.chosenVariable) != -1) {
                 //if the chosen map is an environmental variable
                     legend_svg = "<g transform='translate(0,350)'>"+d3.select(".env-legend-td").node().innerHTML+"</g>";
             }
@@ -126,10 +126,15 @@ function SocietiesCtrl($scope, $timeout, $http, searchModelService, LanguageClas
                             .attr("stroke-width", "0.5")
                             .attr("fill", function() {
                                 if (variable[0].codes[c].description.indexOf("Missing data") != -1)
-                                    return 'hsl(0, 0%, 100%)';
+                                    return 'rgb(255,255,255)';
                                 var value = variable[0].codes[c].code;
-                                var hue = value * 240 / variable[0].codes.length;
-                                return 'hsl('+hue+',100%,50%)';
+                                if (variable[0].variable.data_type.toUpperCase() == 'ORDINAL') {
+                                    rgb = colorMapService.generateRandomHue(value, variable[0].codes.length, variable[0].variable.id, 5);
+                                    return rgb;
+                                }
+                                
+                                rgb = colorMapService.colorMap[parseInt(value)];
+                                return rgb;
                             });
                         g.append("svg:text")
                             .attr("x", "20")
@@ -151,38 +156,36 @@ function SocietiesCtrl($scope, $timeout, $http, searchModelService, LanguageClas
             var filename = $scope.results.chosenVariable.name.replace(/[\W]+/g, "-").toLowerCase()+"-map.svg";
         }
         
-        else if ($scope.results.classifications && $scope.results.languages.length > 0) {
+        else if ($scope.results.classifications) {
             count = 0;
-            for (var key in $scope.results.classifications) {
-                for (var i = 0; i < $scope.results.classifications[key].length; i++) {
-                    g = legend.append("svg:g")
-                        .attr("transform", function() {
-                            return 'translate(0,'+ count*25 + ')';
-                        });
-                    g.append("svg:circle")
-                        .attr("cx", "10")
-                        .attr("cy", "10")
-                        .attr("r", "4.5")
-                        .attr("stroke", "#000")
-                        .attr("stroke-width", "0.5")
-                        .attr("fill", function() {
-                            var value = $scope.results.classifications[key][i].id;
-                            var hue = value * 240 / $scope.results.classifications['NumClassifications'];
-                            return 'hsl('+hue+',100%,50%)';
-                        });
-                    g.append("svg:text")
-                        .attr("x", "20")
-                        .attr("y", "15")
-                        .text($scope.results.classifications[key][i].name);
-                    count++;
-                }
+            
+            for (var i = 0; i < $scope.results.classifications.length; i++) {
+                g = legend.append("svg:g")
+                    .attr("transform", function() {
+                        return 'translate(0,' + count*25 + ')';
+                    });
+                g.append("svg:circle")
+                    .attr("cx", "10")
+                    .attr("cy", "10")
+                    .attr("r", "4.5")
+                    .attr("stroke", "#000")
+                    .attr("stroke-width", "0.5")
+                    .attr("fill", function() {
+                        var value = $scope.results.classifications[i].id;
+                        rgb = colorMapService.mapColor(value, $scope.results.classifications.length);
+                        return rgb;
+                    });
+                g.append("svg:text")
+                    .attr("x", "20")
+                    .attr("y", "15")
+                    .text($scope.results.classifications[i].name);
+                count++;
                 
             }
             var legend_svg = "<g transform='translate(0,350)'>"+legend.node().innerHTML+"</g>";
             var map_svg = map_svg.substring(0, map_svg.indexOf("</svg>"));
             map_svg = map_svg.concat(legend_svg+"</svg>");
-            lang_family = $scope.results.languages[0].language_family.name;
-            var filename = $scope.results.languages[0].language_family.name.replace(/[\W]+/g, "-")+"-map.svg";
+            var filename = "language-classifications-map.svg";
 
         }
         
@@ -201,8 +204,8 @@ function SocietiesCtrl($scope, $timeout, $http, searchModelService, LanguageClas
                     .attr("stroke-width", "0.5")
                     .attr("fill", function() {
                         var value = $scope.results.geographic_regions[i].tdwg_code;
-                        var hue = value * 240 / $scope.results.geographic_regions.length;
-                        return 'hsl('+hue+',100%,50%)';
+                        rgb = colorMapService.mapColor(value, $scope.results.geographic_regions.length);
+                        return rgb;
                     });
                 g.append("svg:text")
                     .attr("x", "20")
@@ -328,13 +331,20 @@ function SocietiesCtrl($scope, $timeout, $http, searchModelService, LanguageClas
             legends_list.push({'name': name.replace(/[\W]+/g, "-")+'-legend.svg', 'svg': svg_string});    
         }
         
-        if ($scope.results.environmental_variables.length > 0) {
+        for (var i = 0; i < $scope.results.environmental_variables.length; i++) {
+            env_svg = d3.select("#e"+$scope.results.environmental_variables[i].id).node().innerHTML;
+            env_svg = '<svg version="1.1" xmlns="http://www.w3.org/2000/svg" transform="translate(10, 10)">'+env_svg.substring(0, env_svg.indexOf("</svg>")) + '</svg>' + gradients_svg + '</svg>';
+            name = $scope.results.environmental_variables[i].CID + '-'+$scope.results.environmental_variables[i].name;
+            legends_list.push({'name': name.replace(/[\W]+/g, "-")+'-legend.svg', 'svg': env_svg});
+        }
+        
+        
+        /*if ($scope.results.environmental_variables.length > 0) {
             var env_svg = d3.select("#E1").node().innerHTML;
-            
             env_svg = '<svg version="1.1" xmlns="http://www.w3.org/2000/svg" transform="translate(10, 10)">'+env_svg.substring(0, env_svg.indexOf("</svg>")) + '</svg>' + gradients_svg + '</svg>';
             name = "E1-"+$scope.results.environmental_variables[0].name;
             legends_list.push({'name': name.replace(/[\W]+/g, "-")+'-legend.svg', 'svg': env_svg});
-        }
+        }*/
             
         query = {"legends": legends_list, "tree": tree_svg, "name": $scope.results.selectedTree.name+'.svg'};
         var date = new Date();

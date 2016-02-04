@@ -1,27 +1,36 @@
-from rest_framework import renderers
 import csv
+import zipfile
+
+from rest_framework import renderers
 from six import StringIO, text_type
-from models import *
+
 
 class DPLACECSVResults(object):
-    def __init__(self,data):
+    def __init__(self, data):
         self.data = data
         self.field_map = dict()
-        self.field_names = ['Society name', 'Society source', 'Longitude', 'Latitude',
-                            'ISO code', 'Language name']
+        self.field_names = [
+            'Society name',
+            'Society source',
+            'Longitude',
+            'Latitude',
+            'ISO code',
+            'Language name',
+            'Language family']
         self.rows = []
         self.parse()
         self.encode_field_names()
         self.flatten()
 
     def field_names_for_cultural_variable(self, variable):
-        return {'code' : "Code: %s %s" % (variable['label'], variable['name']),
+        return {'code': "Code: %s %s" % (variable['label'], variable['name']),
                 'description': "Description: %s %s" % (variable['label'], variable['name']),
                 'comments': "Comment: %s %s" % (variable['label'], variable['name']),
                 'focal_year': "Focal Year: %s %s" % (variable['label'], variable['name']),
                 'sources': "References: %s %s" % (variable['label'], variable['name'])}
+
     def field_names_for_environmental_variable(self, variable):
-        return {'name' : "%s (%s)" % (variable['name'], variable['units']) }
+        return {'name': "%s (%s)" % (variable['name'], variable['units'])}
 
     def parse(self):
         # get IDs for variable descriptions
@@ -51,20 +60,26 @@ class DPLACECSVResults(object):
         self.field_names = [field.encode("utf-8") for field in self.field_names]
 
     def flatten(self):
-    # data is a dictionary with a list of societies
-        for item in self.data['societies']:
+        # data is a dictionary with a list of societies
+        for item in self.data.get('societies', []):
             row = dict()
             # Merge in society data
             society = item['society']
             row['Society name'] = society['name']
-            row ['Society source'] = society['source']['name']
-            row['Longitude'] = "" if society['location'] is None else society['location']['coordinates'][0]
-            row['Latitude'] = "" if society['location'] is None else society['location']['coordinates'][1]
+            row['Society source'] = society['source']['name']
+            row['Longitude'] = "" if society['location'] is None \
+                else society['location']['coordinates'][0]
+            row['Latitude'] = "" if society['location'] is None \
+                else society['location']['coordinates'][1]
             if society['language'] is not None and 'name' in society['language']:
                 row['ISO code'] = society['language']['iso_code']
                 row['Language name'] = society['language']['name']
+                if 'family' in society['language'] and 'name' in society['language']['family']:
+                    row['Language family'] = society['language']['family']['name']
             else:
                 row['Language name'] = ""
+                row['Language family'] = ""
+                
             # geographic - only one
             geographic_regions = item['geographic_regions']
             if len(geographic_regions) == 1:
@@ -81,11 +96,14 @@ class DPLACECSVResults(object):
                 row[field_names['focal_year']] = cultural_trait_value['focal_year']
                 if 'code_description' in cultural_trait_value:
                     try:
-                        row[field_names['description']] = cultural_trait_value['code_description']['description']
+                        row[field_names['description']] = \
+                            cultural_trait_value['code_description']['description']
                     except:
-                        break
+                        row[field_names['description']] = ''
                 row[field_names['comments']] = cultural_trait_value['comment']
-                row[field_names['sources']] = ''.join([x['author']+'('+x['year']+'); ' for x in cultural_trait_value['references']])
+                row[field_names['sources']] = ''.join([
+                    x['author'] + '(' + x['year'] + '); '
+                    for x in cultural_trait_value['references']])
             # environmental
             environmental_values = item['environmental_values']
             for environmental_value in environmental_values:
@@ -96,8 +114,10 @@ class DPLACECSVResults(object):
             #
             self.rows.append(row)
 
+
 def encode_if_text(val):
     return val.encode('utf-8') if isinstance(val, text_type) else val
+
 
 def encode_rowdict(rowdict):
     encoded = dict()
@@ -106,6 +126,7 @@ def encode_rowdict(rowdict):
         elem = rowdict[k]
         encoded[encoded_k] = encode_if_text(elem)
     return encoded
+
 
 class DPLACECsvRenderer(renderers.BaseRenderer):
     media_type = 'text/csv'
@@ -118,43 +139,42 @@ class DPLACECsvRenderer(renderers.BaseRenderer):
         if data is None:
             return ''
         results = DPLACECSVResults(data)
-
         csv_buffer = StringIO()
         csv_writer = csv.DictWriter(csv_buffer, results.field_names)
         cite_writer = csv.writer(csv_buffer)
-        cite_writer.writerow(['To cite D-PLACE: Research that uses data from D-PLACE should cite both the original source of the coded data and this paper (e.g., for anthropological data from the Ethnographic Atlas: "Murdock (1962-1971); Kirby et al n.d.)." In the reference list, the D-PLACE URL (www.d-place.org) and the date the data were downloaded should be given.']) #add in 'How to cite' here
+        cite_writer.writerow(['Research that uses data from D-PLACE should cite both the original source(s) of the data and this paper (e.g., research using cultural data from the Binford Hunter-Gatherer dataset: "Binford (2001); Binford and Johnson (2006); Kirby et al. Submitted)." The reference list should include the date data were accessed and URL for D-PLACE (http://d-place.org), in addition to the full references for Binford (2001) and Binford and Johnson (2006).']) #add in 'How to cite' here
         csv_writer.writeheader()
         for row in results.rows:
             csv_writer.writerow(encode_rowdict(row))
 
         return csv_buffer.getvalue()
-        
-class ZipRenderer(renderers.BaseRenderer):
 
+
+class ZipRenderer(renderers.BaseRenderer):
     media_type = 'application/zip'
     format = 'zip'
-    
+
     def render(self, data, accepted_media_type=None, renderer_context=None):
-        '''
-        Renders zip file for phylogeny download
-        '''
-        import zipfile
+        """Renders zip file for phylogeny download"""
         if data is None:
             return ''
-        
+
         s = StringIO()
+        zf = zipfile.ZipFile(s, "w")
         try:
-            zf = zipfile.ZipFile(s, "w") 
             if 'legends' in data:
-                for l in data['legends']:
+                for l in data['legends'] or []:
                     if 'svg' in l:
                         if 'name' in l:
-                            zf.writestr(l['name'].encode('utf-8'), l['svg'].encode('utf-8'))
+                            zf.writestr(
+                                l['name'].encode('utf-8'), l['svg'].encode('utf-8'))
             if 'tree' in data:
                 if 'name' in data:
-                    zf.writestr(data['name'].encode('utf-8'), data['tree'].encode('utf-8'))
+                    zf.writestr(
+                        (data['name'] or 'x').encode('utf-8'),
+                        (data['tree'] or '').encode('utf-8'))
                 else:
-                    zf.writestr('tree.svg', data['tree'].encode('utf-8'))
+                    zf.writestr('tree.svg', (data['tree'] or '').encode('utf-8'))
         finally:
             zf.close()
         return s.getvalue()

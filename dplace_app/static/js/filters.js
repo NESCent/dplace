@@ -8,40 +8,50 @@ angular.module('dplaceFilters', [])
             }
         }
     })    
-    .filter('joinDictItems', function() {
-        return function(dict) {
-            items = []
-            for (var key in dict) {
-                if (key != 'NumClassifications')
-                    items = items.concat(dict[key]);
-            }
-            return items;
-        }
-    })
-    .filter('colorNode', function() {
+    .filter('colorNode', ['colorMapService', function(colorMapService) {
         return function(value, codes) {
+            if (codes.societies) {
+                if (codes.classifications) {
+                    rgb = colorMapService.mapColor(value, codes.classifications.length);
+                    return rgb;
+                }
+                if (codes.geographic_regions.length > 0) {
+                    rgb = colorMapService.mapColor(value, codes.geographic_regions.length);
+                    return rgb;
+                } 
+            }
+        
             var missingData = false;
             var missingDataValue;
-            for (var i = 0; i < codes.length; i++) {
-                if (codes[i].description && codes[i].description.indexOf("Missing data") != -1) {
+            for (var i = 0; i < codes.codes.length; i++) {
+                if (codes.codes[i].description && codes.codes[i].description.indexOf("Missing data") != -1) {
                     missingData = true;
-                    missingDataValue = codes[i].code;
+                    missingDataValue = codes.codes[i].code;
                     break;
                 }
             }
-            if (missingData && value == missingDataValue) return 'hsl(0, 0%, 100%)';
+            if (missingData && value == missingDataValue) return 'rgb(255, 255, 255)';
             else {
-               var hue = value * 240 / codes.length;
+                if (codes.variable.data_type.toUpperCase() == 'ORDINAL') {
+                    rgb = colorMapService.generateRandomHue(value, codes.codes.length,codes.variable.id,5);
+                } else rgb = colorMapService.colorMap[parseInt(value)];
+                return rgb;
             }
-            return 'hsl('+hue+',100%, 50%)';
-            
         }
-    })
+    }])
     .filter('formatVariableCodeValues', function() {
         return function(values, variable_id) {
             return values.map( function(code_value) {   
                 if (code_value.code_description && (variable_id == code_value.code_description.variable)) return code_value.code_description.description;
                 else if (variable_id == code_value.variable) return code_value.coded_value;
+                else return ''
+            }).join('');
+        };
+    })
+    .filter('formatEnvironmentalValues', function () {
+        return function(values, variable_id) {
+            return values.map( function(environmental_value) {
+                if (environmental_value.variable == variable_id) return environmental_value.value.toFixed(4);
                 else return ''
             }).join('');
         };
@@ -81,18 +91,11 @@ angular.module('dplaceFilters', [])
             }).join('')
         };
     })
-    .filter('formatEnvironmentalValues', function () {
-        return function(values) {
-            return values.map( function(environmental_value) {
-                    return environmental_value.value.toFixed(4);
-            }).join(',');
-        };
-    })
     .filter('formatLanguage', function () {
         return function(values) {
             return values.map( function(language) {
-                return language.name;
-            }).join(',');
+                return language.family.name;
+            }).join('; ');
         };
     })
     .filter('formatLanguageTrees', function () {

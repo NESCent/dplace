@@ -1,80 +1,92 @@
-
-__author__ = 'dan'
+from __future__ import unicode_literals
 from collections import defaultdict
-from dplace_app.load.isocode import load_isocode
-from dplace_app.load.society_binford import load_bf_society
-from dplace_app.load.society_ea import load_ea_society
-from dplace_app.load.language import load_lang
+
 from django.test import TestCase
 
-class LoadISOCodeTestCase(TestCase):
+from dplace_app.models import Society
+from dplace_app.load.isocode import load_isocode
+from dplace_app.load.society import load_societies
+from dplace_app.load.values import load_data
+from dplace_app.load.variables import load_vars
+from dplace_app.load.glottocode import xd_to_language
+
+
+class LoadTestCase(TestCase):
     '''
     Tests loading
     '''
-    def test_load_isocode(self):
-        row_dict = {'ISO 693-3 code': 'abc'}
-        isocode = load_isocode(row_dict)
-        self.assertIsNotNone(isocode, 'Unable to load an iso code with 3 characters')
-    def test_isocode_too_long(self):
-        row_dict = {'ISO 693-3 code': 'abcd'}
-        isocode = load_isocode(row_dict)
-        self.assertIsNone(isocode, 'Should not load an isocode with 4 characters')
-    def test_isocode_not_present(self):
-        row_dict = {'foo':'bar'}
-        isocode = load_isocode(row_dict)
-        self.assertIsNone(isocode, 'Should not load an isocode without iso code')
-    def test_load_ea_society(self):
-        row_dict = defaultdict(
-            lambda: '',
-            **{
-            'ID': 'EA12',
-            'Society_name_EA': 'Example EA Society',
-            'ISO693_3': 'abc',
-            'LangNam': 'Language, Test',
-        })
-        iso_code = load_isocode({'ISO': 'abc'}) # Make sure iso code exists
-        self.assertIsNotNone(iso_code, 'Did not create iso_code')
-        society = load_ea_society(row_dict)
-        #self.assertIsNotNone(society, 'unable to load society')
-        #self.assertIsNotNone(society.iso_code, 'society has no linked iso code')
-        #self.assertEqual(society.source.author, 'Murdock et al.', 'Society source should be Murdock et al.')
-        # Not testing language creation here
-        #self.assertIsNone(society.language, 'society should have no language')
-    def test_load_bf_society(self):
-        row_dict = defaultdict(
-            lambda: '',
-            **{'soc_id': 'socid',
-            'soc_name': 'socname',
-            'xd_id': 'xdid',
-            'ID': 'BF34',
-            'STANDARD SOCIETY NAME Binford': 'Example Binford Society',
-            'ISO693_3': 'def',
-            'LangNam': 'Language2, Test'})
+    def get_dict(self, **kw):
+        return defaultdict(lambda: '', **kw)
 
-        iso_code = load_isocode({'ISO': 'def'}) # Make sure iso code exists
-        self.assertIsNotNone(iso_code, 'Did not create iso_code')
-        society = load_bf_society(row_dict)
-        # FIXME: the following assertions need to be fixed!
-        #self.assertIsNotNone(society, 'unable to load society')
-        #self.assertIsNotNone(society.iso_code, 'society has no linked iso code')
-        #self.assertEqual(society.source.author, 'Binford', 'Society source should be Binford')
-        # Not testing language creation here
-        #self.assertIsNone(society.language, 'society should have no language')
     def test_load_language(self):
-        row_dict = {
-            'ISO 693-3 code': 'acv',
-            'Language name': 'Achumawi',
-            'FAMILY-REVISED': 'Palaihnihan',
-            'Class2': '',
-            'Class3': '',
-            'Ethnologue Classification (unrevised)': 'Palaihnihan',
-        }
-        iso_code = load_isocode({'ISO': 'acv'}) # Make sure iso code exists
-        self.assertIsNotNone(iso_code, 'Did not create iso_code')
-        language = load_lang(row_dict)
-        self.assertIsNotNone(language, 'unable to load language')
-        self.assertEqual(row_dict['Language name'], language.name, 'Language did not have correct name')
-        classification = language.languageclassification_set.first()
-        self.assertEqual(row_dict['FAMILY-REVISED'], classification.class_family.name, 'Language did not have correct family name')
+        soc = Society.objects.create(ext_id='socid', xd_id='socid', name='society')
+        soc.save()
+        res = xd_to_language(
+            [self.get_dict(xd_id='socid', DialectLanguageGlottocode='none1234')],
+            [self.get_dict(id='abcd1234', name='name', iso_code='iso')])
+        self.assertEqual(res, 0)
+        res = xd_to_language(
+            [self.get_dict(xd_id='socid', DialectLanguageGlottocode='abcd1234')],
+            [self.get_dict(id='abcd1234', name='name', iso_code='iso')])
+        self.assertEqual(res, 1)
 
+    def test_load_isocode(self):
+        isocode = load_isocode({'ISO 693-3 code': 'abc'})
+        self.assertIsNotNone(isocode, 'Unable to load an iso code with 3 characters')
 
+    def test_isocode_too_long(self):
+        isocode = load_isocode({'ISO 693-3 code': 'abcd'})
+        self.assertIsNone(isocode, 'Should not load an isocode with 4 characters')
+
+    def test_isocode_not_present(self):
+        isocode = load_isocode({'foo': 'bar'})
+        self.assertIsNone(isocode, 'Should not load an isocode without iso code')
+
+    def test_load_society(self):
+        def society(dataset):
+            return self.get_dict(
+                dataset=dataset,
+                soc_id='EA12' + dataset,
+                xd_id='xd1',
+                soc_name='Example Society',
+                alternate_names='Example',
+                main_focal_year='2016')
+        self.assertEqual(load_societies([society('EA'), society('LRB'), society('x')]), 2)
+
+    def test_load_data(self):
+        self.assertEqual(load_data([self.get_dict()]), 0)
+        self.assertEqual(load_data([self.get_dict(soc_id='notknown')]), 0)
+        soc = Society.objects.create(ext_id='socid', name='society')
+        soc.save()
+        res = load_data([self.get_dict(soc_id='socid')])
+        self.assertEqual(res, 0)
+        res = load_data([self.get_dict(soc_id='socid', Dataset='LRB')])
+        self.assertEqual(res, 0)
+        load_vars([self.get_dict(Dataset='LRB', VarId='5')])
+        res = load_data([self.get_dict(soc_id='socid', Dataset='LRB', VarId='5')])
+        self.assertEqual(res, 1)
+
+    def test_environmental(self):
+        from dplace_app.load.environmental import (
+            create_environmental_variables, load_environmental,
+        )
+
+        res = load_environmental([self.get_dict(Source='EA')])
+        self.assertEqual(res, 0)
+        row_dict = self.get_dict(
+            dataset='EA',
+            soc_id='EA12',
+            xd_id='xd1',
+            soc_name='Example EA Society',
+            alternate_names='Example',
+            main_focal_year='2016')
+        load_societies([row_dict])
+        res = load_environmental([self.get_dict(**{
+            'Source': 'EA',
+            'ID': 'EA12',
+            'Orig.longitude': 1,
+            'Orig.latitude': 1,
+            'longitude': 1,
+            'latitude': 1,
+        })])
+        self.assertEqual(res, 1)
