@@ -171,7 +171,7 @@ class ZipRenderer(renderers.BaseRenderer):
             if 'tree' in data:
                 if 'name' in data:
                     zf.writestr(
-                        (data['name'] or '').encode('utf-8'),
+                        (data['name'] or 'x').encode('utf-8'),
                         (data['tree'] or '').encode('utf-8'))
                 else:
                     zf.writestr('tree.svg', (data['tree'] or '').encode('utf-8'))
