@@ -3,7 +3,6 @@ function LanguageCtrl($scope, searchModelService, Language, LanguageFamily) {
         // Get a reference to the language classifications from the model
         $scope.languageClassifications = searchModelService.getModel().getLanguageClassifications();
         $scope.families = [$scope.languageClassifications.allClasses];
-        $scope.alreadySelected = []; //keeps track of language families the user has already selected
     };
     $scope.$on('searchModelReset', linkModel); // When model is reset, update our model
     linkModel();

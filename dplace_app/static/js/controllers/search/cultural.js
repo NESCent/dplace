@@ -2,7 +2,10 @@ function CulturalCtrl($scope, searchModelService, Variable, CodeDescription, Con
    var linkModel = function() {
         // Model/state lives in searchModelService
         $scope.traits = [searchModelService.getModel().getCulturalTraits()];
-        $scope.alreadySelected = []; //keeps track of traits the user has already selected
+        $scope.traits.forEach(function(trait) {
+            if (!trait.alreadySelected)
+                trait.alreadySelected = []; //keeps track of traits the user has already selected
+        });
     };
     
     
@@ -31,7 +34,7 @@ function CulturalCtrl($scope, searchModelService, Variable, CodeDescription, Con
         trait.selected = trait.selected.filter(function(code) { return code.isSelected; });
 
         //make select all the default
-        if ($scope.alreadySelected.indexOf(trait.selectedVariable.id) == -1) {
+        if (trait.alreadySelected.indexOf(trait.selectedVariable.id) == -1) {
             trait.codes.isSelected = true;
             trait.codes.$promise.then(function(result) {
                 result.forEach(function(code) {
@@ -42,7 +45,7 @@ function CulturalCtrl($scope, searchModelService, Variable, CodeDescription, Con
                 });
                 trait.badgeValue = trait.selected.filter(function(code) { return code.isSelected; }).length;
             });
-            $scope.alreadySelected.push(trait.selectedVariable.id);
+            trait.alreadySelected.push(trait.selectedVariable.id);
         } else {
             trait.codes.$promise.then(function(result) {
                 result.forEach(function(code) {
