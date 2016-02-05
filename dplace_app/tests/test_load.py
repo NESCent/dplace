@@ -1,22 +1,75 @@
 from __future__ import unicode_literals
 from collections import defaultdict
+import os
 
 from django.test import TestCase
 
-from dplace_app.models import Society
+from dplace_app.models import (
+    Society, GeographicRegion, Language, LanguageTree, ISOCode, CulturalVariable,
+)
+from dplace_app import load
+from dplace_app.load.util import csv_dict_reader, eavar_number_to_label, configure_logging
 from dplace_app.load.isocode import load_isocode
-from dplace_app.load.society import load_societies
+from dplace_app.load.society import load_societies, society_locations
 from dplace_app.load.values import load_data
-from dplace_app.load.variables import load_vars
+from dplace_app.load.variables import load_vars, load_codes
 from dplace_app.load.glottocode import xd_to_language
+from dplace_app.load.geographic import load_regions
+from dplace_app.load.tree import load_trees
+from dplace_app.load.sources import load_references
+
+
+def data_path(fname=None):
+    comps = ['data']
+    if fname is not None:
+        comps.append(fname)
+    return os.path.join(os.path.dirname(__file__), *comps)
 
 
 class LoadTestCase(TestCase):
-    '''
+    """
     Tests loading
-    '''
+    """
+    def setUp(self):
+        TestCase.setUp(self)
+        configure_logging(test=True)
+
     def get_dict(self, **kw):
         return defaultdict(lambda: '', **kw)
+
+    def test_load_references(self):
+        res = load_references(csv_dict_reader(data_path('references.csv')))
+        self.assertEqual(res, 2)
+
+    def test_load_vars(self):
+        res = load_vars(csv_dict_reader(data_path('variables.csv')))
+        self.assertEqual(res, 2)
+
+    def test_load_codes(self):
+        var = CulturalVariable.objects.create(label=eavar_number_to_label(1))
+        load_codes(csv_dict_reader(data_path('code_descriptions.csv')))
+        # FIXME: assertions!
+
+    def test_load_society_locations(self):
+        load_regions(data_path('test_geo.json'))
+        load_societies(csv_dict_reader(data_path('societies.csv')))
+        res = society_locations(csv_dict_reader(data_path('society_locations.csv')))
+
+    def test_load_trees(self):
+        iso = ISOCode.objects.create(iso_code='abc')
+        lang = Language.objects.create(glotto_code='ubyk1235', name='Ubykh', iso_code=iso)
+        lang.save()
+        res = load_trees(data_path())
+        self.assertEqual(res, 1)
+        tree = LanguageTree.objects.filter(name='Abkhaz-Adyge.glotto.trees').first()
+        self.assertIn(lang, tree.languages.all())
+        # existing trees are not recreated:
+        self.assertEqual(load_trees(data_path()), 0)
+
+    def test_load_regions(self):
+        self.assertEqual(load_regions(data_path('test_geo.json')), 2)
+        self.assertEqual(
+            GeographicRegion.objects.filter(region_nam='Northern Europe').count(), 1)
 
     def test_load_language(self):
         soc = Society.objects.create(ext_id='socid', xd_id='socid', name='society')
