@@ -2,11 +2,10 @@ import json
 import re
 import datetime
 
-from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Prefetch
 from django.http import Http404
-from nexus import NexusReader
 from ete2 import Tree
+from ete2.coretype.tree import TreeError
 from rest_framework import viewsets
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.decorators import api_view, permission_classes, renderer_classes
@@ -171,7 +170,7 @@ def trees_from_languages_array(language_ids):
                 else:
                     newick.prune(langs_in_tree, preserve_branch_length=True)
                     t.newick_string = newick.write(format=1)
-        except:
+        except TreeError:
             continue
     return trees
 
@@ -313,14 +312,26 @@ def find_societies(request):
     return Response(d)
 
 
+def get_query_from_json(request):
+    query_string = request.query_params.get('query')
+    if query_string is None:
+        raise Http404('missing query parameter')
+    try:
+        query_dict = json.loads(query_string)
+    except ValueError:
+        raise Http404('malformed query parameter')
+    if not isinstance(query_dict, dict):
+        raise Http404('malformed query parameter')
+    return query_dict
+
+
 @api_view(['GET'])
 @permission_classes((AllowAny,))
 def get_categories(request):
     """
     Filters categories for sources, as some categories are empty for some sources
     """
-    query_string = request.query_params['query']
-    query_dict = json.loads(query_string)
+    query_dict = get_query_from_json(request)
     categories = models.CulturalCategory.objects.all()
     source_categories = []
     if 'source' in query_dict:
@@ -353,11 +364,10 @@ class GeographicRegionViewSet(viewsets.ReadOnlyModelViewSet):
 @permission_classes((AllowAny,))
 @renderer_classes((JSONRenderer,))
 def get_min_and_max(request):
-    query_string = request.query_params['query']
-    query_dict = json.loads(query_string)
-    if 'environmental_id' in query_dict:
-        values = models.EnvironmentalValue.objects.filter(
-            variable__id=query_dict['environmental_id'])
+    res = {}
+    environmental_id = get_query_from_json(request).get('environmental_id')
+    if environmental_id:
+        values = models.EnvironmentalValue.objects.filter(variable__id=environmental_id)
         min_value = None
         max_value = 0
         for v in values:
@@ -368,22 +378,18 @@ def get_min_and_max(request):
                 min_value = v.value
             elif v.value > max_value:
                 max_value = v.value
-    else:
-        min_value = None
-        max_value = None
-    return Response({'min': format(min_value, '.4f'), 'max': format(max_value, '.4f')})
+        res = {'min': format(min_value or 0.0, '.4f'), 'max': format(max_value, '.4f')}
+    return Response(res)
 
 
 @api_view(['GET'])
 @permission_classes((AllowAny,))
 @renderer_classes((JSONRenderer,))
 def bin_cont_data(request):  # MAKE THIS GENERIC
-    query_string = request.query_params['query']
-    query_dict = json.loads(query_string)
+    bf_id = get_query_from_json(request).get('bf_id')
     bins = []
-    if 'bf_id' in query_dict:
-        values = models.CulturalValue.objects.filter(
-            variable__id=query_dict['bf_id'])
+    if bf_id:
+        values = models.CulturalValue.objects.filter(variable__id=bf_id)
         min_value = None
         max_value = 0.0
         missing_data_option = False
@@ -393,7 +399,7 @@ def bin_cont_data(request):  # MAKE THIS GENERIC
                     bins.append({
                         'code': v.coded_value,
                         'description': v.code.description,
-                        'variable': query_dict['bf_id'],
+                        'variable': bf_id,
                     })
                     missing_data_option = True
                 continue
@@ -406,6 +412,7 @@ def bin_cont_data(request):  # MAKE THIS GENERIC
                 elif float(v.coded_value) > max_value:
                     max_value = float(v.coded_value)
 
+        min_value = min_value or 0.0  # This is the case when there are no values!
         data_range = max_value - min_value
         bin_size = data_range / 5
         min_bin = min_value
@@ -417,28 +424,10 @@ def bin_cont_data(request):  # MAKE THIS GENERIC
                 'description': str(min) + ' - ' + str(max),
                 'min': min_bin,
                 'max': min_bin + bin_size,
-                'variable': query_dict['bf_id'],
+                'variable': bf_id,
             })
             min_bin = min_bin + bin_size + 1
     return Response(bins)
-
-
-def newick_tree(key):
-    # Get a newick format tree from a language tree id
-    language_tree_id = key
-    try:
-        language_tree = models.LanguageTree.objects.get(pk=language_tree_id)
-    except ObjectDoesNotExist:
-        raise Http404
-    n = NexusReader(language_tree.file.path)
-    # Remove '[&R]' from newick string
-    tree = re.sub(r'\[.*?\]', '', n.trees.trees[0])
-    # Remove data before the =
-    try:
-        tree = tree[tree.index('=') + 1:]
-    except ValueError:
-        tree = tree
-    return tree
 
 
 @api_view(['POST'])

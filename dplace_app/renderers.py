@@ -1,5 +1,7 @@
-from rest_framework import renderers
 import csv
+import zipfile
+
+from rest_framework import renderers
 from six import StringIO, text_type
 
 
@@ -154,7 +156,6 @@ class ZipRenderer(renderers.BaseRenderer):
 
     def render(self, data, accepted_media_type=None, renderer_context=None):
         """Renders zip file for phylogeny download"""
-        import zipfile
         if data is None:
             return ''
 
@@ -162,7 +163,7 @@ class ZipRenderer(renderers.BaseRenderer):
         zf = zipfile.ZipFile(s, "w")
         try:
             if 'legends' in data:
-                for l in data['legends']:
+                for l in data['legends'] or []:
                     if 'svg' in l:
                         if 'name' in l:
                             zf.writestr(
@@ -170,9 +171,10 @@ class ZipRenderer(renderers.BaseRenderer):
             if 'tree' in data:
                 if 'name' in data:
                     zf.writestr(
-                        data['name'].encode('utf-8'), data['tree'].encode('utf-8'))
+                        (data['name'] or 'x').encode('utf-8'),
+                        (data['tree'] or '').encode('utf-8'))
                 else:
-                    zf.writestr('tree.svg', data['tree'].encode('utf-8'))
+                    zf.writestr('tree.svg', (data['tree'] or '').encode('utf-8'))
         finally:
             zf.close()
         return s.getvalue()
