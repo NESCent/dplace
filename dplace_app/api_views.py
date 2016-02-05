@@ -298,15 +298,15 @@ def find_societies(request):
 
     Returns serialized collection of SocietyResult objects
     """
-    from time import time
-    from django.db import connection
+    #from time import time
+    #from django.db import connection
 
-    start = time()
-    nstart = len(connection.queries)
+    #start = time()
+    #nstart = len(connection.queries)
     result_set = result_set_from_query_dict(request.data)
-    print '-->', len(connection.queries) - nstart, time() - start
+    #print '-->', len(connection.queries) - nstart, time() - start
     d = serializers.SocietyResultSetSerializer(result_set).data
-    print '==>', len(connection.queries) - nstart, time() - start
+    #print '==>', len(connection.queries) - nstart, time() - start
     # for q in connection.queries[-10:]:
     #     print q['sql'][:1000]
     return Response(d)

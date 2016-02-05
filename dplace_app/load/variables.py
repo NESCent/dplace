@@ -72,7 +72,7 @@ def load_codes(items):
             logging.warn("Unknown dataset, skipping row %s" % row)
             continue
 
-        variable = CulturalVariable.objects.get(label=label)
+        variable = CulturalVariable.objects.filter(label=label).first()
         if variable:
             code_description, created = CulturalCodeDescription.objects.get_or_create(
                 variable=variable, code=code)
