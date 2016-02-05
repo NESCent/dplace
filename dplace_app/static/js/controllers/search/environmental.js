@@ -4,7 +4,6 @@ function EnvironmentalCtrl($scope, searchModelService, EnvironmentalVariable, En
         $scope.environmentalData = searchModelService.getModel().getEnvironmentalData();
         if ($scope.environmentalData.selectedVariables.length == 0) {
             $scope.environmentalData.selectedVariables.push({'vals': ['', ''], 'selectedFilter': $scope.environmentalData.selectedFilter, 'variables': []});
-            $scope.environmentalData.badgeValue = 1;
         }
             
     };
@@ -17,7 +16,6 @@ function EnvironmentalCtrl($scope, searchModelService, EnvironmentalVariable, En
     
     $scope.addVariable = function() {
         $scope.environmentalData.selectedVariables.push({'vals': ['', ''], 'selectedFilter': $scope.environmentalData.selectedFilter, 'variables': []});
-        $scope.environmentalData.badgeValue += 1;
     };
     
     $scope.removeVariable = function(variable) {
@@ -27,7 +25,7 @@ function EnvironmentalCtrl($scope, searchModelService, EnvironmentalVariable, En
     };
 
     $scope.variableChanged = function(variable) {
-        if(variable.selectedVariable != null && $scope.environmentalData.badgeValue == 0) {
+        if(variable.selectedVariable != null) {
             $scope.environmentalData.badgeValue += 1;
         } 
 
