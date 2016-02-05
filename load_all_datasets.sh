@@ -43,13 +43,13 @@ python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/society_locations.c
 
 # Loading Variables
 python "${DPLACE_PATH}/dplace_app/load.py" \
- "${REPO_DEST}/csv/EAVariableList_17Nov2015.csv" \
+ "${REPO_DEST}/csv/EAVariableList_20Jan2016.csv" \
  "${REPO_DEST}/csv/BinfordVariableList_18Nov2015.csv" \
  vars
 
 # Loading Variable Codes
 python "${DPLACE_PATH}/dplace_app/load.py" \
- "${REPO_DEST}/csv/EACodeDescriptions_17Nov2015.csv" \
+ "${REPO_DEST}/csv/EACodeDescriptions_20Jan2016.csv" \
  "${REPO_DEST}/csv/BinfordVariableListCodeDescription_18Nov2015.csv" \
  codes
 

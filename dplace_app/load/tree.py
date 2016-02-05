@@ -49,20 +49,19 @@ def _load_tree(file_name, get_language, verbose=False):
     #Remove '[&R]' from newick string
     newick = re.sub(r'\[.*?\]', '', reader.trees.trees[0])
     try:
-        newick = newick[newick.index('=')+1:]
-    except ValueError:
+        newick = newick[newick.index('=') + 1:]
+    except ValueError:  # pragma: no cover
         newick = newick
         
     if verbose:
-        logging.info("Formatting newick string %s" % (newick))
+        logging.info("Formatting newick string %s" % (newick))  # pragma: no cover
 
     tree.newick_string = str(newick)
     for taxon_name in reader.trees.taxa:
         if taxon_name is '1':
-            continue
+            continue  # pragma: no cover
         languages = get_language(taxon_name)
         if not languages:
-            logging.warn("load_tree: Error with taxon - `%s` %s" % (taxon_name, file_name))
             continue
 
         for l in languages:

@@ -28,7 +28,7 @@ ITEM_LOADER = dict(
 )
 
 
-def run(mode, *fnames):
+def run(mode, *fnames):  # pragma: no cover
     configure_logging()
 
     if mode == 'geo':
@@ -42,7 +42,7 @@ def run(mode, *fnames):
     raise ValueError(mode)
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     if len(sys.argv) < 3:
         print "\nUsage: %s source_file mode" % sys.argv[0]
         print "You should run load_all_datasets.sh instead of this script directly."

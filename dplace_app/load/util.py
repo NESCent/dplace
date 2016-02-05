@@ -23,15 +23,15 @@ def bfvar_number_to_label(number):
     return "B{0:0>3}".format(number)
 
 
-def configure_logging():
+def configure_logging(test=False):
     logger = logging.getLogger()
-    logger.setLevel(logging.INFO)
+    logger.setLevel(logging.CRITICAL if test else logging.INFO)
     # file load.log gets everything
     fh = logging.FileHandler('load.log')
-    fh.setLevel(logging.INFO)
+    fh.setLevel(logging.CRITICAL if test else logging.INFO)
     # create console handler with a higher log level
     ch = logging.StreamHandler()
-    ch.setLevel(logging.WARN)
+    ch.setLevel(logging.CRITICAL if test else logging.WARN)
     # create formatter and add it to the handlers
     formatter = logging.Formatter('%(levelname)s:%(message)s')
     fh.setFormatter(formatter)
@@ -61,5 +61,5 @@ def csv_dict_reader(fname):
             try:
                 dict_row[k] = dict_row[k].decode('utf8').strip()
             except:
-                print k, dict_row
+                logging.warn('cannot decode row item %s in %s' % (k, dict_row))
         yield dict_row
