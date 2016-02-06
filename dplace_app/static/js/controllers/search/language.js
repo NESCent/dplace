@@ -40,7 +40,7 @@ function LanguageCtrl($scope, searchModelService, Language, LanguageFamily) {
         }
         if (index > -1) {
             $scope.languageClassifications.selected.splice(index, 1);
-            $scope.languageClassifications.badgeValue -= 1;
+            $scope.languageClassifications.badgeValue -= language.count;
         }
     };
     
@@ -50,7 +50,7 @@ function LanguageCtrl($scope, searchModelService, Language, LanguageFamily) {
                 language.isSelected = true;
                 if ($scope.languageClassifications.selected.map(function(lang) { return lang.id; }).indexOf(language) == -1) {
                     $scope.languageClassifications.selected.push(language);
-                    $scope.languageClassifications.badgeValue += 1;
+                    $scope.languageClassifications.badgeValue += language.count;
                 }
             });
         } else {
@@ -77,7 +77,7 @@ function LanguageCtrl($scope, searchModelService, Language, LanguageFamily) {
                 if (language.isSelected) {
                     if ($scope.languageClassifications.selected.map(function(lang) { return lang.id; }).indexOf(language.id) == -1) {
                         $scope.languageClassifications.selected.push(language);
-                        $scope.languageClassifications.badgeValue += 1;
+                        $scope.languageClassifications.badgeValue += language.count;
                     }
                 } else {
                     if ($scope.languageClassifications.selected.map(function(lang) { return lang.id; }).indexOf(language.id) != -1) {
