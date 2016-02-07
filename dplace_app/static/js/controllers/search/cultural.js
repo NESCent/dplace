@@ -2,6 +2,10 @@ function CulturalCtrl($scope, searchModelService, Variable, CodeDescription, Con
    var linkModel = function() {
         // Model/state lives in searchModelService
         $scope.traits = [searchModelService.getModel().getCulturalTraits()];
+        $scope.traits.forEach(function(trait) {
+            if (!trait.alreadySelected)
+                trait.alreadySelected = []; //keeps track of traits the user has already selected
+        });
     };
     
     
@@ -27,18 +31,31 @@ function CulturalCtrl($scope, searchModelService, Variable, CodeDescription, Con
             trait.codes = ContinuousVariable.query({query: {bf_id: trait.selectedVariable.id}});
         } else
             trait.codes = CodeDescription.query({variable: trait.selectedVariable.id });
-        
+        trait.selected = trait.selected.filter(function(code) { return code.isSelected; });
+
         //make select all the default
-        trait.codes.isSelected = true;
-        trait.codes.$promise.then(function(result) {
-            result.forEach(function(code) {
-               code.isSelected = true;
-                if (trait.selected.indexOf(code) == -1) {
-                    trait.selected.push(code);
-                }
+        if (trait.alreadySelected.indexOf(trait.selectedVariable.id) == -1) {
+            trait.codes.isSelected = true;
+            trait.codes.$promise.then(function(result) {
+                result.forEach(function(code) {
+                   code.isSelected = true;
+                   if (trait.selected.map(function(code) { return code.id; }).indexOf(code.id) == -1) {
+                        trait.selected.push(code);
+                   }
+                });
+                trait.badgeValue = trait.selected.filter(function(code) { return code.isSelected; }).length;
             });
-            trait.badgeValue = trait.selected.filter(function(code) { return code.isSelected; }).length;
-        });
+            trait.alreadySelected.push(trait.selectedVariable.id);
+        } else {
+            trait.codes.$promise.then(function(result) {
+                result.forEach(function(code) {
+                    if (trait.selected.map(function(code) { return code.id; }).indexOf(code.id) != -1) {
+                        code.isSelected = true;
+                   }
+                });
+                trait.badgeValue = trait.selected.length;
+            });
+        }
     };
 
     // used before searching to extract the codes from the search selection
@@ -49,34 +66,53 @@ function CulturalCtrl($scope, searchModelService, Variable, CodeDescription, Con
 		var allCodes = Array.prototype.concat.apply([], traits.map( function(trait) { 
 			return trait.codes; 
 		}));
-		selectedCodes = allCodes.filter( function(c) { return c.isSelected; }).map( function(c) { return c; });
-	   return selectedCodes;
+		return allCodes.filter( function(c) { return c.isSelected; });
+    };
+    
+    function removeCode(trait, code) {
+        var index = -1;
+        for (var i = 0; i < trait.selected.length; i++) {
+            if (trait.selected[i].id == code.id) {
+                index = i;
+                break;
+            }
+        }
+        if (index > -1) {
+            trait.selected.splice(index, 1);
+        }
     };
 
     $scope.traitCodeSelectionChanged = function(trait) {
 		currentSelection = $scope.getSelectedTraitCodes();
         if (currentSelection.length == trait.codes.length) trait.codes.isSelected = true;
         else trait.codes.isSelected = false;
-		currentSelection.forEach(function(code) {
-			if (trait.selected.indexOf(code) == -1) {
-			//if selected trait code is not already in the array of selected codes, add it to the array
-				trait.selected.push(code);
-			}
-		});
-		trait.badgeValue = trait.selected.filter(function(code) { return code.isSelected; }).length;
+        trait.selected = trait.selected.filter(function(code) { return code.isSelected; });
+        trait.codes.forEach(function(code) {
+            if (code.isSelected) {
+                if (trait.selected.map(function(code) { return code.id; }).indexOf(code.id) == -1) {
+                    trait.selected.push(code);
+                }
+            } else {
+                removeCode(trait, code);
+            }
+        });
+		trait.badgeValue = trait.selected.length;
 	};
 	
 	$scope.selectAllChanged = function(trait) {
+        trait.selected = trait.selected.filter(function(code) { return code.isSelected; });
 		if (trait.codes.isSelected) {
-			trait.codes.forEach(function(code){ code.isSelected = true;
-			if (trait.selected.indexOf(code) == -1) {
-				trait.selected.push(code);
-			}
+			trait.codes.forEach(function(code){ 
+                code.isSelected = true;
+                if (trait.selected.map(function(code) { return code.id; }).indexOf(code.id) == -1) trait.selected.push(code);
 			});
-		} else { trait.codes.forEach(function(code){ code.isSelected = false; });}
-
-		trait.badgeValue = trait.selected.filter(function(code) { return code.isSelected; }).length;
-
+		} else { 
+            trait.codes.forEach(function(code){ 
+                code.isSelected = false; 
+                removeCode(trait, code);
+            });
+        }
+		trait.badgeValue = trait.selected.length;
 	};
 
     // wired to the search button. Gets the code ids, adds cultural to the query, and invokes the search

@@ -31,7 +31,7 @@
                                 class="form-control"
                                 style="width:100%"
 								ng-change="selectionChanged(scheme)"
-                                ng-options="item.name + ' (' + item.language_count + ')' for item in scheme"
+                                ng-options="item.name + ' (' + item.language_count + ' societies)' for item in scheme"
                                 >
                             <option value="">Select a Language Family</option>
                         </select>
@@ -42,8 +42,8 @@
 				<span class="variable-label"  ng-show="scheme.languages.length > 1">Select All<input type="checkbox" class="pull-left" ng-model="scheme.languages.allSelected" ng-change="selectAllChanged(scheme)" />
 					</span>
                 <div ng-repeat="language in scheme.languages">
-                    <input class="pull-left" type="checkbox" ng-model="language.isSelected" ng-change="classificationSelectionChanged(language)">
-                    <span class="language-label">{{ language.name }}</span>
+                    <input class="pull-left" type="checkbox" ng-model="language.isSelected" ng-change="classificationSelectionChanged()">
+                    <span class="language-label">{{ language.name }} ({{language.count}} societies)</span>
                 </div>
             </div>
         </div>

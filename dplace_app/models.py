@@ -315,7 +315,7 @@ class LanguageFamily(models.Model):
     language_count = models.IntegerField(default=0, null=False)
 
     def update_counts(self):
-        self.language_count = Language.objects.all().filter(family=self).count()
+        self.language_count = Society.objects.all().filter(language__family=self).count()
         self.save()
 
 
