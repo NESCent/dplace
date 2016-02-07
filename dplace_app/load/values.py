@@ -95,10 +95,10 @@ def _load_data(val_row, societies=None, sources=None, variables=None, descriptio
         code=descriptions.get((variable.id, val_row['Code'].strip())),
         focal_year=val_row['Year'],
         comment=val_row['Comment'],
-        subcase=val_row['SpecRef'])
+        subcase=val_row['SubCase'])
 
     refs = set()
-    for r in val_row['References'].split(";"):
+    for r in val_row['EthnoReferences'].split(";"):
         r = r.strip()
         author, year = None, None
         m = BINFORD_REF_PATTERN.match(r)

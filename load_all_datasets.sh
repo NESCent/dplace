@@ -43,13 +43,13 @@ python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/society_locations.c
 
 # Loading Variables
 python "${DPLACE_PATH}/dplace_app/load.py" \
- "${REPO_DEST}/csv/EAVariableList_20Jan2016.csv" \
+ "${REPO_DEST}/csv/EAVariableList_6Feb2016.csv" \
  "${REPO_DEST}/csv/BinfordVariableList_18Nov2015.csv" \
  vars
 
 # Loading Variable Codes
 python "${DPLACE_PATH}/dplace_app/load.py" \
- "${REPO_DEST}/csv/EACodeDescriptions_20Jan2016.csv" \
+ "${REPO_DEST}/csv/EACodeDescriptions_6Feb2016.csv" \
  "${REPO_DEST}/csv/BinfordVariableListCodeDescription_18Nov2015.csv" \
  codes
 
@@ -68,7 +68,7 @@ python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/ReferenceMapping_11
 
 # Loading Data
 python "${DPLACE_PATH}/dplace_app/load.py" \
- "${REPO_DEST}/csv/EA_DATA_Stacked_17Nov2015.csv" \
+ "${REPO_DEST}/csv/EA_DATA_Stacked_6Feb2016.csv" \
  "${REPO_DEST}/csv/Binford_merged_18Nov2015.csv" \
  vals
 
