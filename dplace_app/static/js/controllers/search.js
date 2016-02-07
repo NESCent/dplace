@@ -127,6 +127,7 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties, 
                 $scope.searchModel.results.variable_descriptions[i].variable['min'] = min;
                 $scope.searchModel.results.variable_descriptions[i].variable['max'] = max;
                 $scope.searchModel.results.variable_descriptions[i].variable['units'] = $scope.searchModel.results.variable_descriptions[i].variable.name.substring($scope.searchModel.results.variable_descriptions[i].variable.name.indexOf('(')+1, $scope.searchModel.results.variable_descriptions[i].variable.name.indexOf(')'));
+                $scope.searchModel.results.variable_descriptions[i].codes = codes;
             }                    
             
         }
