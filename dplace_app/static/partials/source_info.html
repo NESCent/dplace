@@ -1,19 +1,207 @@
+<script>
+function scrollToAnchor(aid){
+    var aTag = $("a[name='"+ aid +"']");
+    $('html,body').animate({scrollTop: aTag.offset().top-140},'slow');
+}
+</script>
 <div class="">
   <div class="container">
     <div class="row about header">
-      <h2>
-        How-To
-      </h2>
+      <h2>HOW-TO</h2>
     </div>
+    <h3><a name="a_ch0"></a>GETTING STARTED WITH D-PLACE</h3>
     <p>
-    D-PLACE allows interested users to simultaneously consider how cultural practices relate to linguistic ancestry, practices of neighbouring cultures, and the environment. D-PLACE makes visualizing these relationships easy, either via a map or a linguistic tree.
-    Eventually, this page will include detailed tutorials on how to use D-PLACE. In the meantime, we encourage users to begin with the “Search” tab, and to explore the available data.
-    The examples below show two cultural variables in D-PLACE, “Dependence on fishing” and “Transactions at marriage” displayed on a global language taxonomy (a, c) and map (b, d). 
-    Panels a and b show a society’s dependence on fishing relative to other subsistence activities, based on data from both the Ethnographic Atlas (Murdock 1961-1967) and the Binford Hunter-Gatherer dataset (Binford 2001). Data for Pama-Nyungan societies are highlighted on both the global tree and the map (black boxes and magnified section of taxonomy). 
-    Panels c and d show the most common type of transaction at marriage, based on data from the Ethnographic Atlas (Murdock 1961-1967), with data for Sino-Tibetan societies highlighted on both the global tree and the map (black boxes and magnified section of taxonomy).
+        In the following Tutorial sections we give examples of the kinds of research questions you might have, and work through how you may use the database to find data to answer them.<br><br>
+        &nbsp;&nbsp;<a onclick="scrollToAnchor('a_ch1')">1. Simple Search</a><br>
+        &nbsp;&nbsp;<a onclick="scrollToAnchor('a_ch2')">2. Investigating Cultural Diversity</a><br>
+        &nbsp;&nbsp;<a onclick="scrollToAnchor('a_ch3')">3. Searching by Language Family and Displaying Data on Trees</a><br>
+        &nbsp;&nbsp;<a  onclick="scrollToAnchor('a_ch4')">4. Targeted Search: Exploring and Displaying Combinations of Data</a><br><br>
+        For all Tutorials, buttons and pages are in bold and variable or feature names are in italics.
     </p>
-    <center>
-        <img src="/static/images/howto01.png" width="50%" />
-    </center>
+    <h3><a name="a_ch1"></a>1. Simple Search <small><a onclick="scrollToAnchor('a_ch0')">⬆︎</a></small></h3>
+    <p>
+        You can search D-PLACE by geographical area, language family, cultural features, or by environmental variables. Here we work through a search by PLACES (geography). The same basic principles in each Tutorial apply to each search, and these can be combined for more complex searches.
+    </p>
+    <p>For example:</p>
+    <p><i>Q: What South American societies are in D-PLACE?</i></p>
+    <p>From the Home screen, click the <b>SEARCH</b> button. Click the <b>PLACES</b> button. You will see the Map screen.
+    </p>
+    <p>
+Click on the four regions that make up South America. They will darken in colour to show that you have selected them, and the names of the regions will appear above the map. When you're done, click the <b>Search</b> button on the top right-hand corner above the map.
+    </p>
+    <p><center><img src="/static/images/howto/places1.png" width="90%" style="border:solid 1px black"/></center></p>
+    <p>
+The <b>Search</b> button will change to <b>Working</b>. When the search is complete you will be presented with the <b>RESULTS</b> page in Table view, showing the 107 South American societies found in D-PLACE.
+    </p>
+    <p><center><img src="/static/images/howto/places2.png" width="90%" style="border:solid 1px black"/></center></p>
+    <p>
+The <i>Table</i> view shows the society <i>Name</i>, the <i>Dataset(s)</i> that from which data are taken, the <a href="http://www.glottolog.org" target="_blank"><i>Glottolog Code</i></a>, the <i>Language</i> name, the number of <i>Trees</i> (language phylogenies) on which the society is present, and the <i>Geographic Region</i>. The coloured circles beside each society name indicate its region.
+    </p>
+    <p>
+You can click on the name of any society and it will take you to the <i>Society</i> page, where all the information in D-PLACE about that cultural group is stored.
+    </p>
+    <p>
+For example, clicking on <i>Aweikoma</i> gives the following page. Click on any of the expandable headings to see all the data in that category, for example, <i>Physical landscape</i>, and <i>Housing</i>.
+    </p>
+    <p><center><img src="/static/images/howto/places3a.png" width="90%" style="border:solid 1px black"/><br><br><img src="/static/images/howto/places3b.png" width="90%" style="border:solid 1px black"/></center></p>
+    <blockquote>
+<small><b>Note:</b> Each coded cultural trait is tagged with the ethnographic references that were consulted when coding it; these can be seen by clicking on [Source]. Similarly, by clicking on the speech bubble symbol [<img src="/static/images/howto/bubble.png" width="18"/>] in the right-most column of the table, users can quickly view the focal year to which the cultural data refer, and any comments that might be associated with the code. <i>Sources</i> and <i>Comments</i> are included when data tables are downloaded as Comma Separated Value (.csv) files (see <a  onclick="scrollToAnchor('a_ch2')">Tutorial 2</a>).</small>
+    </blockquote>
+    <p>
+Returning to the <b>RESULTS</b> page you can click on the <b>Map</b> tab to see the societies plotted on a zoomable map. Here we've zoomed in and you can see societies are coloured by Region. Clicking on a marker will also take you to the Society page.
+    </p>
+    <p><center><img src="/static/images/howto/places4.png" width="90%" style="border:solid 1px black"/></center></p>
+    <p>
+All Maps are downloadable: just click the <b>Download Map</b> button in the top left-hand corner above the map to export an SVG file and save locally.
+    </p>
+    <p>
+To start a new search, click <b>SEARCH</b> and press the <b>Reset</b> button.
+    </p>
+    <h3><a name="a_ch2"></a>2. Investigating Cultural Diversity <small><a onclick="scrollToAnchor('a_ch0')">⬆︎</a></small></h3>
+    <p>
+There are two cultural databases in D-PLACE at present: the Ethnographic Atlas and Binford’s Hunter-Gatherer Database. Click the <b>CULTURE</b> button to start your search and for the purposes of this tutorial, choose Binford Hunter-Gatherer from the <b>Select a Source</b> drop-down menu on the top left of the results box. A new drop-down menu will ask you to select a category.
+    </p>
+    <p><i>Q: Do hunter-gatherer groups have any social classes?</i></p>
+    <p><center><img src="/static/images/howto/cult1.png" width="90%" style="border:solid 1px black"/></center></p>
+    <p>
+Select <i>Class</i> and then from the new right-side drop-down menu select from the available options, in this case, <i>B031 - Type of social class distinction</i>. A short description of the variable will appear, along with the different categories in that variable.
+    </p>
+    <p>
+Click the <b>Select All</b> check-box on the right-hand side of the results box. A small grey circle will appear on the <b>CULTURE</b> button to indicate the number of cultural categories (4) you have selected. Click the <b>Search</b> button.
+    </p>
+    <p>
+On the <b>RESULTS</b> page click the Map tab. You'll see the 339 hunter-gatherer societies colour-coded according to whether they have no class distinctions, class based on wealth, or class based on hereditary aristocracy. Because we chose <b>Select All</b> we also see societies with missing data (very few in this case). 
+    </p>
+    <p><center><img src="/static/images/howto/cult2.png" width="90%" style="border:solid 1px black"/></center></p>
+    <p>
+The striking thing here is that hunter-gatherer societies in Western North America seem to be the majority of those that are recorded as having class distinctions, suggesting something particular about the societies in that region.
+    </p>
+    <p>
+Searching in the <u>Ethnographic Atlas</u> follows the exact same steps. (For a Tutorial on combining searches from both sources, see <a onclick="scrollToAnchor('a_ch4')">Tutorial 4</a>.)
+    </p>
+    <p>
+Sometimes you might want to see only one particular category of a cultural feature, in which case do not choose <b>Select All</b> but tick just the checkboxes of the categories you are interested in. For example:
+    </p>
+    <p><i>Q: Where in the world are societies that allow marriage to any of your first cousins?</i></p>
+    <p>
+Select <i>Ethnographic Atlas</i>, then <i>Marriage</i>, then <i>EA023 - Cousin marriages permitted</i>. The categories here are quite complex, but the one we want to show is <i>10: Quadrilateral marriage, i.e., marriage allowed with any first cousin</i>. Select that check box and press <b>Search</b>.
+    </p>
+    <p><center><img src="/static/images/howto/cult3.png" width="90%" style="border:solid 1px black"/></center></p>
+    <p>
+From the <b>RESULTS</b> page click the Map tab. 
+There are 117 societies that are recorded as allowing marriage to any of one's first cousins. Most of them are in the Americas, South Asia, the Middle East, and Africa.
+    </p>
+    <p><center><img src="/static/images/howto/cult4.png" width="90%" style="border:solid 1px black"/></center></p>
+    <p>
+As before, you can download the Map, or you can download the results of your search as a CSV (comma-separated-values) table from the <b>Download</b> tab in <b>RESULTS</b>.
+    </p>
+    <p>To start a new search, click <b>SEARCH</b> and press the <b>Reset</b> button.</p>
+    <h3><a name="a_ch3"></a>3. Searching by Language Family and Displaying Data on Trees <small><a onclick="scrollToAnchor('a_ch0')">⬆︎</a></small></h3>
+    <p>
+Click the <b>LANGUAGE</b> button for the drop-down <i>Family</i> list. The list is alphabetical and the number of languages in the family that are present in D-PLACE follows the Family name in brackets. Note that isolates are listed separately, so there are many language families with one member.
+    </p>
+    <p><i>Q: What Indo-European-speaking societies are there in D-PLACE and how are they related?</i></p>
+    <p>
+Select <i>Indo-European</i> and click the <b>Select All</b> check box. Click <b>Search</b>.
+    </p>
+    <p><center><img src="/static/images/howto/lang1.png" width="90%" style="border:solid 1px black"/></center></p>
+    <p>
+The <b>RESULTS</b> page gives the same tabs as previous searches, starting with a Table view of all the languages. You can click on the name of a society, view the societies on the Map, and download a CSV file. Here we want to see how these societies are related. Go to the <b>Tree</b> tab.
+    </p>
+    <p><center><img src="/static/images/howto/lang2.png" width="90%" style="border:solid 1px black"/></center></p>
+    <blockquote>
+<small><b>NOTE:</b> There are three different kinds of language trees available in D-PLACE. <b>Phylogenies</b> are trees that have been inferred using quantitative phylogenetic methods on discrete linguistic data: these have informative branch lengths and you can download a Nexus treefile containing a Bayesian posterior sample of trees. 
+<b>Glottolog Trees</b> are linguistic taxonomies (classification) from the <a href="http://www.glottolog.org" target="_blank">Glottolog</a> web resource. 
+<b>Global Tree</b> is a “supertree” composed of all the Glottolog classifications.</small>
+    </blockquote>
+    <p>
+Quantitative phylogenetic analyses of the Indo-European language family have been published, so all three sorts of trees are available. Click on <b>Phylogenies</b> and then select <i>indoeuropean.trees</i> from the drop-down menu. A language phylogeny will appear, where each language has been matched to the corresponding society in D-PLACE.
+    </p>
+    <p><center><img src="/static/images/howto/lang3.png" width="90%" style="border:solid 1px black"/></center></p>
+    <p>
+If you choose to see a <b>Glottolog Tree</b> a different and larger phylogeny with more societies will be shown, because Glottolog trees are classifications, not the results of phylogenetic analysis on linguistic data.
+    </p>
+    <p><center><img src="/static/images/howto/lang4.png" width="90%" style="border:solid 1px black"/></center></p>
+    <p>
+The <b>Global Tree</b> option displays a circular tree. This is best for showing results across a number of different language families. 
+    </p>
+    <p>
+The <b>Glottolog tree</b> is downloadable in a ZIP file and will unzip to an SVG graphics file. The <b>Phylogenies</b> will contain a Nexus file for further phylogenetic analysis or visualisation. There is not currently a download option for <b>Global Trees</b>.
+    </p>
+    <p>
+From here, you may be interested in seeing some further cultural or environmental variable of interest on the language tree. Return to the <b>SEARCH</b> page but this time DO NOT press <b>Reset</b>. You can check your previous search is active by seeing that there is still a grey circle displaying a number above the <b>LANGUAGE</b> button.
+    </p>
+    <p><i>Q: What is the variation in the growing season across Indo-European-speaking societies?</i></p>
+    <p>
+Click the green <b>ENVIRONMENT</b> button. There are three classes of environmental data: <i>Climate</i>, <i>Ecology</i>, and <i>Physical Landscape</i>. Click <i>Climate</i>, then <i>Duration of Growing Season</i>. You have the option to delimit your search range, but for now we will choose <i>All Values</i> from the drop-down box. A grey circle will appear on the <b>ENVIRONMENT</b> button indicating that we have chosen one category of data.
+    </p>
+    <p><center><img src="/static/images/howto/env1.png" width="90%" style="border:solid 1px black"/></center></p>
+    <p>
+Click <b>Search</b> for the <b>RESULTS</b> page in Table view. The number of months of the growing season is listed here. To visualise spatially, click the Map tab. 
+    </p>
+    <p><center><img src="/static/images/howto/env2.png" width="90%" style="border:solid 1px black"/></center></p>
+    <p>
+Zoom in to see the detail in Eurasia. The length of the growing season is displayed as a colour gradient from 6 months to 12. Societies towards the equator have a longer growing season.
+    </p>
+    <p>
+Now we want to see these data on the Indo-European language tree. Click the Tree tab and choose <b>Phylogenies</b>. Select <i>indoeuropean.trees</i>, and now each society on the tree will be displayed with a coloured dot reflecting the length of the growing season.
+    </p>
+    <p>
+Click the legend name <i>E1: Duration of Growing Season</i> to display the colour scale bar. This will move as you scroll down through the tree.
+    </p>
+    <p><center><img src="/static/images/howto/env3.png" width="90%" style="border:solid 1px black"/></center></p>
+    <blockquote>
+<small><b>Note:</b> All environmental data is provided raw on a continuous scale so that researchers can impose their own categories as needed. Appropriate data bins will vary according to the kind of analysis and ecoregion.</small>
+    </blockquote>
+    <p>
+As before, you can do the same sort of search and tree display with cultural data. Here is a Glottolog tree displaying variation in the sorts of <i>Games</i> a society has, using <i>Ethnographic Atlas</i> variable <i>EA035 Games</i>.
+    </p>
+    <p><center><img src="/static/images/howto/cult5.png" width="90%" style="border:solid 1px black"/></center></p>
+    <p>
+Data, maps, treefiles and images are all downloadable.
+    </p>
+    <h3><a name="a_ch4"></a>4. Targeted Search: Exploring and Displaying Combinations of Data <small><a onclick="scrollToAnchor('a_ch0')">⬆︎</a></small></h3>
+    <p>
+Many users will want to use D-PLACE for research that tests particular hypotheses about the relationship between different sorts of cultural features, or between cultural and environmental features. See the publication <a href="#/publication">Kirby et al 2016</a> for suggestions and details.
+    </p>
+    <p>
+Here we will look at how you might use D-PLACE to perform a targeted search investigating a potential correlation between aspects of culture and ecology.
+    </p>
+    <p><i>Q: Is there a relationship between the way people build houses and rainfall in their region?</i></p>
+    <p>
+First we need to choose which cultural data source to use. Click the <b>CULTURE</b> button, <i>Ethnographic Atlas</i>, and <i>Housing</i>. We will use variable <i>EA082 – House construction: shape of roof</i>. 
+    </p>
+    <p>
+This time we don't want societies with missing data. Make sure the check boxes for both <i>Select all</i> and <i>Missing data</i> are <u>unchecked</u> and then click <b>Search</b>. This search may take some time as there are over 1200 societies in D-PLACE!
+    </p>
+    <p><center><img src="/static/images/howto/target1.png" width="90%" style="border:solid 1px black"/></center></p>
+    <p>
+Now return to the <b>SEARCH</b> page. Instead of a cultural variable this time we will be searching environmental data. Click the green <b>ENVIRONMENT</b> button and select <i>Climate</i>, then <i>Annual Mean Precipitation</i>. Select <i>All Values</i>. 
+    </p>
+    <p>
+The grey circle above <b>ENVIRONMENT</b> should now show you have selected one variable category, and the circle above <b>CULTURE</b> indicates 9 variable categories selected. Click <b>Search</b>.
+    </p>
+    <p><center><img src="/static/images/howto/target2.png" width="90%" style="border:solid 1px black"/></center></p>
+    <p>
+Your <b>RESULTS</b> page will now show 1111 societies that have data for these features. The Table view will list them all, and you can also view them on a Map or Tree.
+    </p>
+    <p>
+Click on the Map tab. You can select each variable from the drop-down menu to display on the map.
+    </p>
+    <p><center><img src="/static/images/howto/target3a.png" width="90%" style="border:solid 1px black"/><br><br><img src="/static/images/howto/target3b.png" width="90%" style="border:solid 1px black"/></center></p>
+    <p>
+Click on the Tree tab and go to <b>Phylogenies</b>. While we are interested in the diversity across the world, we might want to focus on the variation in these two features in societies in Africa through use of the <i>Bantu Family</i>. Select bantu.trees from the drop-down menu. Both features (<i>precipitation</i> and <i>roof type</i>) are displayed on the right of the tree: click them to display their legends. Here is a zoomed-in part of the tree.
+    </p>
+    <p><center><img src="/static/images/howto/target4.png" width="90%" style="border:solid 1px black"/></center></p>
+    <p>
+Two columns of circles are displayed on the phylogeny next to the society name, giving you a visualisation of the variation in the data. You can look at the variation and potential relationships between these two features in other language families by selecting them from the drop-down menus in either <b>Phylogenies</b> or <b>Glottolog Trees</b>.
+    </p>
+    <p>
+Similar searches can be run and displayed using a combination of two cultural features. Let’s look at a different example. Here are the Map and Tree results when the <b>LANGUAGE</b> <i>Family</i> is set to <i>Austronesian</i>, and we examine two <b>CULTURAL</b> features such as <i>Population</i> - <i>EA031: Mean size of local communities</i> and <i>Politics</i> - <i>EA070: Slavery: type</i>. Missing data is excluded in each of these searches, but not every society has information on both features.
+    </p>
+    <p><center><img src="/static/images/howto/target5a.png" width="90%" style="border:solid 1px black"/><br><br><img src="/static/images/howto/target5b.png" width="90%" style="border:solid 1px black"/><br><br><img src="/static/images/howto/target5c.png" width="90%" style="border:solid 1px black"/></center></p>
+    <p>
+These four tutorials cover the basic elements of what users can do with D-PLACE. For a detailed description of the database and the data contained, see the paper “D-PLACE: A Global Database of Cultural, Linguistic, and Ecological Diversity” by <a href="#/publication">Kirby et al</a>. For ideas on how to use data from D-PLACE, see that paper and others in the D-PLACE <a href="#/publication">Publication section</a>.
+    </p>
   </div>
 </div>
