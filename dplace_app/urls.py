@@ -21,8 +21,7 @@ router.register(r'language_trees', api_views.LanguageTreeViewSet)
 router.register(r'geographic_regions', api_views.GeographicRegionViewSet)
 router.register(r'sources', api_views.SourceViewSet)
 
-urlpatterns = patterns(
-    'dplace_app.views',
+urlpatterns = [
     url(r'^$', RedirectView.as_view(url='angular/', permanent=True), name='home'),
     url(r'^society/(?P<society_id>\d+)/$', views.view_society, name='view_society'),
     url(r'^language/(?P<language_id>\d+)/$', views.view_language, name='view_language'),
@@ -37,4 +36,4 @@ urlpatterns = patterns(
     url(r'^api/v1/get_dataset_sources', api_views.get_dataset_sources, name="get_dataset_sources"),
     url(r'^api/v1/csv_download', api_views.csv_download, name='csv_download'),
     url(r'^api/v1/zip', api_views.zip_legends, name='zip_legends'),
-)
+]
