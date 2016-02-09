@@ -33,8 +33,8 @@
             }
         },
         focusOn: {
-            lat: {{ society.location.y }},
-            lng: {{ society.location.x }},
+            lat: {{ location.lat }},
+            lng: {{ location.lng }},
             scale: 5
         },
         regionStyle: {
@@ -58,7 +58,7 @@
     $('#society-map').vectorMap('get', 'mapObject').addMarker(
         {{ society.id }}, 
         {
-            latLng: [{{ society.location.y }}, {{ society.location.x }}], 
+            latLng: [{{ location.lat }},{{ location.lng }}], 
             name: "{{ society.name }}"
         }
     );
@@ -67,8 +67,15 @@
 <h1><img height="60px" title="HOME" src="{% static "images/D-PLACE_Logo.png" %}">Society: {{ society.name }}</h1>
     {% if society.language %}
         <h4>Language or dialect: {{ society.language.name }} </h4>
-        <h5>{% if society.language.glotto_code %}Glottolog ID: <a href="http://glottolog.org/resource/languoid/id/{{society.language.glotto_code.glotto_code}}" target="_blank">{{ society.language.glotto_code.glotto_code }}</a>{% endif %}
-        </h5><h5>{% if society.language.iso_code %}ISO 639-3: <a href="http://www-01.sil.org/iso639-3/documentation.asp?id={{society.language.iso_code.iso_code}}" target="_blank">{{ society.language.iso_code.iso_code }}</a>{% endif %}
+        <h5>
+            {% if society.language.glotto_code %}
+            Glottolog ID: <a href="http://glottolog.org/resource/languoid/id/{{society.language.glotto_code}}" target="_blank">{{ society.language.glotto_code }}</a>
+            {% endif %}
+        </h5>
+        <h5>
+            {% if society.language.iso_code %}
+            ISO 639-3: <a href="http://www-01.sil.org/iso639-3/documentation.asp?id={{society.language.iso_code}}" target="_blank">{{ society.language.iso_code.iso_code }}</a>
+            {% endif %}
         </h5>
         <h4>Language family: {% for classification in language_classification %}{{classification.name}}{% endfor %}</h4>
     {% endif %}

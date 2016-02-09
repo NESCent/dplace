@@ -34,7 +34,18 @@ angular.module('dplaceFilters', [])
             else {
                 if (codes.variable.data_type.toUpperCase() == 'ORDINAL') {
                     rgb = colorMapService.generateRandomHue(value, codes.codes.length,codes.variable.id,5);
-                } else rgb = colorMapService.colorMap[parseInt(value)];
+                } else {
+                    if (codes.variable.label == "EA094") {
+                        for (var k = 0; k < codes.codes.length; k++) {
+                            if (codes.codes[k].code == value) {
+                                rgb = colorMapService.colorMap[k+1];
+                                break;
+                            }
+                            
+                        }
+                    } else 
+                        rgb = colorMapService.colorMap[parseInt(value)];
+                }
                 return rgb;
             }
         }

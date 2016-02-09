@@ -1,6 +1,7 @@
 function ColorMapService() {
     //an array of colors for coded values
     this.colorMap = [
+        'NaN',
         'rgb(228,26,28)',
         'rgb(69,117,180)',
         'rgb(77,146,33)',
@@ -141,10 +142,18 @@ function ColorMapService() {
                     var color = this.mapColorMonochrome(variable_description[0].variable.min, variable_description[0].variable.max, society.variable_coded_values[j].coded_value, 0);
                     colors[society.society.id] = color;
                 } else {
-                    if (society.variable_coded_values[j].code_description && society.variable_coded_values[j].code_description.description.indexOf("Missing data") != -1) {
+                    if (society.variable_coded_values[j].code == 'NA') {
                         colors[society.society.id] = 'rgb(255,255,255)';
                     } else {
-                        colors[society.society.id] = this.colorMap[parseInt(society.variable_coded_values[j].coded_value)];
+                        if (variable_description[0].variable.label == "EA094") { //this variable's codes range from 11-99, for some reason
+                            for (var k = 0; k < variable_description[0].codes.length; k++) {
+                                if (variable_description[0].codes[k].code == society.variable_coded_values[j].coded_value) {
+                                    colors[society.society.id] = this.colorMap[k+1];
+                                    break;
+                                }
+                            }
+                        } else 
+                            colors[society.society.id] = this.colorMap[parseInt(society.variable_coded_values[j].coded_value)];
                     }
                 }
             }
