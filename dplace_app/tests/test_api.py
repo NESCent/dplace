@@ -18,7 +18,9 @@ class Test(APITestCase):
     def get_json(self, urlname, *args, **kw):
         kw.setdefault('format', 'json')
         reverse_args = kw.pop('reverse_args', [])
-        response = self.client.get(reverse(urlname, args=reverse_args), *args, **kw)
+        response = self.client.get(
+            reverse(urlname, args=reverse_args), *args, **kw
+        )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         return json.loads(response.content)
 

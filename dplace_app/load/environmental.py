@@ -2,9 +2,9 @@
 from __future__ import unicode_literals
 import logging
 
-from django.contrib.gis.geos import Point
-from django.core.exceptions import ObjectDoesNotExist
-from dplace_app.models import *
+from dplace_app.models import ISOCode, Society
+from dplace_app.models import Environmental, EnvironmentalCategory
+from dplace_app.models import EnvironmentalVariable, EnvironmentalValue
 from sources import get_source
 
 ENVIRONMENTAL_MAP = {
@@ -17,7 +17,7 @@ ENVIRONMENTAL_MAP = {
     'AnnualTemperatureVariance': {
         'name': 'Annual Temperature Variance',
         'category': 'Climate',
-        'description': 'Variance in temperature means (averaged across years)', 
+        'description': 'Variance in temperature means (averaged across years)',
         'units': '°C',
     },
     'TemperatureConstancy': {
@@ -146,16 +146,18 @@ def iso_from_code(code):
 def create_environmental_variables():
     for k, var_dict in ENVIRONMENTAL_MAP.items():
         if 'category' in var_dict:
-            env_category, created = EnvironmentalCategory.objects.get_or_create(name=var_dict['category'])
+            category, created = EnvironmentalCategory.objects.get_or_create(
+                name=var_dict['category']
+            )
             if created:
-                logging.info("Created environmental category %s" % env_category)
+                logging.info("Created environmental category %s" % category)
         else:
-            env_category = None
+            category = None
 
         obj, created = EnvironmentalVariable.objects.get_or_create(
             name=var_dict['name'],
             units=var_dict['units'],
-            category=env_category)
+            category=category)
         obj.codebook_info = var_dict['description']
         obj.save()
         logging.info("Saved environmental variable %s" % obj)
@@ -165,7 +167,6 @@ def create_environmental_variables():
 def load_environmental(items):
     variables = dict(list(create_environmental_variables()))
     societies = {(s.ext_id, s.source_id): s for s in Society.objects.all()}
-
     res = 0
     for item in items:
         if _load_environmental(item, variables, societies):

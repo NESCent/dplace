@@ -3,8 +3,7 @@ from __future__ import unicode_literals
 import logging
 from dplace_app.models import Source
 
-
-_SOURCE_CACHE = {}  
+_SOURCE_CACHE = {}
 SOURCE_DATA = {
     'EA': dict(
         year="1999",

@@ -7,7 +7,6 @@ from django.test import TestCase
 from dplace_app.models import (
     Society, GeographicRegion, Language, LanguageTree, ISOCode, CulturalVariable,
 )
-from dplace_app import load
 from dplace_app.load.util import csv_dict_reader, eavar_number_to_label, configure_logging
 from dplace_app.load.isocode import load_isocode
 from dplace_app.load.society import load_societies, society_locations

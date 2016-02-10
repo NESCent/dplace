@@ -373,7 +373,7 @@ def get_min_and_max(request):
         for v in values:
             if min_value is None:
                 min_value = v.value
-                
+
             if v.value < min_value:
                 min_value = v.value
             elif v.value > max_value:

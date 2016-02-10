@@ -6,13 +6,12 @@ import logging
 from six import BytesIO
 from django.db import connection
 
-from dplace_app.models import Society, GeographicRegion
-
-
 def delete_all(model):
     model.objects.all().delete()
     with connection.cursor() as c:
-        c.execute("ALTER SEQUENCE %s_id_seq RESTART WITH 1" % model._meta.db_table)
+        c.execute(
+            "ALTER SEQUENCE %s_id_seq RESTART WITH 1" % model._meta.db_table
+        )
 
 
 def eavar_number_to_label(number):
@@ -43,14 +42,18 @@ def configure_logging(test=False):
 
 def stream(fname):
     with open(fname, 'rb') as fp:
-        stream_ = BytesIO(fp.read().replace(b'\x90', b'').replace(b'\x8b', b' '))
+        stream_ = BytesIO(
+            fp.read().replace(b'\x90', b'').replace(b'\x8b', b' ')
+        )
         stream_.seek(0)
         return stream_
 
 
 def csv_reader(fname):
     for row in csv.reader(stream(fname)):
-        yield [col if col is None else col.decode('utf8').strip() for col in row]
+        yield [
+            col if col is None else col.decode('utf8').strip() for col in row
+        ]
 
 
 def csv_dict_reader(fname):
