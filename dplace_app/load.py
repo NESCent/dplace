@@ -1,9 +1,12 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import sys
 from itertools import chain
 from time import time
 
 import django
+django.setup()
+
 from django.db import transaction
 
 from load.util import configure_logging, csv_dict_reader
