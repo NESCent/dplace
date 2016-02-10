@@ -1,0 +1,2 @@
+[report]
+omit = dplace_app/admin.py
