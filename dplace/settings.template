@@ -123,7 +123,7 @@ TEMPLATES = [
 
 INSTALLED_APPS = (
     'django.contrib.auth',
-    'django.contrib./Users/dan/Code/django/dplace/dplace_app/templatesenttypes',
+    'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.messages',
