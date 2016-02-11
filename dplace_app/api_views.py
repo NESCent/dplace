@@ -135,20 +135,26 @@ class SourceViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = models.Source.objects.all()
 
 
-# returns trees that contain the societies from the SocietyResultSet
 # maybe needs cleaning up in the future
 def trees_from_languages_array(language_ids):
+    """
+    Takes a list of language ids
+    
+    Returns trees that contain the societies from the SocietyResultSet
+    """
     trees = models.LanguageTree.objects\
         .filter(languages__pk__in=language_ids)\
         .prefetch_related('languages__family', 'languages__iso_code')\
         .distinct()
     for t in trees:
         if 'glotto' in t.name:
-            langs_in_tree = [str(l.glotto_code)
-                             for l in t.languages.all() if l.id in language_ids]
+            langs_in_tree = [
+                str(l.glotto_code) for l in t.languages.all() if l.id in language_ids
+            ]
         else:
-            langs_in_tree = [str(l.iso_code.iso_code)
-                             for l in t.languages.all() if l.id in language_ids]
+            langs_in_tree = [
+                str(l.iso_code.iso_code) for l in t.languages.all() if l.id in language_ids
+            ]
         newick = Tree(t.newick_string, format=1)
         try:
             if 'glotto' not in t.name:
