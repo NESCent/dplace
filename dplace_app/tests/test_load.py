@@ -15,7 +15,8 @@ from dplace_app.load.variables import load_vars, load_codes
 from dplace_app.load.glottocode import xd_to_language
 from dplace_app.load.geographic import load_regions
 from dplace_app.load.tree import load_trees
-from dplace_app.load.sources import load_references
+from dplace_app.load.sources import load_references, get_source
+
 
 
 def data_path(fname=None):
@@ -142,3 +143,9 @@ class LoadTestCase(TestCase):
             'latitude': 1,
         })])
         self.assertEqual(res, 1)
+    
+    def test_get_source_raises_ValueError(self):
+        with self.assertRaises(ValueError):
+            get_source(source='personal communication')
+            
+        
