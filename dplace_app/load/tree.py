@@ -36,7 +36,9 @@ def load_trees(tree_dir, verbose=False):
 
 def _load_tree(file_name, get_language, verbose=False):
     # make a tree if not exists. Use the name of the tree
-    tree, created = LanguageTree.objects.get_or_create(name=os.path.basename(file_name))
+    tree, created = LanguageTree.objects.get_or_create(
+        name=os.path.basename(file_name)
+    )
     if not created:
         return False
 
@@ -46,16 +48,16 @@ def _load_tree(file_name, get_language, verbose=False):
 
     # now add languages to the tree
     reader = NexusReader(file_name)
-    #Remove '[&R]' from newick string
+    # Remove '[&R]' from newick string
     newick = re.sub(r'\[.*?\]', '', reader.trees.trees[0])
     try:
         newick = newick[newick.index('=') + 1:]
     except ValueError:  # pragma: no cover
         newick = newick
         
-    if verbose:
-        logging.info("Formatting newick string %s" % (newick))  # pragma: no cover
-
+    if verbose:  # pragma: no cover
+        logging.info("Formatting newick string %s" % (newick))
+        
     tree.newick_string = str(newick)
     for taxon_name in reader.trees.taxa:
         if taxon_name is '1':

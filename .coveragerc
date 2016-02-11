@@ -1,0 +1,14 @@
+[report]
+omit = dplace_app/admin.py
+
+exclude_lines =
+    # Have to re-enable the standard pragma
+    pragma: no cover
+
+    # Don't complain about repr's etc.
+    def __repr__
+    def __unicode__
+    
+    # Don't complain if runnable endpoints aren't run
+    if __name__ == .__main__.:
+

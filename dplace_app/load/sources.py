@@ -3,8 +3,7 @@ from __future__ import unicode_literals
 import logging
 from dplace_app.models import Source
 
-
-_SOURCE_CACHE = {}  
+_SOURCE_CACHE = {}
 SOURCE_DATA = {
     'EA': dict(
         year="1999",
@@ -57,7 +56,8 @@ def load_references(items):
                                  % (reference.author, reference.year))
             except IndexError:
                 logging.warn("No author and/or year for %s" % str(row))
-        except Exception as e:
-            logging.warn("Could not save reference for row %s: %e"
-                         % (str(row), e))
+        except Exception as e:  # pragma: no cover
+            logging.warn(
+                "Could not save reference for row %s: %e" % (str(row), e)
+            )
     return count

@@ -14,7 +14,7 @@ from rest_framework.views import Response
 from rest_framework.renderers import JSONRenderer
 
 from dplace_app.filters import GeographicRegionFilter
-from dplace_app.renderers import DPLACECsvRenderer, ZipRenderer
+from dplace_app.renderers import DPLACECSVRenderer, ZipRenderer
 from dplace_app import serializers
 from dplace_app import models
 
@@ -135,20 +135,26 @@ class SourceViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = models.Source.objects.all()
 
 
-# returns trees that contain the societies from the SocietyResultSet
 # maybe needs cleaning up in the future
 def trees_from_languages_array(language_ids):
+    """
+    Takes a list of language ids
+    
+    Returns trees that contain the societies from the SocietyResultSet
+    """
     trees = models.LanguageTree.objects\
         .filter(languages__pk__in=language_ids)\
         .prefetch_related('languages__family', 'languages__iso_code')\
         .distinct()
     for t in trees:
         if 'glotto' in t.name:
-            langs_in_tree = [str(l.glotto_code)
-                             for l in t.languages.all() if l.id in language_ids]
+            langs_in_tree = [
+                str(l.glotto_code) for l in t.languages.all() if l.id in language_ids
+            ]
         else:
-            langs_in_tree = [str(l.iso_code.iso_code)
-                             for l in t.languages.all() if l.id in language_ids]
+            langs_in_tree = [
+                str(l.iso_code.iso_code) for l in t.languages.all() if l.id in language_ids
+            ]
         newick = Tree(t.newick_string, format=1)
         try:
             if 'glotto' not in t.name:
@@ -373,7 +379,7 @@ def get_min_and_max(request):
         for v in values:
             if min_value is None:
                 min_value = v.value
-                
+
             if v.value < min_value:
                 min_value = v.value
             elif v.value > max_value:
@@ -432,7 +438,7 @@ def bin_cont_data(request):  # MAKE THIS GENERIC
 
 @api_view(['POST'])
 @permission_classes((AllowAny,))
-@renderer_classes((DPLACECsvRenderer,))
+@renderer_classes((DPLACECSVRenderer,))
 def csv_download(request):
     result_set = result_set_from_query_dict(request.data)
     response = Response(serializers.SocietyResultSetSerializer(result_set).data)

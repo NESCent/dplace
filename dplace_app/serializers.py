@@ -2,6 +2,12 @@ from rest_framework import serializers
 
 from dplace_app import models
 
+# constants for SocietyResult
+SEARCH_LANGUAGE = 'l'
+SEARCH_ENVIRONMENTAL = 'e'
+SEARCH_VARIABLES = 'v'
+SEARCH_GEOGRAPHIC = 'g'
+
 
 class SourceSerializer(serializers.ModelSerializer):
     class Meta(object):
@@ -25,7 +31,8 @@ class CulturalVariableSerializer(serializers.ModelSerializer):
             'codebook_info',
             'data_type',
             'source',
-            'index_categories')
+            'index_categories'
+        )
 
 
 class CulturalCategorySerializer(serializers.ModelSerializer):
@@ -40,7 +47,9 @@ class CulturalVariableDetailSerializer(serializers.ModelSerializer):
 
     class Meta(object):
         model = models.CulturalVariable
-        fields = ('id', 'label', 'name', 'index_categories', 'niche_categories')
+        fields = (
+            'id', 'label', 'name', 'index_categories', 'niche_categories'
+        )
 
 
 class CulturalCategoryDetailSerializer(serializers.ModelSerializer):
@@ -69,7 +78,8 @@ class CulturalValueSerializer(serializers.ModelSerializer):
             'references',
             'subcase',
             'focal_year',
-            'comment')
+            'comment'
+        )
 
 
 class ISOCodeSerializer(serializers.ModelSerializer):
@@ -103,7 +113,7 @@ class LanguageFamilySerializer(serializers.ModelSerializer):
 
 
 class LanguageSerializer(serializers.ModelSerializer):
-    #glotto_code = serializers.CharField(source='glotto_code')
+    # glotto_code = serializers.CharField(source='glotto_code')
     iso_code = serializers.CharField(source='iso_code.iso_code')
     family = LanguageFamilySerializer()
     count = serializers.SerializerMethodField()
@@ -137,13 +147,16 @@ class SocietySerializer(serializers.ModelSerializer):
             'location',
             'language',
             'focal_year',
-            'source')
+            'source'
+        )
 
 
 class GeographicRegionSerializer(serializers.ModelSerializer):
     class Meta(object):
         model = models.GeographicRegion
-        fields = ('id', 'level_2_re', 'count', 'region_nam', 'continent', 'tdwg_code')
+        fields = (
+            'id', 'level_2_re', 'count', 'region_nam', 'continent', 'tdwg_code'
+        )
 
 
 class LanguageTreeSerializer(serializers.ModelSerializer):
@@ -152,11 +165,6 @@ class LanguageTreeSerializer(serializers.ModelSerializer):
     class Meta(object):
         model = models.LanguageTree
         fields = ('id', 'name', 'languages', 'newick_string')
-
-SEARCH_LANGUAGE = 'l'
-SEARCH_ENVIRONMENTAL = 'e'
-SEARCH_VARIABLES = 'v'
-SEARCH_GEOGRAPHIC = 'g'
 
 
 class SocietyResult(object):
@@ -232,40 +240,39 @@ class SocietyResultSet(object):
         if variable.id not in self._codes.keys():
             self._codes[variable.id] = VariableCode(codes, variable)
 
-    def add_cultural(self, society, variable_description, codes, variable_coded_value):
-        self._get_society_result(society).add_variable_coded_value(variable_coded_value)
-        self.add_code(codes, variable_description)
+    def add_cultural(self, society, description, codes, value):
+        self._get_society_result(society).add_variable_coded_value(value)
+        self.add_code(codes, description)
         
-    def add_environmental(self, society, environmental_variable, environmental_value):
-        self.environmental_variables.add(environmental_variable)
-        self._get_society_result(society).add_environmental_value(environmental_value)
+    def add_environmental(self, society, variable, value):
+        self.environmental_variables.add(variable)
+        self._get_society_result(society).add_environmental_value(value)
 
     def add_language(self, society, language):
         self.languages.add(language)
         self._get_society_result(society).add_language(language)
 
-    def add_geographic_region(self, society, geographic_region):
-        self.geographic_regions.add(geographic_region)
-        self._get_society_result(society).add_geographic_region(geographic_region)
+    def add_geographic_region(self, society, region):
+        self.geographic_regions.add(region)
+        self._get_society_result(society).add_geographic_region(region)
    
     def add_language_tree(self, language_tree):
         self.language_trees.add(language_tree)
     
     def finalize(self, criteria):
         self.societies = [
-            x for x in self._society_results.values() if x.includes_criteria(criteria)]
+            x for x in self._society_results.values() if x.includes_criteria(criteria)
+        ]
         self.variable_descriptions = [x for x in self._codes.values()]
 
 
-class VariableCodeSerializer(serializers.Serializer):    
+class VariableCodeSerializer(serializers.Serializer):
     codes = CulturalCodeDescriptionSerializer(many=True)
     variable = CulturalVariableSerializer()
 
 
 class SocietyResultSerializer(serializers.Serializer):
-    """
-    Serializer for the SocietyResult object
-    """
+    "Serializer for the SocietyResult object"
     society = SocietySerializer()
     variable_coded_values = CulturalValueSerializer(many=True)
     environmental_values = EnvironmentalValueSerializer(many=True)
@@ -274,9 +281,7 @@ class SocietyResultSerializer(serializers.Serializer):
 
 
 class SocietyResultSetSerializer(serializers.Serializer):
-    """
-    Serialize a set of society results and the search criteria
-    """
+    "Serialize a set of society results and the search criteria"
     # Results contains a society and variable values that matched
     societies = SocietyResultSerializer(many=True)
     # These contain the search parameters

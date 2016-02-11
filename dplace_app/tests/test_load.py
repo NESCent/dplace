@@ -7,7 +7,6 @@ from django.test import TestCase
 from dplace_app.models import (
     Society, GeographicRegion, Language, LanguageTree, ISOCode, CulturalVariable,
 )
-from dplace_app import load
 from dplace_app.load.util import csv_dict_reader, eavar_number_to_label, configure_logging
 from dplace_app.load.isocode import load_isocode
 from dplace_app.load.society import load_societies, society_locations
@@ -16,7 +15,8 @@ from dplace_app.load.variables import load_vars, load_codes
 from dplace_app.load.glottocode import xd_to_language
 from dplace_app.load.geographic import load_regions
 from dplace_app.load.tree import load_trees
-from dplace_app.load.sources import load_references
+from dplace_app.load.sources import load_references, get_source
+
 
 
 def data_path(fname=None):
@@ -143,3 +143,9 @@ class LoadTestCase(TestCase):
             'latitude': 1,
         })])
         self.assertEqual(res, 1)
+    
+    def test_get_source_raises_ValueError(self):
+        with self.assertRaises(ValueError):
+            get_source(source='personal communication')
+            
+        

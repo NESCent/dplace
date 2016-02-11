@@ -37,7 +37,6 @@ def society_locations(items):
 
 def load_societies(items):
     delete_all(Society)
-
     societies = []
     for item in items:
         if item['dataset'] == 'EA':
@@ -45,7 +44,9 @@ def load_societies(items):
         elif item['dataset'] == 'LRB':
             source = get_source("Binford")
         else:
-            logging.warn("Could not determine dataset source for row %s, skipping" % item)
+            logging.warn(
+                "Could not determine source for row %s, skipping" % item
+            )
             continue
 
         societies.append(Society(

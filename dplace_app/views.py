@@ -9,7 +9,10 @@ def view_society(request, society_id):
     # gets the society's location for inset map
     location = {}
     if society.location:
-        location = {'lat': society.location['coordinates'][1], 'lng': society.location['coordinates'][0]}
+        location = {
+            'lat': society.location['coordinates'][1],
+            'lng': society.location['coordinates'][0]
+        }
 
     # gets other societies in database with the same xd_id
     xd_id = Society.objects.filter(xd_id=society.xd_id).exclude(pk=society_id)
@@ -17,21 +20,21 @@ def view_society(request, society_id):
     cultural_traits = society.get_cultural_trait_data()
     references = society.get_data_references()
     language_classification = None
+    
     if society.language:
         # just glottolog at the moment
         language_classification = LanguageFamily.objects\
             .filter(name=society.language.family.name, scheme='G')
-    return render(
-        request,
-        'society.html',
-        {
-            'society': society,
-            'xd_id': xd_id,
-            'location': location,
-            'language_classification': language_classification,
-            'environmentals': dict(environmentals),
-            'cultural_traits': dict(cultural_traits),
-            'references': references})
+    
+    return render(request, 'society.html', {
+        'society': society,
+        'xd_id': xd_id,
+        'location': location,
+        'language_classification': language_classification,
+        'environmentals': dict(environmentals),
+        'cultural_traits': dict(cultural_traits),
+        'references': references
+    })
 
 
 def view_language(request, language_id):
@@ -40,14 +43,12 @@ def view_language(request, language_id):
         raise Http404
     environmentals = language.society.environmentals.all()
     ea_values = language.society.get_ethnographic_atlas_data()
-    return render(
-        request,
-        'society.html',
-        {
-            'language': language,
-            'society': language.society,
-            'environmentals': environmentals,
-            'ea_values': ea_values})
+    return render(request, 'society.html', {
+        'language': language,
+        'society': language.society,
+        'environmentals': environmentals,
+        'ea_values': ea_values
+    })
 
 
 def angular(request):
