@@ -14,7 +14,7 @@ from rest_framework.views import Response
 from rest_framework.renderers import JSONRenderer
 
 from dplace_app.filters import GeographicRegionFilter
-from dplace_app.renderers import DPLACECsvRenderer, ZipRenderer
+from dplace_app.renderers import DPLACECSVRenderer, ZipRenderer
 from dplace_app import serializers
 from dplace_app import models
 
@@ -438,7 +438,7 @@ def bin_cont_data(request):  # MAKE THIS GENERIC
 
 @api_view(['POST'])
 @permission_classes((AllowAny,))
-@renderer_classes((DPLACECsvRenderer,))
+@renderer_classes((DPLACECSVRenderer,))
 def csv_download(request):
     result_set = result_set_from_query_dict(request.data)
     response = Response(serializers.SocietyResultSetSerializer(result_set).data)

@@ -146,7 +146,7 @@ def encode_rowdict(rowdict):
     return encoded
 
 
-class DPLACECsvRenderer(renderers.BaseRenderer):
+class DPLACECSVRenderer(renderers.BaseRenderer):
     media_type = 'text/csv'
     format = 'csv'
 
