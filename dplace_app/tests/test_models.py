@@ -73,3 +73,16 @@ class EATestCase(TestCase):
                 index_of_10 = index
             index += 1
         self.assertLess(index_of_2, index_of_10)
+    
+    def test_get_description(self):
+        assert self.value.get_description() == self.value.code.description
+    
+    def test_get_description_no_code(self):
+        obj = models.CulturalValue.objects.create(
+                    variable=self.variable,
+                    society=self.ea_society,
+                    coded_value='5',
+                    code=None,
+                    source=self.source
+        )
+        assert obj.get_description() == ''

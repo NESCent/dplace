@@ -39,7 +39,7 @@ class DPLACECSVResults(object):
             'description': "Description: %s" % v,
             'comments': "Comment: %s" % v,
             'focal_year': "Focal Year: %s" % v,
-            'sources': "References: %s %s" % v,
+            'sources': "References: %s" % v,
         }
 
     def field_names_for_environmental_variable(self, variable):
