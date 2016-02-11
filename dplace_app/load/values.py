@@ -42,7 +42,7 @@ def load_data(items):
         res = _load_data(item, **kw)
         if res:
             key = (res[0]['variable'].id, res[0]['society'].id, res[0]['coded_value'])
-            if key in inserted:
+            if key in inserted:  # pragma: no cover
                 logging.warn("duplicate value %s" % item)
             else:
                 inserted.add(key)
@@ -113,7 +113,7 @@ def _load_data(val_row, societies=None, sources=None, variables=None, descriptio
             ref = sources.get((author, year))
             if ref:
                 refs.add(ref.id)
-            else:
+            else:  # pragma: no cover
                 logging.warn(
                     "Could not find reference %s (%s) in database, skipping reference"
                     % (author, year))
