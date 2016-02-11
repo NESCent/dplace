@@ -56,7 +56,8 @@ def load_references(items):
                                  % (reference.author, reference.year))
             except IndexError:
                 logging.warn("No author and/or year for %s" % str(row))
-        except Exception as e:
-            logging.warn("Could not save reference for row %s: %e"
-                         % (str(row), e))
+        except Exception as e:  # pragma: no cover
+            logging.warn(
+                "Could not save reference for row %s: %e" % (str(row), e)
+            )
     return count

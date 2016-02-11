@@ -203,7 +203,7 @@ def _load_environmental(env_dict, variables, societies):
         for k in ENVIRONMENTAL_MAP:  # keys are the columns in the CSV file
             var_dict = ENVIRONMENTAL_MAP[k]
             variable = variables.get(var_dict['name'])
-            if variable is None:
+            if variable is None:  # pragma: no cover
                 logging.warn("Did not find an EnvironmentalVariable with name %s" % var_dict['name'])
                 continue
             if env_dict[k] and env_dict[k] != 'NA':
