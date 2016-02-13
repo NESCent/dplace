@@ -9,8 +9,11 @@ install:
   - cp dplace/settings.travis dplace/settings.py
 before_script:
   - psql -c 'create database travis_postgis;' -U postgres
+  - npm install
 # command to run tests
-script: "coverage run --source='dplace_app' manage.py test"
+script: 
+  - "coverage run --source='dplace_app' manage.py test"
+  - npm test
 after_success:
   - coverage report -m
   - codecov
