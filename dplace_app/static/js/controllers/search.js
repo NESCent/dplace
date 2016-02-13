@@ -7,7 +7,7 @@
  * @param FindSocieties
  * @constructor
  */
-function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties, TreesFromLanguages) {
+function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties) {
     $scope.setActive('search');
     $scope.searchModel = searchModelService.getModel();
     $scope.selectedButton = $scope.searchModel.selectedButton;
