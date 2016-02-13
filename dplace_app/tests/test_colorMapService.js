@@ -5,73 +5,8 @@
     generateColorMap(results)
     
 */
-/*describe('SearchModelService Testing', function() {
-    var mockSearchService;
-    
-    beforeEach(function() {
-        module('ngResource');
-        module('dplaceServices');
-    });
-    
-    beforeEach(inject(function(searchModelService) {
-        mockSearchService = searchModelService;
-        spyOn(searchModelService, 'getModel');
-    }));
-    
-    it('testing', function() {
-        expect(mockSearchService.model).toBeDefined();
-        
-    });
 
-});*/
-
-describe('HomeController', function() {
-    var appScope, homeScope, mockAppCtrl, mockHomeCtrl, mockSearchModelService;
-    beforeEach(function() {
-        module('dplaceServices');
-        module('dplace');
-    });
-    
-    beforeEach(inject(function($rootScope, $controller, searchModelService) {
-        appScope = $rootScope.$new();
-        mockSearchModelService = searchModelService;
-        mockAppCtrl = $controller('AppCtrl', {$scope: appScope, searchModelService: mockSearchModelService});
-        spyOn(appScope, 'setActive');
-        homeScope = appScope.$new();
-        mockHomeCtrl = $controller('HomeCtrl', {$scope: homeScope});
-    }));
-    
-    it('should do this', function() {
-        expect(appScope).toBeDefined(); 
-    });
-});
-
-/*describe('Family', function () {
-    var mockUserResource, $httpBackend, results;
-    beforeEach(angular.mock.module('dplaceServices'));
-
-    beforeEach(function () {
-        angular.mock.inject(function ($injector) {
-            $httpBackend = $injector.get('$httpBackend');
-            mockUserResource = $injector.get('LanguageFamily');
-        })
-    });
-
-    describe('getUser', function () {
-        it('should call getUser with username', inject(function (LanguageFamily) {
-            $httpBackend.whenGET('/api/v1/language_families?page_size=1000')
-                .respond("{\"results\":[]}");
-                //.respond("lang_fam.json"); //figure out how to return file contents here
-                mockUserResource.query();
-
-            $httpBackend.flush();
-           // expect(result).toEqual('test');
-        }));
-
-    });
-});
-
-/*describe('Color Map Service Testing', function() {
+describe('Color Map Service Testing', function() {
     var mockColorService, mockResults, society;
     
     beforeEach(function() {
@@ -113,8 +48,7 @@ describe('HomeController', function() {
        mockResults.geographic_regions.push(geographic_region);
         mockResults.societies.push(society);
         var map = mockColorService.generateColorMap(mockResults);
-        var expected_color = 'hsl(' + 24*240 + ',100%,50%)';
-        expect(map[society.society.id]).toBe(expected_color);
+        expect(map[society.society.id]).toBe('rgb(255,0,0)');
     });
     
     it('environmental color map', function() {
@@ -134,8 +68,7 @@ describe('HomeController', function() {
         society.environmental_values.push(environmental_value);
         mockResults.societies.push(society);
         var map = mockColorService.generateColorMap(mockResults);
-        var expected_color = 'hsl('+(240-(((18.25+17)/(29+17))*240))+',100%, 50%)';
-        expect(map[society.society.id]).toBe(expected_color);
+        expect(map[society.society.id]).toBe('rgb(255,238,0)');
     
     });
     
@@ -164,9 +97,8 @@ describe('HomeController', function() {
         society.variable_coded_values.push(coded_value);
         mockResults.societies.push(society);
         var map = mockColorService.generateColorMap(mockResults);
-        var expected_color = 'hsl('+ (1/5)*240 + ',100%,50%)';
-        expect(map[society.society.id]).toBe(expected_color);
+        expect(map[society.society.id]).toBe('rgb(228,26,28)');
     
     });
 
-});*/
+});
