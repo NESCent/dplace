@@ -22,7 +22,7 @@ module.exports = function(config) {
         'dplace_app/static/bower_components/angular-mocks/angular-mocks.js',
         'dplace_app/static/js/app.js',
         'dplace_app/static/js/controllers/app.js',
-        'dplace_app/static/js/controllers/home.js',
+        'dplace_app/static/js/controllers/*.js',
         'dplace_app/static/js/models.js',
         'dplace_app/static/js/colorMapService.js',
         'dplace_app/static/js/searchModelService.js',
@@ -30,7 +30,7 @@ module.exports = function(config) {
         'dplace_app/static/js/filters.js',
         'dplace_app/static/js/directives.js',
         'dplace_app/static/bower_components/angular-ui-bootstrap-bower/ui-bootstrap-tpls.min.js',
-        //'dplace_app/static/js/controllers/search/*.js',
+        'dplace_app/static/js/controllers/search/*.js',
         'dplace_app/tests/*.js',
         
         {pattern: 'dplace_app/tests/data/*.json', watched: true, served: true, included: false}
