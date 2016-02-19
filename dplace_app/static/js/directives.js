@@ -609,7 +609,7 @@ angular.module('dplaceMapDirective', [])
                       }
                     },
                     onMarkerClick: function(e, code) {
-                        window.open("/society/"+code);
+                        window.open("/society/"+scope.map.series.markers[0].elements[code].config.weburl);
                     },
                     onRegionOver: function(e, code) {
                         if(attrs.region) {
@@ -668,7 +668,7 @@ angular.module('dplaceMapDirective', [])
                     scope.results.societies.forEach(function(societyResult) {
                         var society = societyResult.society;
                         // Add a marker for each point
-                        var marker = {latLng: [society.location.coordinates[1], society.location.coordinates[0]], name: society.name}
+                        var marker = {latLng: [society.location.coordinates[1], society.location.coordinates[0]], name: society.name, weburl: society.ext_id}
                         
                          if (!scope.chosen) {   
                             results = scope.results;

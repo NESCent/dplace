@@ -4,7 +4,7 @@ from dplace_app.models import Society, Language, LanguageFamily
 
 
 def view_society(request, society_id):
-    society = get_object_or_404(Society, pk=society_id)
+    society = get_object_or_404(Society, ext_id=society_id)
 
     # gets the society's location for inset map
     location = {}
@@ -15,7 +15,7 @@ def view_society(request, society_id):
         }
 
     # gets other societies in database with the same xd_id
-    xd_id = Society.objects.filter(xd_id=society.xd_id).exclude(pk=society_id)
+    xd_id = Society.objects.filter(xd_id=society.xd_id).exclude(ext_id=society_id)
     environmentals = society.get_environmental_data()
     cultural_traits = society.get_cultural_trait_data()
     references = society.get_data_references()
