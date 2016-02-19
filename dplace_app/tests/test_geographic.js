@@ -23,6 +23,7 @@ describe('Testing geographic search', function() {
         });
         spyOn(searchScope, 'search').and.callThrough();
         spyOn(searchScope, 'updateSearchQuery');
+        spyOn(searchScope, 'searchSocieties');
 
         geographicScope = searchScope.$new();
         
@@ -85,5 +86,6 @@ describe('Testing geographic search', function() {
         };
         expect(searchScope.updateSearchQuery).toHaveBeenCalled();
         expect(searchScope.updateSearchQuery).toHaveBeenCalledWith(expected_searchQuery);
+        expect(searchScope.searchSocieties).toHaveBeenCalled();
     });
 });
