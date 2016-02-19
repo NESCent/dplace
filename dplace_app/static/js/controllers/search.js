@@ -213,7 +213,7 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties) 
             }
             //get selected regions
             if (propertyName == 'geographicRegions') {
-                var selectedRegions = searchParams[propertyName].selectedRegions;          
+                var selectedRegions = searchParams[propertyName].selectedRegions;  
                 selectedRegions.forEach(function (selectedRegion) {
                     var regionId = null;
                     searchParams[propertyName].allRegions.forEach(function(region) {
