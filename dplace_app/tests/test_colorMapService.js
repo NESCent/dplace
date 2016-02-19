@@ -110,8 +110,11 @@ describe('Color Map Service Testing', function() {
         society.variable_coded_values.push(coded_value);
         mockResults.societies.push(society);
         var map = mockColorService.generateColorMap(mockResults);
-        expect(map[society.society.id]).toBe('rgb(228,26,28)');
+        expect(map[society.society.id]).toEqual('rgb(228,26,28)');
     
+    });
+    
+    it('should use monochromatic scale for ordinal variables', function() {
     });
     
     it('language family map', function() {
@@ -153,8 +156,7 @@ describe('Color Map Service Testing', function() {
             'name': "LMNO"
          
         };
-        
-        
+
         society.society.language = language1;
         society2.society.language = language2;
         society3.society.language = language3;
@@ -181,6 +183,91 @@ describe('Color Map Service Testing', function() {
        expect(map[society.society.id]).toBe("rgb(0,0,255)");
        expect(map[society2.society.id]).toBe("rgb(0,255,0)");
        expect(map[society2.society.id]).toEqual(map[society3.society.id]);
+    });
+    
+    it('geographic regions and languages color map', function() {
+        //when searching by geographic region and language family, marker should be colored according to language family
+        var geographic_region = {
+            'continent': "AFRICA",
+            'count': 71,
+            'id': 7398,
+            'level_2_re': 24,
+            'region_nam': "Northeastern Africa",
+            'tdwg_code': 24
+        };
+        var language1 = {
+            'family': {
+                'id': 11,
+                'language_count': 11,
+                'name': 'Family 1',
+                'scheme': 'G'
+            },
+            'glotto_code': "abcd1234",
+            'id': 1100,
+            'iso_code': "abc",
+            'name': "ABCD"
+         
+        };
+       society.geographic_regions.push(geographic_region);
+       mockResults.geographic_regions.push(geographic_region);
+       society.society.language = language1;
+       mockResults.languages.push(language1);
+       mockResults.classifications = [
+            {
+                'id': 11,
+                'name': 'Family 1',
+                'scheme': 'G'
+            },
+             {
+                'id': 58,
+                'name': "Austronesian",
+                'scheme': 'G'
+            }
+        ];
+     mockResults.societies.push(society);
+    var map = mockColorService.generateColorMap(mockResults);
+    expect(map[society.society.id]).toEqual("rgb(0,0,255)")
+    });
+    
+    it('geographic region and cultural variable', function() {
+        //should color by cultural variable 
+        var geographic_region = {
+            'continent': "AFRICA",
+            'count': 71,
+            'id': 7398,
+            'level_2_re': 24,
+            'region_nam': "Northeastern Africa",
+            'tdwg_code': 24
+        };
+        
+        var variable_description = {
+            'codes': [
+                {'code': 'NA', 'description': 'Missing data'},
+                {'code': '1', 'description': 'Absence of slavery'},
+                {'code': '2', 'description': 'Incipient or nonhereditary slavery, i.e., where slave status is temporary and not transmitted to the children of slaves'},
+                {'code': '3', 'description': "Slavery reported but not identified as hereditary or nonhereditary"},
+                {'code': '4', 'description': "Hereditary slavery present and of at least modest social significance"},
+            ],
+            'variable': {
+                'id': 1628,
+                'data_type': 'Categorical'
+            }
+        };
+        
+        var coded_value = {
+            'coded_value': '1',
+            'variable': 1628,
+            'code_description': variable_description.codes[1]
+        };
+        society.geographic_regions.push(geographic_region);
+        mockResults.geographic_regions.push(geographic_region);
+        mockResults.variable_descriptions.push(variable_description);
+        society.variable_coded_values.push(coded_value);
+        mockResults.societies.push(society);
+        
+        var map = mockColorService.generateColorMap(mockResults);
+        expect(map[society.society.id]).toEqual('rgb(228,26,28)');
+    
     });
 
 });
