@@ -110,6 +110,7 @@ class LanguageFamilyViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = serializers.LanguageFamilySerializer
     filter_fields = ('name', 'scheme',)
     queryset = models.LanguageFamily.objects.all().order_by('name')
+    pagination_class = LargeResultsSetPagination
 
 
 class TreeResultsSetPagination(PageNumberPagination):
