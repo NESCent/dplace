@@ -106,15 +106,50 @@ describe('Color Map Service Testing', function() {
             'code_description': variable_description.codes[1]
         };
         
+        var coded_value_na = { //check missing data
+            'coded_value': 'NA',
+            'variable': 1628,
+            'code_description': variable_description.codes[0]
+        };
+        
+        mockResults.variable_descriptions.push(variable_description);
+        society.variable_coded_values.push(coded_value);
+        society2.variable_coded_values.push(coded_value_na);
+        mockResults.societies.push(society);
+        mockResults.societies.push(society2);
+        var map = mockColorService.generateColorMap(mockResults);
+        expect(map[society.society.id]).toEqual('rgb(228,26,28)');
+        expect(map[society2.society.id]).toEqual('rgb(255,255,255)'); 
+    });
+    
+    it('should use monochromatic scale for ordinal variables', function() {
+        var variable_description = {
+            'codes': [
+                {'code': 'NA', 'description': '0-25%'},
+                {'code': '1', 'description': '26-50%'},
+                {'code': '2', 'description': '51-75%'},
+                {'code': '3', 'description': '76-100%'}
+            ],
+            'variable': {
+                'id': 1934,
+                'data_type': 'Ordinal'
+            }
+        };
+        
+        var coded_value = {
+            'coded_value': '1',
+            'variable': 1934,
+            'code_description': variable_description.codes[1]
+        };
+        
         mockResults.variable_descriptions.push(variable_description);
         society.variable_coded_values.push(coded_value);
         mockResults.societies.push(society);
         var map = mockColorService.generateColorMap(mockResults);
-        expect(map[society.society.id]).toEqual('rgb(228,26,28)');
+        //check to make sure it isn't assigning the color from colorMap
+        expect(map[society.society.id]).not.toEqual('rgb(228,26,28)'); 
+        expect(map[society.society.id]).toEqual('rgb(97,222,97)');
     
-    });
-    
-    it('should use monochromatic scale for ordinal variables', function() {
     });
     
     it('language family map', function() {
