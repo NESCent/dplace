@@ -7,7 +7,7 @@
 */
 
 describe('Color Map Service Testing', function() {
-    var mockColorService, mockResults, society;
+    var mockColorService, mockResults, society, society2, society3;
     
     beforeEach(function() {
         module('dplaceServices');
@@ -27,7 +27,20 @@ describe('Color Map Service Testing', function() {
             'society': { 'id': 11264 }, 
             'environmental_values': [],
             'geographic_regions': [],
-            'languages': [],
+            'variable_coded_values': []
+        };
+        
+        society2 = {
+            'society': { 'id': 16 }, 
+            'environmental_values': [],
+            'geographic_regions': [],
+            'variable_coded_values': []
+        };
+        
+        society3 = {
+            'society': { 'id': 46 }, 
+            'environmental_values': [],
+            'geographic_regions': [],
             'variable_coded_values': []
         };
         
@@ -99,6 +112,75 @@ describe('Color Map Service Testing', function() {
         var map = mockColorService.generateColorMap(mockResults);
         expect(map[society.society.id]).toBe('rgb(228,26,28)');
     
+    });
+    
+    it('language family map', function() {
+        var language1 = {
+            'family': {
+                'id': 11,
+                'language_count': 11,
+                'name': 'Family 1',
+                'scheme': 'G'
+            },
+            'glotto_code': "abcd1234",
+            'id': 1100,
+            'iso_code': "abc",
+            'name': "ABCD"
+         
+        };
+        var language2 = {
+            'family': {
+                'id': 58,
+                'name': 'Austronesian',
+                'scheme': 'G'
+            },
+            'glotto_code': "efgh1234",
+            'id': 1110,
+            'iso_code': "efg",
+            'name': "SFGH"
+         
+        };
+        
+        var language3 = {
+            'family': {
+                'id': 58,
+                'name': 'Austronesian',
+                'scheme': 'G'
+            },
+            'glotto_code': "lmno1234",
+            'id': 1110,
+            'iso_code': "lmn",
+            'name': "LMNO"
+         
+        };
+        
+        
+        society.society.language = language1;
+        society2.society.language = language2;
+        society3.society.language = language3;
+        mockResults.societies.push(society);
+        
+        //societies 2 and 3 have the same language family
+        mockResults.societies.push(society2);
+        mockResults.societies.push(society3);
+        mockResults.languages = mockResults.languages.concat([language1, language2, language3]);
+        mockResults.classifications = [
+            {
+                'id': 11,
+                'name': 'Family 1',
+                'scheme': 'G'
+            },
+            {
+                'id': 58,
+                'name': "Austronesian",
+                'scheme': 'G'
+            }
+        ];
+        
+        var map = mockColorService.generateColorMap(mockResults);
+       expect(map[society.society.id]).toBe("rgb(0,0,255)");
+       expect(map[society2.society.id]).toBe("rgb(0,255,0)");
+       expect(map[society2.society.id]).toEqual(map[society3.society.id]);
     });
 
 });
