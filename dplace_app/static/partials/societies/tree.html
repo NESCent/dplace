@@ -28,8 +28,8 @@
     </div>
 
     <div id="legend" ng-show="results.selectedTree">
-        Click on a variable title to expand or collapse variable legend.
-        <table ng-repeat="variable in results.variable_descriptions" style="margin-bottom:8px;">
+        <i>Click on a variable title to expand or collapse variable legend.</i>
+        <table ng-repeat="variable in results.variable_descriptions" style="margin-top:5px;margin-bottom:8px;">
             <tr ng-show="!globalTree" ng-click="variable.hidden = !variable.hidden" data-toggle="collapse" data-target="#{{variable.CID}}" class="accordion-toggle legends" style="cursor:pointer;">
                 <td><span ng-show="!variable.hidden" class="glyphicon glyphicon-chevron-right" aria-hidden="true" style="padding-right:3px;"></span><span ng-show="variable.hidden" class="glyphicon glyphicon-chevron-down" aria-hidden="true" style="padding-right:3px;"></span><b>{{variable.CID}}:</b> {{variable.variable.name}}</td>
             </tr>
