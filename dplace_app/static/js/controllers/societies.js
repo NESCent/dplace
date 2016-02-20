@@ -226,6 +226,7 @@ function SocietiesCtrl($scope, $timeout, $http, searchModelService, colorMapServ
     $scope.buttonChanged = function(buttonVal) {
         d3.select('language-phylogeny').html('');
         $scope.globalTree = false;
+        $scope.results.selectedTree = null;
         if (buttonVal.indexOf("global") != -1) {
             $scope.globalTree = true;
             $scope.results.selectedTree = $scope.results.language_trees.global_tree;
