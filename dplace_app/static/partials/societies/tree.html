@@ -28,13 +28,14 @@
     </div>
 
     <div id="legend" ng-show="results.selectedTree">
+        Click on a variable title to expand or collapse variable legend.
         <table ng-repeat="variable in results.variable_descriptions" style="margin-bottom:8px;">
-            <tr ng-show="!globalTree" ng-click="legendArrow(variable)" data-toggle="collapse" data-target="#{{variable.CID}}" class="accordion-toggle legends" style="cursor:pointer;">
+            <tr ng-show="!globalTree" ng-click="variable.hidden = !variable.hidden" data-toggle="collapse" data-target="#{{variable.CID}}" class="accordion-toggle legends" style="cursor:pointer;">
                 <td><span ng-show="!variable.hidden" class="glyphicon glyphicon-chevron-right" aria-hidden="true" style="padding-right:3px;"></span><span ng-show="variable.hidden" class="glyphicon glyphicon-chevron-down" aria-hidden="true" style="padding-right:3px;"></span><b>{{variable.CID}}:</b> {{variable.variable.name}}</td>
             </tr>
             <tr>
                 <td class="hiddenRow">
-                    <div ng-class="{'accordion-body collapse': !globalTree}" ng-hide="showOrHide(results.chosenTVariable.id, variable.variable.id)" id="{{variable.CID}}">
+                    <div ng-class="{'accordion-body collapse': !globalTree, 'in': variable.CID == 'C1'}" ng-hide="showOrHide(results.chosenTVariable.id, variable.variable.id)" id="{{variable.CID}}">
                         <svg ng-show="variable.variable.data_type !== 'Continuous'" height="{{variable.svgSize}}" width="600" class="tree-legend legends" var-id="{{variable.variable.id}}">
                             <g ng-repeat="c in variable.codes" transform="{{$index|transformG}}">
                             <circle
@@ -72,7 +73,7 @@
                 <td><span ng-show="!environmental.hidden" class="glyphicon glyphicon-chevron-right" aria-hidden="true" style="padding-right:3px;"></span><span ng-show="environmental.hidden" class="glyphicon glyphicon-chevron-down" aria-hidden="true" style="padding-right:3px;"></span><b>{{environmental.CID}}:</b> {{environmental.name}}</td>
             </tr>
             <tr><td class="hiddenRow">
-                <div ng-class="{'accordion-body collapse':!globalTree}" ng-hide="showOrHide(results.chosenTVariable.name, environmental.name)" class="accordion-body collapse" id="e{{environmental.id}}">
+                <div ng-class="{'accordion-body collapse':!globalTree, 'in': (environmental.CID == 'E1' && results.variable_descriptions.length == 0)}" ng-hide="showOrHide(results.chosenTVariable.name, environmental.name)" class="accordion-body collapse" id="e{{environmental.id}}">
                 </div>                
             </td></tr>
         </table>

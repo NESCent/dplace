@@ -24,10 +24,15 @@ function SocietiesCtrl($scope, $timeout, $http, searchModelService, colorMapServ
             $scope.variables.push(variable.variable);
             variable['svgSize'] = variable.codes.length * 27;
         });
+        if ($scope.results.variable_descriptions.length > 0)
+            $scope.results.variable_descriptions[0].hidden = true;
     }
+    
         
     if ($scope.query.environmental_filters) {
         $scope.variables = $scope.variables.concat($scope.results.environmental_variables);
+        if ($scope.results.environmental_variables.length > 0 && $scope.results.variable_descriptions.length == 0)
+            $scope.results.environmental_variables[0].hidden = true;
     }
     
     $scope.setActive('societies');
