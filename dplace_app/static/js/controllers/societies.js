@@ -243,7 +243,6 @@ function SocietiesCtrl($scope, $timeout, $http, searchModelService, colorMapServ
         $scope.$broadcast('treeSelected', {tree: $scope.results.selectedTree});
         if ($scope.results.selectedTree.name.indexOf("global") == -1) {
             $scope.globalTree = false;
-            //$scope.treeDownload();
         } else {
             $scope.globalTree = true;
         }

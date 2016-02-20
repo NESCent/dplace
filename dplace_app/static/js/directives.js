@@ -521,21 +521,18 @@ angular.module('languagePhylogenyDirective', [])
 
             scope.$on('treeSelected', function(event, args) {
                 constructTree(args.tree);
-                //these lines throw an error :(
                 phyloWidth = d3.select("language-phylogeny").select("g").node().getBBox().width;
                 d3.select("#legend")
                     .attr("style", "width:"+($(window).width()-phyloWidth-100)+"px; position:absolute; right:20px; z-index:1;");
                 var pos = $(".phylogeny").offset();
                 $(window).scroll(function() {
-                    if ($(window).scrollTop() > $(".navbar").height()+100)
-                        $("#legend").stop().animate({"marginTop":($(window).scrollTop() - 200) + "px"}, "slow");
+                    if ($(window).scrollTop() > $(".navbar").height()+250) {
+                        $("#legend").stop().animate({"marginTop":($(window).scrollTop() - 300) + "px"}, "slow");
+                    }
                     else {
-                        d3.select("#legend")
-                            .style("position", "absolute")
-                            .style("right", "20px")
-                            .style("z-index", "1");
+                        $("#legend").stop().animate({"marginTop": "0px"}, "slow");
                     } 
-                    if ($(window).scrollTop() > $(".navbar").height()+100) {
+                    if ($(window).scrollTop() > $(".navbar").height()+250) {
                         d3.select("#varLabels")
                             .attr('class', 'var-labels-fixed')
                             .style("visibility", "visible");
