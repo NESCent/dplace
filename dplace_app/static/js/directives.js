@@ -223,7 +223,7 @@ angular.module('languagePhylogenyDirective', [])
                 d3.select("language-phylogeny").html('');
                 var newick = Newick.parse(langTree.newick_string);
                 if (langTree.name.indexOf("global") != -1) var w = 900;
-                else  var w = 700;
+                else  var w = 500;
                 if (langTree.name.indexOf("global") != -1)  {
                     var tree = d3.layout.cluster()
                     .size([360, (w/2)-100])
@@ -524,7 +524,10 @@ angular.module('languagePhylogenyDirective', [])
              
                 $(window).scroll(function() {
                     if ($(window).scrollTop() > $(".navbar").height()+250) {
-                        $("#legend").stop().animate({"marginTop":($(window).scrollTop() - 300) + "px"}, "slow");
+                        if (args.tree.name.indexOf("global") == -1)
+                            $("#legend").stop().animate({"marginTop":($(window).scrollTop() - 350) + "px"}, "slow");
+                        else
+                            $("#legend").stop().animate({"marginTop": ($(window).scrollTop() - 300) + "px"}, "slow");
                     }
                     else {
                         $("#legend").stop().animate({"marginTop": "0px"}, "slow");
