@@ -521,10 +521,7 @@ angular.module('languagePhylogenyDirective', [])
 
             scope.$on('treeSelected', function(event, args) {
                 constructTree(args.tree);
-                phyloWidth = d3.select("language-phylogeny").select("g").node().getBBox().width;
-                d3.select("#legend")
-                    .attr("style", "width:"+($(window).width()-phyloWidth-100)+"px; position:absolute; right:20px; z-index:1;");
-                var pos = $(".phylogeny").offset();
+             
                 $(window).scroll(function() {
                     if ($(window).scrollTop() > $(".navbar").height()+250) {
                         $("#legend").stop().animate({"marginTop":($(window).scrollTop() - 300) + "px"}, "slow");
