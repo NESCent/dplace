@@ -23,7 +23,7 @@ router.register(r'sources', api_views.SourceViewSet)
 
 urlpatterns = [
     url(r'^$', RedirectView.as_view(url='angular/', permanent=True), name='home'),
-    url(r'^society/(?P<society_id>.*)$', views.view_society, name='view_society'),
+    url(r'^society/(?P<society_id>.*)$', api_views.SocietyDetail), #views.view_society, name='view_society'),
     url(r'^language/(?P<language_id>\d+)/$', views.view_language, name='view_language'),
     url(r'^angular/$', views.angular, name='angular'),
     # API
