@@ -3,21 +3,22 @@ import re
 import datetime
 
 from django.db.models import Prefetch
+from django.shortcuts import get_object_or_404
 from django.http import Http404
 from ete2 import Tree
 from ete2.coretype.tree import TreeError
 from rest_framework import viewsets
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.decorators import api_view, permission_classes, renderer_classes
+from rest_framework.decorators import api_view, permission_classes, renderer_classes, detail_route
 from rest_framework.permissions import AllowAny
 from rest_framework.views import Response
-from rest_framework.renderers import JSONRenderer
+from rest_framework.generics import RetrieveAPIView
+from rest_framework.renderers import JSONRenderer, TemplateHTMLRenderer
 
 from dplace_app.filters import GeographicRegionFilter
 from dplace_app.renderers import DPLACECSVRenderer, ZipRenderer
 from dplace_app import serializers
 from dplace_app import models
-
 
 # Resource routes
 class CulturalVariableViewSet(viewsets.ReadOnlyModelViewSet):
@@ -61,7 +62,42 @@ class SocietyViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = serializers.SocietySerializer
     queryset = models.Society.objects.all().select_related(
         'source', 'language__iso_code', 'language__family')
+    lookup_field = 'ext_id'
 
+    
+    def detail(self, request, society_id):
+        society = get_object_or_404(models.Society, ext_id=society_id)
+        # gets the society's location for inset map
+        location = {}
+        if society.location:
+            location = {
+                'lat': society.location['coordinates'][1],
+                'lng': society.location['coordinates'][0]
+            }
+
+        # gets other societies in database with the same xd_id
+        xd_id = models.Society.objects.filter(xd_id=society.xd_id).exclude(ext_id=society_id)
+        environmentals = society.get_environmental_data()
+        cultural_traits = society.get_cultural_trait_data()
+        references = society.get_data_references()
+        language_classification = None
+        
+        if society.language:
+            # just glottolog at the moment
+            language_classification = models.LanguageFamily.objects\
+                .filter(name=society.language.family.name, scheme='G')
+
+        return Response({
+            'society': society,
+            'xd_id': xd_id,
+            'location': location,
+            'language_classification': language_classification,
+            'environmentals': dict(environmentals),
+            'cultural_traits': dict(cultural_traits),
+            'references': references
+            }, 
+            template_name='society.html'
+        )
 
 class ISOCodeViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = serializers.ISOCodeSerializer

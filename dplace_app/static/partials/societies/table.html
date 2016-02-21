@@ -16,7 +16,7 @@
         </tr>
         <tr ng-repeat="society_result in results.societies | orderBy:columnSort.sortColumn:columnSort.reverse">
             <td><span class="circle" ng-style="society_result.society.style"></span>
-                <a ng-href="/society/{{ society_result.society.id }}" target="_blank">{{ society_result.society.name }}</a>
+                <a ng-href="/society/{{ society_result.society.ext_id }}" target="_blank">{{ society_result.society.name }}</a>
             </td>
             <td>{{ society_result.society.source.name }}</td>
             <td>{{ society_result.society.language.glotto_code }}</td>

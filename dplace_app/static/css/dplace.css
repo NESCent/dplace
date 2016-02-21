@@ -122,6 +122,14 @@ a {
     border:0px;
 }
 
+#legend {
+    position: absolute;
+    right: 20px;
+    z-index: 1;
+    width:350px;
+    margin-top:0px;
+}
+
 .tooltip-inner {
     white-space:pre-wrap;
 }
@@ -246,7 +254,7 @@ label.light {
 
 .var-labels-fixed {
     position: fixed;
-    top: 160px;
+    top: 125px;
 }
 
 .teamTABLE {
