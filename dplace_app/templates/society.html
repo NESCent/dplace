@@ -81,7 +81,7 @@
     {% endif %}
         <h4>Alternate names: {{ society.alternate_names }}</h4>
         <h4>Principal year to which data refer: {{ society.focal_year }}</h4>
-        {% if xd_id %}<h4>Name and ID in other cross-cultural databases: {% for x in xd_id %} <a href="/society/{{ x.id }}" target="_blank">{{ x.name }} ({{ x.source.name}})</a>{% endfor %}</h4>{% endif %}
+        {% if xd_id %}<h4>Name and ID in other cross-cultural databases: {% for x in xd_id %} <a href="/society/{{ x.ext_id }}" target="_blank">{{ x.name }} ({{ x.source.name}})</a>{% endfor %}</h4>{% endif %}
     <h2>Environmental Data</h2>
     {% for key, value in environmentals.items %}
         <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
