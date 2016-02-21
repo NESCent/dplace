@@ -2,6 +2,7 @@ from django.conf.urls import url, include
 from django.views.generic.base import RedirectView
 
 from rest_framework import routers
+from rest_framework import renderers 
 from dplace_app import views, api_views
 
 router = routers.DefaultRouter()
@@ -23,7 +24,7 @@ router.register(r'sources', api_views.SourceViewSet)
 
 urlpatterns = [
     url(r'^$', RedirectView.as_view(url='angular/', permanent=True), name='home'),
-    url(r'^society/(?P<society_id>.*)$', api_views.SocietyDetail), #views.view_society, name='view_society'),
+    url(r'^society/(?P<society_id>.*)$', api_views.SocietyViewSet.as_view({'get': 'detail'}, renderer_classes=[renderers.TemplateHTMLRenderer])), #views.view_society, name='view_society'),
     url(r'^language/(?P<language_id>\d+)/$', views.view_language, name='view_language'),
     url(r'^angular/$', views.angular, name='angular'),
     # API

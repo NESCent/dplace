@@ -9,7 +9,7 @@ from ete2 import Tree
 from ete2.coretype.tree import TreeError
 from rest_framework import viewsets
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.decorators import api_view, permission_classes, renderer_classes
+from rest_framework.decorators import api_view, permission_classes, renderer_classes, detail_route
 from rest_framework.permissions import AllowAny
 from rest_framework.views import Response
 from rest_framework.generics import RetrieveAPIView
@@ -63,46 +63,41 @@ class SocietyViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = models.Society.objects.all().select_related(
         'source', 'language__iso_code', 'language__family')
     lookup_field = 'ext_id'
-        
-@api_view(['GET'])
-@permission_classes((AllowAny,))
-@renderer_classes((TemplateHTMLRenderer,))        
-def SocietyDetail(request, society_id):
-    society = get_object_or_404(models.Society, ext_id=society_id)
-    
-    # gets the society's location for inset map
-    location = {}
-    if society.location:
-        location = {
-            'lat': society.location['coordinates'][1],
-            'lng': society.location['coordinates'][0]
-        }
 
-    # gets other societies in database with the same xd_id
-    xd_id = models.Society.objects.filter(xd_id=society.xd_id).exclude(ext_id=society_id)
-    environmentals = society.get_environmental_data()
-    cultural_traits = society.get_cultural_trait_data()
-    references = society.get_data_references()
-    language_classification = None
     
-    if society.language:
-        # just glottolog at the moment
-        language_classification = models.LanguageFamily.objects\
-            .filter(name=society.language.family.name, scheme='G')
+    def detail(self, request, society_id):
+        society = get_object_or_404(models.Society, ext_id=society_id)
+        # gets the society's location for inset map
+        location = {}
+        if society.location:
+            location = {
+                'lat': society.location['coordinates'][1],
+                'lng': society.location['coordinates'][0]
+            }
 
-    return Response({
-        'society': society,
-        'xd_id': xd_id,
-        'location': location,
-        'language_classification': language_classification,
-        'environmentals': dict(environmentals),
-        'cultural_traits': dict(cultural_traits),
-        'references': references
-        }, 
-        template_name='society.html'
-    )
+        # gets other societies in database with the same xd_id
+        xd_id = models.Society.objects.filter(xd_id=society.xd_id).exclude(ext_id=society_id)
+        environmentals = society.get_environmental_data()
+        cultural_traits = society.get_cultural_trait_data()
+        references = society.get_data_references()
+        language_classification = None
         
-    
+        if society.language:
+            # just glottolog at the moment
+            language_classification = models.LanguageFamily.objects\
+                .filter(name=society.language.family.name, scheme='G')
+
+        return Response({
+            'society': society,
+            'xd_id': xd_id,
+            'location': location,
+            'language_classification': language_classification,
+            'environmentals': dict(environmentals),
+            'cultural_traits': dict(cultural_traits),
+            'references': references
+            }, 
+            template_name='society.html'
+        )
 
 class ISOCodeViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = serializers.ISOCodeSerializer
