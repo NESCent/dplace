@@ -245,7 +245,7 @@ angular.module('languagePhylogenyDirective', [])
                 
                 //WRITE C1, C2, E1, etc LABELS
                 if (langTree.name.indexOf("global") == -1) {
-                    var labels = d3.select("language-phylogeny").append("svg:svg")
+                    /*var labels = d3.select("language-phylogeny").append("svg:svg")
                         .attr("width", w+300)
                         .attr("height", 18)
                         .attr("id", "varLabels")
@@ -255,7 +255,7 @@ angular.module('languagePhylogenyDirective', [])
                         .attr("width", "100%")
                         .attr("height", "100%")
                         .attr("fill", "white")
-                        .attr("fill-opacity", "0.8");
+                        .attr("fill-opacity", "0.8");*/
                     var vis = d3.select("language-phylogeny").append("svg:svg")
                         .attr("width", w+300)
                         .attr("height", h+150)
@@ -270,10 +270,10 @@ angular.module('languagePhylogenyDirective', [])
                                 .attr("dx", w+translate-9)
                                 .attr("dy", 10)
                                 .text("C"+keysWritten);
-                            labels.append("svg:text")
+                            /*labels.append("svg:text")
                                 .attr("dx", w+translate)
                                 .attr("dy", 15)
-                                .text("C"+keysWritten);
+                                .text("C"+keysWritten);*/
                             scope.results.variable_descriptions[r].CID = "C"+keysWritten;
                             keysWritten++;
                             translate += 20;
@@ -288,10 +288,10 @@ angular.module('languagePhylogenyDirective', [])
                                 .attr("dx", w+translate-9)
                                 .attr("dy", 10)
                                 .text("E"+keysWritten);
-                             labels.append("svg:text")
+                             /*labels.append("svg:text")
                                 .attr("dx", w+translate)
                                 .attr("dy", 15)
-                                .text("E"+keysWritten);
+                                .text("E"+keysWritten);*/
                                 scope.results.environmental_variables[r].CID = "E"+keysWritten;
                                 keysWritten++;
                                 translate += 20;
@@ -532,7 +532,7 @@ angular.module('languagePhylogenyDirective', [])
                     else {
                         $("#legend").stop().animate({"marginTop": "0px"}, "slow");
                     } 
-                    if ($(window).scrollTop() > $(".navbar").height()+250) {
+                    /*if ($(window).scrollTop() > $(".navbar").height()+250) {
                         d3.select("#varLabels")
                             .attr('class', 'var-labels-fixed')
                             .style("visibility", "visible");
@@ -540,7 +540,7 @@ angular.module('languagePhylogenyDirective', [])
                         d3.select("#varLabels")
                             .classed('var-labels-fixed', false)
                             .style("visibility", "hidden");
-                    }
+                    }*/
                 });
             });
             
