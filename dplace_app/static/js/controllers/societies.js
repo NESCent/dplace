@@ -312,7 +312,8 @@ function SocietiesCtrl($scope, $timeout, $http, searchModelService, colorMapServ
             .attr("version", 1.1)
             .attr("xmlns", "http://www.w3.org/2000/svg")
             .node().parentNode.innerHTML;
-        tree_svg = tree_svg.substring(tree_svg.indexOf("</svg>")+6);
+            
+        //need to do this to remove the time scale
         tree_svg = tree_svg.substring(0, tree_svg.indexOf("</svg>"));
         tree_svg = tree_svg.concat("</svg>");
         var all_legends = {};
@@ -342,15 +343,7 @@ function SocietiesCtrl($scope, $timeout, $http, searchModelService, colorMapServ
             name = $scope.results.environmental_variables[i].CID + '-'+$scope.results.environmental_variables[i].name;
             legends_list.push({'name': name.replace(/[\W]+/g, "-")+'-legend.svg', 'svg': env_svg});
         }
-        
-        
-        /*if ($scope.results.environmental_variables.length > 0) {
-            var env_svg = d3.select("#E1").node().innerHTML;
-            env_svg = '<svg version="1.1" xmlns="http://www.w3.org/2000/svg" transform="translate(10, 10)">'+env_svg.substring(0, env_svg.indexOf("</svg>")) + '</svg>' + gradients_svg + '</svg>';
-            name = "E1-"+$scope.results.environmental_variables[0].name;
-            legends_list.push({'name': name.replace(/[\W]+/g, "-")+'-legend.svg', 'svg': env_svg});
-        }*/
-            
+
         query = {"legends": legends_list, "tree": tree_svg, "name": $scope.results.selectedTree.name+'.svg'};
         var date = new Date();
         var filename = "dplace-tree-"+date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate()+".zip"
