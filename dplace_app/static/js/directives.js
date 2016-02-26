@@ -637,8 +637,8 @@ angular.module('dplaceMapDirective', [])
                 $.get("/static/images/D-PLACE_VLogo_RGB.svg", function(data) {
                     var svg_data = data.childNodes;
                     d3.select(".jvectormap-container").select("svg").append("svg:g")//.append("svg:image")
-                        .attr("transform", "scale(0.37) translate(350, 470)")
-                        .attr("style", "opacity: 0.5;")
+                        .attr("transform", "scale(0.27) translate(550, 850)")
+                        .attr("style", "opacity: 0.45;")
                         .attr("id", "map-logo");
                     document.getElementById("map-logo").innerHTML = svg_data[1].innerHTML;
                 });
