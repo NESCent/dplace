@@ -37,8 +37,8 @@ class ISOCode(models.Model):
 
 
 class Society(models.Model):
-    ext_id = models.CharField('External ID', unique=True, max_length=10)
-    xd_id = models.CharField('Cross ID', default=None, null=True, max_length=10)
+    ext_id = models.CharField('External ID', db_index=True, unique=True, max_length=10)
+    xd_id = models.CharField('Cross ID', db_index=True, default=None, null=True, max_length=10)
     name = models.CharField('Name', db_index=True, max_length=200)
     latitude = models.FloatField('Latitude', null=True)
     longitude = models.FloatField('Longitude', null=True)
@@ -297,10 +297,10 @@ class Source(models.Model):
     # this model, I won't change it yet.
 
     # text, because might be '1996', '1999-2001', or 'ND'
-    year = models.CharField(max_length=30)
-    author = models.CharField(max_length=50)
+    year = models.CharField(max_length=30, db_index=True)
+    author = models.CharField(max_length=50, db_index=True)
     reference = models.CharField(max_length=500)
-    name = models.CharField(max_length=100, default="")
+    name = models.CharField(max_length=100, db_index=True, default="")
 
     def __unicode__(self):
         return "%s (%s)" % (self.author, self.year)
