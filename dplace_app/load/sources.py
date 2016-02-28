@@ -29,7 +29,7 @@ SOURCE_DATA = {
         author="Jorgensen",
         reference=""
     ),
-    'EHRAF': dict(
+    'HRAF': dict(
         year="2016",
         author="Human Relations Area Files, Inc.",
         reference=""
