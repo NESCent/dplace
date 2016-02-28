@@ -81,38 +81,11 @@ def load_societies(items):
                     xd_id=item['xd_id'],
                     name=item['pref_name_for_society'],
                     alternate_names=item['alt_names_by_society'],
-                    focal_year=item['main_focal_year']
+                    focal_year=item['main_focal_year'],
+                    source=source
                 )
                 if society.ext_id not in [x.ext_id for x in societies]:
                     societies.append(society)
-            
-        
-        # save SCCS society
-        #if item['SCCS_society_equivalent']:
-        #    source = get_source("SCCS")
-        #    sccs_society = Society(
-        #        ext_id=item['SCCS_society_equivalent'][item['SCCS_society_equivalent'].find("(")+1:item['SCCS_society_equivalent'].find(")")],
-        #        xd_id=item['xd_id'],
-        #        name=item['pref_name_for_society'],
-        #        alternate_names=item['alt_names_by_society'],
-        #        focal_year=item['main_focal_year']
-        #    )
-            # check to make sure this SCCS society isn't already in the database
-        #    if sccs_society.ext_id not in [x.ext_id for x in societies]:
-        #        societies.append(sccs_society)
-            
-        # save HRAF society
-        #if item['HRAF_name_ID']:
-        #    source = get_source("EHRAF")
-        #    hraf_society = Society(
-        #        ext_id=item['HRAF_name_ID'][item['HRAF_name_ID'].find("(")+1:item['HRAF_name_ID'].find(")")],
-        #        xd_id=item['xd_id'],
-        #        name=item['pref_name_for_society'],
-        #        alternate_names=item['alt_names_by_society'],
-        #        focal_year=item['main_focal_year']
-        #    )
-        #    if hraf_society.ext_id not in [x.ext_id for x in societies]:
-        #        societies.append(hraf_society)
                 
         logging.info("Saving society %s" % item)
 
