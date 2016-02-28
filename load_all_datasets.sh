@@ -32,8 +32,7 @@ export PYTHONPATH=$DPLACE_PATH
 # Loading Societies
 python "${DPLACE_PATH}/dplace_app/load.py" \
  "${REPO_DEST}/csv/EA_header_data_24Feb2016.csv" \
- soc
- #"${REPO_DEST}/csv/Binford_Society_HeaderData.csv" \
+ "${REPO_DEST}/csv/Binford_header_data_24Feb2016.csv" \
  soc
 
 # Loading Geographic regions
