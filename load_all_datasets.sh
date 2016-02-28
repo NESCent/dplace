@@ -16,13 +16,13 @@ REPO_DEST="${BASEDIR}/datasets"
 DPLACE_PATH="${BASEDIR}"
 
 # Clone the repository
-if [ ! -d "$REPO_DEST" ]; then
-	mkdir -p "$REPO_DEST"
-	git clone $REPO_SRC $REPO_DEST
-else
-	orig=`pwd`
-	cd $REPO_DEST && git pull && cd "$orig"
-fi
+#if [ ! -d "$REPO_DEST" ]; then
+#	mkdir -p "$REPO_DEST"
+#	git clone $REPO_SRC $REPO_DEST
+#else
+#	orig=`pwd`
+#	cd $REPO_DEST && git pull && cd "$orig"
+#fi
 
 ## import the data
 
@@ -31,8 +31,9 @@ export PYTHONPATH=$DPLACE_PATH
 
 # Loading Societies
 python "${DPLACE_PATH}/dplace_app/load.py" \
- "${REPO_DEST}/csv/EA_Society_HeaderData.csv" \
- "${REPO_DEST}/csv/Binford_Society_HeaderData.csv" \
+ "${REPO_DEST}/csv/EA_header_data_24Feb2016.csv" \
+ soc
+ #"${REPO_DEST}/csv/Binford_Society_HeaderData.csv" \
  soc
 
 # Loading Geographic regions

@@ -17,6 +17,23 @@ SOURCE_DATA = {
         reference="Binford, L. 2001. Constructing Frames of Reference: An Analytical Method for Archaeological Theory Building Using Hunter-gatherer and Environmental Data Sets. University of California Press",
         name="Binford Hunter-Gatherer",
     ),
+    
+    # data from these databases are not stored in our database, but the easiest way to link our societies to external databases is to do this, rather than create new fields for the Society model
+    'SCCS': dict(
+        year="1969",
+        author="Murdock",
+        reference=""
+    ),
+    'WNAI': dict(
+        year="1966",
+        author="Jorgensen",
+        reference=""
+    ),
+    'EHRAF': dict(
+        year="2016",
+        author="Human Relations Area Files, Inc.",
+        reference=""
+    )
 }
 
 
