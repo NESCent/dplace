@@ -37,7 +37,7 @@ class ISOCode(models.Model):
 
 
 class Society(models.Model):
-    ext_id = models.CharField('External ID', unique=True, max_length=10)
+    ext_id = models.CharField('External ID', unique=True, max_length=20)
     xd_id = models.CharField('Cross ID', default=None, null=True, max_length=10)
     name = models.CharField('Name', db_index=True, max_length=200)
     latitude = models.FloatField('Latitude', null=True)
