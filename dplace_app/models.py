@@ -44,6 +44,7 @@ class Society(models.Model):
     longitude = models.FloatField('Longitude', null=True)
     focal_year = models.CharField('Focal Year', null=True, blank=True, max_length=100)
     alternate_names = models.TextField(default="")
+    original_name = models.CharField('ORIG_name', max_length=200, default=None, null=True)
 
     region = models.ForeignKey('GeographicRegion', null=True, related_name='societies')
     source = models.ForeignKey('Source', null=True)
