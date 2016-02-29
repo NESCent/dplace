@@ -24,8 +24,17 @@ router.register(r'sources', api_views.SourceViewSet)
 
 urlpatterns = [
     url(r'^$', RedirectView.as_view(url='angular/', permanent=True), name='home'),
-    url(r'^society/(?P<society_id>.*)$', api_views.SocietyViewSet.as_view({'get': 'detail'}, renderer_classes=[renderers.TemplateHTMLRenderer])), #views.view_society, name='view_society'),
-    url(r'^language/(?P<language_id>\d+)/$', views.view_language, name='view_language'),
+    url(r'^society/(?P<society_id>.*)$',
+        api_views.SocietyViewSet.as_view(
+            {'get': 'detail'},
+            renderer_classes=[renderers.TemplateHTMLRenderer]
+        )
+        name='view_society'
+    ), 
+    url(r'^language/(?P<glottocode>.*)$',
+        views.view_language,
+        name='view_language'
+    ),
     url(r'^angular/$', views.angular, name='angular'),
     # API
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
