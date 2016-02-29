@@ -28,7 +28,7 @@ urlpatterns = [
         api_views.SocietyViewSet.as_view(
             {'get': 'detail'},
             renderer_classes=[renderers.TemplateHTMLRenderer]
-        )
+        ),
         name='view_society'
     ), 
     url(r'^language/(?P<glottocode>.*)$',
