@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 from collections import defaultdict
 
+from django.core.urlresolvers import reverse
 from django.db import models
 
 UNIT_CHOICES = (
@@ -97,7 +98,10 @@ class Society(models.Model):
 
     def __unicode__(self):
         return "%s - %s (%s)" % (self.ext_id, self.name, self.source)
-
+    
+    def get_absolute_url(self):
+        return reverse("view_society", args=[self.ext_id])
+    
     class Meta(object):
         verbose_name_plural = "Societies"
 
@@ -330,7 +334,10 @@ class Language(models.Model):
     def __unicode__(self):
         return "Language: %s, ISO Code %s, Glotto Code %s" % (
             self.name, self.iso_code, self.glotto_code)
-
+    
+    def get_absolute_url(self):
+        return reverse("view_language", args=[self.glotto_code])
+    
     class Meta(object):
         verbose_name = "Language"
         unique_together = ('iso_code', 'glotto_code')
