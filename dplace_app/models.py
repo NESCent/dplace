@@ -38,13 +38,14 @@ class ISOCode(models.Model):
 
 
 class Society(models.Model):
-    ext_id = models.CharField('External ID', db_index=True, unique=True, max_length=10)
+    ext_id = models.CharField('External ID', db_index=True, unique=True, max_length=20)
     xd_id = models.CharField('Cross ID', db_index=True, default=None, null=True, max_length=10)
     name = models.CharField('Name', db_index=True, max_length=200)
     latitude = models.FloatField('Latitude', null=True)
     longitude = models.FloatField('Longitude', null=True)
     focal_year = models.CharField('Focal Year', null=True, blank=True, max_length=100)
     alternate_names = models.TextField(default="")
+    original_name = models.CharField('ORIG_name', max_length=200, default=None, null=True)
 
     region = models.ForeignKey('GeographicRegion', null=True, related_name='societies')
     source = models.ForeignKey('Source', null=True)
