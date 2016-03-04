@@ -27,7 +27,7 @@ def load_var(var_dict, categories):
     if var_dict['Dataset'] == 'EA':
         label = eavar_number_to_label(var_dict['VarID'])
         source = get_source("EA")
-    elif var_dict['Dataset'] == 'LRB':
+    elif var_dict['Dataset'] == 'Binford':
         label = bfvar_number_to_label(var_dict['VarID'])
         source = get_source("Binford")
     else:
@@ -66,7 +66,7 @@ def load_codes(items):
         
         if dataset == 'EA':
             label = eavar_number_to_label(id)
-        elif dataset == 'LRB':
+        elif dataset == 'Binford':
             label = bfvar_number_to_label(id)
         else:
             logging.warn("Unknown dataset, skipping row %s" % row)

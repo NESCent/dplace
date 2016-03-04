@@ -75,7 +75,7 @@ def _load_data(val_row, societies=None, sources=None, variables=None, descriptio
     if val_row['Dataset'] == 'EA':
         source = get_source("EA")
         label = eavar_number_to_label(variable_id)
-    elif val_row['Dataset'] == 'LRB':
+    elif val_row['Dataset'] == 'Binford':
         source = get_source("Binford")
         label = bfvar_number_to_label(variable_id)
     else:
