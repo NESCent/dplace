@@ -284,13 +284,13 @@ class CulturalValue(models.Model):
         verbose_name = "Value"
         ordering = ("variable", "coded_value")
         index_together = [
-            ['variable', 'society'],
-            ['variable', 'coded_value'],
-            ['variable', 'code'],
-            ['society', 'coded_value'],
-            ['society', 'code'],
+            ['variable', 'society', 'focal_year'],
+            ['variable', 'coded_value', 'focal_year', 'subcase'],
+            ['variable', 'code', 'focal_year'],
+            ['society', 'coded_value', 'focal_year', 'subcase'],
+            ['society', 'code', 'focal_year'],
         ]
-        unique_together = ('variable', 'society', 'coded_value')
+        unique_together = ('variable', 'society', 'coded_value', 'comment', 'subcase', 'focal_year')
 
 
 class Source(models.Model):
