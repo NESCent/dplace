@@ -41,7 +41,7 @@ def load_data(items):
     for i, item in enumerate(items):
         res = _load_data(item, **kw)
         if res:
-            key = (res[0]['variable'].id, res[0]['society'].id, res[0]['coded_value'])
+            key = (res[0]['variable'].label, res[0]['society'].ext_id, res[0]['coded_value'], res[0]['focal_year'], res[0]['comment'], res[0]['subcase'])
             if key in inserted:  # pragma: no cover
                 logging.warn("duplicate value %s" % item)
             else:
@@ -75,7 +75,7 @@ def _load_data(val_row, societies=None, sources=None, variables=None, descriptio
     if val_row['Dataset'] == 'EA':
         source = get_source("EA")
         label = eavar_number_to_label(variable_id)
-    elif val_row['Dataset'] == 'LRB':
+    elif val_row['Dataset'] == 'Binford':
         source = get_source("Binford")
         label = bfvar_number_to_label(variable_id)
     else:

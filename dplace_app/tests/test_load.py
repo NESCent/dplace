@@ -113,10 +113,10 @@ class LoadTestCase(TestCase):
         soc.save()
         res = load_data([self.get_dict(soc_id='socid')])
         self.assertEqual(res, 0)
-        res = load_data([self.get_dict(soc_id='socid', Dataset='LRB')])
+        res = load_data([self.get_dict(soc_id='socid', Dataset='Binford')])
         self.assertEqual(res, 0)
-        load_vars([self.get_dict(Dataset='LRB', VarId='5')])
-        res = load_data([self.get_dict(soc_id='socid', Dataset='LRB', VarId='5')])
+        load_vars([self.get_dict(Dataset='Binford', VarId='5')])
+        res = load_data([self.get_dict(soc_id='socid', Dataset='Binford', VarId='5')])
         self.assertEqual(res, 1)
 
     def test_environmental(self):
