@@ -106,10 +106,30 @@ class DPLACECSVResults(object):
 
             # cultural
             cultural_trait_values = item['variable_coded_values']
+            extra_rows = [] # Binford societies may have multiple values for one variable
             for cultural_trait_value in cultural_trait_values:
                 # Figure out the column name
                 variable_id = cultural_trait_value['variable']
                 field_names = self.field_map['variable_descriptions'][variable_id]
+                if field_names['code'] in row:
+                    if 'code_description' in cultural_trait_value:
+                        try:
+                            description = cultural_trait_value['code_description']['description']
+                        except:
+                            description = ""
+                    else:
+                        description = ""
+                    extra_rows.append(dict({
+                        'Society name': society['name'],
+                        'Society source': society['source']['name'],
+                        field_names['code']: cultural_trait_value['coded_value'],
+                        field_names['description']: description,
+                        field_names['focal_year']: cultural_trait_value['focal_year'],
+                        field_names['comments']: cultural_trait_value['comment'],
+                        field_names['sources']: ''.join([x['author'] + '(' + x['year'] + '); ' for x in cultural_trait_value['references']])
+                    }))
+                    continue
+
                 row[field_names['code']] = cultural_trait_value['coded_value']
                 row[field_names['focal_year']] = cultural_trait_value['focal_year']
                 if 'code_description' in cultural_trait_value:
@@ -131,6 +151,8 @@ class DPLACECSVResults(object):
             # language - already have
             #
             self.rows.append(row)
+            for extra in extra_rows:
+                self.rows.append(extra)
 
 
 def encode_if_text(val):
