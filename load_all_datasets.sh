@@ -68,7 +68,7 @@ python "${DPLACE_PATH}/dplace_app/load.py" \
 # Loading Data
 python "${DPLACE_PATH}/dplace_app/load.py" \
  "${REPO_DEST}/csv/EA_DATA_Stacked_1Mar2016.csv" \
- "${REPO_DEST}/csv/Binford_DATA_stacked_3Mar2016_utf8.csv" \
+ "${REPO_DEST}/csv/Binford_DATA_stacked_5Mar2016_utf8.csv" \
  vals
 
 # Loading Environmental Data

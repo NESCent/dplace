@@ -50,13 +50,28 @@ angular.module('dplaceFilters', [])
             }
         }
     }])
+    .filter('numValues', function() {
+        return function(values, variable_id) {
+            return values.filter(function(code_value) {
+                if (code_value.code_description && (variable_id == code_value.code_description.variable)) return code_value;
+                else if (variable_id == code_value.variable) return code_value;
+            }).length - 1;
+        };
+    })
     .filter('formatVariableCodeValues', function() {
         return function(values, variable_id) {
-            return values.map( function(code_value) {   
-                if (code_value.code_description && (variable_id == code_value.code_description.variable)) return code_value.code_description.description;
-                else if (variable_id == code_value.variable) return code_value.coded_value;
-                else return ''
-            }).join('');
+            codes = values.filter( function(code_value) {   
+               if (code_value.code_description && (variable_id == code_value.code_description.variable)) return code_value;
+                else if (variable_id == code_value.variable) return code_value;
+            });
+            return [codes[0]];
+        };
+    })
+    .filter('formatValue', function() {
+        return function(value) {
+            if (!value) return '';
+            if (value.code_description) return value.code_description.description;
+            else return value.coded_value;
         };
     })
     .filter('formatEnvironmentalValues', function () {
@@ -68,38 +83,20 @@ angular.module('dplaceFilters', [])
         };
     })
     .filter('formatValueSources', function() {
-        return function(values, variable_id) {
-            return values.map( function(code_value) {
-                if (code_value.code_description && (variable_id == code_value.code_description.variable)) {
-                    return code_value.references.map(function(reference) {
-                        return reference.author + ' (' + reference.year + ')';
-                    });
-                }
-                else if (variable_id == code_value.variable) {
-                    return code_value.references.map(function(reference) {
-                        return reference.author + ' (' + reference.year + ')';
-                    });
-                }
-            }).join('')
+        return function(value) {
+            if (!value) return '';
+            return value.references.map(function(reference) {
+                return reference.author + ' (' + reference.year + ')';
+            }).join('; ');
         };
     })
     .filter('formatComment', function() {
-        return function(values, variable_id) {
+        return function(code_value) {
+            if (!code_value) return '';
             str = '';
-            return values.map( function(code_value) {
-                if (code_value.code_description && (variable_id == code_value.code_description.variable)) {
-                    if (code_value.focal_year != 'NA')
-                        str = 'Focal Year: ' + code_value.focal_year;
-                    if (code_value.comment) str += '\n' + code_value.comment;
-                    return str;
-                }
-                else if (variable_id == code_value.variable) {
-                    if (code_value.focal_year != 'NA') str = 'Focal Year: ' + code_value.focal_year;
-                    if (code_value.comment) str += '\n' + code_value.comment;
-                    return str;
-                } else return ''
-
-            }).join('')
+            if (code_value.focal_year != 'NA') str = 'Focal Year: ' + code_value.focal_year;
+            if (code_value.comment) str += '\n' + code_value.comment;
+            return str;
         };
     })
     .filter('formatLanguage', function () {
