@@ -125,7 +125,7 @@ class DPLACECSVResults(object):
                         field_names['code']: cultural_trait_value['coded_value'],
                         field_names['description']: description,
                         field_names['focal_year']: cultural_trait_value['focal_year'],
-                        field_names['comments']: cultural_trait_value['comment'],
+                        field_names['comments']: cultural_trait_value['subcase'] + '; ' + cultural_trait_value['comment'],
                         field_names['sources']: ''.join([x['author'] + '(' + x['year'] + '); ' for x in cultural_trait_value['references']])
                     }))
                     continue
@@ -138,7 +138,7 @@ class DPLACECSVResults(object):
                             cultural_trait_value['code_description']['description']
                     except:
                         row[field_names['description']] = ''
-                row[field_names['comments']] = cultural_trait_value['comment']
+                row[field_names['comments']] = cultural_trait_value['subcase'] + '; '+ cultural_trait_value['comment']
                 row[field_names['sources']] = ''.join([
                     x['author'] + '(' + x['year'] + '); '
                     for x in cultural_trait_value['references']])
