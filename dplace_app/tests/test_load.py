@@ -121,11 +121,12 @@ class LoadTestCase(TestCase):
 
     def test_environmental(self):
         from dplace_app.load.environmental import (
-            create_environmental_variables, load_environmental,
+            load_environmental_var, load_environmental,
         )
-
         res = load_environmental([self.get_dict(Source='EA')])
         self.assertEqual(res, 0)
+        res = load_environmental_var(csv_dict_reader(data_path('envvariables.csv')))
+        self.assertEqual(res, 3)
         row_dict = self.get_dict(
             dataset='EA',
             soc_id='EA12',
@@ -136,9 +137,9 @@ class LoadTestCase(TestCase):
         load_societies([row_dict])
         res = load_environmental([self.get_dict(**{
             'Source': 'EA',
-            'ID': 'EA12',
-            'Orig.longitude': 1,
-            'Orig.latitude': 1,
+            'soc_ID': 'EA12',
+            'AnnualMeanTemperature': 1,
+            'AnnualTemperatureVariance': 1,
             'longitude': 1,
             'latitude': 1,
         })])
