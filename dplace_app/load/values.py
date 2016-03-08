@@ -104,17 +104,19 @@ def _load_data(val_row, societies=None, sources=None, variables=None, descriptio
         m = BINFORD_REF_PATTERN.match(r)
         if m:
             author, year = m.group('author').strip(), m.group('year')
+            if author.endswith(','):
+                author = author[:-1].strip()
         else:
             ref_short = r.split(",")
             if len(ref_short) == 2:
                 author = ref_short[0].strip()
-                year = ref_short[1].strip()
+                year = ref_short[1].strip().split(':')[0]
         if author and year:
             ref = sources.get((author, year))
             if ref:
                 refs.add(ref.id)
             else:  # pragma: no cover
                 logging.warn(
-                    "Could not find reference %s (%s) in database, skipping reference"
+                    "Could not find reference %s, %s in database, skipping reference"
                     % (author, year))
     return v, refs
