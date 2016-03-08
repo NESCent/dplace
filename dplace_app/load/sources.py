@@ -36,22 +36,29 @@ def get_source(source='EA'):
 
 
 def load_references(items):
-    count = 0
+    keys = set()
     for row in items:
         # skip rows that don't have two columns
         if len(row) != 2:
             continue
 
+        short = row.get('ReferenceShort', row.get('ShortRef_w_AND_wout_pp', ''))
+        complete = row.get('ReferenceComplete', row.get('LongRef', ''))
+        if ':' in short:
+            # skip short refs with page numbers.
+            continue
+
         # ReferenceShort field is in the format Author, Year
         try:
-            ref_short = row['ReferenceShort'].split(",")
+            ref_short = short.split(",")
             try:
-                reference, created = Source.objects.get_or_create(
-                    author=ref_short[0].strip(),
-                    year=ref_short[1].strip(),
-                    reference=row['ReferenceComplete'])
-                if created:
-                    count += 1
+                author, year = ref_short[0].strip(), ref_short[1].strip()
+                if (author, year) not in keys:
+                    keys.add((author, year))
+                    reference = Source.objects.create(
+                        author=ref_short[0].strip(),
+                        year=ref_short[1].strip(),
+                        reference=complete)
                     logging.info("Saved new reference %s (%s)"
                                  % (reference.author, reference.year))
             except IndexError:
@@ -60,4 +67,4 @@ def load_references(items):
             logging.warn(
                 "Could not save reference for row %s: %s" % (str(row), e)
             )
-    return count
+    return len(keys)

@@ -79,7 +79,8 @@ def load_codes(items):
             code_description.description = description
             code_description.short_description = short_description
             code_description.save()
-            logging.info("Created CulturalCodeDescription: %s" % code_description)
+            logging.info(
+                ("Created CulturalCodeDescription: %s" % code_description).decode('utf8'))
             count += 1
         else:
             logging.warn("Missing variable in database: %s" % label)
