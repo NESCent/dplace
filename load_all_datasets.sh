@@ -72,7 +72,8 @@ python "${DPLACE_PATH}/dplace_app/load.py" \
  vals
 
 # Loading Environmental Data
-python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/EcologicalData.DBASE.07Mar14.csv" "env_vals"
+python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/EnvironmentalVariables_3Mar2016_utf8.csv" "env_vars"
+python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/EcologicalData.DBASE.04Mar16_utf8.csv" "env_vals"
 
 # Loading Trees
 python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/trees/" tree
