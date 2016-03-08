@@ -18,7 +18,6 @@ def iso_from_code(code):
 def clean_category(category):
     return category.strip().capitalize()
 
-
 def load_environmental_var(items):
     categories = {}
 
@@ -48,9 +47,7 @@ def load_env_var(var_dict, categories):
         logging.info("Saved environmental variable %s" % variable)
     return True
 
-
 def load_environmental(items):
-    #variables = dict(list(create_environmental_variables()))
     variables = EnvironmentalVariable.objects.all()
     societies = {(s.ext_id, s.source_id): s for s in Society.objects.all()}
     res = 0
@@ -58,10 +55,8 @@ def load_environmental(items):
     for item in items:
         if _load_environmental(item, variables, societies, objs):
             res += 1
-    
     EnvironmentalValue.objects.bulk_create(objs, batch_size=1000)
     return res
-
 
 def _load_environmental(env_dict, variables, societies, objs):
     ext_id = env_dict['soc_ID']
