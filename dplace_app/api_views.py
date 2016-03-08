@@ -3,21 +3,22 @@ import re
 import datetime
 
 from django.db.models import Prefetch
+from django.shortcuts import get_object_or_404
 from django.http import Http404
 from ete2 import Tree
 from ete2.coretype.tree import TreeError
 from rest_framework import viewsets
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.decorators import api_view, permission_classes, renderer_classes
+from rest_framework.decorators import api_view, permission_classes, renderer_classes, detail_route
 from rest_framework.permissions import AllowAny
 from rest_framework.views import Response
-from rest_framework.renderers import JSONRenderer
+from rest_framework.generics import RetrieveAPIView
+from rest_framework.renderers import JSONRenderer, TemplateHTMLRenderer
 
 from dplace_app.filters import GeographicRegionFilter
-from dplace_app.renderers import DPLACECsvRenderer, ZipRenderer
+from dplace_app.renderers import DPLACECSVRenderer, ZipRenderer
 from dplace_app import serializers
 from dplace_app import models
-
 
 # Resource routes
 class CulturalVariableViewSet(viewsets.ReadOnlyModelViewSet):
@@ -61,7 +62,42 @@ class SocietyViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = serializers.SocietySerializer
     queryset = models.Society.objects.all().select_related(
         'source', 'language__iso_code', 'language__family')
+    lookup_field = 'ext_id'
 
+    
+    def detail(self, request, society_id):
+        society = get_object_or_404(models.Society, ext_id=society_id)
+        # gets the society's location for inset map
+        location = {}
+        if society.location:
+            location = {
+                'lat': society.location['coordinates'][1],
+                'lng': society.location['coordinates'][0]
+            }
+
+        # gets other societies in database with the same xd_id
+        xd_id = models.Society.objects.filter(xd_id=society.xd_id).exclude(ext_id=society_id)
+        environmentals = society.get_environmental_data()
+        cultural_traits = society.get_cultural_trait_data()
+        references = society.get_data_references()
+        language_classification = None
+        
+        if society.language:
+            # just glottolog at the moment
+            language_classification = models.LanguageFamily.objects\
+                .filter(name=society.language.family.name, scheme='G')
+
+        return Response({
+            'society': society,
+            'xd_id': xd_id,
+            'location': location,
+            'language_classification': language_classification,
+            'environmentals': dict(environmentals),
+            'cultural_traits': dict(cultural_traits),
+            'references': references
+            }, 
+            template_name='society.html'
+        )
 
 class ISOCodeViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = serializers.ISOCodeSerializer
@@ -110,6 +146,7 @@ class LanguageFamilyViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = serializers.LanguageFamilySerializer
     filter_fields = ('name', 'scheme',)
     queryset = models.LanguageFamily.objects.all().order_by('name')
+    pagination_class = LargeResultsSetPagination
 
 
 class TreeResultsSetPagination(PageNumberPagination):
@@ -135,20 +172,26 @@ class SourceViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = models.Source.objects.all()
 
 
-# returns trees that contain the societies from the SocietyResultSet
 # maybe needs cleaning up in the future
 def trees_from_languages_array(language_ids):
+    """
+    Takes a list of language ids
+    
+    Returns trees that contain the societies from the SocietyResultSet
+    """
     trees = models.LanguageTree.objects\
         .filter(languages__pk__in=language_ids)\
         .prefetch_related('languages__family', 'languages__iso_code')\
         .distinct()
     for t in trees:
         if 'glotto' in t.name:
-            langs_in_tree = [str(l.glotto_code)
-                             for l in t.languages.all() if l.id in language_ids]
+            langs_in_tree = [
+                str(l.glotto_code) for l in t.languages.all() if l.id in language_ids
+            ]
         else:
-            langs_in_tree = [str(l.iso_code.iso_code)
-                             for l in t.languages.all() if l.id in language_ids]
+            langs_in_tree = [
+                str(l.iso_code.iso_code) for l in t.languages.all() if l.id in language_ids
+            ]
         newick = Tree(t.newick_string, format=1)
         try:
             if 'glotto' not in t.name:
@@ -298,15 +341,15 @@ def find_societies(request):
 
     Returns serialized collection of SocietyResult objects
     """
-    from time import time
-    from django.db import connection
+    #from time import time
+    #from django.db import connection
 
-    start = time()
-    nstart = len(connection.queries)
+    #start = time()
+    #nstart = len(connection.queries)
     result_set = result_set_from_query_dict(request.data)
-    print '-->', len(connection.queries) - nstart, time() - start
+    #print '-->', len(connection.queries) - nstart, time() - start
     d = serializers.SocietyResultSetSerializer(result_set).data
-    print '==>', len(connection.queries) - nstart, time() - start
+    #print '==>', len(connection.queries) - nstart, time() - start
     # for q in connection.queries[-10:]:
     #     print q['sql'][:1000]
     return Response(d)
@@ -373,7 +416,7 @@ def get_min_and_max(request):
         for v in values:
             if min_value is None:
                 min_value = v.value
-                
+
             if v.value < min_value:
                 min_value = v.value
             elif v.value > max_value:
@@ -432,7 +475,7 @@ def bin_cont_data(request):  # MAKE THIS GENERIC
 
 @api_view(['POST'])
 @permission_classes((AllowAny,))
-@renderer_classes((DPLACECsvRenderer,))
+@renderer_classes((DPLACECSVRenderer,))
 def csv_download(request):
     result_set = result_set_from_query_dict(request.data)
     response = Response(serializers.SocietyResultSetSerializer(result_set).data)

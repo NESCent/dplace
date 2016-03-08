@@ -1,0 +1,6 @@
+soc_id,Latitude,Longitude,OldLat,OldLong,region,tdwg_code
+soc1,-14,130,-14,130,Northern Europe,10
+soc2,-5,150,-5,150,Middle Europe,11
+soc-unknown,-5,150,-5,150,Middle Europe,11
+soc2,xx,xx,-5,150,Middle Europe,11
+soc2,-5,150,-5,150,Unknown Region,xx

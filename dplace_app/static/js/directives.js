@@ -146,6 +146,8 @@ angular.module('languagePhylogenyDirective', [])
                                          d3.select("body").append("div")
                                             .attr("class", "tree-tooltip")
                                             .html("<b>"+society_name+":</b><br>"+hover_text_value)
+                                            .style("z-index", 1000)
+                                            .style("max-width", "250px")
                                             .style("left", (d3.event.pageX + 10)+"px")
                                             .style("top", (d3.event.pageY + 5)+"px");
                                     })
@@ -195,6 +197,8 @@ angular.module('languagePhylogenyDirective', [])
                                              d3.select("body").append("div")
                                                 .attr("class", "tree-tooltip")
                                                 .html("<b>"+society_name+":</b><br>"+hover_text_value)
+                                                .style("z-index", 1000)
+                                                .style("max-width", "250px")
                                                 .style("left", (d3.event.pageX + 10)+"px")
                                                 .style("top", (d3.event.pageY + 5)+"px");
                                         })
@@ -211,8 +215,8 @@ angular.module('languagePhylogenyDirective', [])
                 $.get("/static/images/D-PLACE_VLogo_RGB.svg", function(data) {
                     var svg_data = data.childNodes;
                     d3.select(".phylogeny").append("svg:g")
-                        .attr("transform", "scale(0.75) translate(350,0)")
-                        .attr("style", "opacity: 0.5;")
+                        .attr("transform", "scale(0.5) translate(500,0)")
+                        .attr("style", "opacity: 0.35;")
                         .attr("id", "tree-logo");
                     document.getElementById("tree-logo").innerHTML = svg_data[1].innerHTML;
                 });
@@ -223,7 +227,7 @@ angular.module('languagePhylogenyDirective', [])
                 d3.select("language-phylogeny").html('');
                 var newick = Newick.parse(langTree.newick_string);
                 if (langTree.name.indexOf("global") != -1) var w = 900;
-                else  var w = 700;
+                else  var w = 500;
                 if (langTree.name.indexOf("global") != -1)  {
                     var tree = d3.layout.cluster()
                     .size([360, (w/2)-100])
@@ -245,7 +249,7 @@ angular.module('languagePhylogenyDirective', [])
                 
                 //WRITE C1, C2, E1, etc LABELS
                 if (langTree.name.indexOf("global") == -1) {
-                    var labels = d3.select("language-phylogeny").append("svg:svg")
+                    /*var labels = d3.select("language-phylogeny").append("svg:svg")
                         .attr("width", w+300)
                         .attr("height", 18)
                         .attr("id", "varLabels")
@@ -255,7 +259,7 @@ angular.module('languagePhylogenyDirective', [])
                         .attr("width", "100%")
                         .attr("height", "100%")
                         .attr("fill", "white")
-                        .attr("fill-opacity", "0.8");
+                        .attr("fill-opacity", "0.8");*/
                     var vis = d3.select("language-phylogeny").append("svg:svg")
                         .attr("width", w+300)
                         .attr("height", h+150)
@@ -270,10 +274,10 @@ angular.module('languagePhylogenyDirective', [])
                                 .attr("dx", w+translate-9)
                                 .attr("dy", 10)
                                 .text("C"+keysWritten);
-                            labels.append("svg:text")
+                            /*labels.append("svg:text")
                                 .attr("dx", w+translate)
                                 .attr("dy", 15)
-                                .text("C"+keysWritten);
+                                .text("C"+keysWritten);*/
                             scope.results.variable_descriptions[r].CID = "C"+keysWritten;
                             keysWritten++;
                             translate += 20;
@@ -288,10 +292,10 @@ angular.module('languagePhylogenyDirective', [])
                                 .attr("dx", w+translate-9)
                                 .attr("dy", 10)
                                 .text("E"+keysWritten);
-                             labels.append("svg:text")
+                             /*labels.append("svg:text")
                                 .attr("dx", w+translate)
                                 .attr("dy", 15)
-                                .text("E"+keysWritten);
+                                .text("E"+keysWritten);*/
                                 scope.results.environmental_variables[r].CID = "E"+keysWritten;
                                 keysWritten++;
                                 translate += 20;
@@ -521,21 +525,18 @@ angular.module('languagePhylogenyDirective', [])
 
             scope.$on('treeSelected', function(event, args) {
                 constructTree(args.tree);
-                //these lines throw an error :(
-                phyloWidth = d3.select("language-phylogeny").select("g").node().getBBox().width;
-                d3.select("#legend")
-                    .attr("style", "width:"+($(window).width()-phyloWidth-100)+"px; position:absolute; right:20px; z-index:1;");
-                var pos = $(".phylogeny").offset();
+             
                 $(window).scroll(function() {
-                    if ($(window).scrollTop() > $(".navbar").height()+100)
-                        $("#legend").stop().animate({"marginTop":($(window).scrollTop() - 200) + "px"}, "slow");
+                    if ($(window).scrollTop() > $(".navbar").height()+250) {
+                        if (args.tree.name.indexOf("global") == -1)
+                            $("#legend").stop().animate({"marginTop":($(window).scrollTop() - 350) + "px"}, "slow");
+                        else
+                            $("#legend").stop().animate({"marginTop": ($(window).scrollTop() - 300) + "px"}, "slow");
+                    }
                     else {
-                        d3.select("#legend")
-                            .style("position", "absolute")
-                            .style("right", "20px")
-                            .style("z-index", "1");
+                        $("#legend").stop().animate({"marginTop": "0px"}, "slow");
                     } 
-                    if ($(window).scrollTop() > $(".navbar").height()+100) {
+                    /*if ($(window).scrollTop() > $(".navbar").height()+250) {
                         d3.select("#varLabels")
                             .attr('class', 'var-labels-fixed')
                             .style("visibility", "visible");
@@ -543,7 +544,7 @@ angular.module('languagePhylogenyDirective', [])
                         d3.select("#varLabels")
                             .classed('var-labels-fixed', false)
                             .style("visibility", "hidden");
-                    }
+                    }*/
                 });
             });
             
@@ -609,7 +610,7 @@ angular.module('dplaceMapDirective', [])
                       }
                     },
                     onMarkerClick: function(e, code) {
-                        window.open("/society/"+code);
+                        window.open("/society/"+scope.map.series.markers[0].elements[code].config.weburl);
                     },
                     onRegionOver: function(e, code) {
                         if(attrs.region) {
@@ -640,8 +641,8 @@ angular.module('dplaceMapDirective', [])
                 $.get("/static/images/D-PLACE_VLogo_RGB.svg", function(data) {
                     var svg_data = data.childNodes;
                     d3.select(".jvectormap-container").select("svg").append("svg:g")//.append("svg:image")
-                        .attr("transform", "scale(0.37) translate(350, 470)")
-                        .attr("style", "opacity: 0.5;")
+                        .attr("transform", "scale(0.27) translate(550, 850)")
+                        .attr("style", "opacity: 0.35;")
                         .attr("id", "map-logo");
                     document.getElementById("map-logo").innerHTML = svg_data[1].innerHTML;
                 });
@@ -668,7 +669,7 @@ angular.module('dplaceMapDirective', [])
                     scope.results.societies.forEach(function(societyResult) {
                         var society = societyResult.society;
                         // Add a marker for each point
-                        var marker = {latLng: [society.location.coordinates[1], society.location.coordinates[0]], name: society.name}
+                        var marker = {latLng: [society.location.coordinates[1], society.location.coordinates[0]], name: society.name, weburl: society.ext_id}
                         
                          if (!scope.chosen) {   
                             results = scope.results;

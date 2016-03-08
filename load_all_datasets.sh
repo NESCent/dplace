@@ -43,14 +43,14 @@ python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/society_locations.c
 
 # Loading Variables
 python "${DPLACE_PATH}/dplace_app/load.py" \
- "${REPO_DEST}/csv/EAVariableList_17Nov2015.csv" \
- "${REPO_DEST}/csv/BinfordVariableList_18Nov2015.csv" \
+ "${REPO_DEST}/csv/EAVariableList_1Mar2016.csv" \
+ "${REPO_DEST}/csv/BinfordVariableList_3Mar2016_utf8.csv" \
  vars
 
 # Loading Variable Codes
 python "${DPLACE_PATH}/dplace_app/load.py" \
- "${REPO_DEST}/csv/EACodeDescriptions_17Nov2015.csv" \
- "${REPO_DEST}/csv/BinfordVariableListCodeDescription_18Nov2015.csv" \
+ "${REPO_DEST}/csv/EACodeDescriptions_1Mar2016.csv" \
+ "${REPO_DEST}/csv/BinfordCodeDescriptions_3Mar2016_utf8.csv" \
  codes
 
 # Linking Societies to Languoids
@@ -60,20 +60,20 @@ python "${DPLACE_PATH}/dplace_app/load.py" \
  xd_lang
 
 # Loading References
-python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/ReferenceMapping_11Nov2015.csv" refs
-
-# TODO -- check?
-# Loading References for EA data"
-#python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/EA_DATA_Stacked_17Nov2015.csv" ea_refs
+python "${DPLACE_PATH}/dplace_app/load.py" \
+  "${REPO_DEST}/csv/ReferenceMapping_1Mar2016.csv" \
+  "${REPO_DEST}/csv/BinfordReferenceMapping_3Mar2016_utf8.csv" \
+  refs
 
 # Loading Data
 python "${DPLACE_PATH}/dplace_app/load.py" \
- "${REPO_DEST}/csv/EA_DATA_Stacked_17Nov2015.csv" \
- "${REPO_DEST}/csv/Binford_merged_18Nov2015.csv" \
+ "${REPO_DEST}/csv/EA_DATA_Stacked_1Mar2016.csv" \
+ "${REPO_DEST}/csv/Binford_DATA_stacked_5Mar2016_utf8.csv" \
  vals
 
 # Loading Environmental Data
-python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/EcologicalData.DBASE.07Mar14.csv" "env_vals"
+python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/EnvironmentalVariables_3Mar2016_utf8.csv" "env_vars"
+python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/EcologicalData.DBASE.04Mar16_utf8.csv" "env_vals"
 
 # Loading Trees
 python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/trees/" tree

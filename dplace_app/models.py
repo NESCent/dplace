@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 from collections import defaultdict
 
+from django.core.urlresolvers import reverse
 from django.db import models
 
 UNIT_CHOICES = (
@@ -9,6 +10,7 @@ UNIT_CHOICES = (
     ('℃', '℃'),
     ('mo', 'mo'),
     ('', ''),
+    ('gC m-2 day-1', 'gC m-2 day-1')
 )
 
 CLASS_LEVELS = (
@@ -37,13 +39,14 @@ class ISOCode(models.Model):
 
 
 class Society(models.Model):
-    ext_id = models.CharField('External ID', unique=True, max_length=10)
-    xd_id = models.CharField('Cross ID', default=None, null=True, max_length=10)
+    ext_id = models.CharField('External ID', db_index=True, unique=True, max_length=20)
+    xd_id = models.CharField('Cross ID', db_index=True, default=None, null=True, max_length=10)
     name = models.CharField('Name', db_index=True, max_length=200)
     latitude = models.FloatField('Latitude', null=True)
     longitude = models.FloatField('Longitude', null=True)
     focal_year = models.CharField('Focal Year', null=True, blank=True, max_length=100)
     alternate_names = models.TextField(default="")
+    original_name = models.CharField('ORIG_name', max_length=200, default=None, null=True)
 
     region = models.ForeignKey('GeographicRegion', null=True, related_name='societies')
     source = models.ForeignKey('Source', null=True)
@@ -97,7 +100,10 @@ class Society(models.Model):
 
     def __unicode__(self):
         return "%s - %s (%s)" % (self.ext_id, self.name, self.source)
-
+    
+    def get_absolute_url(self):
+        return reverse("view_society", args=[self.ext_id])
+    
     class Meta(object):
         verbose_name_plural = "Societies"
 
@@ -117,9 +123,9 @@ class EnvironmentalCategory(models.Model):
 class EnvironmentalVariable(models.Model):
     name = models.CharField(max_length=50, unique=True)
     category = models.ForeignKey('EnvironmentalCategory', null=True)
-    units = models.CharField(max_length=10, choices=UNIT_CHOICES)
+    units = models.CharField(max_length=100, choices=UNIT_CHOICES)
     codebook_info = models.CharField(max_length=500, default='None')
-
+    
     def __unicode__(self):
         if self.units:
             return "%s (%s)" % (self.name, self.units)
@@ -279,13 +285,13 @@ class CulturalValue(models.Model):
         verbose_name = "Value"
         ordering = ("variable", "coded_value")
         index_together = [
-            ['variable', 'society'],
-            ['variable', 'coded_value'],
-            ['variable', 'code'],
-            ['society', 'coded_value'],
-            ['society', 'code'],
+            ['variable', 'society', 'focal_year'],
+            ['variable', 'coded_value', 'focal_year', 'subcase'],
+            ['variable', 'code', 'focal_year'],
+            ['society', 'coded_value', 'focal_year', 'subcase'],
+            ['society', 'code', 'focal_year'],
         ]
-        unique_together = ('variable', 'society', 'coded_value')
+        unique_together = ('variable', 'society', 'coded_value', 'comment', 'subcase', 'focal_year')
 
 
 class Source(models.Model):
@@ -297,10 +303,10 @@ class Source(models.Model):
     # this model, I won't change it yet.
 
     # text, because might be '1996', '1999-2001', or 'ND'
-    year = models.CharField(max_length=30)
-    author = models.CharField(max_length=50)
+    year = models.CharField(max_length=30, db_index=True)
+    author = models.CharField(max_length=50, db_index=True)
     reference = models.CharField(max_length=500)
-    name = models.CharField(max_length=100, default="")
+    name = models.CharField(max_length=100, db_index=True, default="")
 
     def __unicode__(self):
         return "%s (%s)" % (self.author, self.year)
@@ -315,7 +321,7 @@ class LanguageFamily(models.Model):
     language_count = models.IntegerField(default=0, null=False)
 
     def update_counts(self):
-        self.language_count = Language.objects.all().filter(family=self).count()
+        self.language_count = Society.objects.all().filter(language__family=self).count()
         self.save()
 
 
@@ -330,7 +336,10 @@ class Language(models.Model):
     def __unicode__(self):
         return "Language: %s, ISO Code %s, Glotto Code %s" % (
             self.name, self.iso_code, self.glotto_code)
-
+    
+    def get_absolute_url(self):
+        return reverse("view_language", args=[self.glotto_code])
+    
     class Meta(object):
         verbose_name = "Language"
         unique_together = ('iso_code', 'glotto_code')

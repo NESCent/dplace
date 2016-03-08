@@ -1,14 +1,17 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import sys
 from itertools import chain
 from time import time
 
 import django
+django.setup()
+
 from django.db import transaction
 
 from load.util import configure_logging, csv_dict_reader
 from load.society import society_locations, load_societies
-from load.environmental import load_environmental
+from load.environmental import load_environmental, load_environmental_var
 from load.geographic import load_regions
 from load.tree import load_trees
 from load.variables import load_vars, load_codes
@@ -24,11 +27,12 @@ ITEM_LOADER = dict(
     vals=load_data,
     codes=load_codes,
     env_vals=load_environmental,
+    env_vars=load_environmental_var,
     refs=load_references,
 )
 
 
-def run(mode, *fnames):
+def run(mode, *fnames):  # pragma: no cover
     configure_logging()
 
     if mode == 'geo':
@@ -42,7 +46,7 @@ def run(mode, *fnames):
     raise ValueError(mode)
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     if len(sys.argv) < 3:
         print "\nUsage: %s source_file mode" % sys.argv[0]
         print "You should run load_all_datasets.sh instead of this script directly."

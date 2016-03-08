@@ -24,12 +24,12 @@ def xd_to_language(items, languoids):
     count = 0
     for item in items:
         societies = societies_.get(item['xd_id'])
-        if not societies:
+        if not societies:  # pragma: no cover
             logging.warning("No societies found with xd_id %(xd_id)s" % item)
             continue
 
         ldata = glottolog.get(item['DialectLanguageGlottocode'])
-        if not ldata:
+        if not ldata:  # pragma: no cover
             logging.warning("No language found for %s, skipping" % item)
             continue
 
@@ -60,7 +60,7 @@ def _xd_to_language(dict_row, societies, ldata, languages, families, isocodes):
         language.family = family
 
         if ldata['iso_code']:
-            if len(ldata['iso_code']) > 3:
+            if len(ldata['iso_code']) > 3:  # pragma: no cover
                 logging.warning("ISOCode too long, skipping %s" % ldata['iso_code'])
             else:
                 isocode = isocodes.get(ldata['iso_code'])

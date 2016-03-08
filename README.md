@@ -1,8 +1,7 @@
 # D-PLACE  [![Build Status](https://travis-ci.org/D-PLACE/dplace.svg?branch=master)](https://travis-ci.org/D-PLACE/dplace)
 ## Synopsis
 
-This repository contains a [GeoDjango](http://geodjango.org) application for the NESCent working group [Explaining cultural diversity: A new evolutionary synthesis](http://evolutionary-synthesis.wikispaces.com) (wiki login required)
-
+This repository contains a [Django](http://djangoproject.com) application for the D-PLACE Project. 
 ## Installation
 
 ### Vagrant/Ansible
@@ -42,8 +41,6 @@ The python dependencies are specified in the `requirements.txt` file.
 
 Activate your virtualenv `source /env/bin/activate` and install dependencies with `pip install -r requirements.txt`
 
-Note: Most of the dependencies are pure python, but [NumPy](http://www.numpy.org) (required by GeoDjango) may require additional software to install.
-
 ### Javascript Dependencies
 
 D-PLACE uses a few JavaScript libraries, which are stored in `dplace_app/static`.  Though all the required JavaScript libraries are contained in the source repository, they can be managed/updated with [Bower](http://bower.io). The `bower.json` file specifies dependencies and versions.
@@ -68,7 +65,7 @@ Be sure to update the following sections:
 
 To install the database, run
 
-		python manage.py migrate
+	python manage.py migrate
 
 This requires valid database credentials in `settings.py`, and activation of your virtualenv if enabled.
 
@@ -76,7 +73,7 @@ This requires valid database credentials in `settings.py`, and activation of you
 
 ### Architecture
 
-D-PLACE is mainly built with [Django](http://djangoproject.com) and [AngularJS](http://angularjs.org). Django (and GeoDjango) are used to model/query data stored in the relational GIS database, and AngularJS is used to build a JavaScript-based browser application that provides an interface to the data. The [Django REST Framework](http://django-rest-framework.org) is used to build a JSON API between Django and AngularJS.
+D-PLACE is mainly built with [Django](http://djangoproject.com) and [AngularJS](http://angularjs.org). Django is used to model/query data stored in the relational GIS database, and AngularJS is used to build a JavaScript-based browser application that provides an interface to the data. The [Django REST Framework](http://django-rest-framework.org) is used to build a JSON API between Django and AngularJS.
 
 #### GeoDjango - Data Models
 
@@ -112,7 +109,7 @@ The [Vagrant+Ansible](https://github.com/dleehr/dplace-vagrant) configuration wi
 
 D-PLACE uses Django's built-in testing framework, tests can be run with
 
-        python manage.py test
+	python manage.py test
         
 Test scripts located in `dplace_app/tests` and should be kept up-to-date with new functionality. The tests cover model and API functionality, but not yet the AngularJS layer.
 

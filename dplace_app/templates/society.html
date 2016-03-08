@@ -33,8 +33,8 @@
             }
         },
         focusOn: {
-            lat: {{ society.location.y }},
-            lng: {{ society.location.x }},
+            lat: {{ location.lat }},
+            lng: {{ location.lng }},
             scale: 5
         },
         regionStyle: {
@@ -58,7 +58,7 @@
     $('#society-map').vectorMap('get', 'mapObject').addMarker(
         {{ society.id }}, 
         {
-            latLng: [{{ society.location.y }}, {{ society.location.x }}], 
+            latLng: [{{ location.lat }},{{ location.lng }}], 
             name: "{{ society.name }}"
         }
     );
@@ -67,14 +67,21 @@
 <h1><img height="60px" title="HOME" src="{% static "images/D-PLACE_Logo.png" %}">Society: {{ society.name }}</h1>
     {% if society.language %}
         <h4>Language or dialect: {{ society.language.name }} </h4>
-        <h5>{% if society.language.glotto_code %}Glottolog ID: <a href="http://glottolog.org/resource/languoid/id/{{society.language.glotto_code.glotto_code}}" target="_blank">{{ society.language.glotto_code.glotto_code }}</a>{% endif %}
-        </h5><h5>{% if society.language.iso_code %}ISO 639-3: <a href="http://www-01.sil.org/iso639-3/documentation.asp?id={{society.language.iso_code.iso_code}}" target="_blank">{{ society.language.iso_code.iso_code }}</a>{% endif %}
+        <h5>
+            {% if society.language.glotto_code %}
+            Glottolog ID: <a href="http://glottolog.org/resource/languoid/id/{{society.language.glotto_code}}" target="_blank">{{ society.language.glotto_code }}</a>
+            {% endif %}
+        </h5>
+        <h5>
+            {% if society.language.iso_code %}
+            ISO 639-3: <a href="http://www-01.sil.org/iso639-3/documentation.asp?id={{society.language.iso_code}}" target="_blank">{{ society.language.iso_code.iso_code }}</a>
+            {% endif %}
         </h5>
         <h4>Language family: {% for classification in language_classification %}{{classification.name}}{% endfor %}</h4>
     {% endif %}
         <h4>Alternate names: {{ society.alternate_names }}</h4>
         <h4>Principal year to which data refer: {{ society.focal_year }}</h4>
-        {% if xd_id %}<h4>Name and ID in other cross-cultural databases: {% for x in xd_id %} <a href="/society/{{ x.id }}" target="_blank">{{ x.name }} ({{ x.source.name}})</a>{% endfor %}</h4>{% endif %}
+        {% if xd_id %}<h4>Name and ID in other cross-cultural databases: {% for x in xd_id %} <a href="/society/{{ x.ext_id }}" target="_blank">{{ x.name }} ({{ x.source.name}})</a>{% endfor %}</h4>{% endif %}
     <h2>Environmental Data</h2>
     {% for key, value in environmentals.items %}
         <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
@@ -132,7 +139,7 @@
                             <td>{{v.label}}</td>
                             <td>{{v.name}}</td>
                             <td>{{v.code}}</td>
-                            <td>{{v.description}} {% if v.sources %}(<a style="cursor:pointer;" data-toggle="collapse" href="#s{{v.label}}" aria-expanded="false" aria-controls="s{{v.label}}">Source</a>) 
+                            <td>{{v.description}} {% if v.sources %}(<a style="cursor:pointer;" data-toggle="collapse" data-target="#s{{v.label}}" aria-expanded="false" aria-controls="s{{v.label}}">Source</a>) 
                                 <div class="collapse" id="s{{v.label}}" style="padding-left:10px; padding-top:5px;">
                                     {% for s in v.sources %}
                                         <a href="#r{{s.id}}">{{s}}</a>;
