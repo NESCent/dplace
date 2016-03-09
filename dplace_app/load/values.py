@@ -41,7 +41,13 @@ def load_data(items):
     for i, item in enumerate(items):
         res = _load_data(item, **kw)
         if res:
-            key = (res[0]['variable'].label, res[0]['society'].ext_id, res[0]['coded_value'], res[0]['focal_year'], res[0]['comment'], res[0]['subcase'])
+            key = (
+                res[0]['variable'].label,
+                res[0]['society'].ext_id,
+                res[0]['coded_value'],
+                res[0]['focal_year'],
+                res[0]['comment'],
+                res[0]['subcase'])
             if key in inserted:  # pragma: no cover
                 logging.warn("duplicate value %s" % item)
             else:
@@ -79,12 +85,14 @@ def _load_data(val_row, societies=None, sources=None, variables=None, descriptio
         source = get_source("Binford")
         label = bfvar_number_to_label(variable_id)
     else:
-        logging.warn("Could not determine dataset source for row %s, skipping" % str(val_row))
+        logging.warn(
+            "Could not determine dataset source for row %s, skipping" % str(val_row))
         return
 
     variable = variables.get(label)
     if variable is None:
-        logging.warn("Could not find variable %s for society %s" % (variable_id, society.name))
+        logging.warn(
+            "Could not find variable %s for society %s" % (variable_id, society.name))
         return
 
     v = dict(

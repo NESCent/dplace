@@ -91,7 +91,8 @@ class DPLACECSVResults(object):
             if society['language'] is not None and 'name' in society['language']:
                 row['ISO code'] = society['language']['iso_code']
                 row['Language name'] = society['language']['name']
-                if 'family' in society['language'] and 'name' in society['language']['family']:
+                if 'family' in society['language'] \
+                        and 'name' in society['language']['family']:
                     row['Language family'] = society['language']['family']['name']
             else:
                 row['Language name'] = ""
@@ -106,7 +107,7 @@ class DPLACECSVResults(object):
 
             # cultural
             cultural_trait_values = item['variable_coded_values']
-            extra_rows = [] # Binford societies may have multiple values for one variable
+            extra_rows = []  # Binford societies may have multiple values for one variable
             for cultural_trait_value in cultural_trait_values:
                 # Figure out the column name
                 variable_id = cultural_trait_value['variable']
@@ -114,7 +115,8 @@ class DPLACECSVResults(object):
                 if field_names['code'] in row:
                     if 'code_description' in cultural_trait_value:
                         try:
-                            description = cultural_trait_value['code_description']['description']
+                            description = \
+                                cultural_trait_value['code_description']['description']
                         except:
                             description = ""
                     else:
@@ -125,8 +127,11 @@ class DPLACECSVResults(object):
                         field_names['code']: cultural_trait_value['coded_value'],
                         field_names['description']: description,
                         field_names['focal_year']: cultural_trait_value['focal_year'],
-                        field_names['comments']: cultural_trait_value['subcase'] + '; ' + cultural_trait_value['comment'],
-                        field_names['sources']: ''.join([x['author'] + '(' + x['year'] + '); ' for x in cultural_trait_value['references']])
+                        field_names['comments']: cultural_trait_value['subcase'] +
+                        '; ' + cultural_trait_value['comment'],
+                        field_names['sources']: ''.join(
+                            [x['author'] + '(' + x['year'] + '); '
+                             for x in cultural_trait_value['references']])
                     }))
                     continue
 
@@ -138,7 +143,9 @@ class DPLACECSVResults(object):
                             cultural_trait_value['code_description']['description']
                     except:
                         row[field_names['description']] = ''
-                row[field_names['comments']] = cultural_trait_value['subcase'] + '; '+ cultural_trait_value['comment']
+                row[field_names['comments']] = \
+                    cultural_trait_value['subcase'] \
+                    + '; ' + cultural_trait_value['comment']
                 row[field_names['sources']] = ''.join([
                     x['author'] + '(' + x['year'] + '); '
                     for x in cultural_trait_value['references']])

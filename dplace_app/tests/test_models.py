@@ -79,10 +79,10 @@ class EATestCase(TestCase):
     
     def test_get_description_no_code(self):
         obj = models.CulturalValue.objects.create(
-                    variable=self.variable,
-                    society=self.ea_society,
-                    coded_value='5',
-                    code=None,
-                    source=self.source
+            variable=self.variable,
+            society=self.ea_society,
+            coded_value='5',
+            code=None,
+            source=self.source
         )
         assert obj.get_description() == ''

@@ -9,14 +9,17 @@ from sources import get_source
 
 _ISO_CODES = None
 
+
 def iso_from_code(code):
     global _ISO_CODES
     if _ISO_CODES is None:
         _ISO_CODES = {c.iso_code: c for c in ISOCode.objects.all()}
     return _ISO_CODES.get(code)
 
+
 def clean_category(category):
     return category.strip().capitalize()
+
 
 def load_environmental_var(items):
     categories = {}
@@ -26,7 +29,8 @@ def load_environmental_var(items):
         if load_env_var(item, categories):
             count += 1
     return count
-        
+
+
 def load_env_var(var_dict, categories):
     if var_dict['VarType'].strip() != 'Continuous':
         return False
@@ -47,6 +51,7 @@ def load_env_var(var_dict, categories):
         logging.info("Saved environmental variable %s" % variable)
     return True
 
+
 def load_environmental(items):
     variables = EnvironmentalVariable.objects.all()
     societies = {(s.ext_id, s.source_id): s for s in Society.objects.all()}
@@ -57,6 +62,7 @@ def load_environmental(items):
             res += 1
     EnvironmentalValue.objects.bulk_create(objs, batch_size=1000)
     return res
+
 
 def _load_environmental(env_dict, variables, societies, objs):
     ext_id = env_dict['soc_ID']

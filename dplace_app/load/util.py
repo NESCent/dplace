@@ -6,6 +6,7 @@ import logging
 from six import BytesIO
 from django.db import connection
 
+
 def delete_all(model):
     model.objects.all().delete()
     with connection.cursor() as c:

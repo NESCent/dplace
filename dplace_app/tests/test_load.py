@@ -18,7 +18,6 @@ from dplace_app.load.tree import load_trees
 from dplace_app.load.sources import load_references, get_source
 
 
-
 def data_path(fname=None):
     comps = ['data']
     if fname is not None:
@@ -46,14 +45,14 @@ class LoadTestCase(TestCase):
         self.assertEqual(res, 2)
 
     def test_load_codes(self):
-        var = CulturalVariable.objects.create(label=eavar_number_to_label(1))
+        CulturalVariable.objects.create(label=eavar_number_to_label(1))
         load_codes(csv_dict_reader(data_path('code_descriptions.csv')))
         # FIXME: assertions!
 
     def test_load_society_locations(self):
         load_regions(data_path('test_geo.json'))
         load_societies(csv_dict_reader(data_path('societies.csv')))
-        res = society_locations(csv_dict_reader(data_path('society_locations.csv')))
+        society_locations(csv_dict_reader(data_path('society_locations.csv')))
 
     def test_load_trees(self):
         iso = ISOCode.objects.create(iso_code='abc')
@@ -148,5 +147,3 @@ class LoadTestCase(TestCase):
     def test_get_source_raises_ValueError(self):
         with self.assertRaises(ValueError):
             get_source(source='personal communication')
-            
-        
