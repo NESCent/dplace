@@ -8,13 +8,17 @@ SOURCE_DATA = {
     'EA': dict(
         year="1999",
         author="Murdock et al.",
-        reference="Murdock, G. P., R. Textor, H. Barry, III, D. R. White, J. P. Gray, and W. T. Divale. 1999. Ethnographic Atlas. World Cultures 10:24-136 (codebook)",
+        reference="Murdock, G. P., R. Textor, H. Barry, III, D. R. White, J. P. Gray, "
+                  "and W. T. Divale. 1999. Ethnographic Atlas. World Cultures 10:24-136 "
+                  "(codebook)",
         name="Ethnographic Atlas",
     ),
     'Binford': dict(
         year="2001",
         author="Binford",
-        reference="Binford, L. 2001. Constructing Frames of Reference: An Analytical Method for Archaeological Theory Building Using Hunter-gatherer and Environmental Data Sets. University of California Press",
+        reference="Binford, L. 2001. Constructing Frames of Reference: An Analytical "
+                  "Method for Archaeological Theory Building Using Hunter-gatherer and "
+                  "Environmental Data Sets. University of California Press",
         name="Binford Hunter-Gatherer",
     ),
 }

@@ -5,6 +5,7 @@ from dplace_app.serializers import Legend, SocietyResult
 # much of the testing of serializers is done in test_api, this is here to catch the
 # remainder of the unexposed/untested code.
 
+
 class LegendTestCase(TestCase):
     """Tests the Legend"""
     def test_name(self):
@@ -24,8 +25,8 @@ class SocietyResultTestCase(TestCase):
             name='EA Test Dataset'
         )
         self.language = models.Language.objects.create(
-            name='language1', #family=family1, 
-            glotto_code='aaaa1234', #iso_code=iso_code
+            name='language1',
+            glotto_code='aaaa1234',
         )
         self.society = models.Society.objects.create(
             ext_id='society1',

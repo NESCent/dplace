@@ -142,7 +142,7 @@ class Test(APITestCase):
             language=language2)
         # Society 3 has the same language characteristics as society 1
         # but different EA Vars
-        society3 = self.set(
+        self.set(
             models.Society, 3,
             ext_id='society3',
             xd_id='xd1',
