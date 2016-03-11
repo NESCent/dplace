@@ -402,40 +402,28 @@ class Test(APITestCase):
 
     def test_find_by_environmental_filter_gt(self):
         response = self.get_results(
-            e=[
-                {'id': str(self.get(models.EnvironmentalVariable, 1).id),
-                 'operator': 'gt',
-                 'params': ['1.5']}])
+            e=[[self.get(models.EnvironmentalVariable, 1).id, 'gt', ['1.5']]])
         socs = {i: self.get(models.Society, i) for i in [1, 2, 3]}
         self.assertTrue(self.society_in_results(socs[2], response))
         self.assertFalse(self.society_in_results(socs[1], response))
 
     def test_find_by_environmental_filter_lt(self):
         response = self.get_results(
-            e=[
-                {'id': str(self.get(models.EnvironmentalVariable, 1).id),
-                 'operator': 'lt',
-                 'params': ['1.5']}])
+            e=[[self.get(models.EnvironmentalVariable, 1).id, 'lt', ['1.5']]])
         socs = {i: self.get(models.Society, i) for i in [1, 2, 3]}
         self.assertTrue(self.society_in_results(socs[1], response))
         self.assertFalse(self.society_in_results(socs[2], response))
 
     def test_find_by_environmental_filter_inrange(self):
         response = self.get_results(
-            e=[
-                {'id': str(self.get(models.EnvironmentalVariable, 1).id),
-                 'operator': 'inrange',
-                 'params': ['0.0', '1.5']}])
+            e=[[self.get(models.EnvironmentalVariable, 1).id, 'inrange', ['0.0', '1.5']]])
         socs = {i: self.get(models.Society, i) for i in [1, 2, 3]}
         self.assertTrue(self.society_in_results(socs[1], response))
         self.assertFalse(self.society_in_results(socs[2], response))
 
     def test_find_by_environmental_filter_outrange(self):
-        response = self.get_results(
-            e=[
-                {'id': str(self.get(models.EnvironmentalVariable, 1).id),
-                 'operator': 'outrange',
-                 'params': ['0.0', '3.0']}])
+        response = self.get_results(e=[
+            [self.get(models.EnvironmentalVariable, 1).id, 'outrange', ['0.0', '3.0']]])
         socs = {i: self.get(models.Society, i) for i in [1, 2, 3]}
         self.assertFalse(self.society_in_results(socs[1], response))
         self.assertFalse(self.society_in_results(socs[2], response))

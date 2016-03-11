@@ -246,14 +246,11 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties) 
             if (propertyName == 'environmentalData') {
                 searchParams[propertyName].selectedVariables.forEach(function(variable) {
                     if (variable.selectedVariable) {
-                        selected_id = variable.selectedVariable.id;
-                        selected_operator = variable.selectedFilter.operator;
-                        selected_params = variable.vals;
-                        filters = {
-                            id: selected_id,
-                            operator: selected_operator,
-                            params: selected_params
-                        }
+                        filters = [
+                            variable.selectedVariable.id,
+                            variable.selectedFilter.operator,
+                            variable.vals
+                        ];
                         if ('e' in searchQuery) {
                             searchQuery['e'].push(filters);
                         } else {

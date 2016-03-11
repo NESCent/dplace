@@ -282,23 +282,16 @@ def result_set_from_query_dict(query_dict):
     if 'e' in query_dict:
         criteria.append(serializers.SEARCH_ENVIRONMENTAL)
         # There can be multiple filters, so we must aggregate the results.
-        for environmental_filter in query_dict['e']:
-            values = models.EnvironmentalValue.objects\
-                .filter(variable=environmental_filter['id'])
-
-            operator = environmental_filter['operator']
+        for varid, operator, params in query_dict['e']:
+            values = models.EnvironmentalValue.objects.filter(variable_id=varid)
             if operator == 'inrange':
-                values = values\
-                    .filter(value__gt=environmental_filter['params'][0])\
-                    .filter(value__lt=environmental_filter['params'][1])
+                values = values.filter(value__gt=params[0]).filter(value__lt=params[1])
             elif operator == 'outrange':
-                values = values\
-                    .filter(value__gt=environmental_filter['params'][1])\
-                    .filter(value__lt=environmental_filter['params'][0])
+                values = values.filter(value__gt=params[1]).filter(value__lt=params[0])
             elif operator == 'gt':
-                values = values.filter(value__gt=environmental_filter['params'][0])
+                values = values.filter(value__gt=params[0])
             elif operator == 'lt':
-                values = values.filter(value__lt=environmental_filter['params'][0])
+                values = values.filter(value__lt=params[0])
             values = values.select_related(
                 'variable', 'environmental__society__language')
             # get the societies from the values
