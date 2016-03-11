@@ -1,8 +1,9 @@
 import json
 import re
 import datetime
+from itertools import groupby
 
-from django.db.models import Prefetch
+from django.db.models import Prefetch, Q
 from django.shortcuts import get_object_or_404
 from django.http import Http404
 from ete2 import Tree
@@ -226,51 +227,50 @@ def result_set_from_query_dict(query_dict):
     # AND them together
     criteria = []
 
-    if 'language_classifications' in query_dict:
+    if 'l' in query_dict:
         criteria.append(serializers.SEARCH_LANGUAGE)
-        language_ids = [int(c['id']) for c in query_dict['language_classifications']]
         for society in models.Society.objects\
-                .filter(language_id__in=language_ids)\
+                .filter(language_id__in=[c['id'] for c in query_dict['l']])\
                 .select_related(
                     'source',
                     'language__family',
                     'language__iso_code'):
             result_set.add_language(society, society.language)
 
-    if 'variable_codes' in query_dict:
+    if 'c' in query_dict:
         criteria.append(serializers.SEARCH_VARIABLES)
-        ids = [x['id'] for x in query_dict['variable_codes'] if 'id' in x]
 
         variables = {
             v.id: v for v in models.CulturalVariable.objects
-            .filter(id__in=[x['variable'] for x in query_dict['variable_codes']])
+            .filter(id__in=[x['variable'] for x in query_dict['c']])
             .prefetch_related(Prefetch(
                 'codes',
-                queryset=models.CulturalCodeDescription.objects.filter(id__in=ids)))
+                queryset=models.CulturalCodeDescription.objects
+                .filter(id__in=[x.get('id') for x in query_dict['c']])))
         }
 
-        for x in query_dict['variable_codes']:
-            variable = variables[x['variable']]
-            assert set(x['id'] for x in query_dict['variable_codes']
-                       if 'id' in x and x['variable'] == variable.id) \
-                == set(c.id for c in variable.codes.all())
+        for variable, codes in groupby(
+            sorted(query_dict['c'], key=lambda c: c['variable']),
+            key=lambda x: x['variable']
+        ):
+            variable = variables[variable]
+            codes = list(codes)
 
-            if variable.data_type and variable.data_type.lower() == 'continuous':
-                values = models.CulturalValue.objects.filter(
-                    variable__id=x['variable'])
-                if 'min' in x:
-                    values = values\
-                        .exclude(coded_value='NA')\
-                        .filter(coded_value__gt=x['min']).filter(coded_value__lt=x['max'])
-                else:  # NA selected
-                    values.filter(coded_value=x['code'])
+            if variable.data_type and variable.data_type == 'Continuous':
+                assert all('min' in c for c in codes)
+                query = reduce(
+                    lambda q, x: q | Q(
+                        coded_value_float__gt=x['min'], coded_value_float__lt=x['max']),
+                    codes,
+                    Q(id=0))
+                values = models.CulturalValue.objects\
+                    .filter(variable=variable)\
+                    .filter(query)\
+                    .exclude(coded_value='NA')
             else:
-                coded_value_ids = []
-                # Aggregate all the coded values for each selected code
-                for code in variable.codes.all():
-                    coded_value_ids.extend(
-                        code.culturalvalue_set.values_list('id', flat=True))
-                values = models.CulturalValue.objects.filter(id__in=coded_value_ids)
+                assert all('id' in c for c in codes)
+                values = models.CulturalValue.objects \
+                    .filter(code_id__in=[x['id'] for x in codes])
 
             for value in values\
                     .select_related('society__language__family') \
@@ -279,11 +279,10 @@ def result_set_from_query_dict(query_dict):
                     .prefetch_related('references'):
                 result_set.add_cultural(value.society, variable, variable.codes, value)
 
-    if 'environmental_filters' in query_dict:
+    if 'e' in query_dict:
         criteria.append(serializers.SEARCH_ENVIRONMENTAL)
-        environmental_filters = query_dict['environmental_filters']
         # There can be multiple filters, so we must aggregate the results.
-        for environmental_filter in environmental_filters:
+        for environmental_filter in query_dict['e']:
             values = models.EnvironmentalValue.objects\
                 .filter(variable=environmental_filter['id'])
 
@@ -306,11 +305,10 @@ def result_set_from_query_dict(query_dict):
             for value in values:
                 result_set.add_environmental(value.society(), value.variable, value)
 
-    if 'geographic_regions' in query_dict:
+    if 'p' in query_dict:
         criteria.append(serializers.SEARCH_GEOGRAPHIC)
-        geographic_region_ids = [int(x['id']) for x in query_dict['geographic_regions']]
         for society in models.Society.objects\
-                .filter(region_id__in=geographic_region_ids)\
+                .filter(region_id__in=[x['id'] for x in query_dict['p']])\
                 .select_related(
                     'region',
                     'language__family',
@@ -332,7 +330,7 @@ def result_set_from_query_dict(query_dict):
     return result_set
 
 
-@api_view(['POST'])
+@api_view(['GET'])
 @permission_classes((AllowAny,))
 def find_societies(request):
     """
@@ -343,7 +341,10 @@ def find_societies(request):
 
     Returns serialized collection of SocietyResult objects
     """
-    result_set = result_set_from_query_dict(request.data)
+    query = {}
+    for k, v in request.query_params.lists():
+        query[k] = [json.loads(vv) for vv in v]
+    result_set = result_set_from_query_dict(query)
     d = serializers.SocietyResultSetSerializer(result_set).data
     return Response(d)
 
