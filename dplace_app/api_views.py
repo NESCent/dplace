@@ -230,7 +230,7 @@ def result_set_from_query_dict(query_dict):
     if 'l' in query_dict:
         criteria.append(serializers.SEARCH_LANGUAGE)
         for society in models.Society.objects\
-                .filter(language_id__in=[c['id'] for c in query_dict['l']])\
+                .filter(language_id__in=query_dict['l'])\
                 .select_related(
                     'source',
                     'language__family',
@@ -308,7 +308,7 @@ def result_set_from_query_dict(query_dict):
     if 'p' in query_dict:
         criteria.append(serializers.SEARCH_GEOGRAPHIC)
         for society in models.Society.objects\
-                .filter(region_id__in=[x['id'] for x in query_dict['p']])\
+                .filter(region_id__in=query_dict['p'])\
                 .select_related(
                     'region',
                     'language__family',

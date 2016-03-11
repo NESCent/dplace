@@ -238,7 +238,7 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties) 
                 if (selectedRegions.length > 0) {
                     searchQuery['p'] = [];
                     for (i = 0; i < selectedRegions.length; i++) {
-                        searchQuery['p'].push({id: selectedRegions[i].id});
+                        searchQuery['p'].push(selectedRegions[i].id);
                     }
                 }
             }
@@ -269,7 +269,7 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties) 
                 if (classifications.length > 0) {
                     searchQuery['l'] = [];
                     for (i = 0; i < classifications.length; i++) {
-                        searchQuery['l'].push({id: classifications[i].id});
+                        searchQuery['l'].push(classifications[i].id);
                     }
                 }
            }

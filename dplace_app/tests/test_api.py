@@ -332,9 +332,7 @@ class Test(APITestCase):
         self.assertEqual(response.content.split()[0], '"Research')
 
         response = self.get_results(
-            urlname='csv_download',
-            p=[
-                GeographicRegionSerializer(self.get(models.GeographicRegion, 1)).data])
+            urlname='csv_download', p=[self.get(models.GeographicRegion, 1).id])
         self.assertIn('Region1', response.content)
 
     #
@@ -356,8 +354,7 @@ class Test(APITestCase):
 
     def test_find_societies_by_language(self):
         # Find the societies that use language1
-        classifications = LanguageSerializer([self.get(models.Language, 1)], many=True)
-        response = self.get_results(l=classifications.data)
+        response = self.get_results(l=[self.get(models.Language, 1).id])
         for i, assertion in [
             (1, self.assertTrue), (2, self.assertFalse), (3, self.assertFalse)
         ]:
@@ -391,8 +388,7 @@ class Test(APITestCase):
         # Society 3 is not coded for any variables, so it should not appear in the list.
         serialized_vcs = CulturalCodeDescriptionSerializer(
             [self.get(models.CulturalCodeDescription, i) for i in [1, 2]], many=True).data
-        serialized_lcs = LanguageSerializer(
-            [self.get(models.Language, i) for i in [1, 3]], many=True).data
+        serialized_lcs = [self.get(models.Language, i).id for i in [1, 3]]
         response = self.get_results(c=serialized_vcs, l=serialized_lcs)
         socs = {i: self.get(models.Society, i) for i in [1, 2, 3]}
         self.assertTrue(self.society_in_results(socs[1], response))
@@ -448,8 +444,7 @@ class Test(APITestCase):
         """
         This uses a region that contains a single polygon around society 2
         """
-        response = self.get_results(
-            p=[GeographicRegionSerializer(self.get(models.GeographicRegion, 2)).data])
+        response = self.get_results(p=[self.get(models.GeographicRegion, 2).id])
         socs = {i: self.get(models.Society, i) for i in [1, 2, 3]}
         self.assertFalse(self.society_in_results(socs[1], response))
         self.assertTrue(self.society_in_results(socs[2], response))
@@ -461,8 +456,7 @@ class Test(APITestCase):
         This uses a region that contains two polygons that should overlap
         societies 1 and 3
         """
-        response = self.get_results(
-            p=[GeographicRegionSerializer(self.get(models.GeographicRegion, 1)).data])
+        response = self.get_results(p=[self.get(models.GeographicRegion, 1).id])
         socs = {i: self.get(models.Society, i) for i in [1, 2, 3]}
         self.assertTrue(self.society_in_results(socs[1], response))
         self.assertTrue(self.society_in_results(socs[3], response))
