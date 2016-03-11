@@ -105,6 +105,9 @@ def _load_data(val_row, societies=None, sources=None, variables=None, descriptio
         comment=val_row['Comment'],
         subcase=val_row['SubCase'])
 
+    if variable.data_type == 'Continuous' and val_row['Code'] and val_row['Code'] != 'NA':
+        v['coded_value_float'] = float(val_row['Code'])
+
     refs = set()
     for r in val_row['EthnoReferences'].split(";"):
         r = r.strip()

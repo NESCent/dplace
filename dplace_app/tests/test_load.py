@@ -114,7 +114,7 @@ class LoadTestCase(TestCase):
         self.assertEqual(res, 0)
         res = load_data([self.get_dict(soc_id='socid', Dataset='Binford')])
         self.assertEqual(res, 0)
-        load_vars([self.get_dict(Dataset='Binford', VarId='5')])
+        load_vars([self.get_dict(Dataset='Binford', VarId='5', VarType='Ordinal')])
         res = load_data([self.get_dict(soc_id='socid', Dataset='Binford', VarId='5')])
         self.assertEqual(res, 1)
 
