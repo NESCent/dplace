@@ -78,7 +78,7 @@ def load_societies(items):
                 source = get_source(key[0:key.find('_')])
                 ext_id = item[key].split('(')[len(item[key].split('('))-1]
                 society = Society(
-                    ext_id=ext_id[0:len(ext_id)-1], #[item[key].find("(")+1:item[key].find(")")],
+                    ext_id=ext_id[0:len(ext_id)-1], 
                     xd_id=item['xd_id'],
                     name=item['pref_name_for_society'],
                     alternate_names=item['alt_names_by_society'],
@@ -87,7 +87,7 @@ def load_societies(items):
                 )
                 if society.ext_id not in [x.ext_id for x in societies]:
                     societies.append(society)
-                    #logging.info("Saving society %s" % society.ext_id)
+                    logging.info("Saving society %s" % society.ext_id)
                 
         logging.info("Saving society %s" % item)
 
