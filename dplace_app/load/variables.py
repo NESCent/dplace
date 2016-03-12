@@ -39,6 +39,7 @@ def load_var(var_dict, categories):
     variable.name = var_dict['VarTitle']
     variable.codebook_info = var_dict['VarDefinition']
     variable.data_type = var_dict['VarType']
+    assert variable.data_type in ['Continuous', 'Categorical', 'Ordinal']
 
     for c in map(clean_category, var_dict['IndexCategory'].split(',')):
         index_category = categories.get(c)
