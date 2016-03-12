@@ -10,6 +10,7 @@ UNIT_CHOICES = (
     ('℃', '℃'),
     ('mo', 'mo'),
     ('', ''),
+    ('gC m-2 day-1', 'gC m-2 day-1')
 )
 
 CLASS_LEVELS = (
@@ -122,9 +123,9 @@ class EnvironmentalCategory(models.Model):
 class EnvironmentalVariable(models.Model):
     name = models.CharField(max_length=50, unique=True)
     category = models.ForeignKey('EnvironmentalCategory', null=True)
-    units = models.CharField(max_length=10, choices=UNIT_CHOICES)
+    units = models.CharField(max_length=100, choices=UNIT_CHOICES)
     codebook_info = models.CharField(max_length=500, default='None')
-
+    
     def __unicode__(self):
         if self.units:
             return "%s (%s)" % (self.name, self.units)
@@ -284,13 +285,13 @@ class CulturalValue(models.Model):
         verbose_name = "Value"
         ordering = ("variable", "coded_value")
         index_together = [
-            ['variable', 'society'],
-            ['variable', 'coded_value'],
-            ['variable', 'code'],
-            ['society', 'coded_value'],
-            ['society', 'code'],
+            ['variable', 'society', 'focal_year'],
+            ['variable', 'coded_value', 'focal_year', 'subcase'],
+            ['variable', 'code', 'focal_year'],
+            ['society', 'coded_value', 'focal_year', 'subcase'],
+            ['society', 'code', 'focal_year'],
         ]
-        unique_together = ('variable', 'society', 'coded_value')
+        unique_together = ('variable', 'society', 'coded_value', 'comment', 'subcase', 'focal_year')
 
 
 class Source(models.Model):

@@ -353,29 +353,6 @@ function SocietiesCtrl($scope, $timeout, $http, searchModelService, colorMapServ
         });
     };
     
-    $scope.showComments = function(society, variable_id) {
-        for (var i = 0; i < society.variable_coded_values.length; i++) {
-            if (society.variable_coded_values[i].variable == variable_id) {
-                if ((society.variable_coded_values[i].focal_year.length > 0 && society.variable_coded_values[i].focal_year != 'NA') || society.variable_coded_values[i].comment.length > 0)
-                    return true
-                else    
-                    return false
-            }
-        }
-    };
-    
-    $scope.showSource = function(society, variable_id) {
-        for (var i = 0; i < society.variable_coded_values.length; i++) {
-            if (society.variable_coded_values[i].variable == variable_id) {
-                if (society.variable_coded_values[i].references.length > 0)
-                    return true;
-                else return false;
-            }
-        }
-        return false;
-    };
-
-    
     //NEW CSV DOWNLOAD CODE
     //Sends a POST (rather than GET) request to the server, then constructs a Blob and uses FileSaver.js to trigger the save as dialog
     //Better because we can send more data to the server using POST request than GET request

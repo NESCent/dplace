@@ -9,6 +9,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('dplace_app', '0076_society_original_name'),
+        ('dplace_app', '0077_increase_max_length_for_Society_id'),
         ('dplace_app', '0002_add_indexes'),
     ]
 

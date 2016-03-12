@@ -24,7 +24,7 @@ class StaticViewSitemap(Sitemap):
     changefreq = 'weekly'
 
     def items(self):
-        return ['home',]  # TODO: add others here once angular urls are settled
+        return ['home']  # TODO: add others here once angular urls are settled
 
     def location(self, item):
         return reverse(item)

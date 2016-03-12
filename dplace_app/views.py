@@ -1,6 +1,6 @@
 from django.http import Http404
 from django.shortcuts import render, get_object_or_404
-from dplace_app.models import Society, Language, LanguageFamily
+from dplace_app.models import Language
 
 
 def view_language(request, glottocode):

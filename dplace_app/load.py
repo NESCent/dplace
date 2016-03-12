@@ -11,7 +11,7 @@ from django.db import transaction
 
 from load.util import configure_logging, csv_dict_reader
 from load.society import society_locations, load_societies
-from load.environmental import load_environmental
+from load.environmental import load_environmental, load_environmental_var
 from load.geographic import load_regions
 from load.tree import load_trees
 from load.variables import load_vars, load_codes
@@ -27,6 +27,7 @@ ITEM_LOADER = dict(
     vals=load_data,
     codes=load_codes,
     env_vals=load_environmental,
+    env_vars=load_environmental_var,
     refs=load_references,
 )
 
