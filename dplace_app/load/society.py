@@ -41,11 +41,7 @@ def load_societies(items):
         if item['dataset'] == 'EA':
             source = get_source("EA")
         elif item['dataset'] == 'Binford':
-            source = get_source("Binford")
-        #elif item['dataset'] == 'SCCS':
-        #    source = get_source("SCCS")
-        #elif item['dataset'] == 'Jorgensen':
-        #    source = get_source("WNAI")       
+            source = get_source("Binford")    
         else:
             logging.warn(
                 "Could not determine source for row %s, skipping" % item
@@ -55,6 +51,7 @@ def load_societies(items):
         societies.append(Society(
             ext_id=item['soc_id'],
             xd_id=item['xd_id'],
+            original_name=item['ORIG_name_and_ID_in_this_dataset'],
             name=item['pref_name_for_society'], #previously ORIG_name -- not sure if we need that one, so for now we'll just save the preferred name
             source=source,
             alternate_names=item['alt_names_by_society'],
@@ -80,6 +77,7 @@ def load_societies(items):
                 society = Society(
                     ext_id=ext_id[0:len(ext_id)-1], 
                     xd_id=item['xd_id'],
+                    original_name=item[key],
                     name=item['pref_name_for_society'],
                     alternate_names=item['alt_names_by_society'],
                     focal_year=item['main_focal_year'],
