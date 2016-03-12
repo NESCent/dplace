@@ -332,31 +332,36 @@ class Test(APITestCase):
         self.assertEqual(response.content.split()[0], '"Research')
 
         response = self.get_results(
-            urlname='csv_download',
-            geographic_regions=[
-                GeographicRegionSerializer(self.get(models.GeographicRegion, 1)).data])
+            urlname='csv_download', p=[self.get(models.GeographicRegion, 1).id])
         self.assertIn('Region1', response.content)
 
     #
     # find societies:
     #
     def get_results(self, urlname='find_societies', **data):
-        return self.client.post(reverse(urlname), data or {}, format='json')
+        method = self.client.post
+        if urlname == 'find_societies':
+            method = self.client.get
+            _data = []
+            for k, v in data.items():
+                for vv in v:
+                    _data.append((k, json.dumps(vv)))
+            data = _data
+        return method(reverse(urlname), data, format='json')
 
     def society_in_results(self, society, response):
         return society.id in [x['society']['id'] for x in response.data['societies']]
 
     def test_find_societies_by_language(self):
         # Find the societies that use language1
-        classifications = LanguageSerializer([self.get(models.Language, 1)], many=True)
-        response = self.get_results(language_classifications=classifications.data)
+        response = self.get_results(l=[self.get(models.Language, 1).id])
         for i, assertion in [
             (1, self.assertTrue), (2, self.assertFalse), (3, self.assertFalse)
         ]:
             assertion(self.society_in_results(self.get(models.Society, i), response))
 
     def test_find_society_by_var(self):
-        response = self.get_results(variable_codes=CulturalCodeDescriptionSerializer(
+        response = self.get_results(c=CulturalCodeDescriptionSerializer(
             [self.get(models.CulturalCodeDescription, 1)], many=True).data)
         for i, assertion in [(1, self.assertTrue), (2, self.assertFalse)]:
             assertion(self.society_in_results(self.get(models.Society, i), response))
@@ -364,14 +369,14 @@ class Test(APITestCase):
     def test_find_societies_by_var(self):
         serialized_codes = CulturalCodeDescriptionSerializer(
             [self.get(models.CulturalCodeDescription, i) for i in [1, 2]], many=True).data
-        response = self.get_results(variable_codes=serialized_codes)
+        response = self.get_results(c=serialized_codes)
         for i in [1, 2]:
             self.assertTrue(
                 self.society_in_results(self.get(models.Society, i), response))
 
     def test_find_no_societies(self):
         response = self.get_results(
-            variable_codes=CulturalCodeDescriptionSerializer(
+            c=CulturalCodeDescriptionSerializer(
                 [self.get(models.CulturalCodeDescription, 10)], many=True).data)
         self.assertEqual(len(response.data['societies']), 0)
 
@@ -383,11 +388,8 @@ class Test(APITestCase):
         # Society 3 is not coded for any variables, so it should not appear in the list.
         serialized_vcs = CulturalCodeDescriptionSerializer(
             [self.get(models.CulturalCodeDescription, i) for i in [1, 2]], many=True).data
-        serialized_lcs = LanguageSerializer(
-            [self.get(models.Language, i) for i in [1, 3]], many=True).data
-        response = self.get_results(
-            variable_codes=serialized_vcs,
-            language_classifications=serialized_lcs)
+        serialized_lcs = [self.get(models.Language, i).id for i in [1, 3]]
+        response = self.get_results(c=serialized_vcs, l=serialized_lcs)
         socs = {i: self.get(models.Society, i) for i in [1, 2, 3]}
         self.assertTrue(self.society_in_results(socs[1], response))
         self.assertFalse(self.society_in_results(socs[2], response))
@@ -400,40 +402,28 @@ class Test(APITestCase):
 
     def test_find_by_environmental_filter_gt(self):
         response = self.get_results(
-            environmental_filters=[
-                {'id': str(self.get(models.EnvironmentalVariable, 1).id),
-                 'operator': 'gt',
-                 'params': ['1.5']}])
+            e=[[self.get(models.EnvironmentalVariable, 1).id, 'gt', ['1.5']]])
         socs = {i: self.get(models.Society, i) for i in [1, 2, 3]}
         self.assertTrue(self.society_in_results(socs[2], response))
         self.assertFalse(self.society_in_results(socs[1], response))
 
     def test_find_by_environmental_filter_lt(self):
         response = self.get_results(
-            environmental_filters=[
-                {'id': str(self.get(models.EnvironmentalVariable, 1).id),
-                 'operator': 'lt',
-                 'params': ['1.5']}])
+            e=[[self.get(models.EnvironmentalVariable, 1).id, 'lt', ['1.5']]])
         socs = {i: self.get(models.Society, i) for i in [1, 2, 3]}
         self.assertTrue(self.society_in_results(socs[1], response))
         self.assertFalse(self.society_in_results(socs[2], response))
 
     def test_find_by_environmental_filter_inrange(self):
         response = self.get_results(
-            environmental_filters=[
-                {'id': str(self.get(models.EnvironmentalVariable, 1).id),
-                 'operator': 'inrange',
-                 'params': ['0.0', '1.5']}])
+            e=[[self.get(models.EnvironmentalVariable, 1).id, 'inrange', ['0.0', '1.5']]])
         socs = {i: self.get(models.Society, i) for i in [1, 2, 3]}
         self.assertTrue(self.society_in_results(socs[1], response))
         self.assertFalse(self.society_in_results(socs[2], response))
 
     def test_find_by_environmental_filter_outrange(self):
-        response = self.get_results(
-            environmental_filters=[
-                {'id': str(self.get(models.EnvironmentalVariable, 1).id),
-                 'operator': 'outrange',
-                 'params': ['0.0', '3.0']}])
+        response = self.get_results(e=[
+            [self.get(models.EnvironmentalVariable, 1).id, 'outrange', ['0.0', '3.0']]])
         socs = {i: self.get(models.Society, i) for i in [1, 2, 3]}
         self.assertFalse(self.society_in_results(socs[1], response))
         self.assertFalse(self.society_in_results(socs[2], response))
@@ -442,9 +432,7 @@ class Test(APITestCase):
         """
         This uses a region that contains a single polygon around society 2
         """
-        response = self.get_results(
-            geographic_regions=[
-                GeographicRegionSerializer(self.get(models.GeographicRegion, 2)).data])
+        response = self.get_results(p=[self.get(models.GeographicRegion, 2).id])
         socs = {i: self.get(models.Society, i) for i in [1, 2, 3]}
         self.assertFalse(self.society_in_results(socs[1], response))
         self.assertTrue(self.society_in_results(socs[2], response))
@@ -456,9 +444,7 @@ class Test(APITestCase):
         This uses a region that contains two polygons that should overlap
         societies 1 and 3
         """
-        response = self.get_results(
-            geographic_regions=[
-                GeographicRegionSerializer(self.get(models.GeographicRegion, 1)).data])
+        response = self.get_results(p=[self.get(models.GeographicRegion, 1).id])
         socs = {i: self.get(models.Society, i) for i in [1, 2, 3]}
         self.assertTrue(self.society_in_results(socs[1], response))
         self.assertTrue(self.society_in_results(socs[3], response))

@@ -268,6 +268,7 @@ class CulturalValue(models.Model):
     variable = models.ForeignKey('CulturalVariable', related_name="values")
     society = models.ForeignKey('Society', null=True)
     coded_value = models.CharField(max_length=100, db_index=True, null=False, default='.')
+    coded_value_float = models.FloatField(null=True)
     code = models.ForeignKey('CulturalCodeDescription', db_index=True, null=True)
     source = models.ForeignKey('Source', null=True)
     comment = models.TextField(default="")
