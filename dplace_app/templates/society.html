@@ -88,11 +88,11 @@
                 {% if x.source.name %}
                     <li><a href="/society/{{ x.ext_id }}" target="_blank">{{ x.name }} ({{x.source.name}})</a></li>
                 {% elif x.source.author == 'Murdock' %}
-                   <li> {{ x.name }} ({{ x.ext_id }})</li>
+                   <li> {{ x.original_name }}</li>
                 {% elif x.source.author == 'Jorgensen' %}
-                    <li>{{ x.name }} (WNAI - {{x.ext_id}})</li>
+                    <li>{{ x.original_name }} (WNAI)</li>
                 {% elif x.source.author == 'Human Relations Area Files, Inc.' %}
-                   <li> <a href="http://ehrafworldcultures.yale.edu/collection?owc={{x.ext_id}}" target="_blank">{{ x.name }} (eHRAF)</a></li>
+                   <li> <a href="http://ehrafworldcultures.yale.edu/collection?owc={{x.ext_id}}" target="_blank">{{ x.original_name }} (eHRAF)</a></li>
                 {% endif %}
             {% endfor %}
             </ul>
