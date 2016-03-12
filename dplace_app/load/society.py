@@ -52,7 +52,7 @@ def load_societies(items):
             ext_id=item['soc_id'],
             xd_id=item['xd_id'],
             original_name=item['ORIG_name_and_ID_in_this_dataset'],
-            name=item['pref_name_for_society'], #previously ORIG_name -- not sure if we need that one, so for now we'll just save the preferred name
+            name=item['pref_name_for_society'], 
             source=source,
             alternate_names=item['alt_names_by_society'],
             focal_year=item['main_focal_year'],
