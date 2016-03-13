@@ -81,6 +81,7 @@ class Society(models.Model):
             categories = value.variable.index_categories.all()
             for c in categories:
                 valueDict[str(c)].append({
+                    'id': value.id,
                     'label': value.variable.label,
                     'name': value.variable.name,
                     'code': value.coded_value,

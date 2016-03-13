@@ -161,8 +161,8 @@
                             <td>{{v.label}}</td>
                             <td>{{v.name}}</td>
                             <td>{{v.code}}</td>
-                            <td>{{v.description}} {% if v.sources %}(<a style="cursor:pointer;" data-toggle="collapse" data-target="#s{{key|cut:" "}}{{v.label}}" aria-expanded="false" aria-controls="s{{v.label}}">Source</a>) 
-                                <div class="collapse" id="s{{key|cut:" "}}{{v.label}}" style="padding-left:10px; padding-top:5px;">
+                            <td>{{v.description}} {% if v.sources %}(<a style="cursor:pointer;" data-toggle="collapse" data-target="#s{{key|cut:" "}}{{v.id}}" aria-expanded="false" aria-controls="s{{v.id}}">Source</a>) 
+                                <div class="collapse" id="s{{key|cut:" "}}{{v.id}}" style="padding-left:10px; padding-top:5px;">
                                     {% for s in v.sources %}
                                         <a href="#r{{s.id}}">{{s}}</a>;
                                     {% endfor %}
