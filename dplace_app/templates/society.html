@@ -87,15 +87,19 @@
             <h5><ul style="line-height:25px;">
             {% for x in xd_id %} 
                 {% if x.source.name %}
-                    <li><a href="/society/{{ x.ext_id }}" target="_blank">{{ x.name }} ({{x.source.name}})</a></li>
+                    <li><a href="/society/{{ x.ext_id }}" target="_blank">{{ x.name }} ({{x.ext_id}}) ({{x.source.name}})</a></li>
                 {% elif x.source.author == 'Murdock' %}
                    <li> {{ x.original_name }}</li>
                 {% elif x.source.author == 'Jorgensen' %}
                     <li>{{ x.original_name }} (WNAI)</li>
-                {% elif x.source.author == 'Human Relations Area Files, Inc.' %}
-                   <li> <a href="http://ehrafworldcultures.yale.edu/collection?owc={{x.ext_id}}" target="_blank">{{ x.original_name }} (eHRAF)</a></li>
                 {% endif %}
             {% endfor %}
+            {% if society.hraf_link %}
+                <li><a href="http://ehrafworldcultures.yale.edu/ehrafe/browseCultures.do?owc={{hraf_link}}" target="_blank">{{ society.hraf_link }} (eHRAF)</a></li>
+            {% endif %}
+            {% if society.chirila_link %}
+                <li><a href="http://www.pamanyungan.net/chirila/" target="_blank">{{ society.chirila_link }} (CHIRILA) </a></li>
+            {% endif %}
             </ul>
             </h5>
             
