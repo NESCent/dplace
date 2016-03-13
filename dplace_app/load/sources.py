@@ -32,11 +32,6 @@ SOURCE_DATA = {
         year="1966",
         author="Jorgensen",
         reference=""
-    ),
-    'HRAF': dict(
-        year="2016",
-        author="Human Relations Area Files, Inc.",
-        reference=""
     )
 }
 

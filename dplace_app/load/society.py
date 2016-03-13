@@ -56,16 +56,17 @@ def load_societies(items):
             source=source,
             alternate_names=item['alt_names_by_society'],
             focal_year=item['main_focal_year'],
+            hraf_link=item['HRAF_name_ID'],
+            chirila_link=item['CHIRILA_society_equivalent']
         ))
         
         society_links = [
             'SCCS_society_equivalent', 
-            'HRAF_name_ID', 
             'WNAI_society_equivalent1',
             'WNAI_society_equivalent2',
             'WNAI_society_equivalent3',
             'WNAI_society_equivalent4',
-            'WNAI_society_equivalent5'
+            'WNAI_society_equivalent5',
         ]
         
         for key in item:
