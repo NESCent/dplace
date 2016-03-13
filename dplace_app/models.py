@@ -51,6 +51,9 @@ class Society(models.Model):
     region = models.ForeignKey('GeographicRegion', null=True, related_name='societies')
     source = models.ForeignKey('Source', null=True)
     language = models.ForeignKey('Language', null=True, related_name="societies")
+    
+    hraf_link = models.CharField('HRAF', null=True, default=None, max_length=200)
+    chirila_link = models.CharField('CHIRILA', default = None, null=True, max_length=200)
 
     @property
     def location(self):
