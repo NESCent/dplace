@@ -77,7 +77,7 @@ class SocietyViewSet(viewsets.ReadOnlyModelViewSet):
         # gets other societies in database with the same xd_id
         xd_id = models.Society.objects.filter(
             xd_id=society.xd_id).exclude(ext_id=society_id)
-        if society.hraf_link:
+        if '(' in society.hraf_link:
             hraf_link = society.hraf_link.split('(')[len(society.hraf_link.split('('))-1]
         else:
             hraf_link = ''
