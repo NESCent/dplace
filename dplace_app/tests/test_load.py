@@ -102,8 +102,11 @@ class LoadTestCase(TestCase):
                 xd_id='xd1',
                 soc_name='Example Society',
                 alternate_names='Example',
+                original_name='Example 1',
+                hraf_link='Example (EX1)',
+                chirila_link='Example (1)',
                 main_focal_year='2016')
-        self.assertEqual(load_societies([society('EA'), society('LRB'), society('x')]), 2)
+        self.assertEqual(load_societies([society('EA'), society('Binford'), society('x')]), 2)
 
     def test_load_data(self):
         self.assertEqual(load_data([self.get_dict()]), 0)

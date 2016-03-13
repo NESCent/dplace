@@ -77,6 +77,10 @@ class SocietyViewSet(viewsets.ReadOnlyModelViewSet):
         # gets other societies in database with the same xd_id
         xd_id = models.Society.objects.filter(
             xd_id=society.xd_id).exclude(ext_id=society_id)
+        if '(' in society.hraf_link:
+            hraf_link = society.hraf_link.split('(')[len(society.hraf_link.split('('))-1]
+        else:
+            hraf_link = ''
         environmentals = society.get_environmental_data()
         cultural_traits = society.get_cultural_trait_data()
         references = society.get_data_references()
@@ -90,6 +94,7 @@ class SocietyViewSet(viewsets.ReadOnlyModelViewSet):
         return Response(
             {
                 'society': society,
+                'hraf_link': hraf_link[0:len(hraf_link)-1],
                 'xd_id': xd_id,
                 'location': location,
                 'language_classification': language_classification,

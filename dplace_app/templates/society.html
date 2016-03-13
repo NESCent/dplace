@@ -66,22 +66,44 @@
 {% endif %}
 <h1><img height="60px" title="HOME" src="{% static "images/D-PLACE_Logo.png" %}">Society: {{ society.name }}</h1>
     {% if society.language %}
+        <h4>Language family: {% for classification in language_classification %}{{classification.name}}{% endfor %}</h4>
+
         <h4>Language or dialect: {{ society.language.name }} </h4>
-        <h5>
+        <ul style="line-height:25px;"><h5>
             {% if society.language.glotto_code %}
-            Glottolog ID: <a href="http://glottolog.org/resource/languoid/id/{{society.language.glotto_code}}" target="_blank">{{ society.language.glotto_code }}</a>
+            <li>Glottolog ID: <a href="http://glottolog.org/resource/languoid/id/{{society.language.glotto_code}}" target="_blank">{{ society.language.glotto_code }}</a></li>
             {% endif %}
         </h5>
         <h5>
             {% if society.language.iso_code %}
-            ISO 639-3: <a href="http://www-01.sil.org/iso639-3/documentation.asp?id={{society.language.iso_code}}" target="_blank">{{ society.language.iso_code.iso_code }}</a>
+            <li>ISO 639-3: <a href="http://www-01.sil.org/iso639-3/documentation.asp?id={{society.language.iso_code}}" target="_blank">{{ society.language.iso_code.iso_code }}</a></li>
             {% endif %}
-        </h5>
-        <h4>Language family: {% for classification in language_classification %}{{classification.name}}{% endfor %}</h4>
+        </h5>        </ul>
     {% endif %}
         <h4>Alternate names: {{ society.alternate_names }}</h4>
         <h4>Principal year to which data refer: {{ society.focal_year }}</h4>
-        {% if xd_id %}<h4>Name and ID in other cross-cultural databases: {% for x in xd_id %} <a href="/society/{{ x.ext_id }}" target="_blank">{{ x.name }} ({{ x.source.name}})</a>{% endfor %}</h4>{% endif %}
+        {% if xd_id %}
+            <h4>Name and ID in other cross-cultural databases:</h4>
+            <h5><ul style="line-height:25px;">
+            {% for x in xd_id %} 
+                {% if x.source.name %}
+                    <li><a href="/society/{{ x.ext_id }}" target="_blank">{{ x.name }} ({{x.ext_id}}) ({{x.source.name}})</a></li>
+                {% elif x.source.author == 'Murdock' %}
+                   <li> {{ x.original_name }}</li>
+                {% elif x.source.author == 'Jorgensen' %}
+                    <li>{{ x.original_name }} (WNAI)</li>
+                {% endif %}
+            {% endfor %}
+            {% if society.hraf_link %}
+                <li><a href="http://ehrafworldcultures.yale.edu/ehrafe/browseCultures.do?owc={{hraf_link}}" target="_blank">{{ society.hraf_link }} (eHRAF)</a></li>
+            {% endif %}
+            {% if society.chirila_link %}
+                <li><a href="http://www.pamanyungan.net/chirila/" target="_blank">{{ society.chirila_link }} (CHIRILA) </a></li>
+            {% endif %}
+            </ul>
+            </h5>
+            
+        {% endif %}
     <h2>Environmental Data</h2>
     {% for key, value in environmentals.items %}
         <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
@@ -139,8 +161,8 @@
                             <td>{{v.label}}</td>
                             <td>{{v.name}}</td>
                             <td>{{v.code}}</td>
-                            <td>{{v.description}} {% if v.sources %}(<a style="cursor:pointer;" data-toggle="collapse" data-target="#s{{key|cut:" "}}{{v.label}}" aria-expanded="false" aria-controls="s{{v.label}}">Source</a>) 
-                                <div class="collapse" id="s{{key|cut:" "}}{{v.label}}" style="padding-left:10px; padding-top:5px;">
+                            <td>{{v.description}} {% if v.sources %}(<a style="cursor:pointer;" data-toggle="collapse" data-target="#s{{key|cut:" "}}{{v.id}}" aria-expanded="false" aria-controls="s{{v.id}}">Source</a>) 
+                                <div class="collapse" id="s{{key|cut:" "}}{{v.id}}" style="padding-left:10px; padding-top:5px;">
                                     {% for s in v.sources %}
                                         <a href="#r{{s.id}}">{{s}}</a>;
                                     {% endfor %}
