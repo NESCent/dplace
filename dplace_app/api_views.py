@@ -240,7 +240,8 @@ def result_set_from_query_dict(query_dict):
                     'source',
                     'language__family',
                     'language__iso_code'):
-            result_set.add_language(society, society.language)
+            if society.culturalvalue_set.count():
+                result_set.add_language(society, society.language)
 
     if 'c' in query_dict:
         criteria.append(serializers.SEARCH_VARIABLES)
