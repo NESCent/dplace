@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 import logging
 
-from dplace_app.models import ISOCode, Society
+from dplace_app.models import ISOCode, Society, Language, LanguageFamily
 from dplace_app.models import Environmental, EnvironmentalCategory
 from dplace_app.models import EnvironmentalVariable, EnvironmentalValue
 from sources import get_source
@@ -61,6 +61,8 @@ def load_environmental(items):
         if _load_environmental(item, variables, societies, objs):
             res += 1
     EnvironmentalValue.objects.bulk_create(objs, batch_size=1000)
+    for language_family in LanguageFamily.objects.all():
+        language_family.update_counts()
     return res
 
 

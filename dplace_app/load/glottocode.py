@@ -35,9 +35,6 @@ def xd_to_language(items, languoids):
 
         _xd_to_language(item, societies, ldata, languages, families, isocodes)
         count += 1
-
-    for language_family in LanguageFamily.objects.all():
-        language_family.update_counts()
     return count
 
 
