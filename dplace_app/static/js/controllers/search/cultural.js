@@ -35,6 +35,7 @@ function CulturalCtrl($scope, searchModelService, Variable, CodeDescription, Con
             });
         });
         $scope.count = variables.length;
+        if ($scope.count < 5) $scope.errors = "";
     };
 
     // triggered by the view when a trait is changed in the picker
