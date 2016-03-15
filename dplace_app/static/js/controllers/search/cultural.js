@@ -103,32 +103,6 @@ function CulturalCtrl($scope, searchModelService, Variable, CodeDescription, Con
             trait.selected.splice(index, 1);
         }
     };
-
-    $scope.traitCodeSelectionChanged = function(trait) {
-		currentSelection = $scope.getSelectedTraitCodes();
-        if (currentSelection.length == trait.codes.length) trait.codes.isSelected = true;
-        else trait.codes.isSelected = false;
-        trait.selected = trait.selected.filter(function(code) { return code.isSelected; });
-        trait.codes.forEach(function(code) {
-            if (code.isSelected) {
-                //continuous variable codes don't have IDs
-               if (trait.selectedVariable.data_type.toUpperCase() == 'CONTINUOUS') {
-                    if (trait.selected.map(function(c) { return c.variable + ''+ c.code; }).indexOf(code.variable+''+code.code) == -1) {
-                        trait.selected.push(code);
-                    }
-               } else {
-                    if (trait.selected.map(function(code) { return code.id; }).indexOf(code.id) == -1) {
-                        trait.selected.push(code);
-                    }
-                }   
-            } else {
-                removeCode(trait, code);
-            }
-        });
-                console.log(trait.selected);
-
-		trait.badgeValue = trait.selected.length;
-	};
 	
 	$scope.selectAllChanged = function(trait) {
         trait.selected = trait.selected.filter(function(code) { return code.isSelected; });
