@@ -6,6 +6,8 @@ function CulturalCtrl($scope, searchModelService, Variable, CodeDescription, Con
             if (!trait.alreadySelected)
                 trait.alreadySelected = []; //keeps track of traits the user has already selected
         });
+        $scope.errors = "";
+        $scope.count = 0;
     };
     
     
@@ -22,6 +24,17 @@ function CulturalCtrl($scope, searchModelService, Variable, CodeDescription, Con
         trait.indexVariables = Variable.query({index_categories: trait.selectedCategory.id, source: trait.selectedSource.id});
 		trait.codes = [];
         trait.selectedCode = "";
+    };
+    
+    function numVars() {
+        variables = [];
+        $scope.traits.forEach(function(trait) {
+            trait.selected.forEach(function(code) {
+                if (variables.indexOf(code.variable) == -1)
+                    variables.push(code.variable);
+            });
+        });
+        $scope.count = variables.length;
     };
 
     // triggered by the view when a trait is changed in the picker
@@ -51,6 +64,8 @@ function CulturalCtrl($scope, searchModelService, Variable, CodeDescription, Con
                    }
                 });
                 trait.badgeValue = trait.selected.filter(function(code) { return code.isSelected; }).length;
+                numVars();
+
             });
             trait.alreadySelected.push(trait.selectedVariable.id);
         } else {
@@ -66,6 +81,8 @@ function CulturalCtrl($scope, searchModelService, Variable, CodeDescription, Con
                    }
                 });
                 trait.badgeValue = trait.selected.length;
+                numVars();
+
             });
         }
     };
@@ -102,6 +119,7 @@ function CulturalCtrl($scope, searchModelService, Variable, CodeDescription, Con
         if (index > -1) {
             trait.selected.splice(index, 1);
         }
+        numVars();
     };
 	
 	$scope.selectAllChanged = function(trait) {
@@ -127,10 +145,15 @@ function CulturalCtrl($scope, searchModelService, Variable, CodeDescription, Con
             });
         }
 		trait.badgeValue = trait.selected.length;
+        numVars();
 	};
 
     // wired to the search button. Gets the code ids, adds cultural to the query, and invokes the search
     $scope.doSearch = function() {
+        if ($scope.count > 4) {
+            $scope.errors = "Error, search is limited to 4 variables";
+            return;
+        }
         $scope.search();
     };
 }
