@@ -9,6 +9,7 @@
     <span class="form-inline clearfix">
         <h4 class="pull-left">Search by Cultural Trait</h4>
        <div class="pull-right">
+        <span ng-show="count > 0 && !errors" style="padding-right:5mm !important" ng-class="{'text-danger': count > 4}">Number of variables selected: {{ count }}</span>
             <button class="btn btn-primary form-control"
                         ng-disabled="searchButton.disabled"
                         ng-click="doSearch()">{{ searchButton.text }}
@@ -21,6 +22,7 @@
             </span> 
         </div>
     </span>
+    <h5 style="padding-left: 5mm !important; line-height:10px;">Note: Search is limited to 4 cultural variables maximum</h5>
     <form class="form-inline" role="form" style="margin-top:20px;">
         <div class="panel panel-default" ng-repeat="trait in traits">
             <div class="panel-heading">

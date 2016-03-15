@@ -6,6 +6,8 @@ function CulturalCtrl($scope, searchModelService, Variable, CodeDescription, Con
             if (!trait.alreadySelected)
                 trait.alreadySelected = []; //keeps track of traits the user has already selected
         });
+        $scope.errors = "";
+        $scope.count = 0;
     };
     
     
@@ -22,6 +24,18 @@ function CulturalCtrl($scope, searchModelService, Variable, CodeDescription, Con
         trait.indexVariables = Variable.query({index_categories: trait.selectedCategory.id, source: trait.selectedSource.id});
 		trait.codes = [];
         trait.selectedCode = "";
+    };
+    
+    function numVars() {
+        variables = [];
+        $scope.traits.forEach(function(trait) {
+            trait.selected.forEach(function(code) {
+                if (variables.indexOf(code.variable) == -1)
+                    variables.push(code.variable);
+            });
+        });
+        $scope.count = variables.length;
+        if ($scope.count < 5) $scope.errors = "";
     };
 
     // triggered by the view when a trait is changed in the picker
@@ -51,6 +65,8 @@ function CulturalCtrl($scope, searchModelService, Variable, CodeDescription, Con
                    }
                 });
                 trait.badgeValue = trait.selected.filter(function(code) { return code.isSelected; }).length;
+                numVars();
+
             });
             trait.alreadySelected.push(trait.selectedVariable.id);
         } else {
@@ -66,6 +82,8 @@ function CulturalCtrl($scope, searchModelService, Variable, CodeDescription, Con
                    }
                 });
                 trait.badgeValue = trait.selected.length;
+                numVars();
+
             });
         }
     };
@@ -102,33 +120,8 @@ function CulturalCtrl($scope, searchModelService, Variable, CodeDescription, Con
         if (index > -1) {
             trait.selected.splice(index, 1);
         }
+        numVars();
     };
-
-    $scope.traitCodeSelectionChanged = function(trait) {
-		currentSelection = $scope.getSelectedTraitCodes();
-        if (currentSelection.length == trait.codes.length) trait.codes.isSelected = true;
-        else trait.codes.isSelected = false;
-        trait.selected = trait.selected.filter(function(code) { return code.isSelected; });
-        trait.codes.forEach(function(code) {
-            if (code.isSelected) {
-                //continuous variable codes don't have IDs
-               if (trait.selectedVariable.data_type.toUpperCase() == 'CONTINUOUS') {
-                    if (trait.selected.map(function(c) { return c.variable + ''+ c.code; }).indexOf(code.variable+''+code.code) == -1) {
-                        trait.selected.push(code);
-                    }
-               } else {
-                    if (trait.selected.map(function(code) { return code.id; }).indexOf(code.id) == -1) {
-                        trait.selected.push(code);
-                    }
-                }   
-            } else {
-                removeCode(trait, code);
-            }
-        });
-                console.log(trait.selected);
-
-		trait.badgeValue = trait.selected.length;
-	};
 	
 	$scope.selectAllChanged = function(trait) {
         trait.selected = trait.selected.filter(function(code) { return code.isSelected; });
@@ -153,10 +146,15 @@ function CulturalCtrl($scope, searchModelService, Variable, CodeDescription, Con
             });
         }
 		trait.badgeValue = trait.selected.length;
+        numVars();
 	};
 
     // wired to the search button. Gets the code ids, adds cultural to the query, and invokes the search
     $scope.doSearch = function() {
+        if ($scope.count > 4) {
+            $scope.errors = "Error, search is limited to 4 variables";
+            return;
+        }
         $scope.search();
     };
 }
