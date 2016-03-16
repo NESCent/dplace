@@ -29,7 +29,7 @@ function SocietiesCtrl($scope, $timeout, $http, searchModelService, colorMapServ
     }
     
         
-    if ($scope.query.environmental_filters) {
+    if ($scope.query.e) {
         $scope.variables = $scope.variables.concat($scope.results.environmental_variables);
         if ($scope.results.environmental_variables.length > 0 && $scope.results.variable_descriptions.length == 0)
             $scope.results.environmental_variables[0].hidden = true;
