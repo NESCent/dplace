@@ -24,15 +24,11 @@ function SocietiesCtrl($scope, $timeout, $http, searchModelService, colorMapServ
             $scope.variables.push(variable.variable);
             variable['svgSize'] = variable.codes.length * 27;
         });
-        if ($scope.results.variable_descriptions.length > 0)
-            $scope.results.variable_descriptions[0].hidden = true;
     }
     
         
-    if ($scope.query.environmental_filters) {
+    if ($scope.query.e) {
         $scope.variables = $scope.variables.concat($scope.results.environmental_variables);
-        if ($scope.results.environmental_variables.length > 0 && $scope.results.variable_descriptions.length == 0)
-            $scope.results.environmental_variables[0].hidden = true;
     }
     
     $scope.setActive('societies');
@@ -271,11 +267,6 @@ function SocietiesCtrl($scope, $timeout, $http, searchModelService, colorMapServ
         else return true;
     };
     
-    $scope.legendArrow = function(code) {
-        if (code.hidden) code.hidden = false;
-        else code.hidden = true;
-    };
-    
     $scope.clicked = function(trees) {
         if (trees.length == 1) {
             tree_to_display = trees[0].name;
@@ -373,16 +364,4 @@ function SocietiesCtrl($scope, $timeout, $http, searchModelService, colorMapServ
             saveAs(file, filename);
         }
     };
-    
-    //OLD CSV DOWNLOAD CODE
-    //Keeping just in case we need it in the future, will delete if we do not.
-    /*$scope.generateDownloadLinks = function() {
-        // queryObject is the in-memory JS object representing the chosen search options
-        var queryObject = searchModelService.getModel().getQuery();
-        console.log(queryObject);
-        // the CSV download endpoint is a GET URL, so we must send the query object as a string.
-        var queryString = encodeURIComponent(JSON.stringify(queryObject));
-        // format (csv/svg/etc) should be an argument, and change the endpoint to /api/v1/download
-        $scope.csvDownloadLink = "/api/v1/csv_download?query=" + queryString;
-    };    */
 }
