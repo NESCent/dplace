@@ -124,9 +124,9 @@ a {
 
 #legend {
     position: absolute;
-    right: 20px;
+    right: 40px;
     z-index: 1;
-    width:350px;
+    width:360px;
     margin-top:0px;
 }
 
