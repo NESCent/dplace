@@ -219,8 +219,7 @@ angular.module('languagePhylogenyDirective', [])
                         .attr("id", "tree-logo");
                     document.getElementById("tree-logo").innerHTML = svg_data[1].innerHTML;
                 });
-            
-            }
+            };
                         
             var constructTree = function(langTree) {   
                 d3.select("language-phylogeny").html('');
@@ -402,8 +401,7 @@ angular.module('languagePhylogenyDirective', [])
                     if ((scope.query.l || scope.query.g) && !scope.query.e && !scope.query.c) {
                             addMarkers(langTree, scope.results, null, node, true, translate);
                     }
-                
-                
+
                     scope.$watch('results.chosenTVariable', function(oldValue, newvalue) {
                     if (scope.results.chosenTVariable) {
                             chosen_var_id = scope.results.variable_descriptions.filter(function(variable) { return variable.variable.id == scope.results.chosenTVariable.id });
@@ -411,7 +409,7 @@ angular.module('languagePhylogenyDirective', [])
                                 addMarkers(langTree, scope.results, chosen_var_id[0], node, true, translate);
                             else {
                                 d3.select(".envVar").attr("fill", function() {
-                                    if (scope.results.chosenTVariable.name == "Annual Mean Precipitation") {console.log("blue"); return "url(#blue)";}
+                                    if (scope.results.chosenTVariable.name == "Monthly Mean Precipitation") {console.log("blue"); return "url(#blue)";}
                                     else if (scope.results.chosenTVariable.name == "Net Primary Production" || scope.results.chosenTVariable.name == "Mean Growing Season NPP") return "url(#earthy)";
                                     else return "url(#temp)";
                                 });
@@ -442,7 +440,7 @@ angular.module('languagePhylogenyDirective', [])
                                     .attr("fill", function() {
                                     if (scope.results.environmental_variables[r].name == "Net Primary Production" || scope.results.environmental_variables[r].name == "Mean Growing Season NPP") 
                                        return "url(#earthy)";
-                                   else if (scope.results.environmental_variables[r].name == "Annual Mean Precipitation") 
+                                   else if (scope.results.environmental_variables[r].name == "Monthly Mean Precipitation") 
                                         return "url(#blue)";
                                     else return "url(#temp)";
                                     });
@@ -723,14 +721,13 @@ angular.module('dplaceMapDirective', [])
                         if (societyIds[i] in colorMap) continue;
                         else scope.map.removeMarkers([societyIds[i]]);
                     }
-                    
                 };
 
                 scope.mapLegend = function() {
                     if (!scope.chosen) return;
                     if (scope.chosen.name == "Net Primary Production" || scope.chosen.name == "Mean Growing Season NPP") {
                         d3.selectAll(".envVar").attr("fill", "url(#earthy)");
-                    } else if (scope.chosen.name == "Annual Mean Precipitation") {
+                    } else if (scope.chosen.name == "Monthly Mean Precipitation") {
                         d3.selectAll(".envVar").attr("fill", "url(#blue)");
                     }
                     else {

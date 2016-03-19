@@ -29,6 +29,11 @@ function SocietiesCtrl($scope, $timeout, $http, searchModelService, colorMapServ
         
     if ($scope.query.e) {
         $scope.variables = $scope.variables.concat($scope.results.environmental_variables);
+        $scope.results.environmental_variables.forEach(function(variable) {
+         if (variable.name == "Monthly Mean Precipitation") variable.fill = "url(#blue)";
+            else if (variable.name == "Net Primary Production" || variable.name == "Mean Growing Season NPP") variable.fill = "url(#earthy)";
+            else variable.fill = "url(#temp)";
+        });
     }
     
     $scope.setActive('societies');
