@@ -236,7 +236,7 @@ angular.module('languagePhylogenyDirective', [])
                     var tree = d3.layout.cluster()
                         .children(function(node) { return node.branchset; });
                     var nodes = tree(newick);
-                    var h = nodes.length * 9;
+                    var h = nodes.length * 8;
                     tree = d3.layout.cluster()
                         .size([h, w])
                         .sort(function comparator(a, b) { return d3.ascending(a.length, b.length); })
@@ -500,7 +500,7 @@ angular.module('languagePhylogenyDirective', [])
                 //Time Scale
                 if (langTree.name.indexOf("glotto") == -1 && langTree.name.indexOf("global") == -1) {
                     line_svg= d3.select('language-phylogeny').append("svg:svg")
-                        .attr("style", "margin-left:100px;");
+                        .attr("style", "margin-left:100px; margin-top:-100px;");
                     line_svg.append("svg:line")
                         .attr("x1", "0")
                         .attr("y1", "0")
