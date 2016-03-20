@@ -24,15 +24,16 @@ function SocietiesCtrl($scope, $timeout, $http, searchModelService, colorMapServ
             $scope.variables.push(variable.variable);
             variable['svgSize'] = variable.codes.length * 27;
         });
-        if ($scope.results.variable_descriptions.length > 0)
-            $scope.results.variable_descriptions[0].hidden = true;
     }
     
         
     if ($scope.query.e) {
         $scope.variables = $scope.variables.concat($scope.results.environmental_variables);
-        if ($scope.results.environmental_variables.length > 0 && $scope.results.variable_descriptions.length == 0)
-            $scope.results.environmental_variables[0].hidden = true;
+        $scope.results.environmental_variables.forEach(function(variable) {
+         if (variable.name == "Monthly Mean Precipitation") variable.fill = "url(#blue)";
+            else if (variable.name == "Net Primary Production" || variable.name == "Mean Growing Season NPP") variable.fill = "url(#earthy)";
+            else variable.fill = "url(#temp)";
+        });
     }
     
     $scope.setActive('societies');
@@ -264,18 +265,6 @@ function SocietiesCtrl($scope, $timeout, $http, searchModelService, colorMapServ
         
     };
     
-    $scope.showOrHide = function(chosenVarId, id) {
-        if (!$scope.globalTree) return false;
-        
-        if (chosenVarId == id) return false;
-        else return true;
-    };
-    
-    $scope.legendArrow = function(code) {
-        if (code.hidden) code.hidden = false;
-        else code.hidden = true;
-    };
-    
     $scope.clicked = function(trees) {
         if (trees.length == 1) {
             tree_to_display = trees[0].name;
@@ -338,7 +327,7 @@ function SocietiesCtrl($scope, $timeout, $http, searchModelService, colorMapServ
         }
         
         for (var i = 0; i < $scope.results.environmental_variables.length; i++) {
-            env_svg = d3.select("#e"+$scope.results.environmental_variables[i].id).node().innerHTML;
+            env_svg = d3.select("#e"+$scope.results.environmental_variables[i].id).select("div").node().innerHTML;
             env_svg = '<svg version="1.1" xmlns="http://www.w3.org/2000/svg" transform="translate(10, 10)">'+env_svg.substring(0, env_svg.indexOf("</svg>")) + '</svg>' + gradients_svg + '</svg>';
             name = $scope.results.environmental_variables[i].CID + '-'+$scope.results.environmental_variables[i].name;
             legends_list.push({'name': name.replace(/[\W]+/g, "-")+'-legend.svg', 'svg': env_svg});
@@ -373,16 +362,4 @@ function SocietiesCtrl($scope, $timeout, $http, searchModelService, colorMapServ
             saveAs(file, filename);
         }
     };
-    
-    //OLD CSV DOWNLOAD CODE
-    //Keeping just in case we need it in the future, will delete if we do not.
-    /*$scope.generateDownloadLinks = function() {
-        // queryObject is the in-memory JS object representing the chosen search options
-        var queryObject = searchModelService.getModel().getQuery();
-        console.log(queryObject);
-        // the CSV download endpoint is a GET URL, so we must send the query object as a string.
-        var queryString = encodeURIComponent(JSON.stringify(queryObject));
-        // format (csv/svg/etc) should be an argument, and change the endpoint to /api/v1/download
-        $scope.csvDownloadLink = "/api/v1/csv_download?query=" + queryString;
-    };    */
 }

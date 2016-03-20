@@ -124,9 +124,9 @@ a {
 
 #legend {
     position: absolute;
-    right: 20px;
+    right: 40px;
     z-index: 1;
-    width:350px;
+    width:360px;
     margin-top:0px;
 }
 
@@ -449,4 +449,10 @@ label.light {
 .st8{fill:#E21E24;}
 .st9{fill:#F6A523;}
 .st10{fill:#EE8025;}
+
+.leg-panel {
+    padding-top:0;
+    padding-bottom:0;
+    padding-right:0;
+}
 

@@ -26,106 +26,92 @@
     <div class="tree-download">
        <button ng-show="!globalTree && results.selectedTree" ng-click="treeDownload()" class="btn btn-info btn-dplace-download">Download This Phylogeny</button>
     </div>
-
+    
     <div id="legend" ng-show="results.selectedTree">
-        <i>Click on a variable title to expand or collapse variable legend.</i>
-        <table ng-repeat="variable in results.variable_descriptions" style="margin-top:5px;margin-bottom:8px;">
-            <tr ng-show="!globalTree" ng-click="variable.hidden = !variable.hidden" data-toggle="collapse" data-target="#{{variable.CID}}" class="accordion-toggle legends" style="cursor:pointer;">
-                <td><span ng-show="!variable.hidden" class="glyphicon glyphicon-chevron-right" aria-hidden="true" style="padding-right:3px;"></span><span ng-show="variable.hidden" class="glyphicon glyphicon-chevron-down" aria-hidden="true" style="padding-right:3px;"></span><b>{{variable.CID}}:</b> {{variable.variable.name}}</td>
-            </tr>
-            <tr>
-                <td class="hiddenRow">
-                    <div ng-class="{'accordion-body collapse': !globalTree, 'in': variable.CID == 'C1'}" ng-hide="showOrHide(results.chosenTVariable.id, variable.variable.id)" id="{{variable.CID}}">
-                        <svg ng-show="variable.variable.data_type !== 'Continuous'" height="{{variable.svgSize}}" width="600" class="tree-legend legends" var-id="{{variable.variable.id}}">
-                            <g ng-repeat="c in variable.codes" transform="{{$index|transformG}}">
-                            <circle
-                                        cx="10"
-                                        cy="10"
-                                        r="4.5"
-                                        fill="{{c.code|colorNode:variable}}"
-                                        stroke="#000"
-                                        stroke-width="0.5"
-                                        />
-                                <text x="20" y="15">{{c.short_description}}</text>
-                            </g>
-                        </svg>
-                        <svg ng-show="variable.variable.data_type == 'Continuous'" class="cont-gradient legends" height="80" height="30" var-id="{{variable.variable.id}}">
-                            <circle
+        <i ng-show="!globalTree && ((results.variable_descriptions.length > 0) || (results.environmental_variables.length > 0))">Click on a variable title to expand or collapse variable legend.</i>
+            <div ng-repeat="variable in results.variable_descriptions" ng-class="{'panel panel-default':!globalTree}" style="margin-bottom:5px;">
+                <div class="panel-heading" ng-show="!globalTree"> 
+                    <a data-toggle="collapse" data-parent="#legend" data-target="#{{variable.CID}}" style="color:#000;"><b>{{variable.CID}}:</b> {{variable.variable.name}}</a>
+                </div>
+                <div id="{{variable.CID}}" ng-class="{'panel-collapse collapse': !globalTree, 'in': variable.CID == 'C1'}" ng-show="(!globalTree || (globalTree && results.chosenTVariable.label==variable.variable.label))">
+                    <div class="leg-panel panel-body">
+                    <svg ng-show="variable.variable.data_type !== 'Continuous'" height="{{variable.svgSize}}" width="600" class="tree-legend legends" var-id="{{variable.variable.id}}">
+                        <g ng-repeat="c in variable.codes" transform="{{$index|transformG}}">
+                        <circle
                                     cx="10"
                                     cy="10"
                                     r="4.5"
-                                    fill="rgb(255,255,255)"
+                                    fill="{{c.code|colorNode:variable}}"
                                     stroke="#000"
                                     stroke-width="0.5"
                                     />
-                                <text x="20" y="15">Missing Data</text>
-                            <rect x="10" y="25" fill="url(#grad1)" height="30" width="250" />
-                            <text x="0" y="70">{{variable.variable.min}} {{code.units}}</text>
-                            <text x="250" y="70">{{variable.variable.max}} {{code.units}}</text>
-                        </svg>
+                            <text x="20" y="15">{{c.short_description}}</text>
+                        </g>
+                    </svg>
+                    <svg ng-show="variable.variable.data_type == 'Continuous'" class="cont-gradient legends" height="80" height="30" var-id="{{variable.variable.id}}">
+                        <circle
+                                cx="10"
+                                cy="10"
+                                r="4.5"
+                                fill="rgb(255,255,255)"
+                                stroke="#000"
+                                stroke-width="0.5"
+                                />
+                            <text x="20" y="15">Missing Data</text>
+                        <rect x="10" y="25" fill="url(#grad1)" height="30" width="250" />
+                        <text x="0" y="70">{{variable.variable.min}} {{code.units}}</text>
+                        <text x="240" y="70">{{variable.variable.max}} {{code.units}}</text>
+                    </svg>
                     </div>
-                </td>
-            </tr>
-        </table>
-       
-        <table ng-repeat="environmental in results.environmental_variables">
-            <tr ng-show="!globalTree" ng-click="legendArrow(environmental)" data-toggle="collapse" data-target="#e{{environmental.id}}" class="accordion-toggle" style="cursor:pointer;">
-                <td><span ng-show="!environmental.hidden" class="glyphicon glyphicon-chevron-right" aria-hidden="true" style="padding-right:3px;"></span><span ng-show="environmental.hidden" class="glyphicon glyphicon-chevron-down" aria-hidden="true" style="padding-right:3px;"></span><b>{{environmental.CID}}:</b> {{environmental.name}}</td>
-            </tr>
-            <tr><td class="hiddenRow">
-                <div ng-class="{'accordion-body collapse':!globalTree, 'in': (environmental.CID == 'E1' && results.variable_descriptions.length == 0)}" ng-hide="showOrHide(results.chosenTVariable.name, environmental.name)" class="accordion-body collapse" id="e{{environmental.id}}">
-                </div>                
-            </td></tr>
-        </table>
-        <table ng-show="globalTree && results.classifications && !results.chosenTVariable">
-            <tr style="cursor:pointer;"><th colspan="2">Language Classifications</th></tr>
-            <tr>
-                <td class="">
-                    <div>
-                        <svg height="100" class="tree-legend-langs legends">
-                            <g ng-repeat="classification in results.classifications" transform="{{$index|transformG}}">
-                                <circle
-                                        cx="10"
-                                        cy="10"
-                                        r="4.5"
-                                        fill="{{classification.id|colorNode:results}}"
-                                        stroke="#000"
-                                        stroke-width="0.5"
-                                        />
-                                
-                                <text x="20" y="15">{{classification.name}}</text>
-                            </g>
-                        </svg>
-                      </div>
-                </td>
-            </tr>
-        </table>
+                </div>
+            </div>
+            <div ng-repeat="environmental in results.environmental_variables" ng-class="{'panel panel-default':!globalTree}" style="margin-bottom:5px;">
+                <div class="panel-heading" ng-show="!globalTree">
+                    <a data-toggle="collapse" data-parent="#legend" data-target="#e{{environmental.id}}" style="color: #000;"><b>{{environmental.CID}}:</b> {{environmental.name}}</a>
+                </div>
+                <div id="e{{environmental.id}}" ng-class="{'panel-collapse collapse':!globalTree, 'in': (environmental.CID == 'E1' && results.variable_descriptions.length == 0)}" ng-show="(!globalTree || (globalTree && results.chosenTVariable.name==environmental.name))">
+                    <div class="leg-panel panel-body">
+                    <svg height="70" width="400" class="envLegend legends" style="font-size: 12px;">
+                        <rect y="10" height="30" width="230" x="20" ng-attr-fill="{{environmental.fill}}"/>
+                        <text x="0" y="60">{{environmental.min}} {{environmental.units}}</text>
+                        <text x="230" y="60">{{environmental.max}} {{environmental.units}}</text>
+                    </svg>
+                    </div>
+                </div>
+            </div>
+            <div ng-show="globalTree && results.classifications && !results.chosenTVariable">
+                <svg height="100" class="tree-legend-langs legends">
+                    <g ng-repeat="classification in results.classifications" transform="{{$index|transformG}}">
+                        <circle
+                                cx="10"
+                                cy="10"
+                                r="4.5"
+                                fill="{{classification.id|colorNode:results}}"
+                                stroke="#000"
+                                stroke-width="0.5"
+                                />
+                        
+                        <text x="20" y="15">{{classification.name}}</text>
+                    </g>
+                </svg>
+            </div>
+            <div ng-show="globalTree && results.geographic_regions && !results.chosenTVariable">
+                <svg height="100" class="tree-legend-langs legends">
+                    <g ng-repeat="region in results.geographic_regions" transform="{{$index|transformG}}">
+                        <circle
+                                cx="10"
+                                cy="10"
+                                r="4.5"
+                                fill="{{region.tdwg_code|colorNode:results}}"
+                                stroke="#000"
+                                stroke-width="0.5"
+                                />
+                        
+                        <text x="20" y="15">{{region.region_nam}}</text>
+                    </g>
+                </svg>
+            </div>
     </div>
-    
-    <table ng-show="globalTree && results.geographic_regions && !results.chosenTVariable">
-    <tr style="cursor:pointer;"><th colspan="2">Geographic Regions</th></tr>
-            <tr>
-                <td class="">
-                    <div>
-                        <svg height="100" class="tree-legend-langs legends">
-                            <g ng-repeat="region in results.geographic_regions" transform="{{$index|transformG}}">
-                                <circle
-                                        cx="10"
-                                        cy="10"
-                                        r="4.5"
-                                        fill="{{region.tdwg_code|colorNode:results}}"
-                                        stroke="#000"
-                                        stroke-width="0.5"
-                                        />
-                                
-                                <text x="20" y="15">{{region.region_nam}}</text>
-                            </g>
-                        </svg>
-                      </div>
-                </td>
-            </tr>
-</table>
-
 
     <div ng-show="globalTree && variables.length > 0">
         <h5>Choose a variable:</h4>
