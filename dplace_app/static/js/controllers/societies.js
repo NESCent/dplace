@@ -265,13 +265,6 @@ function SocietiesCtrl($scope, $timeout, $http, searchModelService, colorMapServ
         
     };
     
-    $scope.showOrHide = function(chosenVarId, id) {
-        if (!$scope.globalTree) return false;
-        
-        if (chosenVarId == id) return false;
-        else return true;
-    };
-    
     $scope.clicked = function(trees) {
         if (trees.length == 1) {
             tree_to_display = trees[0].name;
@@ -334,7 +327,7 @@ function SocietiesCtrl($scope, $timeout, $http, searchModelService, colorMapServ
         }
         
         for (var i = 0; i < $scope.results.environmental_variables.length; i++) {
-            env_svg = d3.select("#e"+$scope.results.environmental_variables[i].id).node().innerHTML;
+            env_svg = d3.select("#e"+$scope.results.environmental_variables[i].id).select("div").node().innerHTML;
             env_svg = '<svg version="1.1" xmlns="http://www.w3.org/2000/svg" transform="translate(10, 10)">'+env_svg.substring(0, env_svg.indexOf("</svg>")) + '</svg>' + gradients_svg + '</svg>';
             name = $scope.results.environmental_variables[i].CID + '-'+$scope.results.environmental_variables[i].name;
             legends_list.push({'name': name.replace(/[\W]+/g, "-")+'-legend.svg', 'svg': env_svg});
