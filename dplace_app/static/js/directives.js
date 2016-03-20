@@ -93,22 +93,20 @@ angular.module('languagePhylogenyDirective', [])
                         if (!global) return;
                         if (scope.query.l) {
                             for (var i = 0; i < society.languages.length; i++) {
-                                var classification = scope.query.l.filter(function(l) { return l.id == society.languages[i].id });
                                 selected.append("svg:circle")
                                     .attr("r", 1.5)
                                     .attr("stroke", "#000")
                                     .attr("stroke-width", "0.5")
                                     .attr("fill", function(n) {
-                                        if (classification.length > 0) {
-                                            value = classification[0].family.id;
-                                            rgb = colorMapService.mapColor(value, results.classifications.length);
-                                            return rgb;
-                                        }
+                                        value = society.languages[i].family.id;
+                                        rgb = colorMapService.mapColor(value, results.classifications.length);
+                                        return rgb;
+                                        
                                     });
                                 
                             }
                         
-                        } else if (scope.query.g) {
+                        } else if (scope.query.p) {
                             for (var i = 0; i < society.geographic_regions.length; i++) {
                                 selected.append("svg:circle")
                                     .attr("r", 1.5)
@@ -398,7 +396,7 @@ angular.module('languagePhylogenyDirective', [])
                 translate = 0;
                 //changes markers for global tree
                 if (langTree.name.indexOf("global") != -1) {
-                    if ((scope.query.l || scope.query.g) && !scope.query.e && !scope.query.c) {
+                    if ((scope.query.l || scope.query.p) && !scope.query.e && !scope.query.c) {
                             addMarkers(langTree, scope.results, null, node, true, translate);
                     }
 
