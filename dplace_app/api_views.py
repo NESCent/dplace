@@ -171,7 +171,12 @@ class LanguageTreeViewSet(viewsets.ReadOnlyModelViewSet):
     filter_fields = ('name',)
     queryset = models.LanguageTree.objects.all()
     pagination_class = TreeResultsSetPagination
-
+    
+class LanguageTreeLabelsViewSet(viewsets.ReadOnlyModelViewSet):
+    serializer_class=serializers.LanguageTreeLabelsSerializer
+    filter_fields = ('label',)
+    queryset = models.LanguageTreeLabels.objects.all()
+    pagination_class = LargeResultsSetPagination
 
 class SourceViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = serializers.SourceSerializer
@@ -187,19 +192,27 @@ def trees_from_languages_array(language_ids):
     Returns trees that contain the societies from the SocietyResultSet
     """
     trees = models.LanguageTree.objects\
-        .filter(languages__pk__in=language_ids)\
-        .prefetch_related('languages__family', 'languages__iso_code')\
-        .distinct()
+        .filter(taxa__societies__ext_id__in=language_ids).distinct()#\
+        #.prefetch_related('languages__family', 'languages__iso_code')\
+        #.distinct()
     for t in trees:
+        #get the labels associated with this tree
+        #determine which to keep and which to prune
+        
+        labels = models.LanguageTreeLabels.objects.filter(languageTree=t).filter(societies__ext_id__in=language_ids)
         if 'glotto' in t.name:
+        #change this cause t.languages doesn't exist anymore!!!
+            continue
             langs_in_tree = [
-                str(l.glotto_code) for l in t.languages.all() if l.id in language_ids
+                str(l.glotto_code) for l in t.taxa.all() if l.id in language_ids
             ]
         else:
-            langs_in_tree = [
-                str(l.iso_code.iso_code)
-                for l in t.languages.all() if l.id in language_ids
-            ]
+            #langs_in_tree = [
+            #    str(l.iso_code.iso_code)
+            #    for l in t.languages.all() if l.id in language_ids
+            #]
+            langs_in_tree = [str(l.label) for l in labels]
+            print langs_in_tree
         newick = Tree(t.newick_string, format=1)
         try:
             if 'glotto' not in t.name:
@@ -224,7 +237,6 @@ def trees_from_languages_array(language_ids):
         except TreeError:
             continue
     return trees
-
 
 def result_set_from_query_dict(query_dict):
     result_set = serializers.SocietyResultSet()
@@ -318,11 +330,14 @@ def result_set_from_query_dict(query_dict):
     result_set.finalize(criteria)
 
     # search for language trees
-    language_ids = []
+    #language_ids = []
+    #for s in result_set.societies:
+    #    if s.society.language:
+    #        language_ids.append(s.society.language.id)
+    ext_ids = []
     for s in result_set.societies:
-        if s.society.language:
-            language_ids.append(s.society.language.id)
-    trees = trees_from_languages_array(language_ids)
+        ext_ids.append(s.society.ext_id)
+    trees = trees_from_languages_array(ext_ids)
     for t in trees:
         result_set.add_language_tree(t)
 

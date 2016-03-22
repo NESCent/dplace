@@ -5,8 +5,59 @@ from collections import defaultdict
 
 from django.core.files import File
 from nexus import NexusReader
-from dplace_app.models import LanguageTree, Language
+from ete2 import Tree
+from ete2.coretype.tree import TreeError
+from dplace_app.models import Society, LanguageTree, Language, LanguageTreeLabels, LanguageTreeLabelsSequence
+from util import csv_dict_reader
 
+def tree_names(name_dir):
+    labels = []
+    sequences = []
+    for fname in os.listdir(name_dir):
+        if fname.startswith('phylogeny'): #save all csv files as phylogeny_name_etc.csv 
+            res = _tree_names(fname.split('_')[1], csv_dict_reader(os.path.join(name_dir,fname)), sequences)
+    LanguageTreeLabelsSequence.objects.bulk_create(sequences)
+    return len(sequences)
+            
+
+def _tree_names(tree_name, items, label_sequences):
+    try:
+        tree = LanguageTree.objects.get(name=tree_name+'.trees')
+    except:
+        return False
+        
+    try:
+        newick = Tree(tree.newick_string, format=1)
+    except TreeError:
+        return False
+        
+    for item in items:
+        name_on_tip = item['Name_on_tree']
+        xd_ids = item['xd_id'].split(',')
+        society_ids = item['soc_id'].split(',')
+        order = item['fixed_order']
+        
+        if not xd_ids:
+            continue
+        
+        label, created = LanguageTreeLabels.objects.get_or_create(
+            languageTree=tree,
+            label=name_on_tip
+        )
+        
+        tree.taxa.add(label)
+
+        for society in Society.objects.all().filter(xd_id__in=xd_ids):
+            label_sequences.append(
+                LanguageTreeLabelsSequence(
+                    society=society,
+                    labels=label,
+                    fixed_order=order
+                )
+            )
+    tree.save()
+    return True
+    
 
 def load_trees(tree_dir, verbose=False):
     l_by_iso, l_by_glotto, l_by_name = \
@@ -59,6 +110,11 @@ def _load_tree(file_name, get_language, verbose=False):
         logging.info("Formatting newick string %s" % (newick))
         
     tree.newick_string = str(newick)
+    if 'glotto' not in file_name:
+        tree.save()
+        return True
+       
+    # phylogeny taxa require reading of CSV mapping files, glottolog trees do not
     for taxon_name in reader.trees.taxa:
         if taxon_name is '1':
             continue  # pragma: no cover
@@ -67,6 +123,18 @@ def _load_tree(file_name, get_language, verbose=False):
             continue
 
         for l in languages:
-            tree.languages.add(l)
+            society = Society.objects.filter(language=l)
+            label, created = LanguageTreeLabels.objects.get_or_create(
+                languageTree=tree,
+                label=taxon_name,
+                language=l
+            )
+            for s in society:
+                LanguageTreeLabelsSequence.objects.get_or_create(
+                    society=s,
+                    labels=label,
+                    fixed_order=0
+                )
+            tree.taxa.add(label)
     tree.save()
     return True
