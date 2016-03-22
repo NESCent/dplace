@@ -32,7 +32,7 @@ def _tree_names(tree_name, items, label_sequences):
         return False
         
     for item in items:
-        name_on_tip = item['Name_on_tree']
+        name_on_tip = item['Name_on_tree_tip']
         xd_ids = item['xd_id'].split(',')
         society_ids = item['soc_id'].split(',')
         order = item['fixed_order']
