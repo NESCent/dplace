@@ -157,11 +157,13 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties) 
         $scope.searchModel.results.language_trees.phylogenies.sort(function(a, b) { return a.name > b.name; });
         });
         $scope.searchModel.getSocieties().forEach(function (container) {
-            var language = container.society.language;
+            var language = container.society.name;
             if(language != null) {
                 container.society.trees = $scope.searchModel.results.language_trees.filter(function (tree) {
-                    return tree.languages.some(function (item) {
-                        return angular.equals(language, item);
+                    return tree.taxa.some(function (item) {
+                        return item.societies.some(function(label) {
+                            return angular.equals(label.name, language);
+                        });
                     });
                 });
             } else {

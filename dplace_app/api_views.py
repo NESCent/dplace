@@ -199,20 +199,8 @@ def trees_from_languages_array(language_ids):
         #get the labels associated with this tree
         #determine which to keep and which to prune
         
-        labels = models.LanguageTreeLabels.objects.filter(languageTree=t).filter(societies__ext_id__in=language_ids)
-        if 'glotto' in t.name:
-        #change this cause t.languages doesn't exist anymore!!!
-            continue
-            langs_in_tree = [
-                str(l.glotto_code) for l in t.taxa.all() if l.id in language_ids
-            ]
-        else:
-            #langs_in_tree = [
-            #    str(l.iso_code.iso_code)
-            #    for l in t.languages.all() if l.id in language_ids
-            #]
-            langs_in_tree = [str(l.label) for l in labels]
-            print langs_in_tree
+        labels = models.LanguageTreeLabels.objects.filter(languageTree=t).filter(societies__ext_id__in=language_ids).distinct()
+        langs_in_tree = [str(l.label) for l in labels]
         newick = Tree(t.newick_string, format=1)
         try:
             if 'glotto' not in t.name:

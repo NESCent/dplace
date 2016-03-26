@@ -79,11 +79,8 @@ angular.module('languagePhylogenyDirective', [])
 
             var addMarkers = function(langTree, results, variable, node, global, translate) { 
                 scope.results.societies.forEach(function(society) {
-                    if (society.society.language) to_match = (langTree.name.indexOf("glotto") == -1) ? society.society.language.iso_code : society.society.language.glotto_code;
-                    else to_match = society.society.name;
-                    
                     var selected = node.filter(function(d) {
-                        return d.name == to_match;
+                        return d.name == society.society.name;
                     });
                     if (global) selected.select("circle").remove(); 
                     var society_name = society.society.name;
@@ -322,8 +319,17 @@ angular.module('languagePhylogenyDirective', [])
                 } else {
                     var diagonal = rightAngleDiagonal();    
                 }
+                
+                taxa = {}
+                for (var i = 0; i < langTree.taxa.length; i++) {
+                    taxa[langTree.taxa[i].label] = langTree.taxa[i].societies[0];
+                }
                 nodes.forEach(function(node) {
                     node.rootDist = (node.parent ? node.parent.rootDist : 0) + (node.length || 0);
+                    console.log(node.name);
+                    if (node.name in taxa) {
+                        node.name = taxa[node.name].name;
+                    }
                 });
                 var rootDists = nodes.map(function(n) { return (n.rootDist); });
                 var yscale = d3.scale.linear()
@@ -460,12 +466,10 @@ angular.module('languagePhylogenyDirective', [])
                         addMarkers(langTree, scope.results, null, node, false, translate);
                     }
                 }
+                                
                 scope.results.societies.forEach(function(society) {
-                    if (society.society.language) to_match = langTree.name.indexOf("glotto") == -1 ? society.society.language.iso_code : society.society.language.glotto_code;
-                    else to_match = society.society.name;
-                    
                     var selected = node.filter(function(d) {
-                        return d.name == to_match;
+                        return d.name == society.society.name;
                     });
                     //lastly, append the text
                          var text = selected.select("text");
