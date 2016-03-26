@@ -100,6 +100,7 @@ def _load_tree(file_name, get_language, verbose=False):
     # now add languages to the tree
     reader = NexusReader(file_name)
     # Remove '[&R]' from newick string
+    reader.trees.detranslate()
     newick = re.sub(r'\[.*?\]', '', reader.trees.trees[0])
     try:
         newick = newick[newick.index('=') + 1:]
@@ -110,7 +111,7 @@ def _load_tree(file_name, get_language, verbose=False):
         logging.info("Formatting newick string %s" % (newick))
         
     tree.newick_string = str(newick)
-    if 'glotto' not in file_name:
+    if 'global' not in file_name and'glotto' not in file_name:
         tree.save()
         return True
        
