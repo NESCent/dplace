@@ -21,6 +21,7 @@ router.register(r'languages', api_views.LanguageViewSet)
 router.register(r'language_trees', api_views.LanguageTreeViewSet)
 router.register(r'geographic_regions', api_views.GeographicRegionViewSet)
 router.register(r'sources', api_views.SourceViewSet)
+router.register(r'language_tree_labels', api_views.LanguageTreeLabelsViewSet)
 
 urlpatterns = [
     url(r'^$', RedirectView.as_view(url='angular/', permanent=True), name='home'),

@@ -363,10 +363,26 @@ class GeographicRegion(models.Model):
     def __unicode__(self):
         return "Region: %s, Continent %s" % (self.region_nam, self.continent)
 
-
 class LanguageTree(models.Model):
     name = models.CharField(max_length=50, db_index=True)
-    languages = models.ManyToManyField(to='Language')
     file = models.FileField(upload_to='language_trees', null=True)
     newick_string = models.TextField(default='')
     source = models.ForeignKey('Source', null=True)
+    taxa = models.ManyToManyField('LanguageTreeLabels')
+    
+class LanguageTreeLabels(models.Model):
+    languageTree = models.ForeignKey('LanguageTree')
+    label = models.CharField(max_length=255, db_index=True)
+    language = models.ForeignKey('Language', null=True)
+    societies = models.ManyToManyField('Society', through="LanguageTreeLabelsSequence")
+    
+    class Meta:
+        ordering = ("-languagetreelabelssequence__fixed_order",)
+    
+class LanguageTreeLabelsSequence(models.Model):
+    society = models.ForeignKey('Society')
+    labels = models.ForeignKey('LanguageTreeLabels')
+    fixed_order = models.PositiveSmallIntegerField(db_index=True)
+    
+    class Meta:
+        ordering = ("-fixed_order",)

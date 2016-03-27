@@ -108,19 +108,37 @@ class Test(APITestCase):
             name='language2', family=family2, glotto_code='dddd1234')
         language3 = self.set(
             models.Language, 3,
-            name='language3', family=family2, glotto_code='cccc1234', iso_code=iso_code)
+            name='language3', family=family2, glotto_code='cccc1234', iso_code=iso_code)    
         tree1 = self.set(
             models.LanguageTree, 1,
             newick_string='((aaaa1234:1,abc:1,abun1254:1)abun1252:1);',
             name='tree',
             source=source_ea)
-        tree1.languages.add(language1)
         tree2 = self.set(
             models.LanguageTree, 2,
             newick_string='((aaaa1234:1,abc:1,abun1254:1)abun1252:1);',
             name='tree.glotto.trees',
             source=source_ea)
-        tree2.languages.add(language1)
+            
+                    
+        label1 = self.set(
+            models.LanguageTreeLabels, 1,
+            languageTree=tree1, label='aaaa1234',
+            language=language1
+        )
+        label2 = self.set(
+            models.LanguageTreeLabels, 2, 
+            languageTree=tree1, label='abun1254',
+            language=language2
+        )
+        label3 = self.set(
+            models.LanguageTreeLabels, 3,
+            languageTree=tree2, label='abun1252',
+            language=language3
+        )
+        tree1.taxa.add(label1)
+        tree1.taxa.add(label2)
+        tree2.taxa.add(label3)
 
         society1 = self.set(
             models.Society, 1,
@@ -150,7 +168,27 @@ class Test(APITestCase):
             name='Society3',
             source=source_ea,
             language=language3)
-
+            
+        sequenceLabel1 = self.set(
+            models.LanguageTreeLabelsSequence, 1,
+            society = society1, labels = label1,
+            fixed_order=0
+        )
+        sequenceLabel2 = self.set(
+            models.LanguageTreeLabelsSequence, 2,
+            society = society1, labels = label2,
+            fixed_order=0
+        )
+        sequenceLabel3 = self.set(
+            models.LanguageTreeLabelsSequence, 3,
+            society = society2, labels = label3,
+            fixed_order=0
+        )
+        sequenceLabel4 = self.set(
+            models.LanguageTreeLabelsSequence, 4,
+            society = society2, labels = label3,
+            fixed_order=1
+        )
         self.set(
             models.CulturalValue, 1,
             variable=variable1,

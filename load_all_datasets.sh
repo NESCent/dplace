@@ -77,3 +77,6 @@ python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/EcologicalData.csv"
 
 # Loading Trees
 python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/trees/" tree
+
+# Loading Trees
+python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/" tree_labels
