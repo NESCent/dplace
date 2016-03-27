@@ -80,7 +80,7 @@ angular.module('languagePhylogenyDirective', [])
             var addMarkers = function(langTree, results, variable, node, global, translate) { 
                 scope.results.societies.forEach(function(society) {
                     var selected = node.filter(function(d) {
-                        return (d.name == society.society.name) && (!d.children);
+                        return (d.name == society.society.name);// && (!d.children);
                     });
                     if (global) selected.select("circle").remove(); 
                     var society_name = society.society.name;
@@ -328,7 +328,7 @@ angular.module('languagePhylogenyDirective', [])
                     node.rootDist = (node.parent ? node.parent.rootDist : 0) + (node.length || 0);
                     if (node.name in taxa) {
                         if (taxa[node.name])
-                            node.name = taxa[node.name].name;
+                            node.name = taxa[node.name].society.name;
                     }
                 });
                 var rootDists = nodes.map(function(n) { return (n.rootDist); });

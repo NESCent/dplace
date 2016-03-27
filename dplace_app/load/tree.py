@@ -33,11 +33,11 @@ def _tree_names(tree_name, items, label_sequences):
         
     for item in items:
         name_on_tip = item['Name_on_tree_tip']
-        xd_ids = item['xd_id'].split(',')
+        xd_ids = [i.strip() for i in item['xd_id'].split(',')]
         society_ids = [i.strip() for i in item['soc_id'].split(',')]
         order = item['fixed_order']
         
-        if not xd_ids:
+        if not xd_ids: # pragma: no cover
             continue
         
         label, created = LanguageTreeLabels.objects.get_or_create(
@@ -47,13 +47,10 @@ def _tree_names(tree_name, items, label_sequences):
         
         tree.taxa.add(label)
 
-        for society in Society.objects.all().filter(xd_id__in=xd_ids):
-            if order == '1':
-                try:
-                    f_order = len(society_ids) - society_ids.index(society.ext_id) - 1
-                except:
-                    f_order = 0
-            else:
+        for society in Society.objects.all().filter(xd_id__in=xd_ids).exclude(source__name=''):
+            try:
+                f_order = len(society_ids) - society_ids.index(society.ext_id) - 1
+            except:
                 f_order = 0
             label_sequences.append(
                 LanguageTreeLabelsSequence(

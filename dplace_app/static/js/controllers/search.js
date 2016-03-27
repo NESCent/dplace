@@ -162,7 +162,7 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties) 
                 container.society.trees = $scope.searchModel.results.language_trees.filter(function (tree) {
                     return tree.taxa.some(function (item) {
                         return item.societies.some(function(label) {
-                            return angular.equals(label.name, language);
+                            return angular.equals(label.society.name, language);
                         });
                     });
                 });
