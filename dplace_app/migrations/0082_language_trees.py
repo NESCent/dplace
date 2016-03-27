@@ -21,7 +21,7 @@ class Migration(migrations.Migration):
                 ('language', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='dplace_app.Language')),
             ],
             options={
-                'ordering': ('LanguageTreeLabelsSequence__fixed_order',),
+                'ordering': ('-languagetreelabelssequence__fixed_order',),
             },
         ),
         migrations.CreateModel(
@@ -32,6 +32,9 @@ class Migration(migrations.Migration):
                 ('labels', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='dplace_app.LanguageTreeLabels')),
                 ('society', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='dplace_app.Society')),
             ],
+            options={
+                'ordering': ('-fixed_order',),
+            },
         ),
         migrations.RemoveField(
             model_name='languagetree',

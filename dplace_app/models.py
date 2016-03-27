@@ -377,9 +377,12 @@ class LanguageTreeLabels(models.Model):
     societies = models.ManyToManyField('Society', through="LanguageTreeLabelsSequence")
     
     class Meta:
-        ordering = ("languagetreelabelssequence__fixed_order",)
+        ordering = ("-languagetreelabelssequence__fixed_order",)
     
 class LanguageTreeLabelsSequence(models.Model):
     society = models.ForeignKey('Society')
     labels = models.ForeignKey('LanguageTreeLabels')
     fixed_order = models.PositiveSmallIntegerField(db_index=True)
+    
+    class Meta:
+        ordering = ("-fixed_order",)
