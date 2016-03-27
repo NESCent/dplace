@@ -5,7 +5,7 @@ import os
 from django.test import TestCase
 
 from dplace_app.models import (
-    Society, GeographicRegion, Language, LanguageTree, ISOCode, CulturalVariable,
+    Society, GeographicRegion, Language, LanguageTree, LanguageTreeLabels, LanguageTreeLabelsSequence, ISOCode, CulturalVariable,
 )
 from dplace_app.load.util import csv_dict_reader, eavar_number_to_label, configure_logging
 from dplace_app.load.isocode import load_isocode
@@ -14,7 +14,7 @@ from dplace_app.load.values import load_data
 from dplace_app.load.variables import load_vars, load_codes
 from dplace_app.load.glottocode import xd_to_language
 from dplace_app.load.geographic import load_regions
-from dplace_app.load.tree import load_trees
+from dplace_app.load.tree import load_trees, tree_names
 from dplace_app.load.sources import load_references, get_source
 
 
@@ -58,10 +58,30 @@ class LoadTestCase(TestCase):
         iso = ISOCode.objects.create(iso_code='abc')
         lang = Language.objects.create(glotto_code='ubyk1235', name='Ubykh', iso_code=iso)
         lang.save()
+        load_societies(csv_dict_reader(data_path('societies.csv')))
+        society = Society.objects.create(
+            ext_id = '455',
+            xd_id = 'xd455',
+            name = 'test',
+            language=lang
+        )
+        society.save()
         res = load_trees(data_path())
-        self.assertEqual(res, 1)
+        self.assertEqual(res, 2)
+        sequences = tree_names(data_path())
+        #labels should be created for the 5 societies in the semitic tree in societies.csv, plus the test society above
+        self.assertEqual(sequences, 6)
+        
         tree = LanguageTree.objects.filter(name='Abkhaz-Adyge.glotto.trees').first()
-        self.assertIn(lang, tree.languages.all())
+        label = LanguageTreeLabels.objects.filter(label='ubyk1235').first()
+        self.assertIn(label, tree.taxa.all())
+        self.assertIn(society, label.societies.all())
+        
+        tree = LanguageTree.objects.filter(name='semitic.trees').first()
+        labels = LanguageTreeLabels.objects.filter(label='Amharic').first()
+        self.assertEqual(tree.taxa.count(), 25)
+        self.assertEqual(labels.societies.count(), 3)
+        self.assertEqual(labels.societies.all().order_by('-languagetreelabelssequence__fixed_order').first().ext_id, 'Ca7')
         # existing trees are not recreated:
         self.assertEqual(load_trees(data_path()), 0)
 
