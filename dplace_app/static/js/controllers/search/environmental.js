@@ -25,8 +25,8 @@ function EnvironmentalCtrl($scope, searchModelService, EnvironmentalVariable, En
     };
 
     $scope.variableChanged = function(variable) {
-        $scope.environmentalData.badgeValue = $scope.environmentalData.selectedVariables.map(function(e) { return e.selectedVariable != null; }).length;
         if(variable.selectedVariable != null) {
+            $scope.environmentalData.badgeValue = $scope.environmentalData.selectedVariables.map(function(e) { return e.selectedVariable != null; }).length;
             variable.EnvironmentalForm.$setPristine();
             $scope.values = MinAndMax.query({query: {environmental_id: variable.selectedVariable.id}});
             $scope.filterChanged(variable);
