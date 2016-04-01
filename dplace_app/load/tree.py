@@ -46,8 +46,7 @@ def _tree_names(tree_name, items, label_sequences):
         )
         
         tree.taxa.add(label)
-
-        for society in Society.objects.all().filter(xd_id__in=xd_ids).exclude(source__name=''):
+        for society in Society.objects.all().filter(xd_id__in=xd_ids):
             try:
                 f_order = len(society_ids) - society_ids.index(society.ext_id) - 1
             except:

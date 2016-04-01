@@ -322,18 +322,15 @@ angular.module('languagePhylogenyDirective', [])
                 
                 taxa = {}
                 include = scope.results.societies.map(function(s) { return s.society.ext_id; });
-                console.log(include);
                 for (var i = 0; i < langTree.taxa.length; i++) {
-                    for (var t = 0; t < langTree.taxa[i].societies.length; t++) {
+                   for (var t = 0; t < langTree.taxa[i].societies.length; t++) {
                         if (include.indexOf(langTree.taxa[i].societies[t].society.ext_id) != -1) {
                             if (langTree.taxa[i].label in taxa)
-                                continue;
-                                
+                                continue; 
                             taxa[langTree.taxa[i].label] = langTree.taxa[i].societies[t];
                         }
                     }
                 }
-                console.log(taxa);
                 nodes.forEach(function(node) {
                     node.rootDist = (node.parent ? node.parent.rootDist : 0) + (node.length || 0);
                     if (node.name in taxa) {
