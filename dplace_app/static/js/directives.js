@@ -337,7 +337,6 @@ angular.module('languagePhylogenyDirective', [])
                         node.name = taxa[node.name].society.name;
                     }
                 });
-                console.log(taxa);
                 var rootDists = nodes.map(function(n) { return (n.rootDist); });
                 var yscale = d3.scale.linear()
                     .domain([0, d3.max(rootDists)])
