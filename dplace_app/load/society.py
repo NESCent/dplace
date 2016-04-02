@@ -8,10 +8,11 @@ from util import delete_all
 from sources import get_source
 
 
-def society_locations(items):
+def society_locations(region, items):
     societies = {s.ext_id: s for s in Society.objects.all()}
     regions = {r.region_nam: r for r in GeographicRegion.objects.all()}
-
+    
+    society_region = {r['soc_id']: r['region'] for r in region}
     count = 0
     for item in items:
         society = societies.get(item['soc_id'])
@@ -21,11 +22,18 @@ def society_locations(items):
 
         try:
             society.latitude, society.longitude = map(
-                float, [item['Latitude'], item['Longitude']])
+                float, [item['Lat'], item['Long']])
         except (TypeError, ValueError):
             logging.warn("Unable to create coordinates for %s" % item)
-
-        region = regions.get(item['region'])
+        
+        try:
+            society.original_latitude, society.original_longitude = map(
+                float, [item['origLat'], item['origLong']])
+        except (TypeError, ValueError):
+            logging.warn("Unable to create original coordinates for %s" % item)
+            
+            
+        region = regions.get(society_region.get(item['soc_id']))
         if not region:
             logging.warn("No matching region found for %s" % item)
         else:
