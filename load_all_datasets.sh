@@ -31,8 +31,8 @@ export PYTHONPATH=$DPLACE_PATH
 
 # Loading Societies
 python "${DPLACE_PATH}/dplace_app/load.py" \
- "${REPO_DEST}/csv/EA_Society_HeaderData.csv" \
- "${REPO_DEST}/csv/Binford_Society_HeaderData.csv" \
+ "${REPO_DEST}/csv/EA_header_data_24Feb2016.csv" \
+ "${REPO_DEST}/csv/Binford_header_data_24Feb2016.csv" \
  soc
 
 # Loading Geographic regions
@@ -46,14 +46,14 @@ python "${DPLACE_PATH}/dplace_app/load.py" \
 
 # Loading Variables
 python "${DPLACE_PATH}/dplace_app/load.py" \
- "${REPO_DEST}/csv/EAVariableList_6Feb2016.csv" \
- "${REPO_DEST}/csv/BinfordVariableList_18Nov2015.csv" \
+ "${REPO_DEST}/csv/EAVariableList.csv" \
+ "${REPO_DEST}/csv/BinfordVariableList.csv" \
  vars
 
 # Loading Variable Codes
 python "${DPLACE_PATH}/dplace_app/load.py" \
- "${REPO_DEST}/csv/EACodeDescriptions_6Feb2016.csv" \
- "${REPO_DEST}/csv/BinfordVariableListCodeDescription_18Nov2015.csv" \
+ "${REPO_DEST}/csv/EACodeDescriptions.csv" \
+ "${REPO_DEST}/csv/BinfordCodeDescriptions.csv" \
  codes
 
 # Linking Societies to Languoids
@@ -63,20 +63,23 @@ python "${DPLACE_PATH}/dplace_app/load.py" \
  xd_lang
 
 # Loading References
-python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/ReferenceMapping_11Nov2015.csv" refs
-
-# TODO -- check?
-# Loading References for EA data"
-#python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/EA_DATA_Stacked_17Nov2015.csv" ea_refs
+python "${DPLACE_PATH}/dplace_app/load.py" \
+  "${REPO_DEST}/csv/ReferenceMapping.csv" \
+  "${REPO_DEST}/csv/BinfordReferenceMapping.csv" \
+  refs
 
 # Loading Data
 python "${DPLACE_PATH}/dplace_app/load.py" \
- "${REPO_DEST}/csv/EA_DATA_Stacked_6Feb2016.csv" \
- "${REPO_DEST}/csv/Binford_merged_18Nov2015.csv" \
+ "${REPO_DEST}/csv/EA_DATA_Stacked.csv" \
+ "${REPO_DEST}/csv/Binford_DATA_stacked.csv" \
  vals
 
 # Loading Environmental Data
-python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/EcologicalData.DBASE.07Mar14.csv" "env_vals"
+python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/EnvironmentalVariables.csv" "env_vars"
+python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/EcologicalData.csv" "env_vals"
 
 # Loading Trees
 python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/trees/" tree
+
+# Loading Trees
+python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/" tree_labels

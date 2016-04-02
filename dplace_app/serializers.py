@@ -157,14 +157,29 @@ class GeographicRegionSerializer(serializers.ModelSerializer):
         fields = (
             'id', 'level_2_re', 'count', 'region_nam', 'continent', 'tdwg_code'
         )
+        
+class LanguageTreeLabelsSequenceSerializer(serializers.HyperlinkedModelSerializer):
+    society = SocietySerializer()
+    labels = serializers.ReadOnlyField(source='labels.label')
+    
+    class Meta:
+        model = models.LanguageTreeLabelsSequence
+        fields = ('society', 'labels', 'fixed_order')
 
+class LanguageTreeLabelsSerializer(serializers.ModelSerializer):
+    societies = LanguageTreeLabelsSequenceSerializer(source='languagetreelabelssequence_set', many=True)
+
+    class Meta(object):
+        model = models.LanguageTreeLabels
+        fields = ('id', 'languageTree', 'label', 'language', 'societies')
 
 class LanguageTreeSerializer(serializers.ModelSerializer):
-    languages = LanguageSerializer(many=True)
+    taxa = LanguageTreeLabelsSerializer(many=True)
 
     class Meta(object):
         model = models.LanguageTree
-        fields = ('id', 'name', 'languages', 'newick_string')
+        fields = ('id', 'name', 'taxa', 'newick_string')
+        
 
 
 class SocietyResult(object):

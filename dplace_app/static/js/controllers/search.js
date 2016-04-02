@@ -95,9 +95,9 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties) 
     //needed for coloring of markers
     $scope.getCodeIDs = function() {
         $scope.searchModel.results.code_ids = {};
-        if ($scope.searchModel.query.language_classifications && !$scope.searchModel.query.variable_codes && !$scope.searchModel.query.environmental_filters) {
+        if ($scope.searchModel.query.l && !$scope.searchModel.query.c && !$scope.searchModel.query.e) {
             $scope.searchModel.results.classifications = [];
-            added = []
+            added = [];
             for (var i = 0; i < $scope.searchModel.results.societies.length; i++) {
                 for (var s = 0; s < $scope.searchModel.results.societies[i].languages.length; s++) {
                     language_family = $scope.searchModel.results.societies[i].languages[s].family;
@@ -108,10 +108,10 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties) 
                 }
             }
         }
-        
+
         for (var i = 0; i < $scope.searchModel.results.variable_descriptions.length; i++) {
             if ($scope.searchModel.results.variable_descriptions[i].variable.data_type.toUpperCase() == 'CONTINUOUS') {
-                codes = $scope.searchModel.query.variable_codes.filter(function(code) { return code.variable == $scope.searchModel.results.variable_descriptions[i].variable.id; });
+                codes = $scope.searchModel.query.c.filter(function(code) { return code.variable == $scope.searchModel.results.variable_descriptions[i].variable.id; });
                 var min;
                 var max = 0;
                 
@@ -157,11 +157,13 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties) 
         $scope.searchModel.results.language_trees.phylogenies.sort(function(a, b) { return a.name > b.name; });
         });
         $scope.searchModel.getSocieties().forEach(function (container) {
-            var language = container.society.language;
+            var language = container.society.name;
             if(language != null) {
                 container.society.trees = $scope.searchModel.results.language_trees.filter(function (tree) {
-                    return tree.languages.some(function (item) {
-                        return angular.equals(language, item);
+                    return tree.taxa.some(function (item) {
+                        return item.societies.some(function(label) {
+                            return angular.equals(label.society.name, language);
+                        });
                     });
                 });
             } else {
@@ -201,6 +203,7 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties) 
     };
 
     $scope.search = function() {
+        var i, pruned;
         searchModel = searchModelService.getModel();
         searchParams = searchModel.params;    
         searchQuery = {};
@@ -208,38 +211,52 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties) 
             //get selected cultural traits/codes
             if (propertyName == 'culturalTraits') {
                 var codes = searchParams[propertyName].selected.filter(function(code){ return code.isSelected; });
-                if (codes.length > 0)
-                    searchQuery['variable_codes'] = codes;
+                if (codes.length > 0) {
+                    searchQuery['c'] = [];
+                    for (i = 0; i < codes.length; i++) {
+                        pruned = {variable: codes[i].variable};
+                        if ('id' in codes[i]) {
+                            pruned['id'] = codes[i].id;
+                        }
+                        if ('min' in codes[i]) {
+                            pruned['min'] = codes[i].min;
+                        }
+                        if ('max' in codes[i]) {
+                            pruned['max'] = codes[i].max;
+                        }
+                        searchQuery['c'].push(pruned);
+                    }
+                }
             }
             //get selected regions
             if (propertyName == 'geographicRegions') {
                 var selectedRegions = searchParams[propertyName].selectedRegions;  
                 selectedRegions.forEach(function (selectedRegion) {
-                    var regionId = null;
                     searchParams[propertyName].allRegions.forEach(function(region) {
                         if (region.tdwg_code == selectedRegion.code)
                             selectedRegion.id = region.id;
                     });
                 });
-                if (selectedRegions.length > 0)
-                    searchQuery['geographic_regions'] = selectedRegions;
+                if (selectedRegions.length > 0) {
+                    searchQuery['p'] = [];
+                    for (i = 0; i < selectedRegions.length; i++) {
+                        searchQuery['p'].push(selectedRegions[i].id);
+                    }
+                }
             }
             //get selected environmental variable and search parameters
             if (propertyName == 'environmentalData') {
                 searchParams[propertyName].selectedVariables.forEach(function(variable) {
                     if (variable.selectedVariable) {
-                        selected_id = variable.selectedVariable.id;
-                        selected_operator = variable.selectedFilter.operator;
-                        selected_params = variable.vals;
-                        filters = {
-                            id: selected_id,
-                            operator: selected_operator,
-                            params: selected_params
-                        }
-                        if ('environmental_filters' in searchQuery) {
-                            searchQuery['environmental_filters'].push(filters);
+                        filters = [
+                            variable.selectedVariable.id,
+                            variable.selectedFilter.operator,
+                            variable.vals
+                        ];
+                        if ('e' in searchQuery) {
+                            searchQuery['e'].push(filters);
                         } else {
-                            searchQuery['environmental_filters'] = [filters];
+                            searchQuery['e'] = [filters];
                         }
                     }
                 });
@@ -248,8 +265,12 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties) 
             //get selected languages
             if (propertyName == 'languageClassifications') { 
                 var classifications = searchParams[propertyName].selected.filter(function(classification){ return classification.isSelected; });
-                if (classifications.length > 0)
-                    searchQuery['language_classifications'] = classifications;
+                if (classifications.length > 0) {
+                    searchQuery['l'] = [];
+                    for (i = 0; i < classifications.length; i++) {
+                        searchQuery['l'].push(classifications[i].id);
+                    }
+                }
            }
         }
         $scope.updateSearchQuery(searchQuery);

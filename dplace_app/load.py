@@ -11,9 +11,9 @@ from django.db import transaction
 
 from load.util import configure_logging, csv_dict_reader
 from load.society import society_locations, load_societies
-from load.environmental import load_environmental
+from load.environmental import load_environmental, load_environmental_var
 from load.geographic import load_regions
-from load.tree import load_trees
+from load.tree import load_trees, tree_names
 from load.variables import load_vars, load_codes
 from load.values import load_data
 from load.sources import load_references
@@ -27,6 +27,7 @@ ITEM_LOADER = dict(
     vals=load_data,
     codes=load_codes,
     env_vals=load_environmental,
+    env_vars=load_environmental_var,
     refs=load_references,
 )
 
@@ -38,6 +39,8 @@ def run(mode, *fnames):  # pragma: no cover
         return load_regions(fnames[0])
     if mode == 'tree':
         return load_trees(fnames[0])
+    if mode == 'tree_labels':
+        return tree_names(fnames[0])
     if mode == 'xd_lang':
         return xd_to_language(csv_dict_reader(fnames[0]), csv_dict_reader(fnames[1]))
     if mode == 'soc_lat_long':

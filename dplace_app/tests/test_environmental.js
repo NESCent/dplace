@@ -132,11 +132,11 @@ describe('Testing environmental search', function() {
         searchScope.$digest();
         
         expected_query = {
-            'environmental_filters': [{
-                'id': variable.id,
-                'operator': envScope.environmentalData.selectedVariables[0].selectedFilter.operator,
-                'params': [1.0, 500]
-            }]
+            'e': [[
+                variable.id,
+                envScope.environmentalData.selectedVariables[0].selectedFilter.operator,
+                [1.0, 500]
+            ]]
         };
         
         expect(searchScope.updateSearchQuery).toHaveBeenCalled();

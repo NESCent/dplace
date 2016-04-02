@@ -41,7 +41,13 @@ def load_data(items):
     for i, item in enumerate(items):
         res = _load_data(item, **kw)
         if res:
-            key = (res[0]['variable'].id, res[0]['society'].id, res[0]['coded_value'])
+            key = (
+                res[0]['variable'].label,
+                res[0]['society'].ext_id,
+                res[0]['coded_value'],
+                res[0]['focal_year'],
+                res[0]['comment'],
+                res[0]['subcase'])
             if key in inserted:  # pragma: no cover
                 logging.warn("duplicate value %s" % item)
             else:
@@ -75,16 +81,18 @@ def _load_data(val_row, societies=None, sources=None, variables=None, descriptio
     if val_row['Dataset'] == 'EA':
         source = get_source("EA")
         label = eavar_number_to_label(variable_id)
-    elif val_row['Dataset'] == 'LRB':
+    elif val_row['Dataset'] == 'Binford':
         source = get_source("Binford")
         label = bfvar_number_to_label(variable_id)
     else:
-        logging.warn("Could not determine dataset source for row %s, skipping" % str(val_row))
+        logging.warn(
+            "Could not determine dataset source for row %s, skipping" % str(val_row))
         return
 
     variable = variables.get(label)
     if variable is None:
-        logging.warn("Could not find variable %s for society %s" % (variable_id, society.name))
+        logging.warn(
+            "Could not find variable %s for society %s" % (variable_id, society.name))
         return
 
     v = dict(
@@ -97,6 +105,9 @@ def _load_data(val_row, societies=None, sources=None, variables=None, descriptio
         comment=val_row['Comment'],
         subcase=val_row['SubCase'])
 
+    if variable.data_type == 'Continuous' and val_row['Code'] and val_row['Code'] != 'NA':
+        v['coded_value_float'] = float(val_row['Code'])
+
     refs = set()
     for r in val_row['EthnoReferences'].split(";"):
         r = r.strip()
@@ -104,17 +115,19 @@ def _load_data(val_row, societies=None, sources=None, variables=None, descriptio
         m = BINFORD_REF_PATTERN.match(r)
         if m:
             author, year = m.group('author').strip(), m.group('year')
+            if author.endswith(','):
+                author = author[:-1].strip()
         else:
             ref_short = r.split(",")
             if len(ref_short) == 2:
                 author = ref_short[0].strip()
-                year = ref_short[1].strip()
+                year = ref_short[1].strip().split(':')[0]
         if author and year:
             ref = sources.get((author, year))
             if ref:
                 refs.add(ref.id)
             else:  # pragma: no cover
                 logging.warn(
-                    "Could not find reference %s (%s) in database, skipping reference"
+                    "Could not find reference %s, %s in database, skipping reference"
                     % (author, year))
     return v, refs

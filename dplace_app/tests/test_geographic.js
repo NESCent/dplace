@@ -82,7 +82,7 @@ describe('Testing geographic search', function() {
         searchScope.$digest();
                 
         expected_searchQuery = {
-            'geographic_regions': geographicScope.geographic.selectedRegions
+            'p': [geographicScope.geographic.selectedRegions[0].id]
         };
         expect(searchScope.updateSearchQuery).toHaveBeenCalled();
         expect(searchScope.updateSearchQuery).toHaveBeenCalledWith(expected_searchQuery);

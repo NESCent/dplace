@@ -27,7 +27,7 @@ def load_var(var_dict, categories):
     if var_dict['Dataset'] == 'EA':
         label = eavar_number_to_label(var_dict['VarID'])
         source = get_source("EA")
-    elif var_dict['Dataset'] == 'LRB':
+    elif var_dict['Dataset'] == 'Binford':
         label = bfvar_number_to_label(var_dict['VarID'])
         source = get_source("Binford")
     else:
@@ -39,6 +39,7 @@ def load_var(var_dict, categories):
     variable.name = var_dict['VarTitle']
     variable.codebook_info = var_dict['VarDefinition']
     variable.data_type = var_dict['VarType']
+    assert variable.data_type in ['Continuous', 'Categorical', 'Ordinal']
 
     for c in map(clean_category, var_dict['IndexCategory'].split(',')):
         index_category = categories.get(c)
@@ -66,7 +67,7 @@ def load_codes(items):
         
         if dataset == 'EA':
             label = eavar_number_to_label(id)
-        elif dataset == 'LRB':
+        elif dataset == 'Binford':
             label = bfvar_number_to_label(id)
         else:
             logging.warn("Unknown dataset, skipping row %s" % row)
@@ -79,7 +80,8 @@ def load_codes(items):
             code_description.description = description
             code_description.short_description = short_description
             code_description.save()
-            logging.info("Created CulturalCodeDescription: %s" % code_description)
+            logging.info(
+                ("Created CulturalCodeDescription: %s" % code_description).decode('utf8'))
             count += 1
         else:
             logging.warn("Missing variable in database: %s" % label)

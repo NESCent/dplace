@@ -6,6 +6,7 @@ import logging
 from six import BytesIO
 from django.db import connection
 
+
 def delete_all(model):
     model.objects.all().delete()
     with connection.cursor() as c:
@@ -42,9 +43,7 @@ def configure_logging(test=False):
 
 def stream(fname):
     with open(fname, 'rb') as fp:
-        stream_ = BytesIO(
-            fp.read().replace(b'\x90', b'').replace(b'\x8b', b' ')
-        )
+        stream_ = BytesIO(fp.read())
         stream_.seek(0)
         return stream_
 

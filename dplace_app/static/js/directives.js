@@ -79,11 +79,8 @@ angular.module('languagePhylogenyDirective', [])
 
             var addMarkers = function(langTree, results, variable, node, global, translate) { 
                 scope.results.societies.forEach(function(society) {
-                    if (society.society.language) to_match = (langTree.name.indexOf("glotto") == -1) ? society.society.language.iso_code : society.society.language.glotto_code;
-                    else to_match = society.society.name;
-                    
                     var selected = node.filter(function(d) {
-                        return d.name == to_match;
+                        return (d.name == society.society.name);
                     });
                     if (global) selected.select("circle").remove(); 
                     var society_name = society.society.name;
@@ -91,24 +88,22 @@ angular.module('languagePhylogenyDirective', [])
                     
                     if (!variable) {
                         if (!global) return;
-                        if (scope.query.language_classifications) {
+                        if (scope.query.l) {
                             for (var i = 0; i < society.languages.length; i++) {
-                                var classification = scope.query.language_classifications.filter(function(l) { return l.id == society.languages[i].id });
                                 selected.append("svg:circle")
                                     .attr("r", 1.5)
                                     .attr("stroke", "#000")
                                     .attr("stroke-width", "0.5")
                                     .attr("fill", function(n) {
-                                        if (classification.length > 0) {
-                                            value = classification[0].family.id;
-                                            rgb = colorMapService.mapColor(value, results.classifications.length);
-                                            return rgb;
-                                        }
+                                        value = society.languages[i].family.id;
+                                        rgb = colorMapService.mapColor(value, results.classifications.length);
+                                        return rgb;
+                                        
                                     });
                                 
                             }
                         
-                        } else if (scope.query.geographic_regions) {
+                        } else if (scope.query.p) {
                             for (var i = 0; i < society.geographic_regions.length; i++) {
                                 selected.append("svg:circle")
                                     .attr("r", 1.5)
@@ -124,8 +119,7 @@ angular.module('languagePhylogenyDirective', [])
                     
                     }
                     
-                    //if the marker is an environmental variable
-                    
+                    //if the marker is an environmental variable      
                     if (society.environmental_values.length > 0) {
                         for (var i = 0; i < society.environmental_values.length; i++) {
                             if (society.environmental_values[i].variable == variable.id) {
@@ -220,8 +214,7 @@ angular.module('languagePhylogenyDirective', [])
                         .attr("id", "tree-logo");
                     document.getElementById("tree-logo").innerHTML = svg_data[1].innerHTML;
                 });
-            
-            }
+            };
                         
             var constructTree = function(langTree) {   
                 d3.select("language-phylogeny").html('');
@@ -238,7 +231,7 @@ angular.module('languagePhylogenyDirective', [])
                     var tree = d3.layout.cluster()
                         .children(function(node) { return node.branchset; });
                     var nodes = tree(newick);
-                    var h = nodes.length * 9;
+                    var h = nodes.length * 8;
                     tree = d3.layout.cluster()
                         .size([h, w])
                         .sort(function comparator(a, b) { return d3.ascending(a.length, b.length); })
@@ -268,7 +261,7 @@ angular.module('languagePhylogenyDirective', [])
                         .attr("transform", "translate(2,5)");
                     keysWritten = 1;
                     translate = 0;
-                    if (scope.query.variable_codes) {
+                    if (scope.query.c) {
                         for (var r = 0; r < scope.results.variable_descriptions.length; r++) {
                             vis.append("svg:text")
                                 .attr("dx", w+translate-9)
@@ -285,7 +278,7 @@ angular.module('languagePhylogenyDirective', [])
                        
                     }
                     
-                    if (scope.query.environmental_filters) {
+                    if (scope.query.e) {
                         keysWritten = 1;
                         for (var r = 0; r < scope.results.environmental_variables.length; r++) {
                             vis.append("svg:text")
@@ -326,8 +319,23 @@ angular.module('languagePhylogenyDirective', [])
                 } else {
                     var diagonal = rightAngleDiagonal();    
                 }
+                
+                taxa = {}
+                include = scope.results.societies.map(function(s) { return s.society.ext_id; });
+                for (var i = 0; i < langTree.taxa.length; i++) {
+                   for (var t = 0; t < langTree.taxa[i].societies.length; t++) {
+                        if (include.indexOf(langTree.taxa[i].societies[t].society.ext_id) != -1) {
+                            if (langTree.taxa[i].label in taxa)
+                                continue; 
+                            taxa[langTree.taxa[i].label] = langTree.taxa[i].societies[t];
+                        }
+                    }
+                }
                 nodes.forEach(function(node) {
                     node.rootDist = (node.parent ? node.parent.rootDist : 0) + (node.length || 0);
+                    if (node.name in taxa) {
+                        node.name = taxa[node.name].society.name;
+                    }
                 });
                 var rootDists = nodes.map(function(n) { return (n.rootDist); });
                 var yscale = d3.scale.linear()
@@ -400,11 +408,10 @@ angular.module('languagePhylogenyDirective', [])
                 translate = 0;
                 //changes markers for global tree
                 if (langTree.name.indexOf("global") != -1) {
-                    if ((scope.query.language_classifications || scope.query.geographic_regions) && !scope.query.environmental_filters && !scope.query.variable_codes) {
+                    if ((scope.query.l || scope.query.p) && !scope.query.e && !scope.query.c) {
                             addMarkers(langTree, scope.results, null, node, true, translate);
                     }
-                
-                
+
                     scope.$watch('results.chosenTVariable', function(oldValue, newvalue) {
                     if (scope.results.chosenTVariable) {
                             chosen_var_id = scope.results.variable_descriptions.filter(function(variable) { return variable.variable.id == scope.results.chosenTVariable.id });
@@ -412,7 +419,7 @@ angular.module('languagePhylogenyDirective', [])
                                 addMarkers(langTree, scope.results, chosen_var_id[0], node, true, translate);
                             else {
                                 d3.select(".envVar").attr("fill", function() {
-                                    if (scope.results.chosenTVariable.name == "Annual Mean Precipitation") {console.log("blue"); return "url(#blue)";}
+                                    if (scope.results.chosenTVariable.name == "Monthly Mean Precipitation") {console.log("blue"); return "url(#blue)";}
                                     else if (scope.results.chosenTVariable.name == "Net Primary Production" || scope.results.chosenTVariable.name == "Mean Growing Season NPP") return "url(#earthy)";
                                     else return "url(#temp)";
                                 });
@@ -423,13 +430,13 @@ angular.module('languagePhylogenyDirective', [])
                 } 
                 else {
                 //markers for non-global trees
-                    if (scope.query.variable_codes) {
+                    if (scope.query.c) {
                         for (var r = 0; r < scope.results.variable_descriptions.length; r++) { 
                             addMarkers(langTree, scope.results, scope.results.variable_descriptions[r], node, false, translate);
                             translate += 20;
                         }
                     }
-                    if (scope.query.environmental_filters) {
+                    if (scope.query.e) {
                         for (var r = 0; r < scope.results.environmental_variables.length; r++) {
                             if (!d3.select("#e"+scope.results.environmental_variables[r].id).select("svg")[0][0]) {
                                 legend = d3.select("#e"+scope.results.environmental_variables[r].id).append("svg:svg")
@@ -443,7 +450,7 @@ angular.module('languagePhylogenyDirective', [])
                                     .attr("fill", function() {
                                     if (scope.results.environmental_variables[r].name == "Net Primary Production" || scope.results.environmental_variables[r].name == "Mean Growing Season NPP") 
                                        return "url(#earthy)";
-                                   else if (scope.results.environmental_variables[r].name == "Annual Mean Precipitation") 
+                                   else if (scope.results.environmental_variables[r].name == "Monthly Mean Precipitation") 
                                         return "url(#blue)";
                                     else return "url(#temp)";
                                     });
@@ -461,16 +468,14 @@ angular.module('languagePhylogenyDirective', [])
                         }
                     }
                     
-                    if (scope.query.language_classifications && !scope.query.environmental_filters && !scope.query.variable_codes) {
+                    if (scope.query.l && !scope.query.e && !scope.query.c) {
                         addMarkers(langTree, scope.results, null, node, false, translate);
                     }
                 }
+                                
                 scope.results.societies.forEach(function(society) {
-                    if (society.society.language) to_match = langTree.name.indexOf("glotto") == -1 ? society.society.language.iso_code : society.society.language.glotto_code;
-                    else to_match = society.society.name;
-                    
                     var selected = node.filter(function(d) {
-                        return d.name == to_match;
+                        return d.name == society.society.name;
                     });
                     //lastly, append the text
                          var text = selected.select("text");
@@ -480,10 +485,10 @@ angular.module('languagePhylogenyDirective', [])
                             selected.append("svg:text") 
                                 .attr("dx", function(n) {
                                     if (langTree.name.indexOf("global") != -1) return 5;
-                                    if (scope.query.environmental_filters && scope.query.variable_codes) return translate+20;
-                                    else if (scope.query.variable_codes) return translate-5;
-                                    else if (scope.query.environmental_filters) return translate+10;
-                                    else if (scope.query.language_classifications) return translate+10;
+                                    if (scope.query.e && scope.query.c) return translate+20;
+                                    else if (scope.query.c) return translate-5;
+                                    else if (scope.query.e) return translate+10;
+                                    else if (scope.query.l) return translate+10;
                                     else return translate+5;
                                 })                           
                             .attr("dy", function() { if (langTree.name.indexOf("global") == -1) return 4; else return 1; })
@@ -503,7 +508,7 @@ angular.module('languagePhylogenyDirective', [])
                 //Time Scale
                 if (langTree.name.indexOf("glotto") == -1 && langTree.name.indexOf("global") == -1) {
                     line_svg= d3.select('language-phylogeny').append("svg:svg")
-                        .attr("style", "margin-left:100px;");
+                        .attr("style", "margin-left:100px; margin-top:-100px;");
                     line_svg.append("svg:line")
                         .attr("x1", "0")
                         .attr("y1", "0")
@@ -724,14 +729,13 @@ angular.module('dplaceMapDirective', [])
                         if (societyIds[i] in colorMap) continue;
                         else scope.map.removeMarkers([societyIds[i]]);
                     }
-                    
                 };
 
                 scope.mapLegend = function() {
                     if (!scope.chosen) return;
                     if (scope.chosen.name == "Net Primary Production" || scope.chosen.name == "Mean Growing Season NPP") {
                         d3.selectAll(".envVar").attr("fill", "url(#earthy)");
-                    } else if (scope.chosen.name == "Annual Mean Precipitation") {
+                    } else if (scope.chosen.name == "Monthly Mean Precipitation") {
                         d3.selectAll(".envVar").attr("fill", "url(#blue)");
                     }
                     else {
