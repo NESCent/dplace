@@ -80,7 +80,7 @@ angular.module('languagePhylogenyDirective', [])
             var addMarkers = function(langTree, results, variable, node, global, translate) { 
                 scope.results.societies.forEach(function(society) {
                     var selected = node.filter(function(d) {
-                        return (d.name == society.society.name);// && (!d.children);
+                        return (d.name == society.society.name);
                     });
                     if (global) selected.select("circle").remove(); 
                     var society_name = society.society.name;
@@ -321,14 +321,20 @@ angular.module('languagePhylogenyDirective', [])
                 }
                 
                 taxa = {}
+                include = scope.results.societies.map(function(s) { return s.society.ext_id; });
                 for (var i = 0; i < langTree.taxa.length; i++) {
-                    taxa[langTree.taxa[i].label] = langTree.taxa[i].societies[0];
+                   for (var t = 0; t < langTree.taxa[i].societies.length; t++) {
+                        if (include.indexOf(langTree.taxa[i].societies[t].society.ext_id) != -1) {
+                            if (langTree.taxa[i].label in taxa)
+                                continue; 
+                            taxa[langTree.taxa[i].label] = langTree.taxa[i].societies[t];
+                        }
+                    }
                 }
                 nodes.forEach(function(node) {
                     node.rootDist = (node.parent ? node.parent.rootDist : 0) + (node.length || 0);
                     if (node.name in taxa) {
-                        if (taxa[node.name])
-                            node.name = taxa[node.name].society.name;
+                        node.name = taxa[node.name].society.name;
                     }
                 });
                 var rootDists = nodes.map(function(n) { return (n.rootDist); });

@@ -80,36 +80,42 @@
                 </div>
             </div>
             <div ng-show="globalTree && results.classifications && !results.chosenTVariable">
-                <svg height="100" class="tree-legend-langs legends">
-                    <g ng-repeat="classification in results.classifications" transform="{{$index|transformG}}">
-                        <circle
-                                cx="10"
-                                cy="10"
-                                r="4.5"
-                                fill="{{classification.id|colorNode:results}}"
-                                stroke="#000"
-                                stroke-width="0.5"
-                                />
-                        
-                        <text x="20" y="15">{{classification.name}}</text>
-                    </g>
-                </svg>
+                <table>
+                    <tr ng-repeat="code in results.classifications">
+                        <td>
+                            <svg height="20" width="20">
+                                <circle
+                                        cx="10"
+                                        cy="10"
+                                        r="4.5"
+                                        fill="{{code.id|colorNode:results}}"
+                                        stroke="#000"
+                                        stroke-width="0.5"
+                                        />
+                                </svg>
+                        </td>
+                        <td>{{code.name}}</td>
+                    </tr>
+                </table>
             </div>
             <div ng-show="globalTree && results.geographic_regions && !results.chosenTVariable">
-                <svg height="100" class="tree-legend-langs legends">
-                    <g ng-repeat="region in results.geographic_regions" transform="{{$index|transformG}}">
-                        <circle
-                                cx="10"
-                                cy="10"
-                                r="4.5"
-                                fill="{{region.tdwg_code|colorNode:results}}"
-                                stroke="#000"
-                                stroke-width="0.5"
-                                />
-                        
-                        <text x="20" y="15">{{region.region_nam}}</text>
-                    </g>
-                </svg>
+                <table>
+                    <tr ng-repeat="region in results.geographic_regions">
+                        <td>
+                            <svg height="20" width="20">
+                                <circle
+                                        cx="10"
+                                        cy="10"
+                                        r="4.5"
+                                        fill="{{region.tdwg_code|colorNode:results}}"
+                                        stroke="#000"
+                                        stroke-width="0.5"
+                                        />
+                                </svg>
+                        </td>
+                        <td>{{region.region_nam}}</td>
+                    </tr>
+                </table>
             </div>
     </div>
 
