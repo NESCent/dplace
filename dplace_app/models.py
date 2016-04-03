@@ -150,6 +150,7 @@ class EnvironmentalValue(models.Model):
     value = models.FloatField(db_index=True)
     environmental = models.ForeignKey('Environmental', related_name="values")
     source = models.ForeignKey('Source', null=True)
+    comment = models.TextField(default="")
 
     def society(self):
         return self.environmental.society
