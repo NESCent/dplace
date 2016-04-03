@@ -47,7 +47,9 @@ class Society(models.Model):
     focal_year = models.CharField('Focal Year', null=True, blank=True, max_length=100)
     alternate_names = models.TextField(default="")
     original_name = models.CharField('ORIG_name', max_length=200, default=None, null=True)
-
+    original_latitude = models.FloatField('ORIG_latitude', null=True)
+    original_longitude = models.FloatField('ORIG_longitude', null=True)
+    
     region = models.ForeignKey('GeographicRegion', null=True, related_name='societies')
     source = models.ForeignKey('Source', null=True)
     language = models.ForeignKey('Language', null=True, related_name="societies")
@@ -58,6 +60,10 @@ class Society(models.Model):
     @property
     def location(self):
         return dict(coordinates=[self.longitude, self.latitude])
+        
+    @property
+    def original_location(self):
+        return dict(coordinates=[self.original_latitude, self.original_longitude])
 
     def get_environmental_data(self):
         """Returns environmental data for the given society"""
@@ -144,6 +150,7 @@ class EnvironmentalValue(models.Model):
     value = models.FloatField(db_index=True)
     environmental = models.ForeignKey('Environmental', related_name="values")
     source = models.ForeignKey('Source', null=True)
+    comment = models.TextField(default="")
 
     def society(self):
         return self.environmental.society
