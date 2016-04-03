@@ -8,7 +8,7 @@ from django.shortcuts import get_object_or_404
 from django.http import Http404
 from ete2 import Tree
 from ete2.coretype.tree import TreeError
-from rest_framework import viewsets
+from rest_framework import viewsets, filters
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.decorators import api_view, permission_classes, renderer_classes
 from rest_framework.permissions import AllowAny
@@ -63,6 +63,24 @@ class SocietyViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = models.Society.objects.all().select_related(
         'source', 'language__iso_code', 'language__family')
     lookup_field = 'ext_id'
+    
+    def search(self, request, name):
+        societies = []
+        if name:
+            soc = self.queryset.filter(
+                Q(name__icontains=name)
+            )
+            societies = [s for s in soc if s.culturalvalue_set.count()]
+            
+        else:
+            societies = None
+        return Response(
+            {
+                'results': societies,
+                'query': name
+            },
+            template_name='search.html'
+        )
 
     def detail(self, request, society_id):
         society = get_object_or_404(models.Society, ext_id=society_id)

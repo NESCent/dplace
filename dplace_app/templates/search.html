@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% load static from staticfiles %}
+{% block extra_head %}
+    <script type="text/javascript" src="{% static "bower_components/jvectormap/jquery.jvectormap.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "js/lib/tdwg-level2-map.js" %}"></script>
+    <link href="{% static "bower_components/jvectormap/jquery-jvectormap.css" %}" media="screen" rel="stylesheet" />
+{% endblock %}
+{% load bootstrap3 %}
+{% block content %}
+
+<div class="container" style="margin-top:-150px;">
+<h1>Search Results: {{ query }}</h1>
+
+<table class="table">
+<tr>
+    <th>Dataset</th>
+    <th>Name (Society ID)</th>
+</tr>
+
+{% for society in results %}
+<tr>
+    <td> {{ society.source.name }}</td>
+    <td> <a href="/society/{{ society.ext_id}}" target="_blank">{{society.name }} ({{society.ext_id}})</a></td>
+</tr>
+{% endfor %}
+</table>
+</div>
+{% endblock %}
