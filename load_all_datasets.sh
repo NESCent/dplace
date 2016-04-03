@@ -41,7 +41,7 @@ python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/geo/level2.json" geo
 # Linking Societies to Locations
 python "${DPLACE_PATH}/dplace_app/load.py" \
   "${REPO_DEST}/csv/society_locations.csv" \
-  "${REPO_DEST}/csv/LatLong_data.csv" \ 
+  "${REPO_DEST}/csv/LatLong_data.csv" \
   soc_lat_long
 
 # Loading Variables
