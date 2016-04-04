@@ -186,6 +186,10 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties) 
         $scope.searchModel.results.searched = true;
         $scope.switchToResults();
     };
+    
+    var searchBySocietyCallBack = function() {
+        $scope.switchToSocResults($scope.model.societyQuery);
+    };
 
         // This method merges the current searchQuery object with the incoming searchQuery
     $scope.updateSearchQuery = function(searchQuery) {
@@ -193,13 +197,17 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties) 
         for(var propertyName in searchQuery) {
             $scope.searchModel.query[propertyName] = searchQuery[propertyName];
         }
-        console.log($scope.searchModel.query);
     };
     
     $scope.searchSocieties = function() {
         $scope.disableSearchButton();
         var query = $scope.searchModel.query;
         $scope.searchModel.results = FindSocieties.find(query, searchCompletedCallback, errorCallBack);
+    };
+    
+    $scope.searchBySociety = function() {
+        var query = {'name': $scope.model.societyQuery}
+        $scope.searchModel.results = FindSocieties.find(query, searchBySocietyCallBack);
     };
 
     $scope.search = function() {

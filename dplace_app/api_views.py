@@ -363,6 +363,15 @@ def find_societies(request):
     """
     query = {}
     for k, v in request.query_params.lists():
+        if str(k) == 'name':
+            if len(v) > 0:
+                soc = models.Society.objects.filter(
+                    Q(name__icontains=v[0])
+                )
+                societies = [s for s in soc if s.culturalvalue_set.count()]
+                return Response({'societies': serializers.SocietySerializer(societies, many=True).data})
+            else:
+                return Response({'societies': []})
         query[k] = [json.loads(vv) for vv in v]
     result_set = result_set_from_query_dict(query)
     d = serializers.SocietyResultSetSerializer(result_set).data

@@ -21,7 +21,7 @@
                         <br><span class="badge" ng-show="button.badgeValue()">{{ button.badgeValue() }}</span></button>
             </div>
             <label style="padding-top:20px;">Or search by society name: <input type="text" name="input" ng-model="model.societyQuery">
-                <a ng-disabled="!model.societyQuery" href="/societies/search={{model.societyQuery}}" class="btn btn-primary">Search</a>
+                <a ng-disabled="!model.societyQuery" ng-click="searchBySociety()" class="btn btn-primary">Search</a>
             </label> 
         </div>
     </div>
