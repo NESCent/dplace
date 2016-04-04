@@ -87,6 +87,15 @@ function CulturalCtrl($scope, searchModelService, Variable, CodeDescription, Con
             });
         }
     };
+    
+    $scope.traitCodeSelectionChanged = function(trait, code) {
+        if (code.isSelected) {
+            if (trait.selected.map(function(c) { return c.id; }).indexOf(code.id) == -1) trait.selected.push(code);
+        } else {
+            removeCode(trait, code);
+        }
+        
+    };
 
     // used before searching to extract the codes from the search selection
     // Expects an array of CulturalTraitModel objects
@@ -155,6 +164,7 @@ function CulturalCtrl($scope, searchModelService, Variable, CodeDescription, Con
             $scope.errors = "Error, search is limited to 4 variables";
             return;
         }
+        console.log($scope.traits);
         $scope.search();
     };
 }
