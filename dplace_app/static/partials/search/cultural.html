@@ -76,7 +76,7 @@
 				<input type="checkbox" class="pull-left" ng-model="trait.codes.isSelected" ng-change="selectAllChanged(trait)" />
               </span>
 				<div ng-repeat="code in trait.codes">
-                    <input type="checkbox" class="pull-left" ng-model="code.isSelected" ng-change="traitCodeSelectionChanged(trait)"/>
+                    <input type="checkbox" class="pull-left" ng-model="code.isSelected" ng-change="traitCodeSelectionChanged(trait, code)"/>
                     <span class="variable-label pull-left">{{ code.code }}:</span>
                     <span class="variable-description">{{ code.description }}</span>
                 </div>
