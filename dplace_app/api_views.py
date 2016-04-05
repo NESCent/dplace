@@ -189,12 +189,14 @@ class LanguageTreeViewSet(viewsets.ReadOnlyModelViewSet):
     filter_fields = ('name',)
     queryset = models.LanguageTree.objects.all()
     pagination_class = TreeResultsSetPagination
-    
+
+
 class LanguageTreeLabelsViewSet(viewsets.ReadOnlyModelViewSet):
-    serializer_class=serializers.LanguageTreeLabelsSerializer
+    serializer_class = serializers.LanguageTreeLabelsSerializer
     filter_fields = ('label',)
     queryset = models.LanguageTreeLabels.objects.all()
     pagination_class = LargeResultsSetPagination
+
 
 class SourceViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = serializers.SourceSerializer
@@ -210,7 +212,13 @@ def trees_from_languages_array(language_ids):
     Returns trees that contain the societies from the SocietyResultSet
     """
     trees = models.LanguageTree.objects\
-        .filter(taxa__societies__ext_id__in=language_ids).distinct()#\
+        .filter(taxa__societies__ext_id__in=language_ids)\
+        .prefetch_related(
+            'taxa__languagetreelabelssequence_set__labels',
+            'taxa__languagetreelabelssequence_set__society__source',
+            'taxa__languagetreelabelssequence_set__society__language__family',
+            'taxa__languagetreelabelssequence_set__society__language__iso_code',
+        ).distinct()
         #.prefetch_related('languages__family', 'languages__iso_code')\
         #.distinct()
     for t in trees:
@@ -218,6 +226,7 @@ def trees_from_languages_array(language_ids):
         #determine which to keep and which to prune
         
         labels = models.LanguageTreeLabels.objects.filter(languageTree=t).filter(societies__ext_id__in=language_ids).distinct()
+
         langs_in_tree = [str(l.label) for l in labels]
         newick = Tree(t.newick_string, format=1)
         try:
@@ -346,7 +355,6 @@ def result_set_from_query_dict(query_dict):
     trees = trees_from_languages_array(ext_ids)
     for t in trees:
         result_set.add_language_tree(t)
-
     return result_set
 
 

@@ -113,13 +113,9 @@ class LanguageFamilySerializer(serializers.ModelSerializer):
 
 
 class LanguageSerializer(serializers.ModelSerializer):
-    # glotto_code = serializers.CharField(source='glotto_code')
     iso_code = serializers.CharField(source='iso_code.iso_code')
     family = LanguageFamilySerializer()
-    count = serializers.SerializerMethodField()
-    
-    def get_count(self, language):
-        return models.Society.objects.all().filter(language=language).count()
+    count = serializers.ReadOnlyField(source='societies_count')
 
     class Meta(object):
         model = models.Language

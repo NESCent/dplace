@@ -58,6 +58,10 @@ class Society(models.Model):
     chirila_link = models.CharField('CHIRILA', default = None, null=True, max_length=200)
 
     @property
+    def societies_count(self):
+        return len(self.societies)
+
+    @property
     def location(self):
         return dict(coordinates=[self.longitude, self.latitude])
         
