@@ -144,6 +144,7 @@ class SocietySerializer(serializers.ModelSerializer):
             'ext_id',
             'xd_id',
             'name',
+            'original_name',
             'location',
             'original_location',
             'language',
