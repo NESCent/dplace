@@ -63,7 +63,7 @@ class Society(models.Model):
         
     @property
     def original_location(self):
-        return dict(coordinates=[self.original_latitude, self.original_longitude])
+        return dict(coordinates=[self.original_longitude, self.original_latitude])
 
     def get_environmental_data(self):
         """Returns environmental data for the given society"""

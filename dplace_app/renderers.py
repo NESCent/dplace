@@ -20,13 +20,21 @@ class DPLACECSVResults(object):
         self.data = data
         self.field_map = dict()
         self.field_names = [
-            'Society name',
-            'Society source',
-            'Longitude',
-            'Latitude',
+            'Source',
+            'Preferred society name',
+            'Society id',
+            'Cross-dataset id',
+            'Original society name',
+            'Revised latitude',
+            'Revised longitude',
+            'Original latitude',
+            'Original longitude',
+            'Glottolog language/dialect id',
+            'Glottolog language/dialect name',
             'ISO code',
-            'Language name',
-            'Language family']
+            'Language family',
+            'Main focal year'
+            ]
         self.rows = []
         self.parse()
         self.encode_field_names()
@@ -81,22 +89,32 @@ class DPLACECSVResults(object):
             row = dict()
             # Merge in society data
             society = item['society']
-            row['Society name'] = society['name']
-            row['Society source'] = society['source']['name']
-            row['Longitude'] = "" if society['location'] is None \
+            row['Source'] = society['source']['name']
+            row['Preferred society name'] = society['name']
+            row['Society id'] = society['ext_id']
+            row['Cross-dataset id'] = society['xd_id']
+            row['Original society name'] = society['original_name']
+            row['Revised longitude'] = "" if society['location'] is None \
                 else society['location']['coordinates'][0]
-            row['Latitude'] = "" if society['location'] is None \
+            row['Revised latitude'] = "" if society['location'] is None \
                 else society['location']['coordinates'][1]
-
+            row['Original longitude'] = "" if society['original_location'] is None \
+                else society['original_location']['coordinates'][0]
+            row['Original latitude'] = "" if society['original_location'] is None \
+                else society['original_location']['coordinates'][1]
             if society['language'] is not None and 'name' in society['language']:
                 row['ISO code'] = society['language']['iso_code']
-                row['Language name'] = society['language']['name']
+                row['Glottolog language/dialect name'] = society['language']['name']
+                row['Glottolog language/dialect id'] = society['language']['glotto_code']
                 if 'family' in society['language'] \
-                        and 'name' in society['language']['family']:
-                    row['Language family'] = society['language']['family']['name']
+                    and 'name' in society['language']['family']:
+                        row['Language family'] = society['language']['family']['name']
             else:
-                row['Language name'] = ""
+                row['Glottolog language/dialect name'] = ""
+                row['Glottolog language/dialect id'] = ""
                 row['Language family'] = ""
+            
+            row['Main focal year'] = society['focal_year']
 
             # geographic - only one
             geographic_regions = item['geographic_regions']
@@ -122,8 +140,8 @@ class DPLACECSVResults(object):
                     else:
                         description = ""
                     extra_rows.append(dict({
-                        'Society name': society['name'],
-                        'Society source': society['source']['name'],
+                        'Preferred society name': society['name'],
+                        'Source': society['source']['name'],
                         field_names['code']: cultural_trait_value['coded_value'],
                         field_names['description']: description,
                         field_names['focal_year']: cultural_trait_value['focal_year'],
