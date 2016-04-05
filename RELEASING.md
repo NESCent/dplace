@@ -14,6 +14,7 @@ flake8 --exclude=migrations,static --ignore=E711,E712,D100,D101,D103,D102,D301,E
 ```
 coverage run --source='dplace_app' manage.py test
 coverage report -m
+npm test
 ```
 
 - Destroy database, upgrade and reload data:
