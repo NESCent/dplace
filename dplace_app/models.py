@@ -113,7 +113,7 @@ class Society(models.Model):
         return sorted(refs, key=lambda r: r.author)
 
     def __unicode__(self):
-        return "%s - %s (%s)" % (self.ext_id, self.name, self.source)
+        return "%s - %s" % (self.ext_id, self.name)
     
     def get_absolute_url(self):
         return reverse("view_society", args=[self.ext_id])
