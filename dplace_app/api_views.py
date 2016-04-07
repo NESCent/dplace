@@ -35,7 +35,7 @@ class CulturalVariableViewSet(viewsets.ReadOnlyModelViewSet):
 
 class CulturalCategoryViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = serializers.CulturalCategorySerializer
-    filter_fields = ('name', 'index_variables', 'niche_variables',)
+    filter_fields = ('name', 'index_variables', 'niche_variables')
     queryset = models.CulturalCategory.objects.all()
     # Override retrieve to use the detail serializer, which includes variables
 
@@ -150,7 +150,7 @@ class EnvironmentalValueViewSet(viewsets.ReadOnlyModelViewSet):
 
 class EnvironmentalViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = serializers.EnvironmentalSerializer
-    filter_fields = ('society', 'iso_code',)
+    filter_fields = ('society', 'iso_code')
     queryset = models.Environmental.objects.all()
 
 
