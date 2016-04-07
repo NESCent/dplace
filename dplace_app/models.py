@@ -50,7 +50,7 @@ class Society(models.Model):
     original_latitude = models.FloatField('ORIG_latitude', null=True)
     original_longitude = models.FloatField('ORIG_longitude', null=True)
     
-    region = models.ForeignKey('GeographicRegion', null=True, related_name='societies')
+    region = models.ForeignKey('GeographicRegion', null=True)
     source = models.ForeignKey('Source', null=True)
     language = models.ForeignKey('Language', null=True, related_name="societies")
     
@@ -150,9 +150,9 @@ class EnvironmentalVariable(models.Model):
 
 
 class EnvironmentalValue(models.Model):
-    variable = models.ForeignKey('EnvironmentalVariable', related_name="values")
+    variable = models.ForeignKey('EnvironmentalVariable')
     value = models.FloatField(db_index=True)
-    environmental = models.ForeignKey('Environmental', related_name="values")
+    environmental = models.ForeignKey('Environmental')
     source = models.ForeignKey('Source', null=True)
     comment = models.TextField(default="")
 
@@ -169,8 +169,8 @@ class EnvironmentalValue(models.Model):
 
 
 class Environmental(models.Model):
-    society = models.ForeignKey('Society', null=True, related_name="environmentals")
-    iso_code = models.ForeignKey('ISOCode', null=True, related_name="environmentals")
+    society = models.ForeignKey('Society', null=True)
+    iso_code = models.ForeignKey('ISOCode', null=True)
     source = models.ForeignKey('Source', null=True)
 
     def __unicode__(self):
@@ -235,8 +235,7 @@ class CulturalCodeDescription(models.Model):
     This model is not used by every value in the EA.
 
     """
-    variable = models.ForeignKey(
-        'CulturalVariable', related_name="codes", db_index=True)
+    variable = models.ForeignKey('CulturalVariable', db_index=True, related_name="codes")
     code = models.CharField(
         max_length=20, db_index=True, null=False, default='.')
     code_number = models.IntegerField(null=True, db_index=True)
@@ -287,7 +286,7 @@ class CulturalValue(models.Model):
     code = models.ForeignKey('CulturalCodeDescription', db_index=True, null=True)
     source = models.ForeignKey('Source', null=True)
     comment = models.TextField(default="")
-    references = models.ManyToManyField('Source', related_name='references')
+    references = models.ManyToManyField('Source')
     subcase = models.TextField(default="")
     focal_year = models.CharField(max_length=10, default="")
 
