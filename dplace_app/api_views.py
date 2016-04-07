@@ -24,7 +24,7 @@ from dplace_app import models
 class CulturalVariableViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = serializers.CulturalVariableSerializer
     filter_fields = ('label', 'name', 'index_categories', 'niche_categories', 'source')
-    queryset = models.CulturalVariable.objects.all()
+    queryset = models.CulturalVariable.objects.all().prefetch_related('index_categories', 'niche_categories')
 
     # Override retrieve to use the detail serializer, which includes categories
     def retrieve(self, request, *args, **kwargs):
@@ -35,7 +35,7 @@ class CulturalVariableViewSet(viewsets.ReadOnlyModelViewSet):
 
 class CulturalCategoryViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = serializers.CulturalCategorySerializer
-    filter_fields = ('name', 'index_variables', 'niche_variables',)
+    filter_fields = ('name', 'index_variables', 'niche_variables')
     queryset = models.CulturalCategory.objects.all()
     # Override retrieve to use the detail serializer, which includes variables
 
@@ -55,7 +55,7 @@ class CulturalValueViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = serializers.CulturalValueSerializer
     filter_fields = ('variable', 'coded_value', 'code', 'society',)
     # Avoid additional database trips by select_related for foreign keys
-    queryset = models.CulturalValue.objects.select_related('variable', 'code').all()
+    queryset = models.CulturalValue.objects.select_related('variable', 'code', 'source').all()
 
 
 class SocietyViewSet(viewsets.ReadOnlyModelViewSet):
@@ -150,7 +150,7 @@ class EnvironmentalValueViewSet(viewsets.ReadOnlyModelViewSet):
 
 class EnvironmentalViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = serializers.EnvironmentalSerializer
-    filter_fields = ('society', 'iso_code',)
+    filter_fields = ('society', 'iso_code')
     queryset = models.Environmental.objects.all()
 
 
@@ -163,7 +163,7 @@ class LargeResultsSetPagination(PageNumberPagination):
 class LanguageViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = serializers.LanguageSerializer
     filter_fields = ('name', 'iso_code', 'societies', 'family',)
-    queryset = models.Language.objects.all()
+    queryset = models.Language.objects.all().select_related('family', 'iso_code')
     pagination_class = LargeResultsSetPagination
 
 
