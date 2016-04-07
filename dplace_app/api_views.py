@@ -55,7 +55,7 @@ class CulturalValueViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = serializers.CulturalValueSerializer
     filter_fields = ('variable', 'coded_value', 'code', 'society',)
     # Avoid additional database trips by select_related for foreign keys
-    queryset = models.CulturalValue.objects.select_related('variable', 'code').all()
+    queryset = models.CulturalValue.objects.select_related('variable', 'code', 'source').all()
 
 
 class SocietyViewSet(viewsets.ReadOnlyModelViewSet):
@@ -163,7 +163,7 @@ class LargeResultsSetPagination(PageNumberPagination):
 class LanguageViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = serializers.LanguageSerializer
     filter_fields = ('name', 'iso_code', 'societies', 'family',)
-    queryset = models.Language.objects.all().select_related('family', 'iso_code')#.prefetch_related('source')
+    queryset = models.Language.objects.all().select_related('family', 'iso_code')
     pagination_class = LargeResultsSetPagination
 
 
