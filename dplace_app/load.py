@@ -44,7 +44,7 @@ def run(mode, *fnames):  # pragma: no cover
     if mode == 'xd_lang':
         return xd_to_language(csv_dict_reader(fnames[0]), csv_dict_reader(fnames[1]))
     if mode == 'soc_lat_long':
-        return society_locations(csv_dict_reader(fnames[0]), csv_dict_reader(fnames[1]))
+        return society_locations(csv_dict_reader(fnames[0]))
     if mode in ITEM_LOADER:
         return ITEM_LOADER[mode](chain(*map(csv_dict_reader, fnames)))
     raise ValueError(mode)
