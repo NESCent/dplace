@@ -286,7 +286,7 @@ class CulturalValue(models.Model):
     code = models.ForeignKey('CulturalCodeDescription', db_index=True, null=True)
     source = models.ForeignKey('Source', null=True)
     comment = models.TextField(default="")
-    references = models.ManyToManyField('Source')
+    references = models.ManyToManyField('Source', related_name="sources")
     subcase = models.TextField(default="")
     focal_year = models.CharField(max_length=10, default="")
 
