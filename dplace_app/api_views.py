@@ -24,7 +24,7 @@ from dplace_app import models
 class CulturalVariableViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = serializers.CulturalVariableSerializer
     filter_fields = ('label', 'name', 'index_categories', 'niche_categories', 'source')
-    queryset = models.CulturalVariable.objects.all()
+    queryset = models.CulturalVariable.objects.all().prefetch_related('index_categories', 'niche_categories')
 
     # Override retrieve to use the detail serializer, which includes categories
     def retrieve(self, request, *args, **kwargs):
