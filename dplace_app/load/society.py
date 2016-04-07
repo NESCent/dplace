@@ -8,13 +8,14 @@ from util import delete_all
 from sources import get_source
 
 
-def society_locations(region, items):
+def society_locations(items):
     societies = {s.ext_id: s for s in Society.objects.all()}
     regions = {r.region_nam: r for r in GeographicRegion.objects.all()}
     
-    society_region = {r['soc_id']: r['region'] for r in region}
     count = 0
     for item in items:
+        if item['dataset'] not in ['EA', 'Binford']:
+            continue
         society = societies.get(item['soc_id'])
         if not society:
             logging.warn("No matching society found for %s" % item)
@@ -31,9 +32,8 @@ def society_locations(region, items):
                 float, [item['origLat'], item['origLong']])
         except (TypeError, ValueError):
             logging.warn("Unable to create original coordinates for %s" % item)
-            
-            
-        region = regions.get(society_region.get(item['soc_id']))
+
+        region = regions.get(item['region'])
         if not region:
             logging.warn("No matching region found for %s" % item)
         else:
@@ -41,6 +41,7 @@ def society_locations(region, items):
         society.save()
         count += 1
     return count
+
 
 def load_societies(items):
     delete_all(Society)
@@ -100,5 +101,3 @@ def load_societies(items):
 
     Society.objects.bulk_create(societies)
     return len(societies)
-
-    

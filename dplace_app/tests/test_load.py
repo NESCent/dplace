@@ -52,7 +52,7 @@ class LoadTestCase(TestCase):
     def test_load_society_locations(self):
         load_regions(data_path('test_geo.json'))
         load_societies(csv_dict_reader(data_path('societies.csv')))
-        society_locations(csv_dict_reader(data_path('society_locations.csv')), csv_dict_reader(data_path('LatLong_data.csv')))
+        society_locations(csv_dict_reader(data_path('society_locations.csv')))
 
     def test_load_trees(self):
         iso = ISOCode.objects.create(iso_code='abc')
