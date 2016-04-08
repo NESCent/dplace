@@ -21,7 +21,7 @@ if [ ! -d "$REPO_DEST" ]; then
 	git clone $REPO_SRC $REPO_DEST
 else
 	orig=`pwd`
-	cd $REPO_DEST && git pull && cd "$orig"
+	cd $REPO_DEST && git pull origin master && cd "$orig"
 fi
 
 ## import the data
