@@ -1,3 +1,4 @@
+# coding: utf8
 from __future__ import unicode_literals
 import json
 
@@ -144,7 +145,7 @@ class Test(APITestCase):
             models.Society, 1,
             ext_id='society1',
             xd_id='xd1',
-            name='Society1',
+            name='Söciety1',
             region=region1,
             source=source_ea,
             language=language1,
@@ -227,8 +228,12 @@ class Test(APITestCase):
             value=2.0, source=source_ea,
             environmental=environmental2)
 
-    def test_society_page(self):
+    def test_society_detail(self):
         self.client.get(reverse('view_society', args=('society1',)))
+
+    def test_society_search(self):
+        res = self.client.get(reverse('search_society', args=('Society1',)))
+        self.assertIn('Söciety1'.encode('utf8'), res.content)
 
     def test_api_culturalcategory(self):
         res = self.get_json(
@@ -374,7 +379,7 @@ class Test(APITestCase):
 
         response = self.get_results(
             urlname='csv_download', p=[self.get(models.GeographicRegion, 1).id])
-        self.assertIn('Region1', response.content)
+        self.assertIn('Region1'.encode('utf8'), response.content)
 
     #
     # find societies:
