@@ -68,7 +68,7 @@ class SocietyViewSet(viewsets.ReadOnlyModelViewSet):
         societies = []
         if name:
             soc = self.queryset.filter(
-                Q(name__unaccent__icontains=name)
+                Q((name__unaccent__icontains=name) | (alternate_names__unaccent__icontains=name))
             )
             societies = [s for s in soc if s.culturalvalue_set.count()]
             

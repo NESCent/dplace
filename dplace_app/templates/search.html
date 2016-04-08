@@ -10,12 +10,14 @@
 <tr>
     <th>Dataset</th>
     <th>Name (Society ID)</th>
+    <th>Alternate names</th>
 </tr>
 
 {% for society in results %}
 <tr>
     <td> {{ society.source.name }}</td>
     <td> <a href="/society/{{ society.ext_id}}" target="_blank">{{society.name }} ({{society.ext_id}})</a></td>
+    <td>{{ society.alternate_names }}</td>
 </tr>
 {% endfor %}
 </table>
