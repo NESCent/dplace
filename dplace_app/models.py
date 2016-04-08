@@ -150,9 +150,9 @@ class EnvironmentalVariable(models.Model):
 
 
 class EnvironmentalValue(models.Model):
-    variable = models.ForeignKey('EnvironmentalVariable')
+    variable = models.ForeignKey('EnvironmentalVariable', related_name="values")
     value = models.FloatField(db_index=True)
-    environmental = models.ForeignKey('Environmental')
+    environmental = models.ForeignKey('Environmental', related_name="values")
     source = models.ForeignKey('Source', null=True)
     comment = models.TextField(default="")
 
@@ -169,7 +169,7 @@ class EnvironmentalValue(models.Model):
 
 
 class Environmental(models.Model):
-    society = models.ForeignKey('Society', null=True)
+    society = models.ForeignKey('Society', null=True, related_name="environmentals")
     iso_code = models.ForeignKey('ISOCode', null=True)
     source = models.ForeignKey('Source', null=True)
 
