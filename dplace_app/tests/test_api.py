@@ -168,7 +168,7 @@ class Test(APITestCase):
             name='Society3',
             source=source_ea,
             language=language3)
-            
+
         sequenceLabel1 = self.set(
             models.LanguageTreeLabelsSequence, 1,
             society = society1, labels = label1,
@@ -226,6 +226,9 @@ class Test(APITestCase):
             variable=env_var,
             value=2.0, source=source_ea,
             environmental=environmental2)
+
+    def test_society_page(self):
+        self.client.get(reverse('view_society', args=('society1',)))
 
     def test_api_culturalcategory(self):
         res = self.get_json(
