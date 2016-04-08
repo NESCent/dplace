@@ -58,10 +58,6 @@ class Society(models.Model):
     chirila_link = models.CharField('CHIRILA', default = None, null=True, max_length=200)
 
     @property
-    def societies_count(self):
-        return len(self.societies)
-
-    @property
     def location(self):
         return dict(coordinates=[self.longitude, self.latitude])
         
@@ -350,6 +346,10 @@ class Language(models.Model):
     # needs to be null=True because some glottolog languages do not have isocodes
     iso_code = models.ForeignKey('ISOCode', null=True)
     family = models.ForeignKey('LanguageFamily', null=True)
+    
+    @property
+    def societies_count(self):
+        return Society.objects.all().filter(language=self).count()
 
     def __unicode__(self):
         return "Language: %s, ISO Code %s, Glotto Code %s" % (
