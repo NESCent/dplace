@@ -43,7 +43,7 @@
 					</span>
                 <div ng-repeat="language in scheme.languages">
                     <input class="pull-left" type="checkbox" ng-model="language.isSelected" ng-change="classificationSelectionChanged()">
-                    <span class="language-label">{{ language.name }} ({{language.count}} societies)</span>
+                    <span class="language-label">{{ language.name }} ({{language.societies.length}} societies)</span>
                 </div>
             </div>
         </div>

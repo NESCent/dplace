@@ -347,10 +347,6 @@ class Language(models.Model):
     # needs to be null=True because some glottolog languages do not have isocodes
     iso_code = models.ForeignKey('ISOCode', null=True)
     family = models.ForeignKey('LanguageFamily', null=True)
-    
-    @property
-    def societies_count(self):
-        return Society.objects.all().filter(language=self).count()
 
     def __unicode__(self):
         return "Language: %s, ISO Code %s, Glotto Code %s" % (
