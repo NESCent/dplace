@@ -42,6 +42,7 @@ def load_env_var(var_dict, categories):
             logging.info("Created EnvironmentalCategory: %s" % c)
     
     variable, created = EnvironmentalVariable.objects.get_or_create(
+        var_id=var_dict['VarID'],
         name=var_dict['Name'],
         units=var_dict['Units'],
         category=index_category,
@@ -53,7 +54,7 @@ def load_env_var(var_dict, categories):
 
 
 def load_environmental(items):
-    variables = {''.join(v.name.split(' ')): v for v in EnvironmentalVariable.objects.all()}
+    variables = {v.var_id: v for v in EnvironmentalVariable.objects.all()}
     societies = {(s.ext_id, s.source_id): s for s in Society.objects.all()}
     res = 0
     objs = []
