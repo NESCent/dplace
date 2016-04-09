@@ -53,7 +53,7 @@ def load_env_var(var_dict, categories):
 
 
 def load_environmental(items):
-    variables = EnvironmentalVariable.objects.all()
+    variables = {''.join(v.name.split(' ')): v for v in EnvironmentalVariable.objects.all()}
     societies = {(s.ext_id, s.source_id): s for s in Society.objects.all()}
     res = 0
     objs = []
@@ -66,9 +66,10 @@ def load_environmental(items):
     return res
 
 
-def _load_environmental(env_dict, variables, societies, objs):
-    ext_id = env_dict['soc_ID']
-    source = get_source(env_dict['Source'])
+def _load_environmental(val_row, variables, societies, objs):
+
+    ext_id = val_row['soc_id']
+    source = get_source(val_row['Dataset'])
 
     # hack for B109 vs. 109
     if source.author == 'Binford' and ext_id.find('B') == -1:
@@ -94,18 +95,20 @@ def _load_environmental(env_dict, variables, societies, objs):
             source=source,
             iso_code=iso_code
         )
-        
-        for v in variables:
-            key = ''.join(v.name.split(' '))
-            if env_dict[key] and env_dict[key] != 'NA':
-                value = float(env_dict[key])
-                objs.append(EnvironmentalValue(
-                    variable=v,
-                    value=value,
-                    environmental=environmental,
-                    source=source
-                ))
-
     else:
         environmental = found_environmentals[0]
-    return environmental
+        
+    variable = variables.get(val_row['variable'])
+    if variable is None:
+        logging.warn(
+            "Could not find environmental variable %s for society %s" % (val_row['variable'], society.name))
+        return
+        
+    objs.append(EnvironmentalValue(
+        variable=variable,
+        value=float(val_row['value']),
+        comment=val_row['comment'],
+        environmental=environmental,
+        source=source
+    ))
+    return True
