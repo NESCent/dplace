@@ -53,7 +53,7 @@ class Test(APITestCase):
         ]):
             self.set(
                 models.EnvironmentalVariable, i + 1,
-                name=name, category=cat, units=units, codebook_info=info)
+                var_id=name, name=name, category=cat, units=units, codebook_info=info)
 
         source_ea = self.set(
             models.Source, 'ea',
