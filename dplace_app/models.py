@@ -74,7 +74,8 @@ class Society(models.Model):
                 valueDict[str(value.variable.category)].append({
                     'name': value.variable.name,
                     'value': format(value.value, '.4f'),
-                    'units': value.variable.units
+                    'units': value.variable.units,
+                    'comment': value.comment
                 })
         return valueDict
 
