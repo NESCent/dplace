@@ -68,7 +68,7 @@ class SocietyViewSet(viewsets.ReadOnlyModelViewSet):
         societies = []
         if name:
             soc = self.queryset.filter(
-                Q(name__unaccent__icontains=name)
+                Q(name__unaccent__icontains=name) | Q(alternate_names__unaccent__icontains=name)
             )
             societies = [s for s in soc if s.culturalvalue_set.count()]
             
@@ -163,7 +163,12 @@ class LargeResultsSetPagination(PageNumberPagination):
 class LanguageViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = serializers.LanguageSerializer
     filter_fields = ('name', 'iso_code', 'societies', 'family',)
-    queryset = models.Language.objects.all().select_related('family', 'iso_code')
+    queryset = models.Language.objects.all()\
+        .select_related('family', 'iso_code')\
+        .prefetch_related(Prefetch(
+            'societies',
+            queryset=models.Society.objects.exclude(culturalvalue__isnull=True)
+        ))
     pagination_class = LargeResultsSetPagination
 
 

@@ -107,35 +107,43 @@
             </h5>
             
         {% endif %}
-    <h2>Environmental Data</h2>
-    {% for key, value in environmentals.items %}
-        <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
-            <div class="panel panel-default">
-                <div class="panel-heading" role="tab" id="h{{key|cut:" "}}">
-                    <h4 class="panel-title">
-                        <a data-toggle="collapse" data-parent="#accordion" href="#e{{key|cut:" "}}" aria-expanded="true" aria-controls="e{{key|cut:" "}}">
-                            {{key}}
-                        </a>
-                    </h4>
-                </div>
-                <div id="e{{key|cut:" "}}" class="panel-collapse collapse out" role="tabpanel" aria-labelledby="h{{key|cut:" "}}">
-                    <table class="panel-body table table-condensed table-striped table-bordered">
-                        <tr>
-                            <th>Variable</th>
-                            <th>Value</th>
-                        </tr>
-                        {% for v in value %}
-                        <tr>
-                            <td>{{v.name}}</td>
-                            <td>{{v.value}} {{v.units}}</td>
-                        </tr>
-                        {% endfor %}
-                    </table>
+    {% if environmentals.items %}
+        <h2>Environmental Data</h2>
+        {% for key, value in environmentals.items %}
+            <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+                <div class="panel panel-default">
+                    <div class="panel-heading" role="tab" id="h{{key|cut:" "}}">
+                        <h4 class="panel-title">
+                            <a data-toggle="collapse" data-parent="#accordion" href="#e{{key|cut:" "}}" aria-expanded="true" aria-controls="e{{key|cut:" "}}">
+                                {{key}}
+                            </a>
+                        </h4>
+                    </div>
+                    <div id="e{{key|cut:" "}}" class="panel-collapse collapse out" role="tabpanel" aria-labelledby="h{{key|cut:" "}}">
+                        <table class="panel-body table table-condensed table-striped table-bordered">
+                            <tr>
+                                <th>Variable</th>
+                                <th>Value</th>
+                            </tr>
+                            {% for v in value %}
+                            <tr>
+                                <td>{{v.name}}</td>
+                                <td>{{v.value}} {{v.units}}</td>
+                                {% if v.comment %}
+                            <td width="10px">
+                                <a class="comment-tooltip" data-toggle="tooltip" title="{{v.comment}}"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span></a>
+                                </td>
+                            {% else %}
+                                <td width="0px"></td>
+                            {% endif %}
+                            </tr>
+                            {% endfor %}
+                        </table>
+                    </div>
                 </div>
             </div>
-        </div>
-    {% endfor %}
-    
+        {% endfor %}
+    {% endif %}
     <h2>Cultural Trait Data</h2>
     {% for key, value in cultural_traits.items %}
         <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">

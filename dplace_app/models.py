@@ -58,10 +58,6 @@ class Society(models.Model):
     chirila_link = models.CharField('CHIRILA', default = None, null=True, max_length=200)
 
     @property
-    def societies_count(self):
-        return len(self.societies)
-
-    @property
     def location(self):
         return dict(coordinates=[self.longitude, self.latitude])
         
@@ -78,7 +74,8 @@ class Society(models.Model):
                 valueDict[str(value.variable.category)].append({
                     'name': value.variable.name,
                     'value': format(value.value, '.4f'),
-                    'units': value.variable.units
+                    'units': value.variable.units,
+                    'comment': value.comment
                 })
         return valueDict
 
@@ -135,6 +132,7 @@ class EnvironmentalCategory(models.Model):
 
 
 class EnvironmentalVariable(models.Model):
+    var_id = models.CharField(max_length=50, unique=True)
     name = models.CharField(max_length=50, unique=True)
     category = models.ForeignKey('EnvironmentalCategory', null=True)
     units = models.CharField(max_length=100, choices=UNIT_CHOICES)

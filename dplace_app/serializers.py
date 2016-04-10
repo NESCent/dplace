@@ -115,7 +115,6 @@ class LanguageFamilySerializer(serializers.ModelSerializer):
 class LanguageSerializer(serializers.ModelSerializer):
     iso_code = serializers.CharField(source='iso_code.iso_code')
     family = LanguageFamilySerializer()
-    count = serializers.ReadOnlyField(source='societies_count')
 
     class Meta(object):
         model = models.Language
@@ -125,7 +124,7 @@ class LanguageSerializer(serializers.ModelSerializer):
             'glotto_code',
             'iso_code',
             'family',
-            'count',
+            'societies',
         )
 
 
