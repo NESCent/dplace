@@ -20,7 +20,7 @@ class DPLACECSVResultsTestCase(TestCase):
     
     def test_field_names_for_environmental_variable(self):
         name = self.renderer.field_names_for_environmental_variable(self.var)
-        assert name['name'] == '%s (%s)' % (self.var['name'], self.var['units'])
+        assert name['name'] == 'Variable: %s (%s)' % (self.var['name'], self.var['units'])
 
 
 class DPLACECSVRendererTestCase(TestCase):
