@@ -18,7 +18,7 @@
         class="form-control"
         style="width:100%"
         ng-change="treeSelected()"
-        ng-options="tree.name for tree in trees"
+        ng-options="tree.name for tree in trees| orderBy:'name'"
         ng-show="!globalTree"
         >
         <option value="">Select a Tree</option>
