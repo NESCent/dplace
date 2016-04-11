@@ -124,6 +124,21 @@ class LanguageSerializer(serializers.ModelSerializer):
             'glotto_code',
             'iso_code',
             'family',
+        )
+
+
+class LanguageSerializerWithSocieties(serializers.ModelSerializer):
+    iso_code = serializers.CharField(source='iso_code.iso_code')
+    family = LanguageFamilySerializer()
+
+    class Meta(object):
+        model = models.Language
+        fields = (
+            'id',
+            'name',
+            'glotto_code',
+            'iso_code',
+            'family',
             'societies',
         )
 
