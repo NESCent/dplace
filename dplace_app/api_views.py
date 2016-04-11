@@ -161,7 +161,7 @@ class LargeResultsSetPagination(PageNumberPagination):
 
 
 class LanguageViewSet(viewsets.ReadOnlyModelViewSet):
-    serializer_class = serializers.LanguageSerializer
+    serializer_class = serializers.LanguageSerializerWithSocieties
     filter_fields = ('name', 'iso_code', 'societies', 'family',)
     queryset = models.Language.objects.all()\
         .select_related('family', 'iso_code')\
@@ -224,8 +224,6 @@ def trees_from_languages_array(language_ids):
             'taxa__languagetreelabelssequence_set__society__language__family',
             'taxa__languagetreelabelssequence_set__society__language__iso_code',
         ).distinct()
-        #.prefetch_related('languages__family', 'languages__iso_code')\
-        #.distinct()
     for t in trees:
         #get the labels associated with this tree
         #determine which to keep and which to prune
@@ -350,10 +348,6 @@ def result_set_from_query_dict(query_dict):
     result_set.finalize(criteria)
 
     # search for language trees
-    #language_ids = []
-    #for s in result_set.societies:
-    #    if s.society.language:
-    #        language_ids.append(s.society.language.id)
     ext_ids = []
     for s in result_set.societies:
         ext_ids.append(s.society.ext_id)
