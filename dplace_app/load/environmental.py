@@ -59,16 +59,20 @@ def load_environmental(items):
     res = 0
     objs = []
     for item in items:
-        if _load_environmental(item, variables, societies, objs):
-            res += 1
+        if item['Dataset'] in ['EA', 'Binford']:
+            if _load_environmental(item, variables, societies, objs):
+                res += 1
     EnvironmentalValue.objects.bulk_create(objs, batch_size=1000)
     for language_family in LanguageFamily.objects.all():
         language_family.update_counts()
     return res
 
 
-def _load_environmental(val_row, variables, societies, objs):
+_missing_variables = set()
 
+
+def _load_environmental(val_row, variables, societies, objs):
+    global _missing_variables
     ext_id = val_row['soc_id']
     source = get_source(val_row['Dataset'])
 
@@ -101,10 +105,11 @@ def _load_environmental(val_row, variables, societies, objs):
         
     variable = variables.get(val_row['variable'])
     if variable is None:
-        logging.warn(
-            "Could not find environmental variable %s for society %s" % (val_row['variable'], society.name))
+        if val_row['variable'] not in _missing_variables:
+            logging.warn("Could not find environmental variable %s" % val_row['variable'])
+            _missing_variables.add(val_row['variable'])
         return
-        
+
     objs.append(EnvironmentalValue(
         variable=variable,
         value=float(val_row['value']),
