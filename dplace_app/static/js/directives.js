@@ -90,6 +90,7 @@ angular.module('languagePhylogenyDirective', [])
                         if (!global) return;
                         if (scope.query.l) {
                             for (var i = 0; i < society.languages.length; i++) {
+
                                 selected.append("svg:circle")
                                     .attr("r", 1.5)
                                     .attr("stroke", "#000")
@@ -99,6 +100,18 @@ angular.module('languagePhylogenyDirective', [])
                                         rgb = colorMapService.mapColor(value, results.classifications.length);
                                         return rgb;
                                         
+                                    })
+                                    .on("mouseover", function() {
+                                         d3.select("body").append("div")
+                                            .attr("class", "tree-tooltip")
+                                            .html("<b>"+society_name+"</b>")
+                                            .style("z-index", 1000)
+                                            .style("max-width", "250px")
+                                            .style("left", (d3.event.pageX + 10)+"px")
+                                            .style("top", (d3.event.pageY + 5)+"px");
+                                    })
+                                    .on("mouseout", function() {
+                                        d3.select(".tree-tooltip").remove();
                                     });
                                 
                             }
@@ -113,6 +126,18 @@ angular.module('languagePhylogenyDirective', [])
                                         value = society.geographic_regions[i].tdwg_code;
                                         rgb = colorMapService.mapColor(value, results.geographic_regions.length);
                                         return rgb;
+                                    })
+                                    .on("mouseover", function() {
+                                         d3.select("body").append("div")
+                                            .attr("class", "tree-tooltip")
+                                            .html("<b>"+society_name+"</b>")
+                                            .style("z-index", 1000)
+                                            .style("max-width", "250px")
+                                            .style("left", (d3.event.pageX + 10)+"px")
+                                            .style("top", (d3.event.pageY + 5)+"px");
+                                    })
+                                    .on("mouseout", function() {
+                                        d3.select(".tree-tooltip").remove();
                                     });
                             }
                         }
@@ -136,7 +161,7 @@ angular.module('languagePhylogenyDirective', [])
                                         rgb = colorMapService.tempColor(society.environmental_values[i].value, variable.min, variable.max, variable.name);
                                         return rgb;
                                     })
-                                    .on("mouseover", function() { 
+                                    .on("mouseover", function() {
                                          d3.select("body").append("div")
                                             .attr("class", "tree-tooltip")
                                             .html("<b>"+society_name+":</b><br>"+hover_text_value)
@@ -187,7 +212,7 @@ angular.module('languagePhylogenyDirective', [])
                                                 rgb = colorMapService.colorMap[parseInt(value)];
                                                 return  rgb;
                                         })
-                                        .on("mouseover", function() { 
+                                        .on("mouseover", function() {
                                              d3.select("body").append("div")
                                                 .attr("class", "tree-tooltip")
                                                 .html("<b>"+society_name+":</b><br>"+hover_text_value)
@@ -304,14 +329,15 @@ angular.module('languagePhylogenyDirective', [])
                         .attr("width", w)
                         .attr("height", w)
                         .attr("pointer-events", "all")
-                        .call(d3.behavior.zoom().on("zoom", redraw))
+                        .call(d3.behavior.zoom().on("zoom", redraw).translate([w/2,w/2]))
                         .attr("class", "phylogeny")
                         .append("svg:g")
-                        .attr("transform", "translate(400,400)");
+                        .attr("transform", "translate("+w/2+","+w/2+")");
                 }
+                
                 function redraw() {
-                vis.attr("transform",
-                    "translate(" + d3.event.translate + ")" + "scale(" + d3.event.scale + ")");
+                    vis.attr("transform",
+                        "translate(" + d3.event.translate + ")" + "scale(" + d3.event.scale + ")");
                 }   
 
                 if (langTree.name.indexOf("global") != -1) {
