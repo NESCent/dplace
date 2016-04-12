@@ -9,19 +9,8 @@ from __future__ import unicode_literals
 
 
 def prune(tree, nodes, const_depth=True, keep_root=False):
-    def cmp_nodes(x, y):
-        if n2depth[x] > n2depth[y]:
-            return -1
-        elif n2depth[x] < n2depth[y]:
-            return 1
-        else:
-            return 0
-
-    name2node = {n.name: n for n in tree.traverse() if n.name in nodes}
-    to_keep = set(name2node.values())
-    n2count = {}
-    n2depth = {}
-    visitors2nodes = {}
+    to_keep = set(n for n in tree.traverse() if n.name in nodes)
+    n2count, n2depth, visitors2nodes = {}, {}, {}
 
     start, node2path = tree.get_common_ancestor(to_keep, get_path=True)
     if keep_root:
@@ -45,9 +34,8 @@ def prune(tree, nodes, const_depth=True, keep_root=False):
 
     for visitors, nodes in visitors2nodes.iteritems():
         if not (to_keep & nodes):
-            #to_keep.add(sorted(nodes)[0])
             # to choose the closest ancestor for a node we want to keep:
-            to_keep.add(sorted(nodes, cmp_nodes)[0])
+            to_keep.add(sorted(nodes, key=lambda n: -n2depth[n])[0])
 
     for n in [n for n in tree.iter_descendants(strategy='postorder', is_leaf_fn=None)]:
         if n not in to_keep:
