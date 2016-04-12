@@ -149,7 +149,8 @@ def prune_trees():
     labels = LanguageTreeLabels.objects.all()
     count = 0
     for t in LanguageTree.objects.order_by('name').all():
-        if update_newick(t, labels):
-            count += 1
-            t.save()
+        if not t.name.startswith('global'):
+            if update_newick(t, labels):
+                count += 1
+                t.save()
     return count
