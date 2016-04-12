@@ -2,12 +2,20 @@ function SocietiesCtrl($scope, $timeout, $http, searchModelService, colorMapServ
     $scope.results = searchModelService.getModel().getResults();
     $scope.query = searchModelService.getModel().getQuery();
     $scope.variables = [];
-    $scope.buttons = [
-        {value:'phylogeny', name:'Phylogenies', description: "Trees derived from discrete data using phylogenetic methods (branch lengths informative)"},
-        {value:'glottolog', name:'Glottolog Trees', description: "Trees derived from Glottolog language family taxonomies (branch lengths uninformative)"},
-        {value:'global', name:'Global Tree', description: "A global language supertree composed from language family taxonomies in Glottolog (branch lengths uninformative)"},
-    ];
-    
+
+    $scope.buttons = [];
+    if ($scope.results && $scope.results.language_trees) {
+        if ($scope.results.language_trees.phylogenies.length > 0) {
+            $scope.buttons.push({value:'phylogeny', name:'Phylogenies', description: "Trees derived from discrete data using phylogenetic methods (branch lengths informative)"});
+        }
+        if ($scope.results.language_trees.glotto_trees.length > 0) {
+            $scope.buttons.push({value:'glottolog', name:'Glottolog Trees', description: "Trees derived from Glottolog language family taxonomies (branch lengths uninformative)"});
+        }
+        if ($scope.results.language_trees.global_tree) {
+            $scope.buttons.push({value:'global', name:'Global Tree', description: "A global language supertree composed from language family taxonomies in Glottolog (branch lengths uninformative)"});
+        }
+    }
+
     $scope.tabs = [
         { title: "Table", content: "table", active: true},
         { title: "Map", content: "map", active: false},
