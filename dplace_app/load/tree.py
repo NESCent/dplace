@@ -8,10 +8,11 @@ from nexus import NexusReader
 from ete2 import Tree
 from ete2.coretype.tree import TreeError
 from dplace_app.models import Society, LanguageTree, Language, LanguageTreeLabels, LanguageTreeLabelsSequence
+from dplace_app.tree import update_newick
 from util import csv_dict_reader
 
+
 def tree_names(name_dir):
-    labels = []
     sequences = []
     for fname in os.listdir(name_dir):
         if fname.startswith('phylogeny'): #save all csv files as phylogeny_name_etc.csv 
@@ -142,3 +143,13 @@ def _load_tree(file_name, get_language, verbose=False):
             tree.taxa.add(label)
     tree.save()
     return True
+
+
+def prune_trees():
+    labels = LanguageTreeLabels.objects.all()
+    count = 0
+    for t in LanguageTree.objects.order_by('name').all():
+        if update_newick(t, labels):
+            count += 1
+            t.save()
+    return count
