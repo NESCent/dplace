@@ -6,38 +6,35 @@ pruning for the special case of
 - branch lengths always 1 for Glottolog trees
 """
 from __future__ import unicode_literals
+from collections import defaultdict
 
 
 def prune(tree, nodes, const_depth=True, keep_root=False):
     to_keep = set(n for n in tree.traverse() if n.name in nodes)
-    n2count, n2depth, visitors2nodes = {}, {}, {}
+    n2depth, n2count, visitors2nodes = {}, defaultdict(set), defaultdict(set)
 
     start, node2path = tree.get_common_ancestor(to_keep, get_path=True)
     if keep_root:
         to_keep.add(tree)
 
-    for seed, path in node2path.iteritems():
+    for seed, path in node2path.items():
         for visited_node in path:
             if visited_node not in n2depth:
-                if const_depth:
-                    n2depth[visited_node] = 1
-                else:
-                    depth = visited_node.get_distance(start, topology_only=True)
-                    n2depth[visited_node] = depth
+                n2depth[visited_node] = 1 if const_depth \
+                    else visited_node.get_distance(start, topology_only=True)
             if visited_node is not seed:
-                n2count.setdefault(visited_node, set()).add(seed)
+                n2count[visited_node].add(seed)
 
-    for node, visitors in n2count.iteritems():
+    for node, visitors in n2count.items():
         if len(visitors) > 1:
-            visitor_key = frozenset(visitors)
-            visitors2nodes.setdefault(visitor_key, set()).add(node)
+            visitors2nodes[frozenset(visitors)].add(node)
 
-    for visitors, nodes in visitors2nodes.iteritems():
-        if not (to_keep & nodes):
+    for visitors, nodes_ in visitors2nodes.items():
+        if not (to_keep & nodes_):
             # to choose the closest ancestor for a node we want to keep:
-            to_keep.add(sorted(nodes, key=lambda n: -n2depth[n])[0])
+            to_keep.add(sorted(nodes_, key=lambda n: -n2depth[n])[0])
 
-    for n in [n for n in tree.iter_descendants(strategy='postorder', is_leaf_fn=None)]:
+    for n in tree.get_descendants('postorder'):
         if n not in to_keep:
             if len(n.children) == 1:
                 n.children[0].dist += n.dist
