@@ -7,8 +7,6 @@ import logging
 from django.db.models import Prefetch, Q
 from django.shortcuts import get_object_or_404
 from django.http import Http404
-from ete2 import Tree
-from ete2.coretype.tree import TreeError
 
 from rest_framework import viewsets
 from rest_framework.pagination import PageNumberPagination
@@ -21,7 +19,7 @@ from dplace_app.filters import GeographicRegionFilter
 from dplace_app.renderers import DPLACECSVRenderer, ZipRenderer
 from dplace_app import serializers
 from dplace_app import models
-from dplace_app.tree import prune
+from dplace_app.tree import update_newick
 
 
 log = logging.getLogger('profile')
@@ -322,28 +320,7 @@ def result_set_from_query_dict(query_dict):
                 'taxa__languagetreelabelssequence_set__society__language__iso_code',
             )\
             .distinct():
-        langs_in_tree = [str(l.label) for l in labels if l.languageTree_id == t.id]
-        is_glottolog_tree = '.glotto' in t.name
-
-        try:
-            newick = Tree(t.newick_string, format=1)
-            if is_glottolog_tree and len(langs_in_tree) == 1:
-                # kind of hacky, but needed for when langs_in_tree is only 1
-                # in future, maybe exclude these trees from the search results?
-                node = newick.search_nodes(name=langs_in_tree[0])
-                if len(node[0].get_leaves()) > 1:
-                    t.newick_string = "(%s:1);" % (langs_in_tree[0])
-                    continue
-                elif (len(node[0].get_leaves()) == 1) \
-                        and not (node[0].get_leaves()[0].name == langs_in_tree[0]):
-                    t.newick_string = "(%s:1);" % (langs_in_tree[0])
-                    continue
-
-            prune(newick, langs_in_tree, const_depth=is_glottolog_tree)
-            t.newick_string = newick.write(format=1)
-        except TreeError:
-            continue
-
+        update_newick(t, labels)
         result_set.language_trees.add(t)
         log.info('mid 4: %s' % (time() - _s,))
 

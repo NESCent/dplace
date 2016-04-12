@@ -8,6 +8,9 @@ pruning for the special case of
 from __future__ import unicode_literals
 from collections import defaultdict
 
+from ete2 import Tree
+from ete2.coretype.tree import TreeError
+
 
 def prune(tree, nodes, const_depth=True, keep_root=False):
     to_keep = set(n for n in tree.traverse() if n.name in nodes)
@@ -45,3 +48,29 @@ def prune(tree, nodes, const_depth=True, keep_root=False):
                 for ch in n.children:
                     parent.add_child(ch)
                 parent.remove_child(n)
+
+
+def update_newick(t, labels):
+    langs_in_tree = [str(l.label) for l in labels if l.languageTree_id == t.id]
+    is_glottolog_tree = '.glotto' in t.name
+
+    try:
+        newick = Tree(t.newick_string, format=1)
+        if is_glottolog_tree and len(langs_in_tree) == 1:
+            # kind of hacky, but needed for when langs_in_tree is only 1
+            # in future, maybe exclude these trees from the search results?
+            node = newick.search_nodes(name=langs_in_tree[0])
+            if len(node[0].get_leaves()) > 1:
+                t.newick_string = "(%s:1);" % (langs_in_tree[0])
+                return True
+            elif (len(node[0].get_leaves()) == 1) \
+                    and not (node[0].get_leaves()[0].name == langs_in_tree[0]):
+                t.newick_string = "(%s:1);" % (langs_in_tree[0])
+                return True
+
+        prune(newick, langs_in_tree, const_depth=is_glottolog_tree)
+        t.newick_string = newick.write(format=1)
+        t.save()
+        return True
+    except TreeError:
+        return False
