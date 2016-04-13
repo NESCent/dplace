@@ -70,7 +70,6 @@ def update_newick(t, labels):
 
         prune(newick, langs_in_tree, const_depth=is_glottolog_tree)
         t.newick_string = newick.write(format=1)
-        t.save()
         return True
     except TreeError:
         return False
