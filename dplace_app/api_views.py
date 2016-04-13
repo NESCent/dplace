@@ -315,9 +315,7 @@ def result_set_from_query_dict(query_dict):
             .filter(taxa__societies__id__in=soc_ids)\
             .prefetch_related(
                 'taxa__languagetreelabelssequence_set__labels',
-                'taxa__languagetreelabelssequence_set__society__source',
-                'taxa__languagetreelabelssequence_set__society__language__family',
-                'taxa__languagetreelabelssequence_set__society__language__iso_code',
+                'taxa__languagetreelabelssequence_set__society',
             )\
             .distinct():
         update_newick(t, labels)
