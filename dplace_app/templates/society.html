@@ -175,7 +175,7 @@
                             <td>{{v.description}} {% if v.sources %}(<a style="cursor:pointer;" data-toggle="collapse" data-target="#s{{key|cut:" "}}{{v.id}}" aria-expanded="false" aria-controls="s{{v.id}}">Source</a>) 
                                 <div class="collapse" id="s{{key|cut:" "}}{{v.id}}" style="padding-left:10px; padding-top:5px;">
                                     {% for s in v.sources %}
-                                        <a href="#r{{s.id}}">{{s}}</a>;
+                                        <a href="society/{{society.ext_id}}#r{{s.id}}" target="_self">{{s}}</a>;
                                     {% endfor %}
                                 </div>{% endif %}
                             </td>
