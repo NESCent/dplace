@@ -36,8 +36,12 @@
             </div>
             </td>
             <td ng-repeat="environmental in results.environmental_variables">
-                {{ society_result.environmental_values | formatEnvironmentalValues:environmental.id }}
-            </td>
+                <div ng-repeat="value in society_result.environmental_values|formatEnvironmentalValues:environmental.id">
+                    {{value.value}}
+                    <a ng-show="value.comment.length > 0" class="comment-tooltip" tooltip = "{{ value.comment }}">
+                        <span class="glyphicon glyphicon-comment" aria-hidden="true"></span></a>
+                </div>
+                
             <td ng-show="results.languages">
                 {{ society_result.languages | formatLanguage}}
             </td>
