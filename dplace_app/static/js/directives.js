@@ -90,6 +90,7 @@ angular.module('languagePhylogenyDirective', [])
                         if (!global) return;
                         if (scope.query.l) {
                             for (var i = 0; i < society.languages.length; i++) {
+
                                 selected.append("svg:circle")
                                     .attr("r", 1.5)
                                     .attr("stroke", "#000")
@@ -99,6 +100,18 @@ angular.module('languagePhylogenyDirective', [])
                                         rgb = colorMapService.mapColor(value, results.classifications.length);
                                         return rgb;
                                         
+                                    })
+                                    .on("mouseover", function() {
+                                         d3.select("body").append("div")
+                                            .attr("class", "tree-tooltip")
+                                            .html("<b>"+society_name+"</b>")
+                                            .style("z-index", 1000)
+                                            .style("max-width", "250px")
+                                            .style("left", (d3.event.pageX + 10)+"px")
+                                            .style("top", (d3.event.pageY + 5)+"px");
+                                    })
+                                    .on("mouseout", function() {
+                                        d3.select(".tree-tooltip").remove();
                                     });
                                 
                             }
@@ -113,6 +126,18 @@ angular.module('languagePhylogenyDirective', [])
                                         value = society.geographic_regions[i].tdwg_code;
                                         rgb = colorMapService.mapColor(value, results.geographic_regions.length);
                                         return rgb;
+                                    })
+                                    .on("mouseover", function() {
+                                         d3.select("body").append("div")
+                                            .attr("class", "tree-tooltip")
+                                            .html("<b>"+society_name+"</b>")
+                                            .style("z-index", 1000)
+                                            .style("max-width", "250px")
+                                            .style("left", (d3.event.pageX + 10)+"px")
+                                            .style("top", (d3.event.pageY + 5)+"px");
+                                    })
+                                    .on("mouseout", function() {
+                                        d3.select(".tree-tooltip").remove();
                                     });
                             }
                         }
@@ -136,7 +161,7 @@ angular.module('languagePhylogenyDirective', [])
                                         rgb = colorMapService.tempColor(society.environmental_values[i].value, variable.min, variable.max, variable.name);
                                         return rgb;
                                     })
-                                    .on("mouseover", function() { 
+                                    .on("mouseover", function() {
                                          d3.select("body").append("div")
                                             .attr("class", "tree-tooltip")
                                             .html("<b>"+society_name+":</b><br>"+hover_text_value)
@@ -187,7 +212,7 @@ angular.module('languagePhylogenyDirective', [])
                                                 rgb = colorMapService.colorMap[parseInt(value)];
                                                 return  rgb;
                                         })
-                                        .on("mouseover", function() { 
+                                        .on("mouseover", function() {
                                              d3.select("body").append("div")
                                                 .attr("class", "tree-tooltip")
                                                 .html("<b>"+society_name+":</b><br>"+hover_text_value)
@@ -304,14 +329,15 @@ angular.module('languagePhylogenyDirective', [])
                         .attr("width", w)
                         .attr("height", w)
                         .attr("pointer-events", "all")
-                        .call(d3.behavior.zoom().on("zoom", redraw))
+                        .call(d3.behavior.zoom().on("zoom", redraw).translate([w/2,w/2]))
                         .attr("class", "phylogeny")
                         .append("svg:g")
-                        .attr("transform", "translate(400,400)");
+                        .attr("transform", "translate("+w/2+","+w/2+")");
                 }
+                
                 function redraw() {
-                vis.attr("transform",
-                    "translate(" + d3.event.translate + ")" + "scale(" + d3.event.scale + ")");
+                    vis.attr("transform",
+                        "translate(" + d3.event.translate + ")" + "scale(" + d3.event.scale + ")");
                 }   
 
                 if (langTree.name.indexOf("global") != -1) {
@@ -419,9 +445,9 @@ angular.module('languagePhylogenyDirective', [])
                                 addMarkers(langTree, scope.results, chosen_var_id[0], node, true, translate);
                             else {
                                 d3.select(".envVar").attr("fill", function() {
-                                    if (scope.results.chosenTVariable.name == "Monthly Mean Precipitation") {console.log("blue"); return "url(#blue)";}
-                                    else if (scope.results.chosenTVariable.name == "Net Primary Production" || scope.results.chosenTVariable.name == "Mean Growing Season NPP") return "url(#earthy)";
-                                    else return "url(#temp)";
+                                    if (scope.results.chosenTVariable.name == "Monthly Mean Precipitation") {console.log("blue"); return "url(societies#blue)";}
+                                    else if (scope.results.chosenTVariable.name == "Net Primary Production" || scope.results.chosenTVariable.name == "Mean Growing Season NPP") return "url(societies#earthy)";
+                                    else return "url(societies#temp)";
                                 });
                                 addMarkers(langTree, scope.results,scope.results.chosenTVariable, node, true, translate);
                             }
@@ -449,10 +475,10 @@ angular.module('languagePhylogenyDirective', [])
                                     .attr("x", "20")
                                     .attr("fill", function() {
                                     if (scope.results.environmental_variables[r].name == "Net Primary Production" || scope.results.environmental_variables[r].name == "Mean Growing Season NPP") 
-                                       return "url(#earthy)";
+                                       return "url(societies#earthy)";
                                    else if (scope.results.environmental_variables[r].name == "Monthly Mean Precipitation") 
-                                        return "url(#blue)";
-                                    else return "url(#temp)";
+                                        return "url(societies#blue)";
+                                    else return "url(societies#temp)";
                                     });
                                 legend.append("svg:text")
                                     .attr("x", "0")
@@ -654,6 +680,9 @@ angular.module('dplaceMapDirective', [])
 
                 
                 scope.addMarkers = function() {
+                    if (!scope.map) {
+                        return;
+                    }
                     scope.map.removeAllMarkers();
                     if(!scope.results) {
                         return;
@@ -734,12 +763,12 @@ angular.module('dplaceMapDirective', [])
                 scope.mapLegend = function() {
                     if (!scope.chosen) return;
                     if (scope.chosen.name == "Net Primary Production" || scope.chosen.name == "Mean Growing Season NPP") {
-                        d3.selectAll(".envVar").attr("fill", "url(#earthy)");
+                        d3.selectAll(".envVar").attr("fill", "url(societies#earthy)");
                     } else if (scope.chosen.name == "Monthly Mean Precipitation") {
-                        d3.selectAll(".envVar").attr("fill", "url(#blue)");
+                        d3.selectAll(".envVar").attr("fill", "url(societies#blue)");
                     }
                     else {
-                        d3.selectAll(".envVar").attr("fill", "url(#temp)");
+                        d3.selectAll(".envVar").attr("fill", "url(societies#temp)");
                     }
                 };
 

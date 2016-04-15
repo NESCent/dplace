@@ -50,7 +50,7 @@ class Society(models.Model):
     original_latitude = models.FloatField('ORIG_latitude', null=True)
     original_longitude = models.FloatField('ORIG_longitude', null=True)
     
-    region = models.ForeignKey('GeographicRegion', null=True, related_name='societies')
+    region = models.ForeignKey('GeographicRegion', null=True)
     source = models.ForeignKey('Source', null=True)
     language = models.ForeignKey('Language', null=True, related_name="societies")
     
@@ -74,7 +74,8 @@ class Society(models.Model):
                 valueDict[str(value.variable.category)].append({
                     'name': value.variable.name,
                     'value': format(value.value, '.4f'),
-                    'units': value.variable.units
+                    'units': value.variable.units,
+                    'comment': value.comment
                 })
         return valueDict
 
@@ -109,7 +110,7 @@ class Society(models.Model):
         return sorted(refs, key=lambda r: r.author)
 
     def __unicode__(self):
-        return "%s - %s (%s)" % (self.ext_id, self.name, self.source)
+        return "%s - %s" % (self.ext_id, self.name)
     
     def get_absolute_url(self):
         return reverse("view_society", args=[self.ext_id])
@@ -131,6 +132,7 @@ class EnvironmentalCategory(models.Model):
 
 
 class EnvironmentalVariable(models.Model):
+    var_id = models.CharField(max_length=50, unique=True)
     name = models.CharField(max_length=50, unique=True)
     category = models.ForeignKey('EnvironmentalCategory', null=True)
     units = models.CharField(max_length=100, choices=UNIT_CHOICES)
@@ -166,7 +168,7 @@ class EnvironmentalValue(models.Model):
 
 class Environmental(models.Model):
     society = models.ForeignKey('Society', null=True, related_name="environmentals")
-    iso_code = models.ForeignKey('ISOCode', null=True, related_name="environmentals")
+    iso_code = models.ForeignKey('ISOCode', null=True)
     source = models.ForeignKey('Source', null=True)
 
     def __unicode__(self):
@@ -231,8 +233,7 @@ class CulturalCodeDescription(models.Model):
     This model is not used by every value in the EA.
 
     """
-    variable = models.ForeignKey(
-        'CulturalVariable', related_name="codes", db_index=True)
+    variable = models.ForeignKey('CulturalVariable', db_index=True, related_name="codes")
     code = models.CharField(
         max_length=20, db_index=True, null=False, default='.')
     code_number = models.IntegerField(null=True, db_index=True)
@@ -283,7 +284,7 @@ class CulturalValue(models.Model):
     code = models.ForeignKey('CulturalCodeDescription', db_index=True, null=True)
     source = models.ForeignKey('Source', null=True)
     comment = models.TextField(default="")
-    references = models.ManyToManyField('Source', related_name='references')
+    references = models.ManyToManyField('Source', related_name="references")
     subcase = models.TextField(default="")
     focal_year = models.CharField(max_length=10, default="")
 

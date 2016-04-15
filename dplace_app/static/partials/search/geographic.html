@@ -3,6 +3,38 @@
         $("a.comment-tooltip").tooltip();
         document.title = 'Search by Geographic Trait – D-PLACE';
     });
+    $( '.dropdown-menu a' ).on( 'click', function( event ) {
+
+        var $target = $( event.currentTarget ),
+            code = $target.attr( 'data-value' );
+
+        var mapObject = $('#search-map').vectorMap('get', 'mapObject');
+
+        if (code === "ClearAll") {
+            mapObject.clearSelectedRegions();
+            $( event.target ).blur();
+            return false;
+        }
+        if (code === "SelectAll") {
+            for (var r in mapObject.regions) {
+                mapObject.setSelectedRegions(r);
+            }
+            $( event.target ).blur();
+            return false;
+        }
+         
+        if (mapObject.regions[code].element.isSelected) {
+            var o = {};
+            o[code] = false;
+            mapObject.setSelectedRegions(o); 
+        } else {
+            mapObject.setSelectedRegions(code);
+        }
+        $( event.target ).blur();
+
+        return false;
+
+    });
 </script>
 
 <div ng-controller="GeographicCtrl"> 
@@ -24,11 +56,30 @@
     <form class="form form-inline" role="form" style="margin-top:20px;">
         <div class="panel panel-default">
             <div class="panel-heading">
-                <span ng-hide="geographic.selectedRegions.length" class="search-help">Select Geographic regions by clicking the map</span>
+                <span ng-hide="geographic.selectedRegions.length" class="search-help">Select Geographic regions by clicking the map and using the <small><span class="glyphicon glyphicon-plus-sign"></span></small> pull-down menu</span>
                 <span class="region" ng-repeat="region in geographic.selectedRegions">
                     <span>{{ region.name }}</span>
                     <span class="glyphicon glyphicon-remove region-remove" ng-click="removeRegion(region)" style="cursor:pointer;"></span></span>
                 </span>
+
+                <div class="col-xs-12">
+                    <div class="button-group" style="margin-left:-30px;margin-top:11px">
+                        <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-plus-sign"></span> <span class="caret"></span></button>
+                        <ul class="dropdown-menu">
+                            <li><a class="small" data-value="21" tabIndex="-1">Macaronesia (Azores region)</a></li>
+                            <!-- no society for this region <li><a href="#" class="small" data-value="28" tabIndex="-1">Middle Atlantic Ocean</a></li> -->
+                            <li><a class="small" data-value="63" tabIndex="-1">North-Central Pacific</a></li>
+                            <li><a class="small" data-value="62" tabIndex="-1">Northwestern Pacific</a></li>
+                            <li><a class="small" data-value="61" tabIndex="-1">South-Central Pacific</a></li>
+                            <li><a class="small" data-value="60" tabIndex="-1">Southwestern Pacific</a></li>
+                            <li><a class="small" data-value="90" tabIndex="-1">Subantarctic Islands</a></li>
+                            <li class="divider"></li>
+                            <li><a class="small" data-value="ClearAll" tabIndex="-1"><i>Clear selected regions</i></a></li>
+                            <li><a class="small" data-value="SelectAll" tabIndex="-1"><i>Select all regions</i></a></li>
+                        </ul>
+                    </div>
+                </div>
+
             </div>
             <div class="panel-body scrollable">
                 <dplace-map selected-regions="geographic.selectedRegions" map-div-id="search-map"></dplace-map>

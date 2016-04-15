@@ -32,6 +32,11 @@ SOURCE_DATA = {
         year="1966",
         author="Jorgensen",
         reference=""
+    ),
+    'Jorgensen': dict(
+        year="1966",
+        author="Jorgensen",
+        reference=""
     )
 }
 

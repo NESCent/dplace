@@ -113,13 +113,8 @@ class LanguageFamilySerializer(serializers.ModelSerializer):
 
 
 class LanguageSerializer(serializers.ModelSerializer):
-    # glotto_code = serializers.CharField(source='glotto_code')
     iso_code = serializers.CharField(source='iso_code.iso_code')
     family = LanguageFamilySerializer()
-    count = serializers.SerializerMethodField()
-    
-    def get_count(self, language):
-        return models.Society.objects.all().filter(language=language).count()
 
     class Meta(object):
         model = models.Language
@@ -129,7 +124,22 @@ class LanguageSerializer(serializers.ModelSerializer):
             'glotto_code',
             'iso_code',
             'family',
-            'count',
+        )
+
+
+class LanguageSerializerWithSocieties(serializers.ModelSerializer):
+    iso_code = serializers.CharField(source='iso_code.iso_code')
+    family = LanguageFamilySerializer()
+
+    class Meta(object):
+        model = models.Language
+        fields = (
+            'id',
+            'name',
+            'glotto_code',
+            'iso_code',
+            'family',
+            'societies',
         )
 
 
@@ -153,20 +163,28 @@ class SocietySerializer(serializers.ModelSerializer):
         )
 
 
+class TreeSocietySerializer(serializers.ModelSerializer):
+    class Meta(object):
+        model = models.Society
+        fields = ('id', 'ext_id', 'name')
+
+
 class GeographicRegionSerializer(serializers.ModelSerializer):
     class Meta(object):
         model = models.GeographicRegion
         fields = (
             'id', 'level_2_re', 'count', 'region_nam', 'continent', 'tdwg_code'
         )
-        
+
+
 class LanguageTreeLabelsSequenceSerializer(serializers.HyperlinkedModelSerializer):
-    society = SocietySerializer()
+    society = TreeSocietySerializer()
     labels = serializers.ReadOnlyField(source='labels.label')
     
     class Meta:
         model = models.LanguageTreeLabelsSequence
         fields = ('society', 'labels', 'fixed_order')
+
 
 class LanguageTreeLabelsSerializer(serializers.ModelSerializer):
     societies = LanguageTreeLabelsSequenceSerializer(source='languagetreelabelssequence_set', many=True)

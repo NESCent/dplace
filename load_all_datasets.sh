@@ -21,7 +21,7 @@ if [ ! -d "$REPO_DEST" ]; then
 	git clone $REPO_SRC $REPO_DEST
 else
 	orig=`pwd`
-	cd $REPO_DEST && git pull && cd "$orig"
+	cd $REPO_DEST && git pull origin master && cd "$orig"
 fi
 
 ## import the data
@@ -29,57 +29,4 @@ fi
 export DJANGO_SETTINGS_MODULE=dplace.settings
 export PYTHONPATH=$DPLACE_PATH
 
-# Loading Societies
-python "${DPLACE_PATH}/dplace_app/load.py" \
- "${REPO_DEST}/csv/EA_header_data_24Feb2016.csv" \
- "${REPO_DEST}/csv/Binford_header_data_24Feb2016.csv" \
- soc
-
-# Loading Geographic regions
-python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/geo/level2.json" geo
-
-# Linking Societies to Locations
-python "${DPLACE_PATH}/dplace_app/load.py" \
-  "${REPO_DEST}/csv/society_locations.csv" \
-  "${REPO_DEST}/csv/LatLong_data.csv" \
-  soc_lat_long
-
-# Loading Variables
-python "${DPLACE_PATH}/dplace_app/load.py" \
- "${REPO_DEST}/csv/EAVariableList.csv" \
- "${REPO_DEST}/csv/BinfordVariableList.csv" \
- vars
-
-# Loading Variable Codes
-python "${DPLACE_PATH}/dplace_app/load.py" \
- "${REPO_DEST}/csv/EACodeDescriptions.csv" \
- "${REPO_DEST}/csv/BinfordCodeDescriptions.csv" \
- codes
-
-# Linking Societies to Languoids
-python "${DPLACE_PATH}/dplace_app/load.py" \
- "${REPO_DEST}/csv/xd_id_to_language.csv" \
- "${REPO_DEST}/csv/glottolog.csv" \
- xd_lang
-
-# Loading References
-python "${DPLACE_PATH}/dplace_app/load.py" \
-  "${REPO_DEST}/csv/ReferenceMapping.csv" \
-  "${REPO_DEST}/csv/BinfordReferenceMapping.csv" \
-  refs
-
-# Loading Data
-python "${DPLACE_PATH}/dplace_app/load.py" \
- "${REPO_DEST}/csv/EA_DATA_Stacked.csv" \
- "${REPO_DEST}/csv/Binford_DATA_stacked.csv" \
- vals
-
-# Loading Environmental Data
-python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/EnvironmentalVariables.csv" "env_vars"
-python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/EcologicalData.csv" "env_vals"
-
-# Loading Trees
-python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/trees/" tree
-
-# Loading Trees
-python "${DPLACE_PATH}/dplace_app/load.py" "${REPO_DEST}/csv/" tree_labels
+python "${DPLACE_PATH}/dplace_app/load.py"

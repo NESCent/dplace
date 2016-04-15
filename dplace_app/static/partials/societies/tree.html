@@ -18,7 +18,7 @@
         class="form-control"
         style="width:100%"
         ng-change="treeSelected()"
-        ng-options="tree.name for tree in trees"
+        ng-options="tree.name for tree in trees| orderBy:'name'"
         ng-show="!globalTree"
         >
         <option value="">Select a Tree</option>
@@ -58,7 +58,7 @@
                                 stroke-width="0.5"
                                 />
                             <text x="20" y="15">Missing Data</text>
-                        <rect x="10" y="25" fill="url(#grad1)" height="30" width="250" />
+                        <rect x="10" y="25" fill="url(societies#grad1)" height="30" width="250" />
                         <text x="0" y="70">{{variable.variable.min}} {{code.units}}</text>
                         <text x="240" y="70">{{variable.variable.max}} {{code.units}}</text>
                     </svg>
