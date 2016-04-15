@@ -247,16 +247,20 @@ def result_set_from_query_dict(query_dict):
             codes = list(codes)
 
             if variable.data_type and variable.data_type == 'Continuous':
-                assert all('min' in c for c in codes)
+                include_NA = not all('min' in c for c in codes)
                 query = reduce(
                     lambda q, x: q | Q(
                         coded_value_float__gt=x['min'], coded_value_float__lt=x['max']),
-                    codes,
+                    [c for c in codes if 'min' in c],
                     Q(id=0))
+                if include_NA:
+                    query = query | Q(coded_value='NA')
+                print query
                 values = models.CulturalValue.objects\
                     .filter(variable=variable)\
-                    .filter(query)\
-                    .exclude(coded_value='NA')
+                    .filter(query)
+                if not include_NA:
+                    values = values.exclude(coded_value='NA')
             else:
                 assert all('id' in c for c in codes)
                 values = models.CulturalValue.objects \
