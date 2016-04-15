@@ -13,7 +13,7 @@ $(document).ready(function(){
         <span class="icon-bar"></span>
       </button>
       <div id="homeLogo" class="homeNavBarLogo">
-          <a class="navbar-brand" href="#"><img height="10%" title="HOME" src="/static/images/D-PLACE_Logo.png"></a>
+          <a class="navbar-brand" href="/home"><img height="10%" title="HOME" src="/static/images/D-PLACE_Logo.png"></a>
       </div>
     </div>
 
@@ -21,21 +21,21 @@ $(document).ready(function(){
     <div class="collapse navbar-collapse navbar-right" id="bs-example-navbar-collapse-1">
       <ul class="nav navbar-nav">
         <!-- <li ng-class="homeActive"><a ng-href href="#/home">Home</a></li> -->
-        <li ng-class="searchActive" class="searchActive"><a ng-href href="#/search"><img class="navicon" src="/static/images/Search_Icon.png"><br />SEARCH</a></li>
-        <li ng-class="societiesActive" class="societiesActive"><a ng-href href="#/societies"><img class="navicon" src="/static/images/Results_Icon.png"><br />RESULTS <span ng-show="model.results.societies.length">({{ model.results.societies.length }})</span></a></li>
-        <li ng-class="sourceInfoActive" class="sourceInfoActive"><a ng-href href="#/source_info"><img class="navicon" src="/static/images/DataSet_Icon.png"><br />HOW-TO</a></li>
+        <li ng-class="searchActive" class="searchActive"><a ng-href href="/search"><img class="navicon" src="/static/images/Search_Icon.png"><br />SEARCH</a></li>
+        <li ng-class="societiesActive" class="societiesActive"><a ng-href href="/societies"><img class="navicon" src="/static/images/Results_Icon.png"><br />RESULTS <span ng-show="model.results.societies.length">({{ model.results.societies.length }})</span></a></li>
+        <li ng-class="sourceInfoActive" class="sourceInfoActive"><a ng-href href="/howto"><img class="navicon" src="/static/images/DataSet_Icon.png"><br />HOW-TO</a></li>
         <li ng-class="aboutActive" class="aboutActive">
             <!-- <div class="btn-group"> -->
             <a class="dropdown-toggle" data-toggle="dropdown"><img class="navicon" src="/static/images/About_Icon.png"><br />INFO</a>
             <ul class="dropdown-menu" role="menu">
-                <li><a ng-href href="#/about">ABOUT</a></li>
+                <li><a ng-href href="/about">ABOUT</a></li>
 				<li><a ng-href href="mailto:dplace@shh.mpg.de" title="Send email to dplace@shh.mpg.de" data-toggle="tooltip" data-placement="top">CONTACT US</a></li>
-                <li><a ng-href href="#/howtocite">HOW TO CITE</a></li>
-                <li><a ng-href href="#/source">DATA SOURCES</a></li>
-                <li><a ng-href href="#/team">TEAM</a></li>
-                <li><a ng-href href="#/technology">TECHNOLOGY</a></li>
-                <li><a ng-href href="#/publication">PUBLICATIONS</a></li>
-                <li><a ng-href href="#/legal">LEGAL</a></li>
+                <li><a ng-href href="/howtocite">HOW TO CITE</a></li>
+                <li><a ng-href href="/source">DATA SOURCES</a></li>
+                <li><a ng-href href="/team">TEAM</a></li>
+                <li><a ng-href href="/technology">TECHNOLOGY</a></li>
+                <li><a ng-href href="/publication">PUBLICATIONS</a></li>
+                <li><a ng-href href="/legal">LEGAL</a></li>
             </ul>
         </div>
         </li>

@@ -38,9 +38,9 @@ function SocietiesCtrl($scope, $timeout, $http, searchModelService, colorMapServ
     if ($scope.query.e) {
         $scope.variables = $scope.variables.concat($scope.results.environmental_variables);
         $scope.results.environmental_variables.forEach(function(variable) {
-         if (variable.name == "Monthly Mean Precipitation") variable.fill = "url(#blue)";
-            else if (variable.name == "Net Primary Production" || variable.name == "Mean Growing Season NPP") variable.fill = "url(#earthy)";
-            else variable.fill = "url(#temp)";
+         if (variable.name == "Monthly Mean Precipitation") variable.fill = "url(societies#blue)";
+            else if (variable.name == "Net Primary Production" || variable.name == "Mean Growing Season NPP") variable.fill = "url(societies#earthy)";
+            else variable.fill = "url(societies#temp)";
         });
     }
     
@@ -165,7 +165,8 @@ function SocietiesCtrl($scope, $timeout, $http, searchModelService, colorMapServ
 
             }
             var map_svg = map_svg.substring(0, map_svg.indexOf("</svg>"));
-            map_svg = map_svg.concat(legend_svg);
+            // concat legend and remove all relative d-place links from svg's defs urls
+            map_svg = map_svg.concat(legend_svg.replace(/url\(.*?#/, 'url(#'));
             map_svg = map_svg.concat(gradients_svg +"</svg>");
             var filename = $scope.results.chosenVariable.name.replace(/[\W]+/g, "-").toLowerCase()+"-map.svg";
         }
@@ -264,11 +265,11 @@ function SocietiesCtrl($scope, $timeout, $http, searchModelService, colorMapServ
         //for environmental legend
         if ($scope.results.environmental_variables.length > 0) {
             if ($scope.results.environmental_variables[0].name == 'Net Primary Production' || $scope.results.environmental_variables[0].name == 'Mean Growing Season NPP') 
-                d3.selectAll(".envVar").attr("fill", "url(#earthy)");
+                d3.selectAll(".envVar").attr("fill", "url(societies#earthy)");
             else if ($scope.results.environmental_variables[0].name == "Annual Mean Precipitation")
-                d3.selectAll(".envVar").attr("fill", "url(#blue)");
+                d3.selectAll(".envVar").attr("fill", "url(societies#blue)");
             else 
-                d3.selectAll(".envVar").attr("fill", "url(#temp)");
+                d3.selectAll(".envVar").attr("fill", "url(societies#temp)");
         }
         
     };

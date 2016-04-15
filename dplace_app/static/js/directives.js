@@ -445,9 +445,9 @@ angular.module('languagePhylogenyDirective', [])
                                 addMarkers(langTree, scope.results, chosen_var_id[0], node, true, translate);
                             else {
                                 d3.select(".envVar").attr("fill", function() {
-                                    if (scope.results.chosenTVariable.name == "Monthly Mean Precipitation") {console.log("blue"); return "url(#blue)";}
-                                    else if (scope.results.chosenTVariable.name == "Net Primary Production" || scope.results.chosenTVariable.name == "Mean Growing Season NPP") return "url(#earthy)";
-                                    else return "url(#temp)";
+                                    if (scope.results.chosenTVariable.name == "Monthly Mean Precipitation") {console.log("blue"); return "url(societies#blue)";}
+                                    else if (scope.results.chosenTVariable.name == "Net Primary Production" || scope.results.chosenTVariable.name == "Mean Growing Season NPP") return "url(societies#earthy)";
+                                    else return "url(societies#temp)";
                                 });
                                 addMarkers(langTree, scope.results,scope.results.chosenTVariable, node, true, translate);
                             }
@@ -475,10 +475,10 @@ angular.module('languagePhylogenyDirective', [])
                                     .attr("x", "20")
                                     .attr("fill", function() {
                                     if (scope.results.environmental_variables[r].name == "Net Primary Production" || scope.results.environmental_variables[r].name == "Mean Growing Season NPP") 
-                                       return "url(#earthy)";
+                                       return "url(societies#earthy)";
                                    else if (scope.results.environmental_variables[r].name == "Monthly Mean Precipitation") 
-                                        return "url(#blue)";
-                                    else return "url(#temp)";
+                                        return "url(societies#blue)";
+                                    else return "url(societies#temp)";
                                     });
                                 legend.append("svg:text")
                                     .attr("x", "0")
@@ -680,6 +680,9 @@ angular.module('dplaceMapDirective', [])
 
                 
                 scope.addMarkers = function() {
+                    if (!scope.map) {
+                        return;
+                    }
                     scope.map.removeAllMarkers();
                     if(!scope.results) {
                         return;
@@ -760,12 +763,12 @@ angular.module('dplaceMapDirective', [])
                 scope.mapLegend = function() {
                     if (!scope.chosen) return;
                     if (scope.chosen.name == "Net Primary Production" || scope.chosen.name == "Mean Growing Season NPP") {
-                        d3.selectAll(".envVar").attr("fill", "url(#earthy)");
+                        d3.selectAll(".envVar").attr("fill", "url(societies#earthy)");
                     } else if (scope.chosen.name == "Monthly Mean Precipitation") {
-                        d3.selectAll(".envVar").attr("fill", "url(#blue)");
+                        d3.selectAll(".envVar").attr("fill", "url(societies#blue)");
                     }
                     else {
-                        d3.selectAll(".envVar").attr("fill", "url(#temp)");
+                        d3.selectAll(".envVar").attr("fill", "url(societies#temp)");
                     }
                 };
 
