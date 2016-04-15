@@ -45,6 +45,7 @@ class DPLACECSVResults(object):
             'code': "Code: %s" % v,
             'description': "Description: %s" % v,
             'comments': "Comment: %s" % v,
+            'subcase': "Subcase: %s" % v,
             'focal_year': "Focal Year: %s" % v,
             'sources': "References: %s" % v,
         }
@@ -70,6 +71,7 @@ class DPLACECSVResults(object):
                 self.field_names.append(field_names['code'])
                 self.field_names.append(field_names['description'])
                 self.field_names.append(field_names['comments'])
+                self.field_names.append(field_names['subcase'])
                 self.field_names.append(field_names['sources'])
 
         if 'environmental_variables' in self.data:
@@ -166,8 +168,8 @@ class DPLACECSVResults(object):
                         field_names['code']: cultural_trait_value['coded_value'],
                         field_names['description']: description,
                         field_names['focal_year']: cultural_trait_value['focal_year'],
-                        field_names['comments']: cultural_trait_value['subcase'] +
-                        '; ' + cultural_trait_value['comment'],
+                        field_names['comments']: cultural_trait_value['comment'],
+                        field_names['subcase']: cultural_trait_value['subcase'],
                         field_names['sources']: ''.join(
                             [x['author'] + '(' + x['year'] + '); '
                              for x in cultural_trait_value['references']])
@@ -183,8 +185,9 @@ class DPLACECSVResults(object):
                     except:
                         row[field_names['description']] = ''
                 row[field_names['comments']] = \
-                    cultural_trait_value['subcase'] \
-                    + '; ' + cultural_trait_value['comment']
+                    cultural_trait_value['comment']
+                row [field_names['subcase']] = \
+                    cultural_trait_value['subcase']
                 row[field_names['sources']] = ''.join([
                     x['author'] + '(' + x['year'] + '); '
                     for x in cultural_trait_value['references']])
