@@ -60,6 +60,7 @@ function CulturalTraitModel(VariableCategory, DatasetSources) {
     this.selected = [];
     this.selectedCategory = null;
     this.selectedVariable = null;
+    this.selectedVariables = [];
     this.badgeValue = 0;
 }
 

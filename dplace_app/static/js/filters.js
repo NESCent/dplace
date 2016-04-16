@@ -8,6 +8,11 @@ angular.module('dplaceFilters', [])
             }
         }
     })    
+    .filter('formatVariables', function() {
+        return function(selected, selectedVariable) {
+            return selected.filter(function(code) { return code.variable == selectedVariable ;});
+        };
+    })
     .filter('colorNode', ['colorMapService', function(colorMapService) {
         return function(value, codes) {
             if (codes.societies) {

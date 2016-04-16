@@ -2,10 +2,6 @@ function CulturalCtrl($scope, searchModelService, Variable, CodeDescription, Con
    var linkModel = function() {
         // Model/state lives in searchModelService
         $scope.traits = [searchModelService.getModel().getCulturalTraits()];
-        $scope.traits.forEach(function(trait) {
-            if (!trait.alreadySelected)
-                trait.alreadySelected = []; //keeps track of traits the user has already selected
-        });
         $scope.errors = "";
         $scope.count = 0;
     };
@@ -13,13 +9,6 @@ function CulturalCtrl($scope, searchModelService, Variable, CodeDescription, Con
     
     $scope.$on('searchModelReset', linkModel); // When model is reset, update our model
     linkModel();
-    
-    $scope.count = $scope.traits.map(function(trait) {
-            trait.selected.map(function(code) {
-                if (variables.indexOf(code.variable) == -1)
-                    variables.push(code.variable);
-            });
-        });
         
     //triggered by the view when a source is changed
     $scope.sourceChanged = function(trait) {
@@ -58,7 +47,7 @@ function CulturalCtrl($scope, searchModelService, Variable, CodeDescription, Con
         trait.selected = trait.selected.filter(function(code) { return code.isSelected; });
 
         //make select all the default
-        if (trait.alreadySelected.indexOf(trait.selectedVariable.id) == -1) {
+        if (trait.selectedVariables.indexOf(trait.selectedVariable) == -1) {
             trait.codes.isSelected = true;
             trait.codes.$promise.then(function(result) {
                 result.forEach(function(code) {
@@ -78,7 +67,7 @@ function CulturalCtrl($scope, searchModelService, Variable, CodeDescription, Con
                 numVars();
 
             });
-            trait.alreadySelected.push(trait.selectedVariable.id);
+            trait.selectedVariables.push(trait.selectedVariable);
         } else {
             trait.codes.$promise.then(function(result) {
                 result.forEach(function(code) {
@@ -104,7 +93,9 @@ function CulturalCtrl($scope, searchModelService, Variable, CodeDescription, Con
         } else {
             $scope.removeFromSearch(code, 'culture');
         }
-        
+        if (trait.selected.filter(function(c) { return c.variable == trait.selectedVariable.id; }).length == trait.codes.length) trait.codes.isSelected = true;
+        else trait.codes.isSelected = false;
+
     };
 
     // used before searching to extract the codes from the search selection

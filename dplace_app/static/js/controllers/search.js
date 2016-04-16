@@ -86,7 +86,7 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties) 
                 }
                 if (index > -1) {
                     $scope.searchModel.getLanguageClassifications().selected.splice(index, 1);
-                    $scope.searchModel.getLanguageClassifications().badgeValue -= object.societies.length;
+                    $scope.$broadcast('updateBadgeValue');
                 }
                 break;
             case 'culture': 
@@ -99,6 +99,7 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties) 
                 }
                 if (index > -1) {
                     $scope.searchModel.getCulturalTraits().selected.splice(index, 1);
+                    $scope.searchModel.getCulturalTraits().codes.isSelected = false;
                 }
                 $scope.searchModel.getCulturalTraits().badgeValue = $scope.searchModel.getCulturalTraits().selected.length;
                 $scope.$broadcast('variableChange');
