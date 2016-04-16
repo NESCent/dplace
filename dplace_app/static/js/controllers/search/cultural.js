@@ -34,7 +34,9 @@ function CulturalCtrl($scope, searchModelService, Variable, CodeDescription, Con
         });
         if ($scope.count < 5) $scope.errors = "";
     };
-
+    
+    $scope.$on('variableCheck', numVars);
+    
     // triggered by the view when a trait is changed in the picker
     $scope.traitChanged = function(trait) {
         trait.selectedCode = "";

@@ -105,6 +105,7 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties) 
                         $scope.searchModel.getCulturalTraits().selected[object.variable].splice(index, 1);
                         $scope.searchModel.getCulturalTraits().selected[object.variable].allSelected = false;
                         $scope.searchModel.getCulturalTraits().badgeValue--;
+                        $scope.$broadcast('variableCheck');
                     }
                 
                 }
