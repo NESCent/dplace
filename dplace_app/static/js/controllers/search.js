@@ -63,6 +63,36 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties) 
         $scope.searchButton.text = 'Search';
     };
     
+    //MOVE DELETE FUNCTIONS INTO HERE?
+    $scope.removeFromSearch = function(object, searchType) {
+        var index = -1;
+        var selected;
+        switch(searchType) {
+            case 'geographic':
+                index = $scope.searchModel.getGeographicRegions().selectedRegions.indexOf(object);
+                $scope.searchModel.getGeographicRegions().selectedRegions.splice(index, 1);
+                break;
+            case 'environmental':
+                index = $scope.searchModel.getEnvironmentalData().selectedVariables.indexOf(object);
+                $scope.searchModel.getEnvironmentalData().selectedVariables.splice(index, 1);
+                $scope.searchModel.getEnvironmentalData().badgeValue -= 1;
+                break;
+            case 'language':
+                for (var i = 0; i < $scope.searchModel.getLanguageClassifications().selected.length; i++) {
+                    if ($scope.searchModel.getLanguageClassifications().selected[i].id == object.id) {
+                        index = i;
+                        break;
+                    }
+                }
+                if (index > -1) {
+                    $scope.searchModel.getLanguageClassifications().selected.splice(index, 1);
+                }
+                break;
+            case 'culture':
+                break;
+        }
+    };
+    
     //calculates the range for environmental variables
     //needed for coloring of markers
     $scope.calculateRange = function(results) {

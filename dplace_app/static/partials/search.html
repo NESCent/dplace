@@ -29,7 +29,36 @@
 <div class="container">
     <div class="row basic-search-forms">
         <div ng-if="model.searchParams.selectedButton.value">
-            <ng-include src="'/static/partials/search/' +  model.searchParams.selectedButton.value + '.html'"></ng-include>
-        </div>
+            <div class="col-md-4">
+            <h3>Your Search Criteria</h3>
+
+            <div class="scrollable">
+            <h5>Geographic</h5>
+            <ul class="list-unstyled">
+            <li ng-repeat="region in searchModel.params.geographicRegions.selectedRegions">
+            {{ region.name }}<a ng-click="removeFromSearch(region, 'geographic')"><span class="glyphicon glyphicon-remove"></span></a>
+            </li>
+            </ul>
+            <h5>Language</h5>
+            <ul class="list-unstyled">
+            <li ng-repeat="language in searchModel.params.languageClassifications.selected">
+            {{ language.name }} (Family: {{ language.family.name }})<a ng-click="removeFromSearch(language, 'language')"><span class="glyphicon glyphicon-remove"></span></a>
+            </li>
+            </ul>
+            <h5>Culture</h5>
+           <ul class="list-unstyled">
+            <li ng-repeat="variable in searchModel.params.culturalTraits.selected">
+            {{ variable.description }} ({{variable.variable}})<a href="#"><span class="glyphicon glyphicon-remove"></span></a>
+            </li>
+            </ul>
+            <h5>Environmental</h5>
+           <ul class="list-unstyled">
+            <li ng-repeat="variable in searchModel.params.environmentalData.selectedVariables">
+            {{variable.selectedVariable.name}}<a ng-click="removeFromSearch(variable, 'environmental')"><span class="glyphicon glyphicon-remove"></span></a>
+            </li>
+            </ul>
+        </div></div>
+        <div class="col-md-8">
+            <ng-include src="'/static/partials/search/' +  model.searchParams.selectedButton.value + '.html'"></ng-include></div>
     </div>
 </div>

@@ -17,4 +17,5 @@ function GeographicCtrl($scope, searchModelService) {
     $scope.doSearch = function() {
         $scope.search();
     };
+
 }
