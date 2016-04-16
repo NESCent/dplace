@@ -102,7 +102,7 @@ function CulturalCtrl($scope, searchModelService, Variable, CodeDescription, Con
         if (code.isSelected) {
             if (trait.selected.map(function(c) { return c.id; }).indexOf(code.id) == -1) trait.selected.push(code);
         } else {
-            removeCode(trait, code);
+            $scope.removeFromSearch(code, 'culture');
         }
         
     };
@@ -116,30 +116,6 @@ function CulturalCtrl($scope, searchModelService, Variable, CodeDescription, Con
 			return trait.codes; 
 		}));
 		return allCodes.filter( function(c) { return c.isSelected; });
-    };
-    
-    function removeCode(trait, code) {
-        var index = -1;
-        //continuous variable codes don't have IDs
-       if (trait.selectedVariable.data_type.toUpperCase() == 'CONTINUOUS') {
-            for (var i = 0; i < trait.selected.length; i++) {
-                if (trait.selected[i].variable == code.variable && trait.selected[i].code == code.code) {
-                    index = i;
-                    break;
-                }
-            }
-       } else {
-            for (var i = 0; i < trait.selected.length; i++) {
-                if (trait.selected[i].id == code.id) {
-                    index = i;
-                    break;
-                }
-            }
-        }
-        if (index > -1) {
-            trait.selected.splice(index, 1);
-        }
-        numVars();
     };
 	
 	$scope.selectAllChanged = function(trait) {
@@ -161,7 +137,8 @@ function CulturalCtrl($scope, searchModelService, Variable, CodeDescription, Con
 		} else { 
             trait.codes.forEach(function(code){ 
                 code.isSelected = false; 
-                removeCode(trait, code);
+                $scope.removeFromSearch(code, 'culture');
+
             });
         }
 		trait.badgeValue = trait.selected.length;
