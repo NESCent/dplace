@@ -91,33 +91,23 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties) 
                         $scope.$broadcast('updateBadgeValue');
                     }
                 }
-            
-                /*for (var i = 0; i < $scope.searchModel.getLanguageClassifications().selected.length; i++) {
-                    if ($scope.searchModel.getLanguageClassifications().selected[i].id == object.id) {
-                        $scope.searchModel.getLanguageClassifications().selected[i].isSelected = false;
-                        index = i;
-                        break;
-                    }
-                }
-                if (index > -1) {
-                    $scope.searchModel.getLanguageClassifications().selected.splice(index, 1);
-                    $scope.$broadcast('updateBadgeValue');
-                }*/
                 break;
             case 'culture': 
-                for (var i = 0; i < $scope.searchModel.getCulturalTraits().selected.length; i++) {
-                    if ($scope.searchModel.getCulturalTraits().selected[i].id == object.id) {
-                        $scope.searchModel.getCulturalTraits().selected[i].isSelected = false;
-                        index = i;
-                        break;
+                if (object.variable in $scope.searchModel.getCulturalTraits().selected) {
+                    for (var i = 0; i < $scope.searchModel.getCulturalTraits().selected[object.variable].length; i++) {
+                        if ($scope.searchModel.getCulturalTraits().selected[object.variable][i].id == object.id) {
+                            $scope.searchModel.getCulturalTraits().selected[object.variable][i].isSelected = false;
+                            index = i;
+                            break;
+                        }
                     }
+                    if (index > -1) {
+                        $scope.searchModel.getCulturalTraits().selected[object.variable].splice(index, 1);
+                        $scope.searchModel.getCulturalTraits().selected[object.variable].allSelected = false;
+                        $scope.$broadcast('variableChange');
+                    }
+                
                 }
-                if (index > -1) {
-                    $scope.searchModel.getCulturalTraits().selected.splice(index, 1);
-                    $scope.searchModel.getCulturalTraits().codes.isSelected = false;
-                }
-                $scope.searchModel.getCulturalTraits().badgeValue = $scope.searchModel.getCulturalTraits().selected.length;
-                $scope.$broadcast('variableChange');
         }
     };
     
@@ -268,7 +258,10 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties) 
         for (var propertyName in searchParams) {
             //get selected cultural traits/codes
             if (propertyName == 'culturalTraits') {
-                var codes = searchParams[propertyName].selected.filter(function(code){ return code.isSelected; });
+                var codes = [];
+                for (var variable in searchParams[propertyName].selected) {
+                    searchParams[propertyName].selected[variable].forEach(function(code) { if (code.isSelected) codes.push(code); });
+                };
                 if (codes.length > 0) {
                     searchQuery['c'] = [];
                     for (i = 0; i < codes.length; i++) {
@@ -324,7 +317,7 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties) 
             if (propertyName == 'languageClassifications') { 
                 var classifications = [];
                 for (var family in searchParams[propertyName].selected) {
-                    searchParams[propertyName].selected[family].forEach(function(language) { classifications.push(language); });
+                    searchParams[propertyName].selected[family].forEach(function(language) { if (language.isSelected) classifications.push(language); });
                 }
                 if (classifications.length > 0) {
                     searchQuery['l'] = [];

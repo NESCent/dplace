@@ -54,12 +54,12 @@
                             </ul>
                         </li>
                         </ul>
-                    <h5 ng-show="searchModel.params.culturalTraits.selected.length > 0"><strong>Culture</strong></h5>
+                    <h5 ng-show="searchModel.params.culturalTraits.selected"><strong>Culture</strong></h5>
                        <ul class="list-unstyled" style="padding-left:10px;">
-                        <li ng-repeat="variable in searchModel.params.culturalTraits.selectedVariables" ng-show="searchModel.params.culturalTraits.selected|formatVariables:variable.id">
-                            {{ variable.label }} - {{ variable.name }}
+                        <li ng-repeat="(variable, codes) in searchModel.params.culturalTraits.selected">
+                            {{ codes.variable_name }}
                             <ul>
-                                <li ng-repeat="code in searchModel.params.culturalTraits.selected|formatVariables:variable.id">
+                                <li ng-repeat="code in codes">
                                     {{ code.short_description }} <a ng-click="removeFromSearch(code, 'culture')" style="color:red;"><span class="glyphicon glyphicon-remove"></span></a>
                                 </li>
                             </ul>

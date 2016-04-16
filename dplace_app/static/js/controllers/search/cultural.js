@@ -24,14 +24,14 @@ function CulturalCtrl($scope, searchModelService, Variable, CodeDescription, Con
     };
     
     function numVars() {
-        variables = [];
+        $scope.count = 0;
         $scope.traits.forEach(function(trait) {
-            trait.selected.forEach(function(code) {
-                if (variables.indexOf(code.variable) == -1)
-                    variables.push(code.variable);
-            });
+            trait.badgeValue = 0;
+            for (var variable in trait.selected) {
+                if (trait.selected[variable].length > 0) $scope.count++;
+                trait.badgeValue += trait.selected[variable].length;
+            }
         });
-        $scope.count = variables.length;
         if ($scope.count < 5) $scope.errors = "";
     };
     
@@ -44,58 +44,56 @@ function CulturalCtrl($scope, searchModelService, Variable, CodeDescription, Con
             trait.codes = ContinuousVariable.query({query: {bf_id: trait.selectedVariable.id}});
         } else
             trait.codes = CodeDescription.query({variable: trait.selectedVariable.id });
-        trait.selected = trait.selected.filter(function(code) { return code.isSelected; });
-
+        
         //make select all the default
-        if (trait.selectedVariables.indexOf(trait.selectedVariable) == -1) {
-            trait.codes.isSelected = true;
-            trait.codes.$promise.then(function(result) {
+        if (trait.selectedVariable.id in trait.selected) {
+            trait.codes.$promise.then(function(result) { 
                 result.forEach(function(code) {
-                   code.isSelected = true;
-                   
-                   //continuous variable codes don't have IDs
-                   if (trait.selectedVariable.data_type.toUpperCase() == 'CONTINUOUS') {
-                        if (trait.selected.map(function(c) { return c.variable+''+c.code; }).indexOf(code.variable+''+code.code) == -1) {
-                            trait.selected.push(code);
+                    if (trait.selectedVariable.data_type.toUpperCase() == 'CONTINUOUS'){
+                        if (trait.selected[trait.selectedVariable.id].map(function(c) { return c.variable+''+c.code; }).indexOf(code.variable+''+code.code) != -1) {
+                            code.isSelected = true;
                         }
-                   
-                   } else if (trait.selected.map(function(code) { return code.id; }).indexOf(code.id) == -1) {
-                            trait.selected.push(code);
-                   }
+                    } else if (trait.selected[trait.selectedVariable.id].map(function(c) { return c.id; }).indexOf(code.id) != -1)
+                        code.isSelected = true;
                 });
-                trait.badgeValue = trait.selected.filter(function(code) { return code.isSelected; }).length;
                 numVars();
-
             });
-            trait.selectedVariables.push(trait.selectedVariable);
         } else {
             trait.codes.$promise.then(function(result) {
                 result.forEach(function(code) {
-                    //continuous variable codes don't have IDs
-                   if (trait.selectedVariable.data_type.toUpperCase() == 'CONTINUOUS') {
-                        if (trait.selected.map(function(c) { return c.variable+''+c.code; }).indexOf(code.variable+''+code.code) != -1) {
-                            code.isSelected = true;
+                    code.isSelected = true;
+                    if (code.variable in trait.selected) {
+                        if (trait.selectedVariable.data_type.toUpperCase() == 'CONTINUOUS') {
+                            if (trait.selected[code.variable].map(function(c) { return c.variable+''+c.code; }).indexOf(code.variable+''+code.code) == -1)
+                                trait.selected[code.variable].push(code);
+                        } else if (trait.selected[code.variable].map(function(c) { return c.id; }).indexOf(code.id) == -1) {
+                            trait.selected[code.variable].push(code);
                         }
-                   } else if (trait.selected.map(function(code) { return code.id; }).indexOf(code.id) != -1) {
-                        code.isSelected = true;
-                   }
+                    } else {
+                        trait.selected[code.variable] = [code];
+                        trait.selected[code.variable].variable_name = trait.selectedVariable.name;
+                    }
                 });
-                trait.badgeValue = trait.selected.length;
+                trait.selected[trait.selectedVariable.id].allSelected = true;
                 numVars();
-
             });
         }
     };
     
     $scope.traitCodeSelectionChanged = function(trait, code) {
         if (code.isSelected) {
-            if (trait.selected.map(function(c) { return c.id; }).indexOf(code.id) == -1) trait.selected.push(code);
+            if (code.variable in trait.selected) {
+                if (trait.selected[code.variable].map(function(c) { return c.id; }).indexOf(code.id) == -1) 
+                    trait.selected[code.variable].push(code);
+            } else 
+                trait.selected[code.variable] = [code];
+                trait.selected[code.variable].variable_name = trait.selectedVariable.name;
         } else {
             $scope.removeFromSearch(code, 'culture');
         }
-        if (trait.selected.filter(function(c) { return c.variable == trait.selectedVariable.id; }).length == trait.codes.length) trait.codes.isSelected = true;
-        else trait.codes.isSelected = false;
-
+        if (trait.selected[code.variable].length == trait.codes.length) trait.selected[code.variable].allSelected = true;
+        else trait.selected[code.variable].allSelected = false;
+        numVars();
     };
 
     // used before searching to extract the codes from the search selection
@@ -110,29 +108,26 @@ function CulturalCtrl($scope, searchModelService, Variable, CodeDescription, Con
     };
 	
 	$scope.selectAllChanged = function(trait) {
-        trait.selected = trait.selected.filter(function(code) { return code.isSelected; });
-		if (trait.codes.isSelected) {
-			trait.codes.forEach(function(code){ 
-                code.isSelected = true;
-                
-                //continuous variable codes don't have IDs
-               if (trait.selectedVariable.data_type.toUpperCase() == 'CONTINUOUS') {
-                    if (trait.selected.map(function(c) { return c.variable+''+c.code; }).indexOf(code.variable+''+code.code) == -1) {
-                        trait.selected.push(code);
+        if (trait.selectedVariable.id in trait.selected) {
+            if (trait.selected[trait.selectedVariable.id].allSelected) { // all selected
+                trait.codes.forEach(function(code) {
+                    code.isSelected = true;
+                    if (trait.selectedVariable.data_type.toUpperCase() == 'CONTINUOUS') {
+                        if (trait.selected[trait.selectedVariable.id].map(function(c) { return c.variable+''+c.code; }).indexOf(code.variable+''+code.code) == -1) {
+                            trait.selected[trait.selectedVariable.id].push(code);
+                        }
+                    } else {
+                        if(trait.selected[trait.selectedVariable.id].map(function(c) { return c.id; }).indexOf(code.id) == -1) 
+                            trait.selected[trait.selectedVariable.id].push(code);
                     }
-               
-               } else {
-                    if (trait.selected.map(function(code) { return code.id; }).indexOf(code.id) == -1) trait.selected.push(code);
-                }
-			});
-		} else { 
-            trait.codes.forEach(function(code){ 
-                code.isSelected = false; 
-                $scope.removeFromSearch(code, 'culture');
-
-            });
+                });
+            } else { // deselect all
+                trait.codes.forEach(function(code) {
+                    code.isSelected = false;
+                    $scope.removeFromSearch(code, 'culture');
+                });
+            }
         }
-		trait.badgeValue = trait.selected.length;
         numVars();
 	};
 

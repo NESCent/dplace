@@ -73,7 +73,7 @@
 	
             <div class="panel-body scrollable">
                 <span class="variable-label" ng-show="trait.codes.length > 1"> Select All
-				<input type="checkbox" class="pull-left" ng-model="trait.codes.isSelected" ng-change="selectAllChanged(trait)" />
+				<input type="checkbox" class="pull-left" ng-model="trait.selected[trait.selectedVariable.id].allSelected" ng-change="selectAllChanged(trait)" />
               </span>
 				<div ng-repeat="code in trait.codes">
                     <input type="checkbox" class="pull-left" ng-model="code.isSelected" ng-change="traitCodeSelectionChanged(trait, code)"/>
