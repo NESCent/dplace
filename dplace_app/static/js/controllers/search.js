@@ -95,7 +95,7 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties) 
             case 'culture': 
                 if (object.variable in $scope.searchModel.getCulturalTraits().selected) {
                     for (var i = 0; i < $scope.searchModel.getCulturalTraits().selected[object.variable].length; i++) {
-                        if ($scope.searchModel.getCulturalTraits().selected[object.variable][i].id == object.id) {
+                        if (($scope.searchModel.getCulturalTraits().selected[object.variable][i].id == object.id) || ($scope.searchModel.getCulturalTraits().selected[object.variable][i].description == object.description)) {
                             $scope.searchModel.getCulturalTraits().selected[object.variable][i].isSelected = false;
                             index = i;
                             break;

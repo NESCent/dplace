@@ -62,10 +62,12 @@ function CulturalCtrl($scope, searchModelService, Variable, CodeDescription, Con
             trait.codes.$promise.then(function(result) {
                 result.forEach(function(code) {
                     code.isSelected = true;
+                    if (trait.selectedVariable.data_type.toUpperCase() == 'CONTINUOUS') code.short_description = code.description;
                     if (code.variable in trait.selected) {
                         if (trait.selectedVariable.data_type.toUpperCase() == 'CONTINUOUS') {
-                            if (trait.selected[code.variable].map(function(c) { return c.variable+''+c.code; }).indexOf(code.variable+''+code.code) == -1)
+                            if (trait.selected[code.variable].map(function(c) { return c.variable+''+c.code; }).indexOf(code.variable+''+code.code) == -1) {
                                 trait.selected[code.variable].push(code);
+                            }
                         } else if (trait.selected[code.variable].map(function(c) { return c.id; }).indexOf(code.id) == -1) {
                             trait.selected[code.variable].push(code);
                         }
@@ -83,7 +85,11 @@ function CulturalCtrl($scope, searchModelService, Variable, CodeDescription, Con
     $scope.traitCodeSelectionChanged = function(trait, code) {
         if (code.isSelected) {
             if (code.variable in trait.selected) {
-                if (trait.selected[code.variable].map(function(c) { return c.id; }).indexOf(code.id) == -1) 
+                if (trait.selectedVariable.data_type.toUpperCase() == 'CONTINUOUS') {
+                    code.short_description = code.description;
+                    if (trait.selected[code.variable].map(function(c) { return c.variable+''+c.code; }).indexOf(code.variable+''+code.code) == -1) 
+                        trait.selected[code.variable].push(code);
+                } else if (trait.selected[code.variable].map(function(c) { return c.id; }).indexOf(code.id) == -1) 
                     trait.selected[code.variable].push(code);
             } else 
                 trait.selected[code.variable] = [code];
@@ -113,6 +119,7 @@ function CulturalCtrl($scope, searchModelService, Variable, CodeDescription, Con
                 trait.codes.forEach(function(code) {
                     code.isSelected = true;
                     if (trait.selectedVariable.data_type.toUpperCase() == 'CONTINUOUS') {
+                        code.short_description = code.description;
                         if (trait.selected[trait.selectedVariable.id].map(function(c) { return c.variable+''+c.code; }).indexOf(code.variable+''+code.code) == -1) {
                             trait.selected[trait.selectedVariable.id].push(code);
                         }
