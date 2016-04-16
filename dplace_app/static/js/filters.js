@@ -13,6 +13,16 @@ angular.module('dplaceFilters', [])
             return selected.filter(function(code) { return code.variable == selectedVariable ;});
         };
     })
+    .filter('formatLanguages', function() {
+        return function(selected) {
+            languages = {}
+            for (var i = 0; i < selected.length ; i++) {
+                if (selected[i].family.name in languages) languages[selected[i].family.name].push(selected[i]);
+                else languages[selected[i].family.name] = [selected[i]];
+            }
+            return languages;
+        };
+    })
     .filter('colorNode', ['colorMapService', function(colorMapService) {
         return function(value, codes) {
             if (codes.societies) {

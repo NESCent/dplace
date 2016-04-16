@@ -30,36 +30,39 @@
     <div class="row basic-search-forms">
         <div ng-if="model.searchParams.selectedButton.value">
             <div class="col-md-3">
-                <h4>Your Search Criteria</h4>
+                <h4>Your Selected Search Criteria</h4>
 
                 <div class="scrollable">
-                    <b><h5 ng-show="searchModel.params.geographicRegions.selectedRegions.length > 0" >Geographic</h5></b>
-                    <ul class="list-unstyled">
+                    <h5 ng-show="!searchModel.params.geographicRegions.selectedRegions.length && !searchModel.params.languageClassifications.selected.length && !searchModel.params.culturalTraits.selected.length && !searchModel.params.environmentalData.selectedVariables.length">
+                        Nothing yet.
+                    </h5>
+                    <h5 ng-show="searchModel.params.geographicRegions.selectedRegions.length > 0" ><strong>Geographic</strong></h5>
+                    <ul class="list-unstyled" style="padding-left:10px;">
                         <li ng-repeat="region in searchModel.params.geographicRegions.selectedRegions">
-                        {{ region.name }}<a ng-click="removeFromSearch(region, 'geographic')"><span class="glyphicon glyphicon-remove"></span></a>
+                        {{ region.name }}<a ng-click="removeFromSearch(region, 'geographic')" style="color:red;"><span class="glyphicon glyphicon-remove"></span></a>
                         </li>
                     </ul>
-                    <b><h5 ng-show="searchModel.params.languageClassifications.selected.length > 0">Language</h5></b>
-                        <ul class="list-unstyled">
+                    <h5 ng-show="searchModel.params.languageClassifications.selected.length > 0"><strong>Language</strong></h5>
+                        <ul class="list-unstyled" style="padding-left:10px;">
                         <li ng-repeat="language in searchModel.params.languageClassifications.selected">
-                        {{ language.name }} ({{ language.family.name }})<a ng-click="removeFromSearch(language, 'language')"><span class="glyphicon glyphicon-remove"></span></a>
+                            {{ language.name }} ({{ language.family.name }})<a ng-click="removeFromSearch(language, 'language')" style="color:red;"><span class="glyphicon glyphicon-remove"></span></a>
                         </li>
                         </ul>
-                    <b><h5 ng-show="searchModel.params.culturalTraits.selected.length > 0">Culture</h5></b>
-                       <ul class="list-unstyled">
+                    <h5 ng-show="searchModel.params.culturalTraits.selected.length > 0"><strong>Culture</strong></h5>
+                       <ul class="list-unstyled" style="padding-left:10px;">
                         <li ng-repeat="variable in searchModel.params.culturalTraits.selectedVariables" ng-show="searchModel.params.culturalTraits.selected|formatVariables:variable.id">
-                        {{ variable.label }} - {{ variable.name }}
+                            {{ variable.label }} - {{ variable.name }}
                             <ul>
                                 <li ng-repeat="code in searchModel.params.culturalTraits.selected|formatVariables:variable.id">
-                                    {{ code.short_description }} <a ng-click="removeFromSearch(code, 'culture')"><span class="glyphicon glyphicon-remove"></span></a>
+                                    {{ code.short_description }} <a ng-click="removeFromSearch(code, 'culture')" style="color:red;"><span class="glyphicon glyphicon-remove"></span></a>
                                 </li>
                             </ul>
                         </li>
                         </ul>
-                    <b><h5 ng-show="searchModel.params.environmentalData.selectedVariables.length > 0">Environmental</h5></b>
-                       <ul class="list-unstyled">
+                    <h5 ng-show="searchModel.params.environmentalData.selectedVariables.length > 0"><strong>Environmental</strong></h5>
+                       <ul class="list-unstyled" style="padding-left:10px;">
                         <li ng-repeat="variable in searchModel.params.environmentalData.selectedVariables">
-                        {{variable.selectedVariable.name}}<a ng-click="removeFromSearch(variable, 'environmental')"><span class="glyphicon glyphicon-remove"></span></a>
+                        {{variable.selectedVariable.name}}<a ng-click="removeFromSearch(variable, 'environmental')" style="color:red;"><span class="glyphicon glyphicon-remove"></span></a>
                         </li>
                         </ul>
                 </div>
