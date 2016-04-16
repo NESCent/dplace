@@ -33,9 +33,6 @@
                 <h4>Your Selected Search Criteria</h4>
 
                 <div class="scrollable">
-                    <h5 ng-show="!searchModel.params.geographicRegions.selectedRegions.length && !searchModel.params.languageClassifications.selected.length && !searchModel.params.culturalTraits.selected.length && !searchModel.params.environmentalData.selectedVariables.length">
-                        Nothing yet.
-                    </h5>
                     <h5 ng-show="searchModel.params.geographicRegions.selectedRegions.length > 0" ><strong>Geographic</strong></h5>
                     <ul class="list-unstyled" style="padding-left:10px;">
                         <li ng-repeat="region in searchModel.params.geographicRegions.selectedRegions">
@@ -56,7 +53,7 @@
                         </ul>
                     <h5 ng-show="searchModel.params.culturalTraits.selected"><strong>Culture</strong></h5>
                        <ul class="list-unstyled" style="padding-left:10px;">
-                        <li ng-repeat="(variable, codes) in searchModel.params.culturalTraits.selected">
+                        <li ng-repeat="(variable, codes) in searchModel.params.culturalTraits.selected" ng-show="codes.length > 0">
                             {{ codes.variable_name }}
                             <ul>
                                 <li ng-repeat="code in codes">

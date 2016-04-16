@@ -70,6 +70,7 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties) 
             case 'geographic':
                 index = $scope.searchModel.getGeographicRegions().selectedRegions.indexOf(object);
                 $scope.searchModel.getGeographicRegions().selectedRegions.splice(index, 1);
+                $scope.searchModel.getGeographicRegions().badgeValue = $scope.searchModel.getGeographicRegions().selectedRegions.length;
                 break;
             case 'environmental':
                 index = $scope.searchModel.getEnvironmentalData().selectedVariables.indexOf(object);
@@ -85,10 +86,9 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties) 
                             break;
                         }
                     }
-                    
                     if (index > -1) {
                         $scope.searchModel.getLanguageClassifications().selected[object.family.name].splice(index, 1);
-                        $scope.$broadcast('updateBadgeValue');
+                        $scope.searchModel.getLanguageClassifications().badgeValue--;
                     }
                 }
                 break;
@@ -104,7 +104,7 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties) 
                     if (index > -1) {
                         $scope.searchModel.getCulturalTraits().selected[object.variable].splice(index, 1);
                         $scope.searchModel.getCulturalTraits().selected[object.variable].allSelected = false;
-                        $scope.$broadcast('variableChange');
+                        $scope.searchModel.getCulturalTraits().badgeValue--;
                     }
                 
                 }

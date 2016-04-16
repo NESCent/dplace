@@ -32,18 +32,7 @@ function LanguageCtrl($scope, searchModelService, Language, LanguageFamily) {
             });
         }
     };
-    
-    //this function is called from search.js, to update the languageClassification model if the user deletes a selection
-    //from the side pane
-    function updateSelectionFromPane() {
-        $scope.families.forEach(function(family) {
-            var selectedClassifications = getSelectedLanguageClassifications(family);
-            if (selectedClassifications.length == family.languages.length) family.languages.allSelected = true;
-            else family.languages.allSelected = false;
-        });
-        badgeValue();
-    }
-    
+
     function badgeValue() {
         var total = 0;
         for (var key in $scope.languageClassifications.selected) {
@@ -53,9 +42,7 @@ function LanguageCtrl($scope, searchModelService, Language, LanguageFamily) {
         }
         $scope.languageClassifications.badgeValue = total;
     };
-    
-    $scope.$on('updateBadgeValue', updateSelectionFromPane);
-    
+        
     $scope.selectAllChanged = function(scheme) {
         if (scheme.languages.allSelected) {
             scheme.languages.forEach(function(language) {

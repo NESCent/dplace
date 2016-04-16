@@ -3,7 +3,7 @@ function CulturalCtrl($scope, searchModelService, Variable, CodeDescription, Con
         // Model/state lives in searchModelService
         $scope.traits = [searchModelService.getModel().getCulturalTraits()];
         $scope.errors = "";
-        $scope.count = 0;
+        numVars();
     };
     
     
@@ -34,8 +34,6 @@ function CulturalCtrl($scope, searchModelService, Variable, CodeDescription, Con
         });
         if ($scope.count < 5) $scope.errors = "";
     };
-    
-    $scope.$on('variableChange', numVars);
 
     // triggered by the view when a trait is changed in the picker
     $scope.traitChanged = function(trait) {
@@ -73,7 +71,7 @@ function CulturalCtrl($scope, searchModelService, Variable, CodeDescription, Con
                         }
                     } else {
                         trait.selected[code.variable] = [code];
-                        trait.selected[code.variable].variable_name = trait.selectedVariable.name;
+                        trait.selected[code.variable].variable_name = trait.selectedVariable.label + ' - ' + trait.selectedVariable.name;
                     }
                 });
                 trait.selected[trait.selectedVariable.id].allSelected = true;
@@ -93,7 +91,7 @@ function CulturalCtrl($scope, searchModelService, Variable, CodeDescription, Con
                     trait.selected[code.variable].push(code);
             } else 
                 trait.selected[code.variable] = [code];
-                trait.selected[code.variable].variable_name = trait.selectedVariable.name;
+                trait.selected[code.variable].variable_name = trait.selectedVariable.label + ' - ' + trait.selectedVariable.name;
         } else {
             $scope.removeFromSearch(code, 'culture');
         }
