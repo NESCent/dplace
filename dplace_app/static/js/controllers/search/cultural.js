@@ -13,6 +13,14 @@ function CulturalCtrl($scope, searchModelService, Variable, CodeDescription, Con
     
     $scope.$on('searchModelReset', linkModel); // When model is reset, update our model
     linkModel();
+    
+    $scope.count = $scope.traits.map(function(trait) {
+            trait.selected.map(function(code) {
+                if (variables.indexOf(code.variable) == -1)
+                    variables.push(code.variable);
+            });
+        });
+        
     //triggered by the view when a source is changed
     $scope.sourceChanged = function(trait) {
         trait.source_categories = [];
@@ -37,6 +45,8 @@ function CulturalCtrl($scope, searchModelService, Variable, CodeDescription, Con
         $scope.count = variables.length;
         if ($scope.count < 5) $scope.errors = "";
     };
+    
+    $scope.$on('variableChange', numVars);
 
     // triggered by the view when a trait is changed in the picker
     $scope.traitChanged = function(trait) {
@@ -164,7 +174,6 @@ function CulturalCtrl($scope, searchModelService, Variable, CodeDescription, Con
             $scope.errors = "Error, search is limited to 4 variables";
             return;
         }
-        console.log($scope.traits);
         $scope.search();
     };
 }

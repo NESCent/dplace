@@ -63,10 +63,8 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties) 
         $scope.searchButton.text = 'Search';
     };
     
-    //MOVE DELETE FUNCTIONS INTO HERE?
     $scope.removeFromSearch = function(object, searchType) {
         var index = -1;
-        var selected;
         switch(searchType) {
             case 'geographic':
                 index = $scope.searchModel.getGeographicRegions().selectedRegions.indexOf(object);
@@ -88,8 +86,18 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties) 
                     $scope.searchModel.getLanguageClassifications().selected.splice(index, 1);
                 }
                 break;
-            case 'culture':
-                break;
+            case 'culture': 
+                for (var i = 0; i < $scope.searchModel.getCulturalTraits().selected.length; i++) {
+                    if ($scope.searchModel.getCulturalTraits().selected[i].id == object.id) {
+                        index = i;
+                        break;
+                    }
+                }
+                if (index > -1) {
+                    $scope.searchModel.getCulturalTraits().selected.splice(index, 1);
+                }
+                $scope.searchModel.getCulturalTraits().badgeValue = $scope.searchModel.getCulturalTraits().selected.length;
+                $scope.$broadcast('variableChange');
         }
     };
     

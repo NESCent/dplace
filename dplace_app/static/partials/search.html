@@ -48,7 +48,7 @@
             <h5>Culture</h5>
            <ul class="list-unstyled">
             <li ng-repeat="variable in searchModel.params.culturalTraits.selected">
-            {{ variable.description }} ({{variable.variable}})<a href="#"><span class="glyphicon glyphicon-remove"></span></a>
+            {{ variable.short_description }} ({{variable.variable}})<a ng-click="removeFromSearch(variable, 'culture')"><span class="glyphicon glyphicon-remove"></span></a>
             </li>
             </ul>
             <h5>Environmental</h5>
