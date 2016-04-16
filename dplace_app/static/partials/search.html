@@ -42,10 +42,16 @@
                         {{ region.name }}<a ng-click="removeFromSearch(region, 'geographic')" style="color:red;"><span class="glyphicon glyphicon-remove"></span></a>
                         </li>
                     </ul>
-                    <h5 ng-show="searchModel.params.languageClassifications.selected.length > 0"><strong>Language</strong></h5>
+                    <h5 ng-show="searchModel.params.languageClassifications.selected"><strong>Language</strong></h5>
                         <ul class="list-unstyled" style="padding-left:10px;">
-                        <li ng-repeat="language in searchModel.params.languageClassifications.selected">
-                            {{ language.name }} ({{ language.family.name }})<a ng-click="removeFromSearch(language, 'language')" style="color:red;"><span class="glyphicon glyphicon-remove"></span></a>
+                        <li ng-repeat="(family, languages) in searchModel.params.languageClassifications.selected" ng-show="languages.length > 0">
+                            {{ family }}
+                            <ul>
+                                <li ng-repeat="language in languages">
+                                    {{ language.name }} <a ng-click="removeFromSearch(language, 'language')" style="color:red;"><span class="glyphicon glyphicon-remove"></span></a>
+
+                                </li>
+                            </ul>
                         </li>
                         </ul>
                     <h5 ng-show="searchModel.params.culturalTraits.selected.length > 0"><strong>Culture</strong></h5>

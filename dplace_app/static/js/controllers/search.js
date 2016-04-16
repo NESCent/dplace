@@ -77,7 +77,22 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties) 
                 $scope.searchModel.getEnvironmentalData().badgeValue = $scope.searchModel.getEnvironmentalData().selectedVariables.length;
                 break;
             case 'language':
-                for (var i = 0; i < $scope.searchModel.getLanguageClassifications().selected.length; i++) {
+                if (object.family.name in $scope.searchModel.getLanguageClassifications().selected) {
+                    for (var i = 0; i < $scope.searchModel.getLanguageClassifications().selected[object.family.name].length; i++) {
+                        if ($scope.searchModel.getLanguageClassifications().selected[object.family.name][i].id == object.id) {
+                            $scope.searchModel.getLanguageClassifications().selected[object.family.name][i].isSelected = false;
+                            index = i;
+                            break;
+                        }
+                    }
+                    
+                    if (index > -1) {
+                        $scope.searchModel.getLanguageClassifications().selected[object.family.name].splice(index, 1);
+                        $scope.$broadcast('updateBadgeValue');
+                    }
+                }
+            
+                /*for (var i = 0; i < $scope.searchModel.getLanguageClassifications().selected.length; i++) {
                     if ($scope.searchModel.getLanguageClassifications().selected[i].id == object.id) {
                         $scope.searchModel.getLanguageClassifications().selected[i].isSelected = false;
                         index = i;
@@ -87,7 +102,7 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties) 
                 if (index > -1) {
                     $scope.searchModel.getLanguageClassifications().selected.splice(index, 1);
                     $scope.$broadcast('updateBadgeValue');
-                }
+                }*/
                 break;
             case 'culture': 
                 for (var i = 0; i < $scope.searchModel.getCulturalTraits().selected.length; i++) {
@@ -307,7 +322,10 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties) 
             
             //get selected languages
             if (propertyName == 'languageClassifications') { 
-                var classifications = searchParams[propertyName].selected.filter(function(classification){ return classification.isSelected; });
+                var classifications = [];
+                for (var family in searchParams[propertyName].selected) {
+                    searchParams[propertyName].selected[family].forEach(function(language) { classifications.push(language); });
+                }
                 if (classifications.length > 0) {
                     searchQuery['l'] = [];
                     for (i = 0; i < classifications.length; i++) {

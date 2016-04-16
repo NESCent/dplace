@@ -90,6 +90,6 @@ function LanguageClassificationModel(LanguageFamily) {
     
     /* List of all Language Classes - needed for language search */
     this.allClasses = LanguageFamily.query();
-    this.selected = [];
+    this.selected = {};
     this.badgeValue = 0;
 }
