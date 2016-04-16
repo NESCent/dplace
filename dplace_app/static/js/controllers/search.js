@@ -63,6 +63,7 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties) 
         $scope.searchButton.text = 'Search';
     };
     
+    //removes a variable, language, or region from search parameters
     $scope.removeFromSearch = function(object, searchType) {
         var index = -1;
         switch(searchType) {
@@ -73,22 +74,25 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties) 
             case 'environmental':
                 index = $scope.searchModel.getEnvironmentalData().selectedVariables.indexOf(object);
                 $scope.searchModel.getEnvironmentalData().selectedVariables.splice(index, 1);
-                $scope.searchModel.getEnvironmentalData().badgeValue -= 1;
+                $scope.searchModel.getEnvironmentalData().badgeValue = $scope.searchModel.getEnvironmentalData().selectedVariables.length;
                 break;
             case 'language':
                 for (var i = 0; i < $scope.searchModel.getLanguageClassifications().selected.length; i++) {
                     if ($scope.searchModel.getLanguageClassifications().selected[i].id == object.id) {
+                        $scope.searchModel.getLanguageClassifications().selected[i].isSelected = false;
                         index = i;
                         break;
                     }
                 }
                 if (index > -1) {
                     $scope.searchModel.getLanguageClassifications().selected.splice(index, 1);
+                    $scope.searchModel.getLanguageClassifications().badgeValue -= object.societies.length;
                 }
                 break;
             case 'culture': 
                 for (var i = 0; i < $scope.searchModel.getCulturalTraits().selected.length; i++) {
                     if ($scope.searchModel.getCulturalTraits().selected[i].id == object.id) {
+                        $scope.searchModel.getCulturalTraits().selected[i].isSelected = false;
                         index = i;
                         break;
                     }

@@ -29,20 +29,6 @@ function LanguageCtrl($scope, searchModelService, Language, LanguageFamily) {
             });
         }
     };
-        
-    function removeClassification(language) {
-        var index = -1;
-        for (var i = 0; i < $scope.languageClassifications.selected.length; i++) {
-            if ($scope.languageClassifications.selected[i].id == language.id) {
-                index = i;
-                break;
-            }
-        }
-        if (index > -1) {
-            $scope.languageClassifications.selected.splice(index, 1);
-            $scope.languageClassifications.badgeValue -= language.count;
-        }
-    };
     
     $scope.selectAllChanged = function(scheme) {
         if (scheme.languages.allSelected) {
@@ -50,13 +36,13 @@ function LanguageCtrl($scope, searchModelService, Language, LanguageFamily) {
                 language.isSelected = true;
                 if ($scope.languageClassifications.selected.map(function(lang) { return lang.id; }).indexOf(language) == -1) {
                     $scope.languageClassifications.selected.push(language);
-                    $scope.languageClassifications.badgeValue += language.count;
+                    $scope.languageClassifications.badgeValue += language.societies.length;
                 }
             });
         } else {
             scheme.languages.forEach(function(language) {
                 language.isSelected = false;
-                removeClassification(language);
+                $scope.removeFromSearch(language, 'language');
                 
             });
         }
@@ -77,11 +63,12 @@ function LanguageCtrl($scope, searchModelService, Language, LanguageFamily) {
                 if (language.isSelected) {
                     if ($scope.languageClassifications.selected.map(function(lang) { return lang.id; }).indexOf(language.id) == -1) {
                         $scope.languageClassifications.selected.push(language);
-                        $scope.languageClassifications.badgeValue += language.count;
+                        $scope.languageClassifications.badgeValue += language.societies.length;
                     }
                 } else {
                     if ($scope.languageClassifications.selected.map(function(lang) { return lang.id; }).indexOf(language.id) != -1) {
-                        removeClassification(language);
+                       $scope.removeFromSearch(language, 'language');
+                       
                     }
                 }
             });
