@@ -82,8 +82,8 @@ angular.module('dplaceFilters', [])
     .filter('formatEnvironmentalValues', function () {
         return function(values, variable_id) {
             codes = values.filter( function(environmental_value) {
-                if (environmental_value.variable == variable_id) { 
-                    environmental_value.value = environmental_value.value.toFixed(4); 
+                if (environmental_value.variable == variable_id) {
+                    environmental_value.value = environmental_value.value.toFixed(4);
                     return environmental_value;
                 }
             });
