@@ -474,6 +474,10 @@ label.light {
     border-radius:5px;
 }
 
+.criteria-list li {
+    white-space: nowrap;
+}
+
 .hidden {
     display:none;
 }

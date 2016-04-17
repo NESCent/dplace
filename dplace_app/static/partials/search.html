@@ -38,7 +38,7 @@
             <div id="selected-criteria" class="hidden col-md-3">
                 <div class="selected-scrollable scrollable">
                     <h5 ng-show="searchModel.params.geographicRegions.selectedRegions.length > 0" ><strong>Geographic</strong></h5>
-                    <ul class="list-unstyled" style="padding-left:10px;">
+                    <ul class="list-unstyled criteria-list" style="padding-left:10px;">
                         <li ng-repeat="region in searchModel.params.geographicRegions.selectedRegions">
                         {{ region.name }}<a ng-click="removeFromSearch(region, 'geographic')" style="color:red;"><span class="glyphicon glyphicon-remove"></span></a>
                         </li>
@@ -47,7 +47,7 @@
                         <ul class="list-unstyled" style="padding-left:10px;">
                         <li ng-repeat="(family, languages) in searchModel.params.languageClassifications.selected" ng-show="languages.length > 0">
                             {{ family }}
-                            <ul>
+                            <ul class="criteria-list">
                                 <li ng-repeat="language in languages">
                                     {{ language.name }} <a ng-click="removeFromSearch(language, 'language')" style="color:red;"><span class="glyphicon glyphicon-remove"></span></a>
 
@@ -59,7 +59,7 @@
                        <ul class="list-unstyled" style="padding-left:10px;">
                         <li ng-repeat="(variable, codes) in searchModel.params.culturalTraits.selected" ng-show="codes.length > 0">
                             {{ codes.variable_name }}
-                            <ul>
+                            <ul class="criteria-list">
                                 <li ng-repeat="code in codes">
                                     {{ code.short_description }} <a ng-click="removeFromSearch(code, 'culture')" style="color:red;"><span class="glyphicon glyphicon-remove"></span></a>
                                 </li>
@@ -67,7 +67,7 @@
                         </li>
                         </ul>
                     <h5 ng-show="!isEmpty(searchModel.params.environmentalData.selectedVariables, 'environmental')"><strong>Environmental</strong></h5>
-                       <ul class="list-unstyled" style="padding-left:10px;">
+                       <ul class="list-unstyled criteria-list" style="padding-left:10px;">
                             <li ng-repeat="variable in searchModel.params.environmentalData.selectedVariables" ng-show="variable.selectedVariable">
                                 {{variable.selectedVariable.name}}<a ng-click="removeFromSearch(variable, 'environmental')" style="color:red;"><span class="glyphicon glyphicon-remove"></span></a>
                             </li>
