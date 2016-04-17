@@ -315,6 +315,9 @@ def result_set_from_query_dict(query_dict):
     labels = models.LanguageTreeLabels.objects.filter(societies__id__in=soc_ids).all()
     log.info('mid 3: %s' % (time() - _s,))
 
+    global_tree = None
+    global_newick = []
+
     for t in models.LanguageTree.objects\
             .filter(taxa__societies__id__in=soc_ids)\
             .prefetch_related(
@@ -322,9 +325,20 @@ def result_set_from_query_dict(query_dict):
                 'taxa__languagetreelabelssequence_set__society',
             )\
             .distinct():
-        update_newick(t, labels)
-        result_set.language_trees.add(t)
+        if 'global' in t.name:
+            global_tree = t
+        else:
+            if update_newick(t, labels):
+                result_set.language_trees.add(t)
+                if 'glotto' in t.name:
+                    #remove last ; in order to be able to join the trees
+                    global_newick.append(t.newick_string[:-1])
+
         log.info('mid 4: %s' % (time() - _s,))
+
+    if global_tree and len(global_newick) > 0:
+        global_tree.newick_string = '(' + ','.join(global_newick) + ');'
+        result_set.language_trees.add(global_tree)
 
     return result_set
 
