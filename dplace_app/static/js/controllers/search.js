@@ -70,6 +70,20 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties) 
         }
         return true;
     };
+    $scope.searchCriteria = "View my selected search criteria";
+
+    $scope.showCriteria = function() {
+        $("#selected-criteria").toggleClass('hidden');
+        $("#search-panel").toggleClass('col-md-9', 'col-md-12');
+    };
+    
+    $scope.checkIfSelected = function() {
+        if ($scope.searchModel.getGeographicRegions().selectedRegions.length > 0) return true;
+        if ($scope.searchModel.getEnvironmentalData().selectedVariables.length > 0) return true;
+        if (!$scope.isEmpty($scope.searchModel.getCulturalTraits().selected)) return true;
+        if (!$scope.isEmpty($scope.searchModel.getLanguageClassifications().selected)) return true;
+        return false;
+    }
     
     //removes a variable, language, or region from search parameters
     $scope.removeFromSearch = function(object, searchType) {
@@ -117,6 +131,11 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties) 
                     }
                 
                 }
+        }
+        if (!$scope.checkIfSelected()) {
+            d3.select("#selected-criteria").classed("hidden", true);
+            d3.select("#search-panel").classed("col-md-12", true);
+            d3.select("#search-panel").classed("col-md-9", false);
         }
     };
     

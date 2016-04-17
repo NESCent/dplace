@@ -2,6 +2,7 @@
     $(document).ready(function() {
         $("a.comment-tooltip").tooltip();
         document.title = 'Search – D-PLACE';
+
     });
 </script>
 
@@ -29,10 +30,13 @@
 <div class="container">
     <div class="row basic-search-forms">
         <div ng-if="model.searchParams.selectedButton.value">
-            <div class="col-md-3">
-                <h4>Your Selected Search Criteria</h4>
-
-                <div class="scrollable">
+        <div class="row">
+            <button ng-show="checkIfSelected()" type="button" class="btn btn-info" style="margin-left:20px;" ng-click="showCriteria()">
+                {{ searchCriteria }}
+            </button>
+            </div>
+            <div id="selected-criteria" class="hidden col-md-3">
+                <div class="selected-scrollable scrollable">
                     <h5 ng-show="searchModel.params.geographicRegions.selectedRegions.length > 0" ><strong>Geographic</strong></h5>
                     <ul class="list-unstyled" style="padding-left:10px;">
                         <li ng-repeat="region in searchModel.params.geographicRegions.selectedRegions">
@@ -70,7 +74,7 @@
                         </ul>
                 </div>
             </div>
-        <div class="col-md-9">
+        <div id="search-panel" class="col-md-12">
             <ng-include src="'/static/partials/search/' +  model.searchParams.selectedButton.value + '.html'"></ng-include></div>
     </div>
 </div>
