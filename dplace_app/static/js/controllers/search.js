@@ -63,6 +63,10 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties) 
         $scope.searchButton.text = 'Search';
     };
     
+    $scope.isEmpty = function(object) {
+        return angular.equals({}, object);
+    };
+    
     //removes a variable, language, or region from search parameters
     $scope.removeFromSearch = function(object, searchType) {
         var index = -1;
