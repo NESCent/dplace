@@ -70,11 +70,14 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties) 
         }
         return true;
     };
-    $scope.searchCriteria = "View my selected search criteria";
+    $scope.searchCriteria = "View selected search criteria";
 
     $scope.showCriteria = function() {
         $("#selected-criteria").toggleClass('hidden');
         $("#search-panel").toggleClass('col-md-9', 'col-md-12');
+        
+        if (!$("#selected-criteria").hasClass('hidden')) $scope.searchCriteria = "Hide selected search criteria";
+        else $scope.searchCriteria = "View selected search criteria";
     };
     
     $scope.checkIfSelected = function() {
