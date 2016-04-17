@@ -57,7 +57,7 @@ function SearchModel(VariableCategory, GeographicRegion, EnvironmentalCategory, 
 function CulturalTraitModel(VariableCategory, DatasetSources) {
     this.categories = VariableCategory.query(); // these objects get annotated with variables
     this.sources = DatasetSources.query();
-    this.selected = [];
+    this.selected = {};
     this.selectedCategory = null;
     this.selectedVariable = null;
     this.badgeValue = 0;
@@ -89,6 +89,6 @@ function LanguageClassificationModel(LanguageFamily) {
     
     /* List of all Language Classes - needed for language search */
     this.allClasses = LanguageFamily.query();
-    this.selected = [];
+    this.selected = {};
     this.badgeValue = 0;
 }

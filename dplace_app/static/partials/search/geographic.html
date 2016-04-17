@@ -59,7 +59,7 @@
                 <span ng-hide="geographic.selectedRegions.length" class="search-help">Select Geographic regions by clicking the map and using the <small><span class="glyphicon glyphicon-plus-sign"></span></small> pull-down menu</span>
                 <span class="region" ng-repeat="region in geographic.selectedRegions">
                     <span>{{ region.name }}</span>
-                    <span class="glyphicon glyphicon-remove region-remove" ng-click="removeRegion(region)" style="cursor:pointer;"></span></span>
+                    <span class="glyphicon glyphicon-remove region-remove" ng-click="removeFromSearch(region, 'geographic')" style="cursor:pointer;"></span></span>
                 </span>
 
                 <div class="col-xs-12">

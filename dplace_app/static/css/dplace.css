@@ -463,3 +463,22 @@ label.light {
 .sourcekeyattr tr {
 	border-top:1px solid black;
 }
+
+#selected-criteria {
+    margin-top:10px;
+}
+
+.selected-scrollable {
+    border: 1px solid #ddd;
+    padding:10px;
+    border-radius:5px;
+}
+
+.criteria-list li {
+    white-space: nowrap;
+}
+
+.hidden {
+    display:none;
+}
+

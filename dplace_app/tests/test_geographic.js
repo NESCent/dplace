@@ -69,11 +69,11 @@ describe('Testing geographic search', function() {
         expect(geographicScope.geographic.badgeValue).toEqual(2);
         
         //test remove region
-        geographicScope.removeRegion({
+        searchScope.removeFromSearch({
                 "code": "20",
                 "id": 4,
                 "name": "Asia"
-            });
+            }, 'geographic');
         geographicScope.$digest();
         expect(geographicScope.geographic.badgeValue).toEqual(1);
         
