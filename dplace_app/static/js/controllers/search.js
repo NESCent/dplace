@@ -64,7 +64,11 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties) 
     };
     
     $scope.isEmpty = function(object) {
-        return angular.equals({}, object);
+        for (var key in object) {
+            if (object[key].length > 0)
+                return false;
+        }
+        return true;
     };
     
     //removes a variable, language, or region from search parameters
