@@ -43,7 +43,7 @@
                         {{ region.name }}<a ng-click="removeFromSearch(region, 'geographic')" style="color:red;"><span class="glyphicon glyphicon-remove"></span></a>
                         </li>
                     </ul>
-                    <h5 ng-show="!isEmpty(searchModel.params.languageClassifications.selected)"><strong>Language</strong></h5>
+                    <h5 ng-show="!isEmpty(searchModel.params.languageClassifications.selected, 'language')"><strong>Language</strong></h5>
                         <ul class="list-unstyled" style="padding-left:10px;">
                         <li ng-repeat="(family, languages) in searchModel.params.languageClassifications.selected" ng-show="languages.length > 0">
                             {{ family }}
@@ -55,7 +55,7 @@
                             </ul>
                         </li>
                         </ul>
-                    <h5 ng-show="!isEmpty(searchModel.params.culturalTraits.selected)"><strong>Culture</strong></h5>
+                    <h5 ng-show="!isEmpty(searchModel.params.culturalTraits.selected, 'cultural')"><strong>Culture</strong></h5>
                        <ul class="list-unstyled" style="padding-left:10px;">
                         <li ng-repeat="(variable, codes) in searchModel.params.culturalTraits.selected" ng-show="codes.length > 0">
                             {{ codes.variable_name }}
@@ -66,11 +66,11 @@
                             </ul>
                         </li>
                         </ul>
-                    <h5 ng-show="searchModel.params.environmentalData.selectedVariables.length > 0"><strong>Environmental</strong></h5>
+                    <h5 ng-show="!isEmpty(searchModel.params.environmentalData.selectedVariables, 'environmental')"><strong>Environmental</strong></h5>
                        <ul class="list-unstyled" style="padding-left:10px;">
-                        <li ng-repeat="variable in searchModel.params.environmentalData.selectedVariables">
-                        {{variable.selectedVariable.name}}<a ng-click="removeFromSearch(variable, 'environmental')" style="color:red;"><span class="glyphicon glyphicon-remove"></span></a>
-                        </li>
+                            <li ng-repeat="variable in searchModel.params.environmentalData.selectedVariables" ng-show="variable.selectedVariable">
+                                {{variable.selectedVariable.name}}<a ng-click="removeFromSearch(variable, 'environmental')" style="color:red;"><span class="glyphicon glyphicon-remove"></span></a>
+                            </li>
                         </ul>
                 </div>
             </div>

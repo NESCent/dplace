@@ -63,10 +63,16 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties) 
         $scope.searchButton.text = 'Search';
     };
     
-    $scope.isEmpty = function(object) {
-        for (var key in object) {
-            if (object[key].length > 0)
-                return false;
+    $scope.isEmpty = function(object, searchType) {
+        if (searchType == 'environmental') {
+            for (var i = 0; i < object.length; i++) {
+                if (object[i].selectedVariable) return false;
+            }
+        } else {
+            for (var key in object) {
+                if (object[key].length > 0)
+                    return false;
+            }
         }
         return true;
     };
@@ -82,7 +88,11 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties) 
     
     $scope.checkIfSelected = function() {
         if ($scope.searchModel.getGeographicRegions().selectedRegions.length > 0) return true;
-        if ($scope.searchModel.getEnvironmentalData().selectedVariables.length > 0) return true;
+        if ($scope.searchModel.getEnvironmentalData().selectedVariables.length > 0) {
+            for (var i = 0; i < $scope.searchModel.getEnvironmentalData().selectedVariables.length; i++) {
+                if ($scope.searchModel.getEnvironmentalData().selectedVariables[i].selectedVariable) return true;
+            }
+        }
         if (!$scope.isEmpty($scope.searchModel.getCulturalTraits().selected)) return true;
         if (!$scope.isEmpty($scope.searchModel.getLanguageClassifications().selected)) return true;
         return false;
@@ -139,6 +149,8 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties) 
             d3.select("#selected-criteria").classed("hidden", true);
             d3.select("#search-panel").classed("col-md-12", true);
             d3.select("#search-panel").classed("col-md-9", false);
+            if (!$("#selected-criteria").hasClass('hidden')) $scope.searchCriteria = "Hide selected search criteria";
+            else $scope.searchCriteria = "View selected search criteria";
         }
     };
     
