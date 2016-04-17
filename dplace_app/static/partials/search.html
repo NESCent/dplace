@@ -2,14 +2,22 @@
     $(document).ready(function() {
         $("a.comment-tooltip").tooltip();
         document.title = 'Search – D-PLACE';
-
+        $('#searchSociety').keyup(function(e){
+          if(e.keyCode==13) {
+              window.open($('#searchSocietyBtn').attr('href'), '_self');
+          }
+        });
     });
 </script>
 
 <div class="">
-    
     <div class="container">
-        <div class="radiolead pull-left" style="margin-top:-15px !important">SEARCH<br>Begin your search by selecting a mode.<br><small>Select additional variables to further refine<br>your search or select reset to start your search over.</small></div>
+        <div class="radiolead pull-left" style="margin-top:-15px !important">
+            SEARCH<br>Begin your search by selecting a mode.<br><small>Select additional variables to further refine<br>your search or select reset to start your search over.</small><br />
+            <button ng-show="checkIfSelected()" type="button" class="btn btn-info" style="padding:2px;padding-right:24px;padding-left:24px" ng-click="showCriteria()">
+                {{ searchCriteria }}
+            </button>
+        </div>
         <div class="row text-center">
             <div class="btn-group">
                 <button ng-repeat="button in buttons"
@@ -21,60 +29,56 @@
                         <span class="radioLabel">{{ button.name }}</span>
                         <br><span class="badge" ng-show="button.badgeValue()">{{ button.badgeValue() }}</span></button>
             </div>
-            <label style="padding-top:20px;">Or search by society name: <input type="text" name="input" ng-model="model.societyQuery">
-                <a ng-disabled="!model.societyQuery" href="societies/search={{model.societyQuery}}" target="_self" class="btn btn-primary">Search</a>
+            <label style="padding-top:20px;">Or search by society name: <input id="searchSociety" type="text" name="input" ng-model="model.societyQuery">
+                <a id="searchSocietyBtn" ng-disabled="!model.societyQuery" href="societies/search={{model.societyQuery}}" target="_self" class="btn btn-primary" style="padding:2px;padding-right:24px;padding-left:24px;margin-top:-4px">Search</a>
             </label> 
         </div>
     </div>
 </div>
+
 <div class="container">
     <div class="row basic-search-forms">
         <div ng-if="model.searchParams.selectedButton.value">
-        <div class="row">
-            <button ng-show="checkIfSelected()" type="button" class="btn btn-info" style="margin-left:20px;" ng-click="showCriteria()">
-                {{ searchCriteria }}
-            </button>
-            </div>
             <div id="selected-criteria" class="hidden col-md-3">
                 <div class="selected-scrollable scrollable">
-                    <h5 ng-show="searchModel.params.geographicRegions.selectedRegions.length > 0" ><strong>Geographic</strong></h5>
-                    <ul class="list-unstyled criteria-list" style="padding-left:10px;">
-                        <li ng-repeat="region in searchModel.params.geographicRegions.selectedRegions">
-                        {{ region.name }}<a ng-click="removeFromSearch(region, 'geographic')" style="color:red;"><span class="glyphicon glyphicon-remove"></span></a>
+                    <h5 data-toggle="collapse" data-target="#scPlaces" ng-show="searchModel.params.geographicRegions.selectedRegions.length > 0" style="cursor:pointer;"><strong>Places</strong></h5>
+                    <ul id="scPlaces" class="list-unstyled criteria-list collapse in" style="padding-left:10px;">
+                        <li ng-repeat="region in searchModel.params.geographicRegions.selectedRegions | orderBy:'name'">
+                            <a ng-click="removeFromSearch(region, 'geographic')" style="color:red;"><span title="Remove criterion" class="glyphicon glyphicon-remove"></span></a>&nbsp;{{ region.name }}
                         </li>
                     </ul>
-                    <h5 ng-show="!isEmpty(searchModel.params.languageClassifications.selected, 'language')"><strong>Language</strong></h5>
-                        <ul class="list-unstyled" style="padding-left:10px;">
+                    <h5 data-toggle="collapse" data-target="#scLanguage" ng-show="!isEmpty(searchModel.params.languageClassifications.selected, 'language')" style="cursor:pointer;"><strong>Language</strong></h5>
+                        <ul id="scLanguage" class="list-unstyled collapse in" style="padding-left:10px;">
                         <li ng-repeat="(family, languages) in searchModel.params.languageClassifications.selected" ng-show="languages.length > 0">
                             {{ family }}
                             <ul class="criteria-list">
                                 <li ng-repeat="language in languages">
-                                    {{ language.name }} <a ng-click="removeFromSearch(language, 'language')" style="color:red;"><span class="glyphicon glyphicon-remove"></span></a>
-
+                                    <a ng-click="removeFromSearch(language, 'language')" style="color:red;"><span title="Remove criterion" class="glyphicon glyphicon-remove"></span></a>&nbsp;{{ language.name }}
                                 </li>
                             </ul>
                         </li>
                         </ul>
-                    <h5 ng-show="!isEmpty(searchModel.params.culturalTraits.selected, 'cultural')"><strong>Culture</strong></h5>
-                       <ul class="list-unstyled" style="padding-left:10px;">
+                    <h5 data-toggle="collapse" data-target="#scCulture" ng-show="!isEmpty(searchModel.params.culturalTraits.selected, 'cultural')" style="cursor:pointer;"><strong>Culture</strong></h5>
+                       <ul id="scCulture" class="list-unstyled collapse in" style="padding-left:10px;">
                         <li ng-repeat="(variable, codes) in searchModel.params.culturalTraits.selected" ng-show="codes.length > 0">
                             {{ codes.variable_name }}
                             <ul class="criteria-list">
                                 <li ng-repeat="code in codes">
-                                    {{ code.short_description }} <a ng-click="removeFromSearch(code, 'culture')" style="color:red;"><span class="glyphicon glyphicon-remove"></span></a>
+                                    <a ng-click="removeFromSearch(code, 'culture')" style="color:red;"><span title="Remove criterion" class="glyphicon glyphicon-remove"></span></a>&nbsp;{{ code.short_description }}
                                 </li>
                             </ul>
                         </li>
                         </ul>
-                    <h5 ng-show="!isEmpty(searchModel.params.environmentalData.selectedVariables, 'environmental')"><strong>Environment</strong></h5>
-                       <ul class="list-unstyled criteria-list" style="padding-left:10px;">
+                    <h5 data-toggle="collapse" data-target="#scEnv" ng-show="!isEmpty(searchModel.params.environmentalData.selectedVariables, 'environmental')" style="cursor:pointer;"><strong>Environment</strong></h5>
+                       <ul id="scEnv" class="list-unstyled criteria-list collapse in" style="padding-left:10px;">
                             <li ng-repeat="variable in searchModel.params.environmentalData.selectedVariables" ng-show="variable.selectedVariable">
-                                {{variable.selectedVariable.name}}<a ng-click="removeFromSearch(variable, 'environmental')" style="color:red;"><span class="glyphicon glyphicon-remove"></span></a>
+                                <a ng-click="removeFromSearch(variable, 'environmental')" style="color:red;"><span title="Remove criterion" class="glyphicon glyphicon-remove"></span></a>&nbsp;{{variable.selectedVariable.name}}
                             </li>
                         </ul>
                 </div>
             </div>
         <div id="search-panel" class="col-md-12">
-            <ng-include src="'/static/partials/search/' +  model.searchParams.selectedButton.value + '.html'"></ng-include></div>
+            <ng-include src="'/static/partials/search/' +  model.searchParams.selectedButton.value + '.html'"></ng-include>
+        </div>
     </div>
 </div>
