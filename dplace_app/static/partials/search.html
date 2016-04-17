@@ -66,7 +66,7 @@
                             </ul>
                         </li>
                         </ul>
-                    <h5 ng-show="!isEmpty(searchModel.params.environmentalData.selectedVariables, 'environmental')"><strong>Environmental</strong></h5>
+                    <h5 ng-show="!isEmpty(searchModel.params.environmentalData.selectedVariables, 'environmental')"><strong>Environment</strong></h5>
                        <ul class="list-unstyled criteria-list" style="padding-left:10px;">
                             <li ng-repeat="variable in searchModel.params.environmentalData.selectedVariables" ng-show="variable.selectedVariable">
                                 {{variable.selectedVariable.name}}<a ng-click="removeFromSearch(variable, 'environmental')" style="color:red;"><span class="glyphicon glyphicon-remove"></span></a>
