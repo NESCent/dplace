@@ -117,13 +117,13 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties) 
                     for (var i = 0; i < $scope.searchModel.getLanguageClassifications().selected[object.family.name].length; i++) {
                         if ($scope.searchModel.getLanguageClassifications().selected[object.family.name][i].id == object.id) {
                             $scope.searchModel.getLanguageClassifications().selected[object.family.name][i].isSelected = false;
+                            $scope.searchModel.getLanguageClassifications().badgeValue -= $scope.searchModel.getLanguageClassifications().selected[object.family.name][i].societies.length
                             index = i;
                             break;
                         }
                     }
                     if (index > -1) {
                         $scope.searchModel.getLanguageClassifications().selected[object.family.name].splice(index, 1);
-                        $scope.searchModel.getLanguageClassifications().badgeValue--;
                     }
                 }
                 break;
