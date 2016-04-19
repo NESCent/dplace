@@ -851,12 +851,3 @@ angular.module('dplaceMapDirective', [])
             link: link
         };
     });
-
-angular.module('heightAttributeDirective', [])
-    .directive('ngHeight', function() {
-        return function(scope, element, attrs) {
-            scope.$watch(attrs.ngHeight, function(value) {
-                element.attr('height', value);
-            });
-        };
-    })

@@ -35,7 +35,7 @@
                 </div>
                 <div id="{{variable.CID}}" ng-class="{'panel-collapse collapse': !globalTree, 'in': variable.CID == 'C1'}" ng-show="(!globalTree || (globalTree && results.chosenTVariable.label==variable.variable.label))">
                     <div class="leg-panel panel-body">
-                    <svg ng-show="variable.variable.data_type !== 'Continuous'" ng-height="{{variable.svgHeight}}" width="600" class="tree-legend legends" var-id="{{variable.variable.id}}">
+                    <svg ng-show="variable.variable.data_type !== 'Continuous'" ng-attr-height="{{variable.svgHeight}}" width="600" class="tree-legend legends" var-id="{{variable.variable.id}}">
                         <g ng-repeat="c in variable.codes" transform="{{$index|transformG}}">
                         <circle
                                     cx="10"
