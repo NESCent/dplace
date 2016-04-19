@@ -30,7 +30,7 @@ function SocietiesCtrl($scope, $timeout, $http, searchModelService, colorMapServ
     if ($scope.results.variable_descriptions) {
         $scope.results.variable_descriptions.forEach(function(variable) {
             $scope.variables.push(variable.variable);
-            variable['svgSize'] = variable.codes.length * 27;
+            variable['svgHeight'] = variable.codes.length * 27;
         });
     }
     
