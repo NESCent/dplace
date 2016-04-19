@@ -83,7 +83,10 @@ angular.module('dplaceFilters', [])
         return function(values, variable_id) {
             codes = values.filter( function(environmental_value) {
                 if (environmental_value.variable == variable_id) {
-                    environmental_value.value = environmental_value.value.toFixed(4);
+                    // TODO why is called this filter twice?
+                    // First environmental_value.value is a float un-toFixed(4)
+                    // then as string whereby the value is already toFixed(4)
+                    try{environmental_value.value = environmental_value.value.toFixed(4)}catch(e){}
                     return environmental_value;
                 }
             });
