@@ -357,7 +357,7 @@ function SocietiesCtrl($scope, $timeout, $http, searchModelService, colorMapServ
     var file;
     $scope.download = function() {
         var date = new Date();
-        var filename = "dplace-societies-"+date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate()+".csv"
+        var filename = "dplace-societies-"+date.toJSON().replace(/T.*$/,'')+".csv"
         if (!file) {
            $scope.disableCSVButton();
             var queryObject = searchModelService.getModel().getQuery(); 
