@@ -112,6 +112,17 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties) 
                 $scope.searchModel.getEnvironmentalData().selectedVariables.splice(index, 1);
                 $scope.searchModel.getEnvironmentalData().badgeValue = $scope.searchModel.getEnvironmentalData().selectedVariables.length;
                 break;
+            case 'family':
+                var langSelectedObjs = $scope.searchModel.getLanguageClassifications().selected;
+                if (object in langSelectedObjs) {
+                    for (var i = 0; i < langSelectedObjs[object].length; i++) {
+                        langSelectedObjs[object][i].isSelected = false;
+                        $scope.searchModel.getLanguageClassifications().badgeValue -= langSelectedObjs[object][i].societies.length
+                    }
+                    delete langSelectedObjs[object];
+                    $scope.$broadcast('classificationSelectionChanged');
+                }
+                break;
             case 'language':
                 var langSelectedObjs = $scope.searchModel.getLanguageClassifications().selected;
                 if (object.family.name in langSelectedObjs) {

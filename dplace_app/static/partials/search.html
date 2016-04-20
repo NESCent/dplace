@@ -50,7 +50,7 @@
                     <h5 data-toggle="collapse" data-target="#scLanguage" ng-show="!isEmpty(searchModel.params.languageClassifications.selected, 'language')" style="cursor:pointer;"><strong>Language</strong></h5>
                         <ul id="scLanguage" class="list-unstyled collapse in" style="padding-left:10px;">
                         <li ng-repeat="(family, languages) in searchModel.params.languageClassifications.selected" ng-show="languages.length > 0">
-                            {{ family }}
+                            <a ng-click="removeFromSearch(family, 'family')" style="color:red;"><span title="Remove criterion" class="glyphicon glyphicon-remove"></span></a>&nbsp;{{ family }}
                             <ul class="criteria-list">
                                 <li ng-repeat="language in languages|orderBy:'name'">
                                     <a ng-click="removeFromSearch(language, 'language')" style="color:red;"><span title="Remove criterion" class="glyphicon glyphicon-remove"></span></a>&nbsp;{{ language.name }}
