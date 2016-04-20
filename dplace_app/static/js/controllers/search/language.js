@@ -70,7 +70,7 @@ function LanguageCtrl($scope, searchModelService, Language, LanguageFamily) {
         });
     };
 
-    $scope.classificationSelectionChanged = function() {
+    var classificationSelectionChangedFunc = $scope.classificationSelectionChanged = function() {
         $scope.families.forEach(function(family) {
             var selectedClassifications = getSelectedLanguageClassifications(family);
             if (selectedClassifications.length == family.languages.length) family.languages.allSelected = true;
@@ -95,6 +95,10 @@ function LanguageCtrl($scope, searchModelService, Language, LanguageFamily) {
             });
         });
     };
+
+    // classificationSelectionChanged is broadcasted if user remove language criterion
+    // from the show search criteria panel - mainly to sync 'Select all' checkbox
+    $scope.$on('classificationSelectionChanged', classificationSelectionChangedFunc);
 
     $scope.doSearch = function() {
         $scope.search();

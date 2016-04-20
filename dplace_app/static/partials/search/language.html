@@ -41,7 +41,7 @@
             <div class="panel-body scrollable">
 				<span class="variable-label"  ng-show="scheme.languages.length > 1">Select All<input type="checkbox" class="pull-left" ng-model="scheme.languages.allSelected" ng-change="selectAllChanged(scheme)" />
 					</span>
-                <div ng-repeat="language in scheme.languages">
+                <div ng-repeat="language in scheme.languages|orderBy:'name'">
                     <input class="pull-left" type="checkbox" ng-model="language.isSelected" ng-change="classificationSelectionChanged()">
                     <span class="language-label">{{ language.name }} ({{language.societies.length}} societies)</span>
                 </div>

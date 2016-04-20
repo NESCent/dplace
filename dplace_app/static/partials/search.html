@@ -52,7 +52,7 @@
                         <li ng-repeat="(family, languages) in searchModel.params.languageClassifications.selected" ng-show="languages.length > 0">
                             {{ family }}
                             <ul class="criteria-list">
-                                <li ng-repeat="language in languages">
+                                <li ng-repeat="language in languages|orderBy:'name'">
                                     <a ng-click="removeFromSearch(language, 'language')" style="color:red;"><span title="Remove criterion" class="glyphicon glyphicon-remove"></span></a>&nbsp;{{ language.name }}
                                 </li>
                             </ul>

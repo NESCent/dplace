@@ -113,17 +113,20 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties) 
                 $scope.searchModel.getEnvironmentalData().badgeValue = $scope.searchModel.getEnvironmentalData().selectedVariables.length;
                 break;
             case 'language':
-                if (object.family.name in $scope.searchModel.getLanguageClassifications().selected) {
-                    for (var i = 0; i < $scope.searchModel.getLanguageClassifications().selected[object.family.name].length; i++) {
-                        if ($scope.searchModel.getLanguageClassifications().selected[object.family.name][i].id == object.id) {
-                            $scope.searchModel.getLanguageClassifications().selected[object.family.name][i].isSelected = false;
-                            $scope.searchModel.getLanguageClassifications().badgeValue -= $scope.searchModel.getLanguageClassifications().selected[object.family.name][i].societies.length
+                var langSelectedObjs = $scope.searchModel.getLanguageClassifications().selected;
+                if (object.family.name in langSelectedObjs) {
+                    for (var i = 0; i < langSelectedObjs[object.family.name].length; i++) {
+                        if (langSelectedObjs[object.family.name][i].id == object.id) {
+                            langSelectedObjs[object.family.name][i].isSelected = false;
+                            $scope.searchModel.getLanguageClassifications().badgeValue -= langSelectedObjs[object.family.name][i].societies.length
                             index = i;
                             break;
                         }
                     }
                     if (index > -1) {
-                        $scope.searchModel.getLanguageClassifications().selected[object.family.name].splice(index, 1);
+                        langSelectedObjs[object.family.name].splice(index, 1);
+                        // sync Select all checkbox in language.(html|js)
+                        $scope.$broadcast('classificationSelectionChanged');
                     }
                 }
                 break;
