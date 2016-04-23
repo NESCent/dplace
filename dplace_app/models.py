@@ -196,6 +196,8 @@ class CulturalVariable(models.Model):
         'CulturalCategory', related_name='niche_variables')
     codebook_info = models.TextField(default='None')
     data_type = models.CharField(max_length=200, null=True)
+    units = models.CharField(max_length=100, default='')
+
 
     def coded_societies(self):
         return Society.objects.filter(culturalvalue__in=self.values.all())
