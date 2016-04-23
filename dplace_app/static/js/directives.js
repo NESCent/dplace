@@ -404,23 +404,23 @@ angular.module('languagePhylogenyDirective', [])
                         else return "leaf-node";
                     })
                     .attr("transform", function(d) { 
-                        if ((langTree.name.indexOf("global") != -1) || (langTree.name.indexOf("glotto") != -1)) {
+                        //if ((langTree.name.indexOf("global") != -1) || (langTree.name.indexOf("glotto") != -1)) {
                            if (!d.children) {
                             if (langTree.name.indexOf("global") != -1)
                                 return "rotate("+(d.x-90)+")translate("+d.y+")";
-                            else if (langTree.name.indexOf("glotto") !=  -1) {
+                            else {//if (langTree.name.indexOf("glotto") !=  -1) {
                                 dotted.push({'x':d.y, 'y':d.x})
                                 return "translate(" + longest_y + ", " + d.x + ")";
                             }  
                            }
                            return "translate(" + d.y + ", "+ d.x + ")";
-                        }
-                        else return "translate(" + d.y + ", "+ d.x + ")";
+                        //}
+                        //else return "translate(" + d.y + ", "+ d.x + ")";
                          });
                 
-                if (langTree.name.indexOf("glotto") != -1) {
+                //if (langTree.name.indexOf("glotto") != -1) {
                     for (var d = 0; d < dotted.length; d++) {
-                        if (dotted[d].x == longest_y) continue;
+                        if (dotted[d].x >= longest_y-4) continue;
                         vis.append("svg:line")
                             .attr("x1", dotted[d].x)
                             .attr("x2", longest_y-5)
@@ -429,7 +429,7 @@ angular.module('languagePhylogenyDirective', [])
                             .attr("stroke-width", "3.5px")
                             .attr("stroke", "#ccc")
                     }
-                }                
+                //}                
                 //CODE FOR MARKERS ---
                 translate = 0;
                 //changes markers for global tree
