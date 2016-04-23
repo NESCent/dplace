@@ -2,13 +2,13 @@ import json
 import re
 import datetime
 from itertools import groupby
+import logging
 
 from django.db.models import Prefetch, Q
 from django.shortcuts import get_object_or_404
 from django.http import Http404
-from ete2 import Tree
-from ete2.coretype.tree import TreeError
-from rest_framework import viewsets, filters
+
+from rest_framework import viewsets
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.decorators import api_view, permission_classes, renderer_classes
 from rest_framework.permissions import AllowAny
@@ -19,12 +19,16 @@ from dplace_app.filters import GeographicRegionFilter
 from dplace_app.renderers import DPLACECSVRenderer, ZipRenderer
 from dplace_app import serializers
 from dplace_app import models
+from dplace_app.tree import update_newick
+
+
+log = logging.getLogger('profile')
 
 
 class CulturalVariableViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = serializers.CulturalVariableSerializer
     filter_fields = ('label', 'name', 'index_categories', 'niche_categories', 'source')
-    queryset = models.CulturalVariable.objects.all()
+    queryset = models.CulturalVariable.objects.all().prefetch_related('index_categories', 'niche_categories')
 
     # Override retrieve to use the detail serializer, which includes categories
     def retrieve(self, request, *args, **kwargs):
@@ -35,7 +39,7 @@ class CulturalVariableViewSet(viewsets.ReadOnlyModelViewSet):
 
 class CulturalCategoryViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = serializers.CulturalCategorySerializer
-    filter_fields = ('name', 'index_variables', 'niche_variables',)
+    filter_fields = ('name', 'index_variables', 'niche_variables')
     queryset = models.CulturalCategory.objects.all()
     # Override retrieve to use the detail serializer, which includes variables
 
@@ -55,7 +59,7 @@ class CulturalValueViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = serializers.CulturalValueSerializer
     filter_fields = ('variable', 'coded_value', 'code', 'society',)
     # Avoid additional database trips by select_related for foreign keys
-    queryset = models.CulturalValue.objects.select_related('variable', 'code').all()
+    queryset = models.CulturalValue.objects.select_related('variable', 'code', 'source').all()
 
 
 class SocietyViewSet(viewsets.ReadOnlyModelViewSet):
@@ -65,22 +69,14 @@ class SocietyViewSet(viewsets.ReadOnlyModelViewSet):
     lookup_field = 'ext_id'
     
     def search(self, request, name):
-        societies = []
+        societies = None
         if name:
             soc = self.queryset.filter(
-                Q(name__icontains=name)
+                Q(name__unaccent__icontains=name) | Q(alternate_names__unaccent__icontains=name)
             )
             societies = [s for s in soc if s.culturalvalue_set.count()]
-            
-        else:
-            societies = None
         return Response(
-            {
-                'results': societies,
-                'query': name
-            },
-            template_name='search.html'
-        )
+            {'results': societies, 'query': name}, template_name='search.html')
 
     def detail(self, request, society_id):
         society = get_object_or_404(models.Society, ext_id=society_id)
@@ -95,7 +91,7 @@ class SocietyViewSet(viewsets.ReadOnlyModelViewSet):
         # gets other societies in database with the same xd_id
         xd_id = models.Society.objects.filter(
             xd_id=society.xd_id).exclude(ext_id=society_id)
-        if '(' in society.hraf_link:
+        if society.hraf_link and '(' in society.hraf_link:
             hraf_link = society.hraf_link.split('(')[len(society.hraf_link.split('('))-1]
         else:
             hraf_link = ''
@@ -150,7 +146,7 @@ class EnvironmentalValueViewSet(viewsets.ReadOnlyModelViewSet):
 
 class EnvironmentalViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = serializers.EnvironmentalSerializer
-    filter_fields = ('society', 'iso_code',)
+    filter_fields = ('society', 'iso_code')
     queryset = models.Environmental.objects.all()
 
 
@@ -161,9 +157,14 @@ class LargeResultsSetPagination(PageNumberPagination):
 
 
 class LanguageViewSet(viewsets.ReadOnlyModelViewSet):
-    serializer_class = serializers.LanguageSerializer
+    serializer_class = serializers.LanguageSerializerWithSocieties
     filter_fields = ('name', 'iso_code', 'societies', 'family',)
-    queryset = models.Language.objects.all()
+    queryset = models.Language.objects.all()\
+        .select_related('family', 'iso_code')\
+        .prefetch_related(Prefetch(
+            'societies',
+            queryset=models.Society.objects.exclude(culturalvalue__isnull=True)
+        ))
     pagination_class = LargeResultsSetPagination
 
 
@@ -189,12 +190,14 @@ class LanguageTreeViewSet(viewsets.ReadOnlyModelViewSet):
     filter_fields = ('name',)
     queryset = models.LanguageTree.objects.all()
     pagination_class = TreeResultsSetPagination
-    
+
+
 class LanguageTreeLabelsViewSet(viewsets.ReadOnlyModelViewSet):
-    serializer_class=serializers.LanguageTreeLabelsSerializer
+    serializer_class = serializers.LanguageTreeLabelsSerializer
     filter_fields = ('label',)
     queryset = models.LanguageTreeLabels.objects.all()
     pagination_class = LargeResultsSetPagination
+
 
 class SourceViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = serializers.SourceSerializer
@@ -202,49 +205,11 @@ class SourceViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = models.Source.objects.all()
 
 
-# maybe needs cleaning up in the future
-def trees_from_languages_array(language_ids):
-    """
-    Takes a list of language ids
-    
-    Returns trees that contain the societies from the SocietyResultSet
-    """
-    trees = models.LanguageTree.objects\
-        .filter(taxa__societies__ext_id__in=language_ids).distinct()#\
-        #.prefetch_related('languages__family', 'languages__iso_code')\
-        #.distinct()
-    for t in trees:
-        #get the labels associated with this tree
-        #determine which to keep and which to prune
-        
-        labels = models.LanguageTreeLabels.objects.filter(languageTree=t).filter(societies__ext_id__in=language_ids).distinct()
-        langs_in_tree = [str(l.label) for l in labels]
-        newick = Tree(t.newick_string, format=1)
-        try:
-            if 'glotto' not in t.name:
-                newick.prune(langs_in_tree, preserve_branch_length=True)
-                t.newick_string = newick.write(format=1)
-            else:
-                # kind of hacky, but needed for when langs_in_tree is only 1
-                # in future, maybe exclude these trees from the search results?
-                if len(langs_in_tree) == 1:
-                    node = newick.search_nodes(name=langs_in_tree[0])
-                    if len(node[0].get_leaves()) > 1:
-                        t.newick_string = "(%s:1);" % (langs_in_tree[0])
-                    elif (len(node[0].get_leaves()) == 1) \
-                            and not (node[0].get_leaves()[0].name == langs_in_tree[0]):
-                        t.newick_string = "(%s:1);" % (langs_in_tree[0])
-                    else:
-                        newick.prune(langs_in_tree, preserve_branch_length=True)
-                        t.newick_string = newick.write(format=1)
-                else:
-                    newick.prune(langs_in_tree, preserve_branch_length=True)
-                    t.newick_string = newick.write(format=1)
-        except TreeError:
-            continue
-    return trees
-
 def result_set_from_query_dict(query_dict):
+    from time import time
+    _s = time()
+    log.info('enter result_set_from_query_dict')
+
     result_set = serializers.SocietyResultSet()
     # Criteria keeps track of what types of data were searched on, so that we can
     # AND them together
@@ -257,7 +222,8 @@ def result_set_from_query_dict(query_dict):
                 .select_related(
                     'source',
                     'language__family',
-                    'language__iso_code'):
+                    'language__iso_code')\
+                .prefetch_related('culturalvalue_set'):
             if society.culturalvalue_set.count():
                 result_set.add_language(society, society.language)
 
@@ -281,23 +247,28 @@ def result_set_from_query_dict(query_dict):
             codes = list(codes)
 
             if variable.data_type and variable.data_type == 'Continuous':
-                assert all('min' in c for c in codes)
+                include_NA = not all('min' in c for c in codes)
                 query = reduce(
                     lambda q, x: q | Q(
                         coded_value_float__gt=x['min'], coded_value_float__lt=x['max']),
-                    codes,
+                    [c for c in codes if 'min' in c],
                     Q(id=0))
+                if include_NA:
+                    query = query | Q(coded_value='NA')
+                print query
                 values = models.CulturalValue.objects\
                     .filter(variable=variable)\
-                    .filter(query)\
-                    .exclude(coded_value='NA')
+                    .filter(query)
+                if not include_NA:
+                    values = values.exclude(coded_value='NA')
             else:
                 assert all('id' in c for c in codes)
                 values = models.CulturalValue.objects \
                     .filter(code_id__in=[x['id'] for x in codes])
 
             for value in values\
-                    .select_related('society__language__family') \
+                    .select_related('code')\
+                    .select_related('society__language__family')\
                     .select_related('society__language__iso_code')\
                     .select_related('society__source')\
                     .prefetch_related('references'):
@@ -332,20 +303,50 @@ def result_set_from_query_dict(query_dict):
                     'language__iso_code')\
                 .prefetch_related('source').all():
             result_set.add_geographic_region(society, society.region)
+
+    log.info('mid 1: %s' % (time() - _s,))
+
     # Filter the results to those that matched all criteria
     result_set.finalize(criteria)
+    log.info('mid 2: %s' % (time() - _s,))
 
     # search for language trees
-    #language_ids = []
-    #for s in result_set.societies:
-    #    if s.society.language:
-    #        language_ids.append(s.society.language.id)
-    ext_ids = []
-    for s in result_set.societies:
-        ext_ids.append(s.society.ext_id)
-    trees = trees_from_languages_array(ext_ids)
-    for t in trees:
-        result_set.add_language_tree(t)
+    soc_ids = [s.society.id for s in result_set.societies]
+    labels = models.LanguageTreeLabels.objects.filter(societies__id__in=soc_ids).all()
+    log.info('mid 3: %s' % (time() - _s,))
+
+    global_tree = None
+    global_newick = []
+    global_isolates = []
+
+    for t in models.LanguageTree.objects\
+            .filter(taxa__societies__id__in=soc_ids)\
+            .prefetch_related(
+                'taxa__languagetreelabelssequence_set__labels',
+                'taxa__languagetreelabelssequence_set__society',
+            )\
+            .distinct():
+        if 'global' in t.name:
+            global_tree = t
+            # TODO ask @Bibiko once the isolates are in the db under global.tree as string: isol1,isol2,isol3,...
+            # global_isolates.extend(t.newick_string.split(','))
+            global_isolates.extend(['alse1251','amas1236','bana1292','calu1239','chim1301','chit1248','chon1248','coah1252','coos1249','furr1244','gaga1251','guai1237','guat1253','hadz1240','high1242','kara1289','karo1304','klam1254','kute1249','lara1258','mull1237','natc1249','nort2938','paez1247','pume1238','pura1257','pure1242','sali1253','sand1273','seri1257','shom1245','sius1254','sout1439','take1257','ticu1245','timu1245','tiwi1244','toll1241','trum1247','uruu1244','wara1303','wash1253','yama1264','yuch1247','zuni1245'])
+        else:
+            if update_newick(t, labels):
+                result_set.language_trees.add(t)
+                if 'glotto' in t.name:
+                    #remove last ; in order to be able to join the trees
+                    global_newick.append(t.newick_string[:-1])
+
+        log.info('mid 4: %s' % (time() - _s,))
+
+    if global_tree:
+        langs_in_tree = [str(l.label) for l in labels]
+        #add isolates if present in current selection
+        [global_newick.append('(' + isolate + ':1)') for isolate in global_isolates if isolate in langs_in_tree]
+        #join all pruned glottolog trees into the global one
+        global_tree.newick_string = '(' + ','.join(global_newick) + ');'
+        result_set.language_trees.add(global_tree)
 
     return result_set
 
@@ -361,6 +362,10 @@ def find_societies(request):
 
     Returns serialized collection of SocietyResult objects
     """
+    from time import time
+    from django.db import connection
+    s = time()
+    log.info('%s find_societies 1: %s queries' % (time() - s, len(connection.queries)))
     query = {}
     for k, v in request.query_params.lists():
         if str(k) == 'name':
@@ -374,7 +379,13 @@ def find_societies(request):
                 return Response({'societies': []})
         query[k] = [json.loads(vv) for vv in v]
     result_set = result_set_from_query_dict(query)
+    log.info('%s find_societies 2: %s queries' % (time() - s, len(connection.queries)))
     d = serializers.SocietyResultSetSerializer(result_set).data
+    log.info('%s find_societies 3: %s queries' % (time() - s, len(connection.queries)))
+    for i, q in enumerate(
+            sorted(connection.queries, key=lambda q: q['time'], reverse=True)):
+        if i < 5:
+            log.info('%s for %s' % (q['time'], q['sql'][:200]))
     return Response(d)
 
 

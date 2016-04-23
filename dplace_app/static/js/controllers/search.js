@@ -63,6 +63,111 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties) 
         $scope.searchButton.text = 'Search';
     };
     
+    $scope.isEmpty = function(object, searchType) {
+        if (searchType == 'environmental') {
+            for (var i = 0; i < object.length; i++) {
+                if (object[i].selectedVariable) return false;
+            }
+        } else {
+            for (var key in object) {
+                if (object[key].length > 0)
+                    return false;
+            }
+        }
+        return true;
+    };
+    $scope.searchCriteria = "View selected search criteria";
+
+    $scope.showCriteria = function() {
+        $("#selected-criteria").toggleClass('hidden');
+        $("#search-panel").toggleClass('col-md-9', 'col-md-12');
+        
+        if (!$("#selected-criteria").hasClass('hidden')) $scope.searchCriteria = "Hide selected search criteria";
+        else $scope.searchCriteria = "View selected search criteria";
+    };
+    
+    $scope.checkIfSelected = function() {
+        if ($scope.searchModel.getGeographicRegions().selectedRegions.length > 0) return true;
+        if ($scope.searchModel.getEnvironmentalData().selectedVariables.length > 0) {
+            for (var i = 0; i < $scope.searchModel.getEnvironmentalData().selectedVariables.length; i++) {
+                if ($scope.searchModel.getEnvironmentalData().selectedVariables[i].selectedVariable) return true;
+            }
+        }
+        if (!$scope.isEmpty($scope.searchModel.getCulturalTraits().selected)) return true;
+        if (!$scope.isEmpty($scope.searchModel.getLanguageClassifications().selected)) return true;
+        return false;
+    }
+    
+    //removes a variable, language, or region from search parameters
+    $scope.removeFromSearch = function(object, searchType) {
+        var index = -1;
+        switch(searchType) {
+            case 'geographic':
+                index = $scope.searchModel.getGeographicRegions().selectedRegions.indexOf(object);
+                $scope.searchModel.getGeographicRegions().selectedRegions.splice(index, 1);
+                $scope.searchModel.getGeographicRegions().badgeValue = $scope.searchModel.getGeographicRegions().selectedRegions.length;
+                break;
+            case 'environmental':
+                index = $scope.searchModel.getEnvironmentalData().selectedVariables.indexOf(object);
+                $scope.searchModel.getEnvironmentalData().selectedVariables.splice(index, 1);
+                $scope.searchModel.getEnvironmentalData().badgeValue = $scope.searchModel.getEnvironmentalData().selectedVariables.length;
+                break;
+            case 'family':
+                var langSelectedObjs = $scope.searchModel.getLanguageClassifications().selected;
+                if (object in langSelectedObjs) {
+                    for (var i = 0; i < langSelectedObjs[object].length; i++) {
+                        langSelectedObjs[object][i].isSelected = false;
+                        $scope.searchModel.getLanguageClassifications().badgeValue -= langSelectedObjs[object][i].societies.length
+                    }
+                    delete langSelectedObjs[object];
+                    $scope.$broadcast('classificationSelectionChanged');
+                }
+                break;
+            case 'language':
+                var langSelectedObjs = $scope.searchModel.getLanguageClassifications().selected;
+                if (object.family.name in langSelectedObjs) {
+                    for (var i = 0; i < langSelectedObjs[object.family.name].length; i++) {
+                        if (langSelectedObjs[object.family.name][i].id == object.id) {
+                            langSelectedObjs[object.family.name][i].isSelected = false;
+                            $scope.searchModel.getLanguageClassifications().badgeValue -= langSelectedObjs[object.family.name][i].societies.length
+                            index = i;
+                            break;
+                        }
+                    }
+                    if (index > -1) {
+                        langSelectedObjs[object.family.name].splice(index, 1);
+                        // sync Select all checkbox in language.(html|js)
+                        $scope.$broadcast('classificationSelectionChanged');
+                    }
+                }
+                break;
+            case 'culture': 
+                if (object.variable in $scope.searchModel.getCulturalTraits().selected) {
+                    for (var i = 0; i < $scope.searchModel.getCulturalTraits().selected[object.variable].length; i++) {
+                        if (($scope.searchModel.getCulturalTraits().selected[object.variable][i].id == object.id) || ($scope.searchModel.getCulturalTraits().selected[object.variable][i].description == object.description)) {
+                            $scope.searchModel.getCulturalTraits().selected[object.variable][i].isSelected = false;
+                            index = i;
+                            break;
+                        }
+                    }
+                    if (index > -1) {
+                        $scope.searchModel.getCulturalTraits().selected[object.variable].splice(index, 1);
+                        $scope.searchModel.getCulturalTraits().selected[object.variable].allSelected = false;
+                        $scope.searchModel.getCulturalTraits().badgeValue--;
+                        $scope.$broadcast('variableCheck');
+                    }
+                
+                }
+        }
+        if (!$scope.checkIfSelected()) {
+            d3.select("#selected-criteria").classed("hidden", true);
+            d3.select("#search-panel").classed("col-md-12", true);
+            d3.select("#search-panel").classed("col-md-9", false);
+            if (!$("#selected-criteria").hasClass('hidden')) $scope.searchCriteria = "Hide selected search criteria";
+            else $scope.searchCriteria = "View selected search criteria";
+        }
+    };
+    
     //calculates the range for environmental variables
     //needed for coloring of markers
     $scope.calculateRange = function(results) {
@@ -85,8 +190,8 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties) 
            });
             var range = max_value - min_value;
             results.environmental_variables[i]['range'] = range;
-            results.environmental_variables[i]['min'] = Math.round(min_value*10000)/10000;
-            results.environmental_variables[i]['max'] = Math.round(max_value*10000)/10000;
+            results.environmental_variables[i]['min'] = min_value.toFixed(4);
+            results.environmental_variables[i]['max'] = max_value.toFixed(4);
         }
         return results;
     };
@@ -124,8 +229,8 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties) 
                     if (c_var.max > max) max = c_var.max;
                 });
                 
-                $scope.searchModel.results.variable_descriptions[i].variable['min'] = min;
-                $scope.searchModel.results.variable_descriptions[i].variable['max'] = max;
+                $scope.searchModel.results.variable_descriptions[i].variable['min'] = min.toFixed(2);
+                $scope.searchModel.results.variable_descriptions[i].variable['max'] = max.toFixed(2);
                 $scope.searchModel.results.variable_descriptions[i].variable['units'] = $scope.searchModel.results.variable_descriptions[i].variable.name.substring($scope.searchModel.results.variable_descriptions[i].variable.name.indexOf('(')+1, $scope.searchModel.results.variable_descriptions[i].variable.name.indexOf(')'));
                 $scope.searchModel.results.variable_descriptions[i].codes = codes;
             }                    
@@ -218,7 +323,10 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties) 
         for (var propertyName in searchParams) {
             //get selected cultural traits/codes
             if (propertyName == 'culturalTraits') {
-                var codes = searchParams[propertyName].selected.filter(function(code){ return code.isSelected; });
+                var codes = [];
+                for (var variable in searchParams[propertyName].selected) {
+                    searchParams[propertyName].selected[variable].forEach(function(code) { if (code.isSelected) codes.push(code); });
+                };
                 if (codes.length > 0) {
                     searchQuery['c'] = [];
                     for (i = 0; i < codes.length; i++) {
@@ -272,7 +380,10 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties) 
             
             //get selected languages
             if (propertyName == 'languageClassifications') { 
-                var classifications = searchParams[propertyName].selected.filter(function(classification){ return classification.isSelected; });
+                var classifications = [];
+                for (var family in searchParams[propertyName].selected) {
+                    searchParams[propertyName].selected[family].forEach(function(language) { if (language.isSelected) classifications.push(language); });
+                }
                 if (classifications.length > 0) {
                     searchQuery['l'] = [];
                     for (i = 0; i < classifications.length; i++) {

@@ -8,6 +8,11 @@ angular.module('dplaceFilters', [])
             }
         }
     })    
+    .filter('formatVariables', function() {
+        return function(selected, selectedVariable) {
+            return selected.filter(function(code) { return code.variable == selectedVariable ;});
+        };
+    })
     .filter('colorNode', ['colorMapService', function(colorMapService) {
         return function(value, codes) {
             if (codes.societies) {
@@ -61,8 +66,8 @@ angular.module('dplaceFilters', [])
     .filter('formatVariableCodeValues', function() {
         return function(values, variable_id) {
             codes = values.filter( function(code_value) {   
-               if (code_value.code_description && (variable_id == code_value.code_description.variable)) return code_value;
-                else if (variable_id == code_value.variable) return code_value;
+               if (code_value.code_description && (variable_id.id == code_value.code_description.variable)) return code_value;
+                else if (variable_id.id == code_value.variable) return code_value;
             });
             return [codes[0]];
         };
@@ -76,10 +81,16 @@ angular.module('dplaceFilters', [])
     })
     .filter('formatEnvironmentalValues', function () {
         return function(values, variable_id) {
-            return values.map( function(environmental_value) {
-                if (environmental_value.variable == variable_id) return environmental_value.value.toFixed(4);
-                else return ''
-            }).join('');
+            codes = values.filter( function(environmental_value) {
+                if (environmental_value.variable == variable_id) {
+                    // TODO why is called this filter twice?
+                    // First environmental_value.value is a float un-toFixed(4)
+                    // then as string whereby the value is already toFixed(4)
+                    try{environmental_value.value = environmental_value.value.toFixed(4)}catch(e){}
+                    return environmental_value;
+                }
+            });
+            return [codes[0]];
         };
     })
     .filter('formatValueSources', function() {

@@ -3,138 +3,169 @@
         $("a.comment-tooltip").tooltip();
         document.title = 'Source – D-PLACE';
     });
+    function scrollToAnchor(aid){
+        var aTag = $("a[name='"+ aid +"']");
+        $('html,body').animate({scrollTop: aTag.offset().top-140},'slow');
+    }
 </script>
-
 <div class="">
   <div class="container">
     <div class="row about header">
-      <h2>
-        Database data
-      </h2>
-        <div class="introduction">
-        <p><b>Cultural data:</b><br>
-            To date, D-PLACE includes cultural data from two major cross-cultural databases: the Ethnographic Atlas (Murdock 1962-1971; Gray 1999; Korotayev et al. 2004; Bondarenko et al. 2005) and the Binford Hunter-Gatherer dataset (Binford 2001). Both cross-cultural datasets use codes to characterize the cultural practices of a ‘society,’ or group of people with a shared language and cultural identity at a given location and point in time. The cultural practices characterized in each dataset are diverse, for example describing aspects of local marriage systems, subsistence economies, political institutions, and house architecture.
-        </p>
-        <p>
-            The Ethnographic Atlas (EA) describes XX cultural practices for 1292 societies, ranging from small hunter-gatherer groups to societies with complex agricultural economies and political systems. The societies are globally distributed with especially good coverage of Africa and western North America.
-        </p>
-        <p>
-            The Binford Hunter-Gatherer dataset describes cultural practices for all 339 “hunter gatherer groups known to exist during colonial and more recent era […] that were described with sufficient detail to be included in a comparative analysis” (Binford 2001: 130). Some of the cultural practices described in Binford’s dataset overlap with those of the EA (e.g., subsistence economy, marriage system), while others are distinct (e.g., social group size, mobility). Approximately 60% of the societies described by Binford are also described in the EA. Relative to the EA, the Binford database includes many more societies in Australia and in northern North America. 
-        </p>
-        <p><b>What is the original source of the cultural data?</b><br>
-            The Binford Hunter-Gatherer dataset describes cultural practices for all 339 “hunter gatherer groups known to exist during colonial and more recent era […] that were described with sufficient detail to be included in a comparative analysis” (Binford 2001: 130). Some of the cultural practices described in Binford’s dataset overlap with those of the EA (e.g., subsistence economy, marriage system), while others are distinct (e.g., social group size, mobility). Approximately 60% of the societies described by Binford are also described in the EA. Relative to the EA, the Binford database includes many more societies in Australia and in northern North America. 
-        </p>
-        <p>
-            In deciding how to interpret the cultural data in D-PLACE, we encourage users to consider not just the focal year and location to which the data refer, but also uncertainty in code assignment. This is likely to reflect, among other things, intra-cultural variability in a practice, the familiarity of source ethnographers with the society in question (for example, fluency in the local language, time spent living with the society), and the ease with which a cultural practice can be inferred by an ethnographer (for example, we might expect more accuracy in descriptions of house shape than in descriptions of religious beliefs; Whiting 1981; Burton and White 1987).
-        </p>
-        <p>
-            To facilitate users’ consideration of uncertainty, we have tagged each cultural ‘data point’ (i.e., description of a cultural practice for a particular society) with the ethnographic source(s) that the author of the cross-cultural dataset used to to code it. We have also digitized any notes published with the cross-cultural codes, which often describe intra-society deviations from dominant practices, and/or changes in practices over time. These are called ‘comments’ in D-PLACE.
-        </p>
-        <p>
-            For each society, a set of geographic coordinates describes the approximate location to which the cultural data refer. In some cases, additional details are also provided on the community or settlement that is the focus of the ethnographic description. The geographic coordinates were used in the process of linking each society to a language (see linguistic data, below), and provided the basis for the extraction of environmental and climate data for each society (see environmental data, below). The coordinates also provide the basis for map-based analyses in D-PLACE.
-        </p>
-        </div>
-        <div class="aboutEA">
-            <h3>
-                Ethnographic Atlas
-            </h3>
-            <p>
-                The original Ethnographic Atlas was published in twenty-one installments by George P. Murdock (Murdock 1962-1966, 1967, 1968, 1971). Subsequent data installments included not just ‘new’ data, but also corrections to data published in previous installments. Three decades later, J. Patrick Gray compiled these corrections in a “Corrected Ethnographic Atlas,” which includes 1265 societies and 112 cultural variables. It also replaces Murdock’s letter-based codes with numeric codes (Gray 1999). This dataset is available as a single, flat file through the journal World Cultures. To the Gray (1999) dataset, we have made the following changes. First, we went back to Murdock’s original codes, and ‘de-aggregated’ any codes that were aggregated by Gray (1999) (see Codebook, for details), in order to avoid loss of information. Next, we eliminated or condensed variables that split a single piece of information (e.g., society name, or year of data collection) over multiple fields (variables 100-111, v114-v115). We also omitted non-cultural data that appears in Gray (1999), but that D-PLACE is explicitly designed to improve upon, including variables describing region (v91, v92), climate (v95, v96), and linguistic affiliation (v97-v99). We deleted two societies in Gray (1999) that appeared to be doubles of other societies (Na18, XXX), and added data for 27 societies in Eurasia recently coded for the Ethnographic Atlas by Korotayev et al. (2004) and Bondarenko et al. (2005).
-            </p>
-        </div>
-        <div class="aboutBinford">
-            <h3>
-                Binford Hunter-Gatherer
-            </h3>
-            <p>
-                In 2001, Lewis R. Binford published a monograph focused on the potential for building archaeological theory using a global dataset on hunter-gatherer societies (Binford 2001). In it, he published data tables summarizing a sample of cultural practices for 339 hunter-gatherer societies. We include in D-PLACE data from tables 5.01, 6.03, 8.01, 8.04, 8.07, 8.08 and 9.01. Although some of these tables include data describing societies’ local environments, we retain only those variables that describe the societies themselves. Data for focal year, and some variable names were obtained from documentation accompanying Binford and Johnson (2006). For additional inforamtion, we refer users to the website of Binford’s long-time collaborator, Amber Johnson (<a href="http://ajohnson.sites.truman.edu/data-and-program/" target="_blank">http://ajohnson.sites.truman.edu/data-and-program/</a>)
-            </p>
-        </div>
-        <div class="aboutBinford">
-            <h3>
-                Links to other cross-cultural datasets
-            </h3>
-            <p>
-                In order to facilitate access to supplementary cultural data for D-PLACE societies, we provide information on whether each society appears in other major cross-cultural databases. For example, about 14% of the societies in the EA also appear in the Standard Cross-Cultural Sample (SCCS), for which over 2000 cultural variables have been coded (White and Murdock 1969). Similarly, approximately 24% of the societies in the EA are included in the Human Relations Area Files (HRAF; Murdock 1983), a repository of annotated primary literature that can be searched by topic (e.g., marriage system). The cross-coding considers whether records share a focal time and place in addition to a focal “society” (e.g., records for “Samoa” in the SCCS and EA may not correspond as they have a different focal time (1829 vs. 1920) and place (Western Samoa vs. American Samoa; Ember et al. 1992; Ember 2007). CHIRALI, JORGENSEN
-            </p>
-        </div>
-        <div class="aboutBinford">
-            <h3>
-                Linguistic data
-            </h3>
-            <p>
-                Summary: Currently, two levels of control on sample independence are possible in D-PLACE. First, because the broad linguistic affiliation of all societies in D-PLACE is known, users can use language family as a coarse- level control of relatedness among societies. Second, a large portion of the societies in each database belong to a language family for which a well-resolved phylogenetic tree is available. These trees allow for much more detailed controls on relatedness; for example, relative time-since-language-divergence can be used as a measure of relative distance among societies. The following section briefly describes the methods we used to link societies to language families and phylogenetic trees. The distribution of D-PLACE societies among language families, and their representation on the phylogenetic trees included in D-PLACE are summarized in Tables 1 and 2 and Figure 3.
-            </p>
-            <p>
-                Methods: Society-language matches were triangulated using a combination of geographic coordinates, bibliographic information from the original EA or Binford databases (White 1989; White 1990; Binford 2001), and online sources – especially Ethnologue and MultiTree (Lewis et al. 2013; LINGUIST List 2009). Geographic coordinates for each society were obtained from their source publications (Gray 1999; Binford 2001; Korotayev et al. 2004; Bondarenko et al. 2005), and coordinates for languages were obtained from the World Language Mapping System (GMI 2005). Each society was linked to its most commonly spoken language. However, multiple societies were often assigned the same language (e.g., the EA database includes information on 17 Shoshone-speaking societies). For the societies for which an ISO 693 code has yet to be assigned, we use a D-PLACE serial number as a place-holder. Once assigned a language and ISO693 code/serial number, we were able to link each society to a language family using a corrected version of the “classification” field of Lewis et al. (2013; correction by C. Bowern and M. Dunn; available as an accessory file on the D-PLACE site). Societies speaking creoles or pidgins were assigned a language family by a linguist. For the X language families for which we had access to a phylogeny, including Austronesian, Bantu, Uto-Aztecan, Pama-Nyungan, Indo-European and Semitic (…), society-language matches were used to map societies to the ‘tips’ of the phylogenetic trees. A few of these phylogenies are well-represented by EA societies (e.g., 105 EA societies mapped to Austronesian tree (Gray et al. XX); 93 EA societies on the Bantu tree (REF)); highlighting the potential for D-PLACE to be used in analyses of multiple cultural traits and their inter-relationships.
-            </p>
-        </div>
-        <div class="aboutBinford">
-            <h3>
-                Environmental data
-            </h3>
-            <p>
-Sampling localities: Ecological variables were sampled at the localities reported in the Ethnographic Atlas. Georeferences were fact-checked by comparison with the corresponding ISO language range centroid localities and additional confirmation with the original ethnographies when needed. We provide in this data set the original EA coordinates as well as the corrected localities used for ecological analysis. Societies were identified as coastal when their sampling locality was 50km or less from a major water body.
-            <p>
-Historical Data: Because a majority of societies in the Ethnographic Atlas were sampled between 1901 and 1950, we attempted when possible to characterize the ecological characteristics at each sampling locality for this particular time period. For each society, we computed the mean, variance, and predictability of the entire annual cycles of precipitation and temperature based on monthly global maps (0.5 by 0.5 degree cells) obtained from the CRU-TS 3.1 Climate Database (Harris et al. 2013). Predictability was measured via Colwell’s (1974) Constancy, Contingency and Predictability indexes. These indexes capture the extent to which yearly cycles vary among years in terms of onset, intensity and duration, ranging from 0 (completely unpredictable) to 1 (fully predictable).
-          <p>
-Contemporary Data: Contemporary values are reported for variables in which the optimal range of historical data was not available. Monthly net primary production data was obtained from the MODIS dataset (available at:
-http://neo.sci.gsfc.nasa.gov/view.php?datasetId=MOD17A2_M_PSN). Last accessed 10 Jan 2014; Data range: 2000-2013). From these data we computed the mean annual productivity at each site and determined the months of the year in which net primary production is positive (hereafter "Mean Growing Season"). Estimates of the number of species at each locality were obtained for birds, mammals, and amphibians from Jenkins et al. (2013) and for vascular plants from Kreft and Jetz (2007). Ecoregions data were obtained from Olson et al. (2001) and elevation data were obtained from the GTOPO30 data set (available at: lpdaac.usgs.gov/gtopo30/gtopo30.asp. Last accessed 17 April 2012).          </p>
-        </div>
-        <div class="aboutBinford">
-            <h3>
-                References for data section
-            </h3>
-            <ul>
-<li>Atkinson, Q.D., & Gray, R. D. (2005). Curious parallels and curious connections: Phylogenetic thinking in biology and historical linguistics. Systematic Biology, 54(4), 513–526.</li>
-<li>Barnett, D. W., Garrison, E. K., & Quinlan, A. R. (2011). BamTools: a C++ API and toolkit for analyzing and managing BAM files. Bioinformatics, 27(12), 1691–1692.</li>
-<li>Bates, D. M., Maechler, M., Bolker, B., & Walker, S. (2014). lme4: Linear mixed-effects models using Eigen and S4. R package version 1.1-7. Retrieved from http://cran.r-project.org/package=lme4</li>
+      <h2><a name="a_ch0"></a>Data Sources</h2>
+    </div>
+&nbsp;&nbsp;<a onclick="scrollToAnchor('a_ch1')"><b>1. Cultural data</b></a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a onclick="scrollToAnchor('a_ch2')">What is the original source of the cultural data?</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a onclick="scrollToAnchor('a_ch3')">Codebooks: overview of cultural variables and codes</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a onclick="scrollToAnchor('a_ch4')">Links to other cross-cultural datasets</a><br>
+&nbsp;&nbsp;<a onclick="scrollToAnchor('a_ch5')"><b>2. Linguistic data</b></a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a onclick="scrollToAnchor('a_ch6')">Language family</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a onclick="scrollToAnchor('a_ch7')">Historical relationships among languages: glottolog trees</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a onclick="scrollToAnchor('a_ch8')">Distance among languages: phylogenies</a><br>
+&nbsp;&nbsp;<a onclick="scrollToAnchor('a_ch9')"><b>3. Environmental data</b></a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a onclick="scrollToAnchor('a_ch10')">Climate</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a onclick="scrollToAnchor('a_ch11')">Productivity and biodiversity</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a onclick="scrollToAnchor('a_ch12')">Physical environment</a><br>
+&nbsp;&nbsp;<a onclick="scrollToAnchor('a_ch13')"><b>4. References</b></a><br>
+<br>
+<p>
+D-PLACE contains cultural, linguistic, environmental and geographic information for over 1400 human cultural groups. All cultural descriptions are tagged with the date to which they refer, a geographic location (using a reported latitude and longitude) and language. This allows users to simultaneously consider how cultural practices relate to linguistic ancestry, practices of neighbouring groups, and the environment. The following sections provide an overview of the sources of cultural, linguistic and environmental data in D-PLACE. More detail is provided in Kirby et al. (Submitted).
+</p>
+
+<h2><a name="a_ch1"></a>1. Cultural data<small><a onclick="scrollToAnchor('a_ch0')">⬆︎</a></small></h2>
+<p>
+To date, D-PLACE includes cultural data from two major cross-cultural datasets: the Ethnographic Atlas (Murdock 1962-1971; Barry 1980; Gray 1999; Korotayev et al. 2004; Bondarenko et al. 2005) and the Binford Hunter-Gatherer dataset (Binford 2001; Binford and Johnson 2006). Both use codes to characterize the cultural practices of a ‘society,’ or group of people with a shared language and cultural identity at a given location and point in time.
+</p>
+<p>
+The Ethnographic Atlas (EA) describes cultural practices for 1291 societies, ranging from societies with complex agricultural economies and political systems to small hunter-gatherer groups. The societies are globally distributed with especially good coverage of Africa and western North America.
+</p>
+<p>
+The Binford Hunter-Gatherer dataset describes cultural practices for 339 hunter-gatherer groups. Approximately two-thirds of the societies described by Binford are also described in the EA. However, the Binford database includes a number of societies not in the EA, including many in Australia and northern North America.
+</p>
+<p>
+The cultural practices characterized in each dataset are diverse, for example describing aspects of local marriage systems, subsistence economies, political institutions, and house architecture. Table 1 summarizes key attributes of the two datasets.
+</p>
+<p>
+<b>Table 1. Key attributes of the Ethnographic Atlas and Binford Hunter-Gatherer datasets</b>
+<table class="sourcekeyattr">
+<tr>
+<td><b>Dataset</b></td><td><b>Ethnographic Atlas</b></td><td><b>Binford Hunter-Gatherer</b></td>
+</tr>
+<tr>
+<td><b>Number&nbsp;of&nbsp;societies&nbsp;described</b></td><td>1291</td><td>339</td>
+</tr>
+<tr>
+<td><b>Geographic focus</b></td><td>Global</td><td>Global</td>
+</tr>
+<tr>
+<td><b>Focal time period for cultural data (% of societies)</b></td><td>Before 1800&nbsp;(3%); 1800-1899&nbsp;(25%); 1900-1950&nbsp;(69%); after 1950&nbsp;(2%); NA&nbsp;(1%)</td><td>Before 1800&nbsp;(2%); 1800-1899&nbsp;(63%); 1900-1950&nbsp;(22%); after 1950&nbsp;(11%); NA&nbsp;(2%)</td>
+</tr>
+<tr>
+<td><b>Number of cultural variables</b></td><td>94</td><td>40</td>
+</tr>
+<tr>
+<td><b>Number of cultural variables by category</b><sup>*</sup></td><td>Marriage and Kinship&nbsp;(24); Labour&nbsp;(22); Politics&nbsp;(12); Subsistence&nbsp;(11); Housing&nbsp;(10); Ritual&nbsp;(7); Property&nbsp;(4); Settlement&nbsp;(2); Games&nbsp;(1); Population&nbsp;(1)</td><td>Marriage and Kinship&nbsp;(13); Labour&nbsp;(1); Politics&nbsp;(6); Subsistence&nbsp;(6); Property&nbsp;(1); Settlement&nbsp;(6); Population&nbsp;(3); Anthropometry&nbsp;(4)</td>
+</tr>
+</table>
+<i><small>*Many cultural variables are relevant to multiple ‘categories’ or thematic areas, here we have assigned each to a main category.</small></i>
+</p>
+<h3><a name="a_ch2"></a>What is the original source of the cultural data?<small><a onclick="scrollToAnchor('a_ch0')">⬆︎</a></small></h3>
+<p>
+The authors of both the Ethnographic Atlas and the Binford Hunter-Gatherer dataset relied on a huge number (over 4,000) of primary data sources to code cultural practices of societies in their datasets. Most of these sources are original ethnographies published as academic journal articles or books. While Murdock, Binford and their successors carefully documented their sources, the references were for the most part excluded from early attempts to digitize the EA and Binford datasets. Also lost from early digital datasets were the authors’ comments regarding particular coding decisions, despite the insights and caveats these comments provide.
+</p>
+<p>
+In D-PLACE, each cultural data point is tagged with both its primary sources and coding comments, with references for the primary sources and comments included in results tables and data downloads. We encourage users to draw on this information when considering intracultural variation and uncertainty in cultural codes, and to return to the primary sources for a better understanding of particular coding decisions.
+</p>
+<h3><a name="a_ch3"></a>Codebooks: overview of cultural variables and codes<small><a onclick="scrollToAnchor('a_ch0')">⬆︎</a></small></h3>
+<p>
+The Ethnographic Atlas and Binford Hunter-Gatherer datasets differ in terms of the cultural practices they document and in their coding schemes. When initiating a Cultural Search in D-PLACE, users see a list of ‘possible’ codes for a given cultural variable. However, the variables and codes included in each dataset are also summarized in the following codebooks, currently available for download as MS Excel files. The complete reference list for each dataset is also included as a sheet in the codebooks.
+</p>
+<ul>
+<table>
+<tr>
+<td>Ethnographic Atlas Codebook</td><td>&nbsp;&nbsp;</td><td><a href="/static/downloads/EACodebook.xlsx.zip">download EACodebook.xlsx.zip</a></td>
+</tr>
+<tr>
+<td>Binford Hunter-Gatherer Codebook</td><td>&nbsp;&nbsp;</td><td><a href="/static/downloads/BinfordCodebook.xlsx.zip">download BinfordCodebook.xlsx.zip</a></td>
+</tr>
+</table>
+</ul>
+<p>
+In adapting the EA and Binford datasets for D-PLACE, we made a number of corrections to earlier digital versions of the datasets. These changes are noted in the codebooks (see the “AdminComments” fields). More details on the process we used to digitize and correct the datasets are provided in the supplementary materials of Kirby et al. (Submitted).
+</p>
+<h3><a name="a_ch4"></a>Links to other cross-cultural datasets<small><a onclick="scrollToAnchor('a_ch0')">⬆︎</a></small></h3>
+<p>
+In order to facilitate access to supplementary cultural data for D-PLACE societies, we provide information on whether each society appears in other major cross-cultural databases. These include the <a href="http://escholarship.org/uc/item/62c5c02n" target="_blank">Standard Cross-Cultural Sample (SCCS)</a>, for which over 2000 cultural variables have been coded (White and Murdock 1969), the <a href="http://ehrafworldcultures.yale.edu/ehrafe" target="_blank">Human Relations Area Files (HRAF)</a> (Murdock 1983), a repository of annotated primary literature that can be searched by topic (e.g., marriage system), Jorgensen’s <a href="http://www.worldcat.org/title/western-indians-comparative-environments-languages-and-cultures-of-172-western-american-indian-tribes/oclc/6143513" target="_blank">Western North American Indian dataset</a> (Jorgensen 1980), and the <a href="http://www.pamanyungan.net/chirila/" target="_blank">CHIRALI database of Australian languages</a> (Bowern 2016).
+</p>
+<p>
+Links to other cross-cultural datasets appear at the top of individual “Society” results pages. Kirby et al. (Submitted) includes a discussion regarding the combination of data from different cross-cultural datasets, including the importance of considering agreement among focal year and focal location. More thorough discussions are included in Ember et al. (1992) and Ember (2007).
+</p>
+
+<h2><a name="a_ch5"></a>2. Linguistic data<small><a onclick="scrollToAnchor('a_ch0')">⬆︎</a></small></h2>
+<h3><a name="a_ch6"></a>Language family<small><a onclick="scrollToAnchor('a_ch0')">⬆︎</a></small></h3>
+<p>
+The language spoken by a society is an important indicator for historical relatedness, cultural identity and contact. D-PLACE specifies the broad language family affiliation for all societies, using the classification systems of <a href="http://www.glottolog.org" target="_blank">Glottolog</a> (Hammarström et al. 2015). Users can treat language family as a variable of interest itself, or can use it as a coarse-level control for relatedness among societies (e.g., Botero et al. 2014).
+</p>
+<h3><a name="a_ch7"></a>Historical relationships among languages: Glottolog trees<small><a onclick="scrollToAnchor('a_ch0')">⬆︎</a></small></h3>
+<p>
+At a closer resolution, all societies in D-PLACE have been linked to a language and, in cases where the language was shared with another D-PLACE society, to a <a href="http://glottolog.org/glottolog/glottologinformation" target="_blank">Glottolog dialect</a>. Languages are identified by both a <a href="http://glottolog.org/glottolog/language" target="_blank">Glottolog ID</a> and an <a href="http://www-01.sil.org/iso639-3/codes.asp?order=reference_name" target="_blank">ISO 639-3 code</a>, and dialects by a Glottolog ID (Hammarström et al. 2015; SIL International 2015). For languages for which an ISO 639-3 code has not been assigned, we use a D-PLACE serial number as a place-holder (x01, x02...; all within the ISO-639-3 private use range). Languages and dialects are used by D-PLACE to link each society to Glottolog’s language classification trees. These trees are topological only, representing genealogical hypotheses of how languages are nested, based on comparative historical linguistic work. The classifications are purely taxonomies and branch lengths do not represent time or amount of change.
+</p>
+<h3><a name="a_ch8"></a>Distance among languages: phylogenies<small><a onclick="scrollToAnchor('a_ch0')">⬆︎</a></small></h3>
+<p>
+At the finest scale, many of the societies in each cross-cultural dataset belong to a language family for which a well-resolved and computationally-derived phylogenetic tree is available (for example: Gray et al 2009, Kitchen et al. 2009, Dunn et al. 2011, Lee and Hasegawa 2011, Bowern and Atkinson 2012, Bouckaert et al 2012, Chacon and List 2015, Grollemund et al. 2015, Sicoli &amp; Holton 2015, Lee 2015). In focusing analyses on these societies, researchers gain the ability to conduct sophisticated hypothesis testing about evolutionary change using phylogenetic comparative methods, as well as robust control for historical relatedness. For example, the relative time since language divergence can be used as a measure of relative distance among societies. Of course, while language provides a highly effective proxy for shared history, language family affiliation may not always reflect deep cultural or linguistic ancestry. Numerous instances of language shift, contact, and borrowing occur when societies interact. For example, many Central African Pygmy groups have adopted the languages of their Bantu trading partners (Bahuchet 2012). In such cases, linguistic relationships still capture meaningful aspects of cultural interaction, but users will need to make their own context-specific judgments.
+</p>
+<p>
+For details on how societies were matched to languages, please see Kirby et al. (Submitted).
+</p>
+
+<h2><a name="a_ch9"></a>3. Environmental data<small><a onclick="scrollToAnchor('a_ch0')">⬆︎</a></small></h2>
+<p>
+We sampled environmental variables at the localities reported in the Ethnographic Atlas and Binford Hunter-Gatherer dataset, with some adjustments to geographic coordinates as outlined in Kirby et al. (Submitted). Both the original and revised latitude and longitude for all societies are included in CSV downloads of search results from this site.
+</p>
+<h3><a name="a_ch10"></a>Climate<small><a onclick="scrollToAnchor('a_ch0')">⬆︎</a></small></h3>
+<p>
+For each society, we computed the mean, variance, and predictability of the entire annual cycles of precipitation and temperature based on monthly global maps (0.5 by 0.5 degree cells) obtained from the CRU-TS 3.1 <a href="http://www.cgiar-csi.org/data/uea-cru-ts-v3-10-01-historic-climate-database" target="_blank">Climate Database</a> (Harris et al. 2013). Predictability was measured via Colwell’s (1974) Constancy, Contingency and Predictability indexes. These indexes capture the extent to which yearly cycles vary among years in terms of onset, intensity and duration, ranging from 0 (completely unpredictable) to 1 (fully predictable). We include constancy (the extent to which a variable can be predicted because it tends to stay fairly constant) and contingency (the extent to which predictions are possible because environmental cycles are highly repeatable) in order to allow interested users to explore the potentially different impacts of these two types of predictability. Because the cultural data for the vast majority of societies in D-PLACE was collected between 1901 and 1950, we sampled climatic variables at each locality for this particular time period.
+</p>
+<h3><a name="a_ch11"></a>Productivity and biodiversity<small><a onclick="scrollToAnchor('a_ch0')">⬆︎</a></small></h3>
+<p>
+Ecoregion and biome locations of each society were obtained from <a href="http://www.worldwildlife.org/publications/terrestrial-ecoregions-of-the-world" target="_blank">Olson et al.</a> (2001). Monthly net primary production data were obtained from the <a href="http://neo.sci.gsfc.nasa.gov/view.php?datasetId=MOD17A2_M_PSN" target="_blank">MODIS dataset</a> (Running et al. 1999, Data range: 2000-2016). From these data we computed the annual mean, variance predictability, constancy and contingency of net primary productivity at each sampled locality. Estimates of the number of species at each site were obtained for birds, mammals, and amphibians from Jenkins et al. (2013) and for vascular plants from Kreft and Jetz (2007).
+</p>
+<h3><a name="a_ch12"></a>Physical environment<small><a onclick="scrollToAnchor('a_ch0')">⬆︎</a></small></h3>
+We also include estimates of distance from a coast, elevation, and slope for all societies, with topographical data provided by the <a href="https://lta.cr.usgs.gov/GTOPO30" target="_blank">GTOPO30 data set</a>.
+
+<h2><a name="a_ch13"></a>4. References<small><a onclick="scrollToAnchor('a_ch0')">⬆︎</a></small></h2>
+<ul>
+<li>Bahuchet, S. (2012). Changing language, remaining pygmy. Human Biology, 84(1), 11-43.</li>
+<li>Barry, H. (1980). Ethnographic Atlas XXVIII. Ethnology 19(2): 245-263.</li>
 <li>Binford, L. R. (2001). Constructing frames of reference: an analytical method for archaeological theory building using ethnographic and environmental data sets. Univ of California Press.</li>
-<li>Binford, L. R., & Johnson, A. L. (2006). Documentation for Program for Calculating Environmental and Hunter-Gatherer Frames of Reference (ENVCALC2). Java version, August 2006.</li>
-<li>Bondarenko, D., Kazankov, A., Khaltourina, D., & Korotayev, A. (2005). Ethnographic atlas XXXI: Peoples of easternmost Europe. Ethnology, 261–289.</li>
-<li>Botero, C.A., Gardner, B, Kirby, K.R., Bulbulia, J., Gavin, M.C. and Gray, R.D. (2014) The ecology of religious beliefs. Proceedings of the National Academy of Sciences. 111 (47), 16784-16789</li>
-<li>Burton, M. L., & White, D. R. (1987). Cross-cultural surveys today. Annual Review of Anthropology, 143–160.</li>
-<li>Colwell, R. K. (1974). Predictability, constancy, and contingency of periodic phenomena. Ecology, 1148–1153.</li>
-<li>Divale, W. T. (1975). Temporal focus and random error in cross-cultural hypothesis tests. Cross-Cultural Research, 10(1), 19–36.</li>
+<li>Binford, L. R., and Johnson, A. L. (2006). Documentation for Program for Calculating Environmental and Hunter-Gatherer Frames of Reference (ENVCALC2). Java version, August 2006.</li>
+<li>Bondarenko, D., Kazankov, A., Khaltourina, D., and Korotayev, A. (2005). Ethnographic atlas XXXI: Peoples of easternmost Europe. Ethnology, 261–289.</li>
+<li>Botero, C.A., Gardner, B, Kirby, K.R., Bulbulia, J., Gavin, M.C. and Gray, R.D. (2014) The ecology of religious beliefs. Proceedings of the National Academy of Sciences. 111 (47), 16784-16789.</li>
+<li>Bouckaert, R., Lemey, P., Dunn, M., Greenhill, S. J., Alekseyenko, A. V., Drummond, A. J., Gray, R. D., Suchard, M. A., and Atkinson, Q. D. (2012). Mapping the Origins and Expansion of the Indo-European Language Family. Science 337, 957.  DOI: 10.1126/science.1219669.</li>
+<li>Bowern, C. (2016). Chirila: Contemporary and Historical Resources for the Indigenous Languages of Australia. Language Documentation and Conservation. February, 2016. Vol 10: 1-44. <a href="http://nflrc.hawaii.edu/ldc/?p=1002" target="_blank">http://nflrc.hawaii.edu/ldc/?p=1002</a>.</li>
+<li>Bowern, C., and Atkinson, Q. (2012). Computational phylogenetics and the internal structure of Pama-Nyungan. Language, 88(4), 817-845.</li>
+<li>Chacon T. C., and List, J. M. (2015) Improved computational models of sound change shed light on the history of the Tukanoan languages. Journal of Language Relationship • <span style="font-family:'Arial'">Вопросы языкового родства.</span> 13:177-203.</li>
+<li>Colwell R. K. (1974) Predictability, constancy, and contingency of periodic phenomena. Ecology. 1:1148-53.</li>
+<li>Dunn M., Greenhill, S. J., Levinson, S. C., and Gray, R.D. (2011) Evolved structure of language shows lineage-specific trends in word-order universals. Nature. 5;473(7345):79-82.</li>
 <li>Ember, C. R. (2007). Using the HRAF collection of ethnography in conjunction with the Standard Cross-Cultural Sample and the Ethnographic Atlas. Cross-Cultural Research, 41(4), 396–427.</li>
-<li>Ember, C. R., Page, H., MM, M., & O’Leary, T. (1992). A computerized concordance of cross-cultural samples. New Haven: Human Relations Area Files.</li>
-<li>Ember, M., Ember, C. R., & Low, B. S. (2007). Comparing explanations of polygyny. Cross-Cultural Research, 41(4), 428–440.</li>
-<li>Fitzjohn, R. G. (2012). Diversitree: Comparative Phylogenetic Analyses of Diversification in R. Methods in Ecology and Evolution. doi:10.1111/j.2041-210X.2012.00234.x</li>
-<li>Gavin, M. C., Botero, C. A., Bowern, C., Colwell, R. K., Dunn, M., Dunn, R. R., … Powell, A. (2013). Toward a mechanistic understanding of linguistic diversity. BioScience, 63(7), 524–535.</li>
-<li>Gavin, M. C., & Sibanda, N. (2012). The island biogeography of languages. Global Ecology and Biogeography, 21(10), 958–967.</li>
-<li>Gray, J. P. (1999a). A corrected ethnographic atlas. World Cultures, 10(1), 24–85.</li>
-<li>Gray, J. P. (1999b). Contents and how to use this issue. World Cultures, 10(1), 5–6.</li>
-<li>Gray, J. P. (1999c). Ethnographic Atlas codebook. World Cultures, 10(1), 86–136.</li>
-<li>Gray, R. D., Drummond, A. J., & Greenhill, S. J. (2009). Language phylogenies reveal expansion pulses and pauses in Pacific settlement. Science, 323(5913), 479–483.</li>
-<li>Gray, R. D., Greenhill, S. J., & Ross, R. M. (2007). The pleasures and perils of Darwinizing culture (with phylogenies). Biological Theory, 2(4), 360-375..</li>
-<li>Harris, I., Jones, P. D., Osborn, T. J., & Lister, D. H. (2014). Updated high‐resolution grids of monthly climatic observations–the CRU TS3. 10 Dataset. International Journal of Climatology, 34(3), 623–642.</li>
-<li>Holden, C. J., & Gray, R. D. (2006). Exploring Bantu linguistic relationships using trees and networks. In P. Forster & C. Renfrew (Eds.), Phylogenetic methods and the prehistory of languages (pp. 19–31). The McDonald Institute for Archaeological Research.</li>
-<li>International, G. M. (2005). World Language Mapping System: Version 16. Colorado Springs.</li>
-<li>Jenkins, C. N., Pimm, S. L., & Joppa, L. N. (2013). Global patterns of terrestrial vertebrate diversity and conservation. Proceedings of the National Academy of Sciences, 110(28), E2602–E2610.</li>
-<li>Korotayev, A., Kazankov, A., Borinskaya, S., Khaltourina, D., & Bondarenko, D. (2004). Ethnographic atlas XXX: peoples of Siberia. Ethnology, 83–92.</li>
-<li>Kreft, H., & Jetz, W. (2007). Global patterns and determinants of vascular plant diversity. Proceedings of the National Academy of Sciences, 104(14), 5925–5930.</li>
-<li>Lewis, P., Simons, G., & Fennig, C. (2013). Ethnologue: Languages of the World. Dallas, Texas: SIL International. Retrieved March 1, 2013.</li>
-<li>List, L. (2009). A digital library of language relationships. Ypsilanti, MI: Institute for Language Information and Technology.</li>
-<li>Mace, R., & Jordan, F. M. (2011). Macro-evolutionary studies of cultural diversity: a review of empirical studies of cultural transmission and cultural adaptation. Philosophical Transactions of the Royal Society B: Biological Sciences, 366(1563), 402–411.</li>
-<li>Mesoudi, A. (2011). Cultural evolution: how Darwinian theory can explain human culture and synthesize the social sciences. University of Chicago Press.</li>
-<li>Murdock, G. P. (n.d.). Ethnographic atlas. Ethnology, 1-10.</li>
+<li>Ember, C. R., Page, H., Martin, M. M., and O’Leary, T. (1992). A computerized concordance of cross-cultural samples. New Haven: Human Relations Area Files.</li>
+<li>Gray, J. P. (1999). A corrected ethnographic atlas. World Cultures, 10(1), 24–85.</li>
+<li>Gray, R. D., Drummond, A. J., and Greenhill, S. J. (2009). Language phylogenies reveal expansion pulses and pauses in Pacific settlement. Science, 323(5913), 479–483.</li>
+<li>Grollemund, R., Branford, S., Bostoen, K., Meade, A., Venditti, C., and Pagel, M. (2015). Bantu expansion shows that habitat alters the route and pace of human dispersals. Proceedings of the National Academy of Sciences (PNAS) 112(43), 13296-13301.</li>
+<li>Harris, I., Jones, P. D., Osborn, T. J., and Lister, D. H. (2014). Updated high‐resolution grids of monthly climatic observations–the CRU TS3. 10 Dataset. International Journal of Climatology, 34(3), 623–642.</li>
+<li>Hammarström, H., Forkel, R., Haspelmath, M., Bank, S. (2015). Glottolog 2.7. Jena: Max Planck Institute for the Science of Human History. Accessed 2015-2016. URL: <a href="http://glottolog.org" target="_blank">http://glottolog.org</a>.</li>
+<li>Jenkins, C. N., Pimm, S. L., and Joppa, L. N. (2013). Global patterns of terrestrial vertebrate diversity and conservation. Proceedings of the National Academy of Sciences, 110(28), E2602–E2610.</li>
+<li>Jorgensen, J. G. (1980). Western Indians: Comparative environments, languages and cultures of 172 Western American Indian tribes. San Francisco.</li>
+<li>Kirby, K. R., Gray, R. D., Greenhill, S. J., Jordan, F. M., Gomes-Ng, S. Bibiko, H. J., Blasi, D. E., Botero, C. A., Bowern, C., Ember, C. R., Leehr, D., Low, B. S., McCarter, J., Divale, W. and Gavin, M. (Submitted). D-PLACE: A Global Database of Cultural, Linguistic and Environmental Diversity.</li>
+<li>Kitchen, A., Ehret, C., Assefa, S., and Mulligan, C. J. (2009). Bayesian phylogenetic analysis of Semitic languages identifies an Early Bronze Age origin of Semitic in the Near East. Proceedings of the Royal Society of London B: Biological Sciences, rspb-2009. doi:10.1098/rspb.2009.0408.</li>
+<li>Korotayev, A., Kazankov, A., Borinskaya, S., Khaltourina, D., and Bondarenko, D. (2004). Ethnographic atlas XXX: peoples of Siberia. Ethnology, 83–92.</li>
+<li>Kreft, H., and Jetz, W. (2007). Global patterns and determinants of vascular plant diversity. Proceedings of the National Academy of Sciences, 104(14), 5925–5930.</li>
+<li>Lee, S., and Hasegawa, T. (2011). Bayesian phylogenetic analysis supports an agricultural origin of Japonic languages. Proceedings of the Royal Society of London B: Biological Sciences, rspb20110518.</li>
+<li>Lee, S. (2015). A Sketch of Language History in the Korean Peninsula. PloS one, 10(5), e0128448.</li>
+<li>Murdock, G. P. (1962-1971). Ethnographic Atlas, Installments I-XXVII. Ethnology, 1-10.</li>
 <li>Murdock, G. P. (1983). Outline of world cultures. Sixth Edition. New Haven Ct: Human Relations Area Files.</li>
-<li>Murdock, G. P., & White, D. R. (1969). Standard cross-cultural sample. Ethnology, 329–369.</li>
-<li>Nunn, C. L. (2011). The comparative approach in evolutionary anthropology and biology. University of Chicago Press.</li>
-<li>O’Brien, M. J., Lyman, R. L., Collard, M., Holden, C. J., Gray, R. D., & Shennan, S. J. (2008). Phylogenetics and the evolution of cultural diversity.</li>
-<li>Olson, D. M., Dinerstein, E., Wikramanayake, E. D., Burgess, N. D., Powell, G. V. N., Underwood, E. C., … Morrison, J. C. (2001). Terrestrial Ecoregions of the World: A New Map of Life on Earth A new global map of terrestrial ecoregions provides an innovative tool for conserving biodiversity. BioScience, 51(11), 933–938.</li>
-<li>Opie, C., Shultz, S., Atkinson, Q. D., Currie, T., & Mace, R. (2014). Phylogenetic reconstruction of Bantu kinship challenges Main Sequence Theory of human social evolution. Proceedings of the National Academy of Sciences, 111(49), 17414–17419.</li>
-<li>Paradis, E., Claude, J., & Strimmer, K. (2004). APE: analyses of phylogenetics and evolution in R language. Bioinformatics, 20(2), 289–290.</li>
-<li>Revell, L. J. (2012). An R package for phylogenetic comparative biology (and other things). Methods in Ecology and Evolution, 3, 217–223. doi:doi:10.1111/j.2041-210X.2011.00169.x</li>
-<li>Richerson, P. J., & Boyd, R. (2008). Cultural evolution: Accomplishments and future prospects. Explaining Culture Scientifically, 75–99.</li>
-<li>Steele, J., Jordan, P., & Cochrane, E. (2010). Evolutionary approaches to cultural and linguistic diversity. Philosophical Transactions of the Royal Society B: Biological Sciences, 365(1559), 3781–3785.</li>
-<li>TDWG. 2000. World Geographical Scheme for Recording Plant Distributions Edition 2 R.K. Brummitt Plant Taxonomic Database Standards No. 2 Edition 2, (http://data.freshwaterbiodiversity.eu/shapefiles#)</li>
-<li>Watts J., Greenhill S. J., Atkinson Q. D. , Currie T. E., Bulbulia J., Gray R. D. (2015) Broad supernatural punishment but not moralizing high gods precede the evolution of political complexity in Austronesia. Proc. R. Soc. B 282: 20142556.</li>
-<li>White, D. R. (1989a). Focused ethnographic bibliography: Standard cross-cultural sample. Cross-Cultural Research, 23(1-4), 1–145.</li>
-<li>White, D. R. (1989b). Focused ethnographic bibliography: Standard cross-cultural sample. Cross-Cultural Research, 23(1-4), 1–145.</li>
-<li>Whiting, J. W. M. (1981). Environmental constraints on infant care practices. Handbook of Cross-Cultural Human Development, 155–179.</li>
-            </ul>
-        </div>
-     </div>
-  </div>
-</div>
+<li>Murdock, G. P., and White, D. R. (1969). Standard cross-cultural sample. Ethnology, 329–369.</li>
+<li>Olson, D. M., Dinerstein, E., Wikramanayake, E. D., Burgess, N. D., Powell, G. V. N., Underwood, E. C., D'amico, J. A., Itoua, I., Strand, H. E., Morrison, J. C., Loucks, C. J., Allnutt, T. F., Ricketts, T. H., Kura, Y., Lamoreux, J. F., Wettengel, W. W., Hedao, P., and Kassem, K. R. (2001). Terrestrial Ecoregions of the World: A New Map of Life on Earth A new global map of terrestrial ecoregions provides an innovative tool for conserving biodiversity. BioScience, 51(11), 933–938.</li>
+<li>Running, S. W., Nemani, R., Glassy, J. M., and Thornton, P. E. (1999). MODIS daily photosynthesis (PSN) and annual net primary production (NPP) product (MOD17) Algorithm Theoretical Basis Document. University of Montana, SCF At-Launch Algorithm ATBD Documents (available online at: www. ntsg. umt. edu/modis/ATBD/ATBD_MOD17_v21. pdf).</li>
+<li>Sicoli, M. A., and Holton, G. (2014). Linguistic phylogenies support back-migration from Beringia to Asia. PloS one, 9(3), e91722.</li>
+<li>SIL International. (2015). ISO 639-3 Registration Authority. URL: <a href="http://www-01.sil.org/iso639-3/" target="_blank">http://www-01.sil.org/iso639-3</a>.</li>
+</ul>

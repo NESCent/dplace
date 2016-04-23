@@ -18,7 +18,7 @@
         class="form-control"
         style="width:100%"
         ng-change="treeSelected()"
-        ng-options="tree.name for tree in trees"
+        ng-options="tree.name for tree in trees| orderBy:'name'"
         ng-show="!globalTree"
         >
         <option value="">Select a Tree</option>
@@ -31,11 +31,11 @@
         <i ng-show="!globalTree && ((results.variable_descriptions.length > 0) || (results.environmental_variables.length > 0))">Click on a variable title to expand or collapse variable legend.</i>
             <div ng-repeat="variable in results.variable_descriptions" ng-class="{'panel panel-default':!globalTree}" style="margin-bottom:5px;">
                 <div class="panel-heading" ng-show="!globalTree"> 
-                    <a data-toggle="collapse" data-parent="#legend" data-target="#{{variable.CID}}" style="color:#000;"><b>{{variable.CID}}:</b> {{variable.variable.name}}</a>
+                    <a data-toggle="collapse" data-parent="#legend" data-target="#{{variable.CID}}" style="color:#000;"><b>{{variable.CID}}:</b> {{variable.variable.name}} <br><em style="font-size:12px;">{{variable.variable.codebook_info}}</em></a>
                 </div>
                 <div id="{{variable.CID}}" ng-class="{'panel-collapse collapse': !globalTree, 'in': variable.CID == 'C1'}" ng-show="(!globalTree || (globalTree && results.chosenTVariable.label==variable.variable.label))">
                     <div class="leg-panel panel-body">
-                    <svg ng-show="variable.variable.data_type !== 'Continuous'" height="{{variable.svgSize}}" width="600" class="tree-legend legends" var-id="{{variable.variable.id}}">
+                    <svg ng-show="variable.variable.data_type !== 'Continuous'" ng-attr-height="{{variable.svgHeight}}" width="600" class="tree-legend legends" var-id="{{variable.variable.id}}">
                         <g ng-repeat="c in variable.codes" transform="{{$index|transformG}}">
                         <circle
                                     cx="10"
@@ -48,7 +48,7 @@
                             <text x="20" y="15">{{c.short_description}}</text>
                         </g>
                     </svg>
-                    <svg ng-show="variable.variable.data_type == 'Continuous'" class="cont-gradient legends" height="80" height="30" var-id="{{variable.variable.id}}">
+                    <svg ng-show="variable.variable.data_type == 'Continuous'" class="cont-gradient legends" height="80" height="30" var-id="{{variable.variable.id}}" style="font-size:12px;">
                         <circle
                                 cx="10"
                                 cy="10"
@@ -58,7 +58,7 @@
                                 stroke-width="0.5"
                                 />
                             <text x="20" y="15">Missing Data</text>
-                        <rect x="10" y="25" fill="url(#grad1)" height="30" width="250" />
+                        <rect x="10" y="25" fill="url(societies#grad1)" height="30" width="250" />
                         <text x="0" y="70">{{variable.variable.min}} {{code.units}}</text>
                         <text x="240" y="70">{{variable.variable.max}} {{code.units}}</text>
                     </svg>

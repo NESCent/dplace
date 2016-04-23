@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 from django.db import migrations, models
+from django.contrib.postgres.operations import UnaccentExtension
 
 
 class Migration(migrations.Migration):
@@ -291,4 +292,5 @@ class Migration(migrations.Migration):
             name='culturalvalue',
             index_together=set([('variable', 'society'), ('variable', 'code'), ('society', 'code'), ('society', 'coded_value'), ('variable', 'coded_value')]),
         ),
+        UnaccentExtension()
     ]

@@ -42,6 +42,7 @@ def load_env_var(var_dict, categories):
             logging.info("Created EnvironmentalCategory: %s" % c)
     
     variable, created = EnvironmentalVariable.objects.get_or_create(
+        var_id=var_dict['VarID'],
         name=var_dict['Name'],
         units=var_dict['Units'],
         category=index_category,
@@ -53,22 +54,27 @@ def load_env_var(var_dict, categories):
 
 
 def load_environmental(items):
-    variables = EnvironmentalVariable.objects.all()
+    variables = {v.var_id: v for v in EnvironmentalVariable.objects.all()}
     societies = {(s.ext_id, s.source_id): s for s in Society.objects.all()}
     res = 0
     objs = []
     for item in items:
-        if _load_environmental(item, variables, societies, objs):
-            res += 1
+        if item['Dataset'] in ['EA', 'Binford']:
+            if _load_environmental(item, variables, societies, objs):
+                res += 1
     EnvironmentalValue.objects.bulk_create(objs, batch_size=1000)
     for language_family in LanguageFamily.objects.all():
         language_family.update_counts()
     return res
 
 
-def _load_environmental(env_dict, variables, societies, objs):
-    ext_id = env_dict['soc_ID']
-    source = get_source(env_dict['Source'])
+_missing_variables = set()
+
+
+def _load_environmental(val_row, variables, societies, objs):
+    global _missing_variables
+    ext_id = val_row['soc_id']
+    source = get_source(val_row['Dataset'])
 
     # hack for B109 vs. 109
     if source.author == 'Binford' and ext_id.find('B') == -1:
@@ -94,18 +100,21 @@ def _load_environmental(env_dict, variables, societies, objs):
             source=source,
             iso_code=iso_code
         )
-        
-        for v in variables:
-            key = ''.join(v.name.split(' '))
-            if env_dict[key] and env_dict[key] != 'NA':
-                value = float(env_dict[key])
-                objs.append(EnvironmentalValue(
-                    variable=v,
-                    value=value,
-                    environmental=environmental,
-                    source=source
-                ))
-
     else:
         environmental = found_environmentals[0]
-    return environmental
+        
+    variable = variables.get(val_row['variable'])
+    if variable is None:
+        if val_row['variable'] not in _missing_variables:
+            logging.warn("Could not find environmental variable %s" % val_row['variable'])
+            _missing_variables.add(val_row['variable'])
+        return
+
+    objs.append(EnvironmentalValue(
+        variable=variable,
+        value=float(val_row['value']),
+        comment=val_row['comment'],
+        environmental=environmental,
+        source=source
+    ))
+    return True

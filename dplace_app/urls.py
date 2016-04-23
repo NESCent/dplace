@@ -24,6 +24,7 @@ router.register(r'sources', api_views.SourceViewSet)
 router.register(r'language_tree_labels', api_views.LanguageTreeLabelsViewSet)
 
 urlpatterns = [
+
     url(r'^$', RedirectView.as_view(url='angular/', permanent=True), name='home'),
     url(r'^society/(?P<society_id>.*)$',
         api_views.SocietyViewSet.as_view(
@@ -53,4 +54,8 @@ urlpatterns = [
         name="get_dataset_sources"),
     url(r'^api/v1/csv_download', api_views.csv_download, name='csv_download'),
     url(r'^api/v1/zip', api_views.zip_legends, name='zip_legends'),
+
+    # catch anything else and let decide angular what to do
+    url(r'^.+?/$', views.angular),
+
 ]

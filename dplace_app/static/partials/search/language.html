@@ -30,8 +30,9 @@
                                 ng-model="scheme.selectedFamily"
                                 class="form-control"
                                 style="width:100%"
+                                ng-attr-name="langFamilySelect"
 								ng-change="selectionChanged(scheme)"
-                                ng-options="item.name + ' (' + item.language_count + ' societies)' for item in scheme"
+                                ng-options="item.name + ' (' + item.language_count + ' societ' + ((item.language_count==1) ? 'y' : 'ies') +')' for item in scheme"
                                 >
                             <option value="">Select a Language Family</option>
                         </select>
@@ -41,9 +42,9 @@
             <div class="panel-body scrollable">
 				<span class="variable-label"  ng-show="scheme.languages.length > 1">Select All<input type="checkbox" class="pull-left" ng-model="scheme.languages.allSelected" ng-change="selectAllChanged(scheme)" />
 					</span>
-                <div ng-repeat="language in scheme.languages">
+                <div ng-repeat="language in scheme.languages|orderBy:'name'">
                     <input class="pull-left" type="checkbox" ng-model="language.isSelected" ng-change="classificationSelectionChanged()">
-                    <span class="language-label">{{ language.name }} ({{language.count}} societies)</span>
+                    <span class="language-label">{{ language.name }} ({{language.societies.length}} societ{{(language.societies.length==1)?'y':'ies'}})</span>
                 </div>
             </div>
         </div>

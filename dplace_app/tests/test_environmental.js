@@ -118,7 +118,7 @@ describe('Testing environmental search', function() {
         expect(envScope.environmentalData.selectedVariables.length).toEqual(2);
         
         //test remove variable
-        envScope.removeVariable(variable);
+        searchScope.removeFromSearch(variable, 'environmental');
         envScope.$digest();
         expect(envScope.environmentalData.selectedVariables.length).toEqual(1);
         expect(envScope.environmentalData.selectedVariables.indexOf(variable)).toEqual(-1);

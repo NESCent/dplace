@@ -456,3 +456,29 @@ label.light {
     padding-right:0;
 }
 
+.sourcekeyattr td {
+	padding:10px;
+	vertical-align:top;
+}
+.sourcekeyattr tr {
+	border-top:1px solid black;
+}
+
+#selected-criteria {
+    margin-top:10px;
+}
+
+.selected-scrollable {
+    border: 1px solid #ddd;
+    padding:10px;
+    border-radius:5px;
+}
+
+.criteria-list li {
+    white-space: nowrap;
+}
+
+.hidden {
+    display:none;
+}
+

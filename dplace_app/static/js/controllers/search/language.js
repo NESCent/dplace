@@ -22,44 +22,46 @@ function LanguageCtrl($scope, searchModelService, Language, LanguageFamily) {
         } else {
             scheme.languages.$promise.then(function(result) {
                 result.forEach(function(language) {
-                    if ($scope.languageClassifications.selected.map(function(lang) { return lang.id; }).indexOf(language.id) != -1) {
+                    if (!(language.family.name in $scope.languageClassifications.selected)) {
+                        $scope.languageClassifications.selected[language.family.name] = [];
+                    }
+                    if ($scope.languageClassifications.selected[language.family.name].map(function(lang) { return lang.id; }).indexOf(language.id) != -1) {
                         language.isSelected = true;
                     }
                 });
             });
         }
     };
-        
-    function removeClassification(language) {
-        var index = -1;
-        for (var i = 0; i < $scope.languageClassifications.selected.length; i++) {
-            if ($scope.languageClassifications.selected[i].id == language.id) {
-                index = i;
-                break;
+
+    function badgeValue() {
+        var total = 0;
+        for (var key in $scope.languageClassifications.selected) {
+            for (var i = 0; i < $scope.languageClassifications.selected[key].length; i++) {
+                total += $scope.languageClassifications.selected[key][i].societies.length;
             }
         }
-        if (index > -1) {
-            $scope.languageClassifications.selected.splice(index, 1);
-            $scope.languageClassifications.badgeValue -= language.count;
-        }
+        $scope.languageClassifications.badgeValue = total;
     };
-    
+        
     $scope.selectAllChanged = function(scheme) {
         if (scheme.languages.allSelected) {
             scheme.languages.forEach(function(language) {
                 language.isSelected = true;
-                if ($scope.languageClassifications.selected.map(function(lang) { return lang.id; }).indexOf(language) == -1) {
-                    $scope.languageClassifications.selected.push(language);
-                    $scope.languageClassifications.badgeValue += language.count;
+                if (!(language.family.name in $scope.languageClassifications.selected)) {
+                        $scope.languageClassifications.selected[language.family.name] = [];
+                    }
+                if ($scope.languageClassifications.selected[language.family.name].map(function(lang) { return lang.id; }).indexOf(language.id) == -1) {
+                    $scope.languageClassifications.selected[language.family.name].push(language);
                 }
             });
         } else {
             scheme.languages.forEach(function(language) {
                 language.isSelected = false;
-                removeClassification(language);
-                
+                $scope.removeFromSearch(language, 'language');
             });
         }
+        badgeValue();
+
     };
     
     function getSelectedLanguageClassifications(scheme) {
@@ -68,25 +70,35 @@ function LanguageCtrl($scope, searchModelService, Language, LanguageFamily) {
         });
     };
 
-    $scope.classificationSelectionChanged = function() {
+    var classificationSelectionChangedFunc = $scope.classificationSelectionChanged = function() {
         $scope.families.forEach(function(family) {
             var selectedClassifications = getSelectedLanguageClassifications(family);
             if (selectedClassifications.length == family.languages.length) family.languages.allSelected = true;
             else family.languages.allSelected = false;
             family.languages.forEach(function(language) {
                 if (language.isSelected) {
-                    if ($scope.languageClassifications.selected.map(function(lang) { return lang.id; }).indexOf(language.id) == -1) {
-                        $scope.languageClassifications.selected.push(language);
-                        $scope.languageClassifications.badgeValue += language.count;
+                    if (!(language.family.name in $scope.languageClassifications.selected)) {
+                        $scope.languageClassifications.selected[language.family.name] = [];
+                    }
+                    if ($scope.languageClassifications.selected[language.family.name].map(function(lang) { return lang.id; }).indexOf(language.id) == -1) {
+                        $scope.languageClassifications.selected[language.family.name].push(language);
+                        badgeValue();
                     }
                 } else {
-                    if ($scope.languageClassifications.selected.map(function(lang) { return lang.id; }).indexOf(language.id) != -1) {
-                        removeClassification(language);
+                    if (!(language.family.name in $scope.languageClassifications.selected)) {
+                        return;
+                    }
+                    if ($scope.languageClassifications.selected[language.family.name].map(function(lang) { return lang.id; }).indexOf(language.id) != -1) {
+                       $scope.removeFromSearch(language, 'language');
                     }
                 }
             });
         });
     };
+
+    // classificationSelectionChanged is broadcasted if user remove language criterion
+    // from the show search criteria panel - mainly to sync 'Select all' checkbox
+    $scope.$on('classificationSelectionChanged', classificationSelectionChangedFunc);
 
     $scope.doSearch = function() {
         $scope.search();
