@@ -190,8 +190,8 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties) 
            });
             var range = max_value - min_value;
             results.environmental_variables[i]['range'] = range;
-            results.environmental_variables[i]['min'] = Math.round(min_value*10000)/10000;
-            results.environmental_variables[i]['max'] = Math.round(max_value*10000)/10000;
+            results.environmental_variables[i]['min'] = min_value.toFixed(4);
+            results.environmental_variables[i]['max'] = max_value.toFixed(4);
         }
         return results;
     };
@@ -229,8 +229,8 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties) 
                     if (c_var.max > max) max = c_var.max;
                 });
                 
-                $scope.searchModel.results.variable_descriptions[i].variable['min'] = min;
-                $scope.searchModel.results.variable_descriptions[i].variable['max'] = max;
+                $scope.searchModel.results.variable_descriptions[i].variable['min'] = min.toFixed(2);
+                $scope.searchModel.results.variable_descriptions[i].variable['max'] = max.toFixed(2);
                 $scope.searchModel.results.variable_descriptions[i].variable['units'] = $scope.searchModel.results.variable_descriptions[i].variable.name.substring($scope.searchModel.results.variable_descriptions[i].variable.name.indexOf('(')+1, $scope.searchModel.results.variable_descriptions[i].variable.name.indexOf(')'));
                 $scope.searchModel.results.variable_descriptions[i].codes = codes;
             }                    
