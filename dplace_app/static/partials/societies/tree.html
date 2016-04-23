@@ -48,7 +48,7 @@
                             <text x="20" y="15">{{c.short_description}}</text>
                         </g>
                     </svg>
-                    <svg ng-show="variable.variable.data_type == 'Continuous'" class="cont-gradient legends" height="80" height="30" var-id="{{variable.variable.id}}" style="font-size:12px;">
+                    <svg ng-show="variable.variable.data_type == 'Continuous'" class="cont-gradient legends" height="80" width="600" var-id="{{variable.variable.id}}" style="font-size:12px;">
                         <circle
                                 cx="10"
                                 cy="10"
@@ -59,8 +59,8 @@
                                 />
                             <text x="20" y="15">Missing Data</text>
                         <rect x="10" y="25" fill="url(societies#grad1)" height="30" width="250" />
-                        <text x="0" y="70">{{variable.variable.min}} {{code.units}}</text>
-                        <text x="240" y="70">{{variable.variable.max}} {{code.units}}</text>
+                        <text x="0" y="70">{{variable.variable.min}} {{variable.variable.units}}</text>
+                        <text x="240" y="70">{{variable.variable.max}} {{variable.variable.units}}</text>
                     </svg>
                     </div>
                 </div>

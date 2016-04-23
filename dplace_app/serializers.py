@@ -31,7 +31,8 @@ class CulturalVariableSerializer(serializers.ModelSerializer):
             'codebook_info',
             'data_type',
             'source',
-            'index_categories'
+            'index_categories',
+            'units'
         )
 
 

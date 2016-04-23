@@ -40,6 +40,8 @@ def load_var(var_dict, categories):
     variable.codebook_info = var_dict['VarDefinition']
     variable.data_type = var_dict['VarType']
     assert variable.data_type in ['Continuous', 'Categorical', 'Ordinal']
+    variable.units = "" if 'Units' not in var_dict \
+        else var_dict['Units']
 
     for c in map(clean_category, var_dict['IndexCategory'].split(',')):
         index_category = categories.get(c)
