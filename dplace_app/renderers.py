@@ -20,6 +20,10 @@ class DPLACECSVResults(object):
         self.data = data
         self.field_map = dict()
         self.field_names = [
+            'Source',
+            'Preferred society name',
+            'Society id',
+            'Cross-dataset id',
             'Original society name',
             'Revised latitude',
             'Revised longitude',
