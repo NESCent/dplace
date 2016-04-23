@@ -66,8 +66,8 @@ angular.module('dplaceFilters', [])
     .filter('formatVariableCodeValues', function() {
         return function(values, variable_id) {
             codes = values.filter( function(code_value) {   
-               if (code_value.code_description && (variable_id == code_value.code_description.variable)) return code_value;
-                else if (variable_id == code_value.variable) return code_value;
+               if (code_value.code_description && (variable_id.id == code_value.code_description.variable)) return code_value;
+                else if (variable_id.id == code_value.variable) return code_value;
             });
             return [codes[0]];
         };
