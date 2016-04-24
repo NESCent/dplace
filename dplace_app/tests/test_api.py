@@ -232,7 +232,7 @@ class Test(APITestCase):
         self.client.get(reverse('view_society', args=('society1',)))
 
     def test_society_search(self):
-        res = self.client.get(reverse('search_society', args=('Society1',)))
+        res = self.client.get(reverse('view_society', args=('society1',)))
         self.assertIn('Söciety1'.encode('utf8'), res.content)
 
     def test_api_culturalcategory(self):
