@@ -19,6 +19,10 @@ function AppCtrl($scope, $location, searchModelService) {
     $scope.switchToResults = function() {
         $location.path('/societies');
     };
+    
+    $scope.switchToSocResults = function(name) {
+        $location.path('/societies/search/'+name);
+    };
 
     $scope.getSocietyIds = function() {
         return $scope.model.getSocieties().map(function (container) {

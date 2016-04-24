@@ -231,7 +231,6 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties) 
                 
                 $scope.searchModel.results.variable_descriptions[i].variable['min'] = min.toFixed(2);
                 $scope.searchModel.results.variable_descriptions[i].variable['max'] = max.toFixed(2);
-                $scope.searchModel.results.variable_descriptions[i].variable['units'] = $scope.searchModel.results.variable_descriptions[i].variable.name.substring($scope.searchModel.results.variable_descriptions[i].variable.name.indexOf('(')+1, $scope.searchModel.results.variable_descriptions[i].variable.name.indexOf(')'));
                 $scope.searchModel.results.variable_descriptions[i].codes = codes;
             }                    
             
@@ -291,6 +290,10 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties) 
         $scope.searchModel.results.searched = true;
         $scope.switchToResults();
     };
+    
+    var searchBySocietyCallBack = function() {
+        $scope.switchToSocResults($scope.model.societyQuery);
+    };
 
         // This method merges the current searchQuery object with the incoming searchQuery
     $scope.updateSearchQuery = function(searchQuery) {
@@ -298,13 +301,17 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties) 
         for(var propertyName in searchQuery) {
             $scope.searchModel.query[propertyName] = searchQuery[propertyName];
         }
-        console.log($scope.searchModel.query);
     };
     
     $scope.searchSocieties = function() {
         $scope.disableSearchButton();
         var query = $scope.searchModel.query;
         $scope.searchModel.results = FindSocieties.find(query, searchCompletedCallback, errorCallBack);
+    };
+    
+    $scope.searchBySociety = function() {
+        var query = {'name': $scope.model.societyQuery}
+        $scope.searchModel.results = FindSocieties.find(query, searchBySocietyCallBack);
     };
 
     $scope.search = function() {

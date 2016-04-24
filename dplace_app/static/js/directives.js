@@ -148,7 +148,7 @@ angular.module('languagePhylogenyDirective', [])
                     if (society.environmental_values.length > 0) {
                         for (var i = 0; i < society.environmental_values.length; i++) {
                             if (society.environmental_values[i].variable == variable.id) {
-                                var hover_text_value = society.environmental_values[i].value;
+                                var hover_text_value = society.environmental_values[i].value + ' ' + variable.units;
                                 selected.append("svg:circle")
                                     .attr("r", function() {
                                         if (global) return 1.5;
