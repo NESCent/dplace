@@ -6,6 +6,7 @@
 <div class="container" style="margin-top:-150px;">
 <h1><span onclick="window.history.back()" style="cursor:pointer;"><img height="60px" title="Go back" src="{% static "images/D-PLACE_Logo.png" %}"></span>Search Results: {{ query }}</h1>
 
+{% if results %}
 <table class="table">
 <tr>
     <th>Dataset</th>
@@ -21,5 +22,14 @@
 </tr>
 {% endfor %}
 </table>
+{% endif %}
+
+{% if not results %}
+<div>
+    <p style="margin:20px;">No societies found.<br /><br />
+        <button onclick="window.history.back()" class="btn btn-info" style="padding:4px">Go back</button>
+    </p>
+</div>
+{% endif %}
 </div>
 {% endblock %}

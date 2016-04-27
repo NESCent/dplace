@@ -117,7 +117,7 @@ class SocietyViewSet(viewsets.ReadOnlyModelViewSet):
                 Q(name__unaccent__icontains=name) | Q(alternate_names__unaccent__icontains=name)
             )
             societies = [s for s in soc if s.culturalvalue_set.count()]
-        if len(societies) > 1:
+        if len(societies) != 1:
             return Response(
                 {'results': societies, 'query': name}, template_name='search.html')
         elif len(societies) == 1:
