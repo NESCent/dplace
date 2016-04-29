@@ -2,7 +2,9 @@
 from __future__ import unicode_literals
 import logging
 
-from dplace_app.models import ISOCode, Society, Language, LanguageFamily
+from django.conf import settings
+
+from dplace_app.models import ISOCode, Society, LanguageFamily
 from dplace_app.models import Environmental, EnvironmentalCategory
 from dplace_app.models import EnvironmentalVariable, EnvironmentalValue
 from sources import get_source
@@ -59,7 +61,7 @@ def load_environmental(items):
     res = 0
     objs = []
     for item in items:
-        if item['Dataset'] in ['EA', 'Binford']:
+        if item['Dataset'] in settings.DATASETS:
             if _load_environmental(item, variables, societies, objs):
                 res += 1
     EnvironmentalValue.objects.bulk_create(objs, batch_size=1000)
@@ -102,18 +104,18 @@ def _load_environmental(val_row, variables, societies, objs):
         )
     else:
         environmental = found_environmentals[0]
-        
-    variable = variables.get(val_row['variable'])
+
+    variable = variables.get(val_row['VarID'])
     if variable is None:
-        if val_row['variable'] not in _missing_variables:
-            logging.warn("Could not find environmental variable %s" % val_row['variable'])
-            _missing_variables.add(val_row['variable'])
+        if val_row['VarID'] not in _missing_variables:
+            logging.warn("Could not find environmental variable %s" % val_row['VarID'])
+            _missing_variables.add(val_row['VarID'])
         return
 
     objs.append(EnvironmentalValue(
         variable=variable,
-        value=float(val_row['value']),
-        comment=val_row['comment'],
+        value=float(val_row['Code']),
+        comment=val_row['Comment'],
         environmental=environmental,
         source=source
     ))
