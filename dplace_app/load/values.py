@@ -3,12 +3,13 @@ import logging
 import re
 
 from django.db import connection
+from django.conf import settings
 
 from dplace_app.models import (
     Society, Source, CulturalValue, CulturalVariable, CulturalCodeDescription,
 )
 from sources import get_source
-from util import eavar_number_to_label, bfvar_number_to_label
+from util import var_number_to_label
 
 
 BINFORD_REF_PATTERN = re.compile('(?P<author>[^0-9]+)(?P<year>[0-9]{4}a-z?):')
@@ -39,6 +40,8 @@ def load_data(items):
     inserted = set()
     pk = 0
     for i, item in enumerate(items):
+        if item['Dataset'] not in settings.DATASETS:
+            continue
         res = _load_data(item, **kw)
         if res:
             key = (
@@ -78,18 +81,7 @@ def _load_data(val_row, societies=None, sources=None, variables=None, descriptio
     society = societies[ext_id]
     variable_id = val_row['VarID']
 
-    if val_row['Dataset'] == 'EA':
-        source = get_source("EA")
-        label = eavar_number_to_label(variable_id)
-    elif val_row['Dataset'] == 'Binford':
-        source = get_source("Binford")
-        label = bfvar_number_to_label(variable_id)
-    else:
-        logging.warn(
-            "Could not determine dataset source for row %s, skipping" % str(val_row))
-        return
-
-    variable = variables.get(label)
+    variable = variables.get(var_number_to_label(val_row['Dataset'], variable_id))
     if variable is None:
         logging.warn(
             "Could not find variable %s for society %s" % (variable_id, society.name))
@@ -98,7 +90,7 @@ def _load_data(val_row, societies=None, sources=None, variables=None, descriptio
     v = dict(
         variable=variable,
         society=society,
-        source=source,
+        source=get_source(val_row['Dataset']),
         coded_value=val_row['Code'],
         code=descriptions.get((variable.id, val_row['Code'].strip())),
         focal_year=val_row['Year'],

@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 import logging
+
 from dplace_app.models import Source
+from django.conf import settings
 
 _SOURCE_CACHE = {}
 SOURCE_DATA = {
@@ -21,8 +23,9 @@ SOURCE_DATA = {
                   "Environmental Data Sets. University of California Press",
         name="Binford Hunter-Gatherer",
     ),
-    
-    # data from these databases are not stored in our database, but the easiest way to link our societies to external databases is to do this, rather than create new fields for the Society model
+    # data from these databases are not stored in our database, but the easiest way to
+    # link our societies to external databases is to do this, rather than create new
+    # fields for the Society model
     'SCCS': dict(
         year="1969",
         author="Murdock",
@@ -39,6 +42,7 @@ SOURCE_DATA = {
         reference=""
     )
 }
+assert all(dataset in SOURCE_DATA for dataset in settings.DATASETS)
 
 
 def get_source(source='EA'):

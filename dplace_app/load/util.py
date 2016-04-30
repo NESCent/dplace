@@ -7,6 +7,9 @@ from six import BytesIO
 from django.db import connection
 
 
+DATASET_SHORT = {'Binford': 'B'}
+
+
 def delete_all(model):
     model.objects.all().delete()
     with connection.cursor() as c:
@@ -15,12 +18,8 @@ def delete_all(model):
         )
 
 
-def eavar_number_to_label(number):
-    return "EA{0:0>3}".format(number)
-
-
-def bfvar_number_to_label(number):
-    return "B{0:0>3}".format(number)
+def var_number_to_label(dataset, number):
+    return "{0}{1:0>3}".format(DATASET_SHORT.get(dataset, dataset), number)
 
 
 def configure_logging(test=False):

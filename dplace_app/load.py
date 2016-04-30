@@ -10,6 +10,7 @@ import django
 django.setup()
 
 from django.db import transaction
+from django.conf import settings
 
 from load.util import configure_logging, csv_dict_reader
 from load.society import society_locations, load_societies
@@ -32,39 +33,29 @@ def csv_items(*names):
     return chain(*[csv_dict_reader(csv_path(name)) for name in names])
 
 
+def csv_names(pattern):
+    return [pattern % dataset for dataset in settings.DATASETS]
+
+
 def main():  # pragma: no cover
     configure_logging()
 
     for spec in [
-        # Loading Societies
-        (
-            load_societies,
-            csv_items(
-                'EA_header_data_24Feb2016.csv', 'Binford_header_data_24Feb2016.csv')),
-        # Loading Geographic regions
+        (load_societies, csv_items(*csv_names('%s_societies.csv'))),
         (load_regions, data_path('geo', 'level2.json')),
-        # Linking Societies to Locations
         (society_locations, csv_items('society_locations.csv')),
-        # Loading Variables
-        (load_vars, csv_items('EAVariableList.csv', 'BinfordVariableList.csv')),
-        # Loading Variable Codes
-        (
-            load_codes,
-            csv_items('EACodeDescriptions.csv', 'BinfordCodeDescriptions.csv')),
+        (load_vars, csv_items(*csv_names('%sVariableList.csv'))),
+        (load_codes, csv_items(*csv_names('%sCodeDescriptions.csv'))),
         # Linking Societies to Languoids
         (
             xd_to_language,
             csv_items('xd_id_to_language.csv'), csv_items('glottolog.csv')),
-        # Loading References
         (
             load_references,
             csv_items('ReferenceMapping.csv', 'BinfordReferenceMapping.csv')),
-        # Loading Data
-        (load_data, csv_items('EA_DATA_Stacked.csv', 'Binford_DATA_stacked.csv')),
-        # Loading Environmental Data
-        (load_environmental_var, csv_items('EnvironmentalVariables.csv')),
-        (load_environmental, csv_items('EnvData.csv')),
-        # Loading Trees
+        (load_data, csv_items(*csv_names('%s_data.csv'))),
+        (load_environmental_var, csv_items('environmentalVariableList.csv')),
+        (load_environmental, csv_items('environmental_data.csv')),
         (load_trees, data_path('trees')),
         (tree_names, data_path('csv')),
         (prune_trees,),

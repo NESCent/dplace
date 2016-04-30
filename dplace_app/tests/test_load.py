@@ -7,7 +7,7 @@ from django.test import TestCase
 from dplace_app.models import (
     Society, GeographicRegion, Language, LanguageTree, LanguageTreeLabels, LanguageTreeLabelsSequence, ISOCode, CulturalVariable,
 )
-from dplace_app.load.util import csv_dict_reader, eavar_number_to_label, configure_logging
+from dplace_app.load.util import csv_dict_reader, var_number_to_label, configure_logging
 from dplace_app.load.isocode import load_isocode
 from dplace_app.load.society import load_societies, society_locations
 from dplace_app.load.values import load_data
@@ -45,7 +45,7 @@ class LoadTestCase(TestCase):
         self.assertEqual(res, 2)
 
     def test_load_codes(self):
-        CulturalVariable.objects.create(label=eavar_number_to_label(1))
+        CulturalVariable.objects.create(label=var_number_to_label('EA', 1))
         load_codes(csv_dict_reader(data_path('code_descriptions.csv')))
         # FIXME: assertions!
 
@@ -126,7 +126,8 @@ class LoadTestCase(TestCase):
                 hraf_link='Example (EX1)',
                 chirila_link='Example (1)',
                 main_focal_year='2016')
-        self.assertEqual(load_societies([society('EA'), society('Binford'), society('x')]), 2)
+        self.assertEqual(load_societies([society('EA'), society('Binford')]), 2)
+        self.assertRaises(ValueError, load_societies, [society('x')])
 
     def test_load_data(self):
         self.assertEqual(load_data([self.get_dict()]), 0)
@@ -160,9 +161,9 @@ class LoadTestCase(TestCase):
         res = load_environmental([self.get_dict(**{
             'Dataset': 'EA',
             'soc_id': 'EA12',
-            'variable': 'AnnualMeanTemperature',
-            'value': 1,
-            'comment': "Comment"
+            'VarID': 'AnnualMeanTemperature',
+            'Code': 1,
+            'Comment': "Comment"
         })])
         self.assertEqual(res, 1)
     
