@@ -82,6 +82,7 @@ def load_societies(items):
                     source=get_source(key[0:key.find('_')])
                 )
                 if society.ext_id not in [x.ext_id for x in societies]:
+                    societies.append(society)
                     logging.info("Saving society %s" % society.ext_id)
 
         logging.info("Saving society %s" % item)

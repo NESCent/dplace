@@ -6,9 +6,7 @@ from django.core.urlresolvers import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from dplace_app.serializers import (
-    GeographicRegionSerializer, LanguageSerializer, CulturalCodeDescriptionSerializer,
-)
+from dplace_app.serializers import CulturalCodeDescriptionSerializer
 from dplace_app import models
 
 
@@ -204,29 +202,19 @@ class Test(APITestCase):
             code=code2,
             source=source_ea)
 
-        # Setup environmentals
-        environmental1 = self.set(
-            models.Environmental, 1,
-            society=society1,
-            source=source_ea,
-            iso_code=iso_code)
-        environmental2 = self.set(
-            models.Environmental, 2,
-            society=society2,
-            source=source_ea,
-            iso_code=iso_code)
-
         env_var = self.get(models.EnvironmentalVariable, 1)
         self.set(
             models.EnvironmentalValue, 1,
             variable=env_var,
-            value=1.0, source=source_ea,
-            environmental=environmental1)
+            value=1.0,
+            source=source_ea,
+            society=society1)
         self.set(
             models.EnvironmentalValue, 2,
             variable=env_var,
-            value=2.0, source=source_ea,
-            environmental=environmental2)
+            value=2.0,
+            source=source_ea,
+            society=society2)
 
     def test_society_detail(self):
         self.client.get(reverse('view_society', args=('society1',)))
