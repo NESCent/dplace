@@ -68,23 +68,19 @@ class Society(models.Model):
     def get_environmental_data(self):
         """Returns environmental data for the given society"""
         valueDict = defaultdict(list)
-        environmentals = self.environmentals.all()
-        for environmental in environmentals:
-            for value in environmental.values.order_by('variable__name').all():
-                valueDict[str(value.variable.category)].append({
-                    'name': value.variable.name,
-                    'value': format(value.value, '.4f'),
-                    'units': value.variable.units,
-                    'comment': value.comment
-                })
+        for value in self.environmentalvalue_set.select_related('variable').order_by('variable__name').all():
+            valueDict[str(value.variable.category)].append({
+                'name': value.variable.name,
+                'value': format(value.value, '.4f'),
+                'units': value.variable.units,
+                'comment': value.comment
+            })
         return valueDict
 
     def get_cultural_trait_data(self):
         """Returns the data for the given society"""
         valueDict = defaultdict(list)
-        qset = self.culturalvalue_set.select_related('code')
-        qset = qset.select_related('variable')
-        for value in qset.order_by('variable__label').all():
+        for value in self.culturalvalue_set.select_related('code').select_related('variable').order_by('variable__label').all():
             categories = value.variable.index_categories.all()
             for c in categories:
                 valueDict[str(c)].append({
@@ -150,32 +146,17 @@ class EnvironmentalVariable(models.Model):
 class EnvironmentalValue(models.Model):
     variable = models.ForeignKey('EnvironmentalVariable', related_name="values")
     value = models.FloatField(db_index=True)
-    environmental = models.ForeignKey('Environmental', related_name="values")
+    society = models.ForeignKey('Society')
     source = models.ForeignKey('Source', null=True)
     comment = models.TextField(default="")
-
-    def society(self):
-        return self.environmental.society
 
     def __unicode__(self):
         return "%f" % self.value
 
     class Meta(object):
         ordering = ["variable"]
-        unique_together = ('variable', 'environmental')
+        unique_together = ('variable', 'society')
         index_together = ['variable', 'value']
-
-
-class Environmental(models.Model):
-    society = models.ForeignKey('Society', null=True, related_name="environmentals")
-    iso_code = models.ForeignKey('ISOCode', null=True)
-    source = models.ForeignKey('Source', null=True)
-
-    def __unicode__(self):
-        return "%d Society: %d" % (self.id, self.society_id)
-
-    class Meta(object):
-        verbose_name = "Environmental"
 
 
 class CulturalVariable(models.Model):
@@ -280,7 +261,7 @@ class CulturalValue(models.Model):
 
     """
     variable = models.ForeignKey('CulturalVariable', related_name="values")
-    society = models.ForeignKey('Society', null=True)
+    society = models.ForeignKey('Society')
     coded_value = models.CharField(max_length=100, db_index=True, null=False, default='.')
     coded_value_float = models.FloatField(null=True)
     code = models.ForeignKey('CulturalCodeDescription', db_index=True, null=True)

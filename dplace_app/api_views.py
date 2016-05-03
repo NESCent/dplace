@@ -117,7 +117,7 @@ class SocietyViewSet(viewsets.ReadOnlyModelViewSet):
                 Q(name__unaccent__icontains=name) | Q(alternate_names__unaccent__icontains=name)
             )
             societies = [s for s in soc if s.culturalvalue_set.count()]
-        if len(societies) != 1:
+        if len(societies) > 1:
             return Response(
                 {'results': societies, 'query': name}, template_name='search.html')
         elif len(societies) == 1:
@@ -143,14 +143,8 @@ class EnvironmentalVariableViewSet(viewsets.ReadOnlyModelViewSet):
 
 class EnvironmentalValueViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = serializers.EnvironmentalValueSerializer
-    filter_fields = ('variable', 'environmental',)
+    filter_fields = ('variable', 'society',)
     queryset = models.EnvironmentalValue.objects.all()
-
-
-class EnvironmentalViewSet(viewsets.ReadOnlyModelViewSet):
-    serializer_class = serializers.EnvironmentalSerializer
-    filter_fields = ('society', 'iso_code')
-    queryset = models.Environmental.objects.all()
 
 
 class LargeResultsSetPagination(PageNumberPagination):
@@ -290,11 +284,14 @@ def result_set_from_query_dict(query_dict):
                 values = values.filter(value__gt=params[0])
             elif operator == 'lt':
                 values = values.filter(value__lt=params[0])
-            values = values.select_related(
-                'variable', 'environmental__society__language')
+            values = values\
+                .select_related('variable')\
+                .select_related('society__language__family') \
+                .select_related('society__language__iso_code') \
+                .select_related('society__source')
             # get the societies from the values
             for value in values:
-                result_set.add_environmental(value.society(), value.variable, value)
+                result_set.add_environmental(value.society, value.variable, value)
 
     if 'p' in query_dict:
         criteria.append(serializers.SEARCH_GEOGRAPHIC)

@@ -103,11 +103,6 @@ class EnvironmentalValueSerializer(serializers.ModelSerializer):
         model = models.EnvironmentalValue
 
 
-class EnvironmentalSerializer(serializers.ModelSerializer):
-    class Meta(object):
-        model = models.Environmental
-
-
 class LanguageFamilySerializer(serializers.ModelSerializer):
     class Meta(object):
         model = models.LanguageFamily
