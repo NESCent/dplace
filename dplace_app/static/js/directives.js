@@ -671,10 +671,10 @@ angular.module('dplaceMapDirective', [])
                     
                 $.get("/static/images/D-PLACE_VLogo_RGB.svg", function(data) {
                     var svg_data = data.childNodes;
-                    d3.select(".jvectormap-container").select("svg").append("svg:g")//.append("svg:image")
-                        .attr("transform", "scale(0.27) translate(550, 850)")
+                    d3.selectAll(".jvectormap-container svg g").insert("svg:g")
+                        .attr("transform", "scale(0.35) translate(30, 800)")
                         .attr("style", "opacity: 0.35;")
-                        .attr("id", "map-logo");
+                    .attr("id", "map-logo");
                     document.getElementById("map-logo").innerHTML = svg_data[1].innerHTML;
                 });
 
