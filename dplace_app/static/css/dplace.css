@@ -238,12 +238,6 @@ label.light {
     cursor: hand;
 }
 
-.map-legend {
-    position: absolute;
-    margin-top: -290px;
-    margin-left: 800px;
-}
-
 .circle {
     border-radius: 50%;
     border: 1px solid darkgray;

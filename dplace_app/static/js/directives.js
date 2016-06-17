@@ -595,7 +595,7 @@ angular.module('dplaceMapDirective', [])
             // If not present, default to 'mapDiv'
             var mapDivId = scope.mapDivId || 'mapDiv';
             // Not possible to assign default values to bound attributes, so check
-            element.append("<div id='" + mapDivId + "' style='width:900px; height:30rem;'></div>");
+            element.append("<div id='" + mapDivId + "' style='width:800px; height:30rem;'></div>");
             scope.localRegions = [];
             scope.checkDirty = function() {
                 return !(angular.equals(scope.localRegions, scope.selectedRegions));
