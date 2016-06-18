@@ -123,11 +123,7 @@ a {
 }
 
 #legend {
-    position: absolute;
-    right: 40px;
-    z-index: 1;
     width:360px;
-    margin-top:0px;
 }
 
 .tooltip-inner {
