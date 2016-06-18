@@ -279,7 +279,7 @@ angular.module('languagePhylogenyDirective', [])
                         .attr("fill", "white")
                         .attr("fill-opacity", "0.8");*/
                     var vis = d3.select("language-phylogeny").append("svg:svg")
-                        .attr("width", w+300)
+                        .attr("width", w+200)
                         .attr("height", h+150)
                         .attr("class", "phylogeny")
                         .append("svg:g")
@@ -558,15 +558,27 @@ angular.module('languagePhylogenyDirective', [])
                 constructTree(args.tree);
              
                 $(window).scroll(function() {
-                    if ($(window).scrollTop() > $(".navbar").height()+250) {
-                        if (args.tree.name.indexOf("global") == -1)
-                            $("#legend").stop().animate({"marginTop":($(window).scrollTop() - 350) + "px"}, "slow");
-                        else
-                            $("#legend").stop().animate({"marginTop": ($(window).scrollTop() - 300) + "px"}, "slow");
+                    if($(".phylogeny").height() > $("#legend").height()) {
+                        
+                        if ($(window).scrollTop() > $(".navbar").height()+250) {
+                            if (args.tree.name.indexOf("global") == -1) {
+                                if (document.getElementsByClassName("in").length > 0) {
+                                    bottom = document.getElementsByClassName("in")[0].getBoundingClientRect().top;
+                                    margTop = document.getElementById("legend").getBoundingClientRect().top;
+                                    difference = bottom - margTop;
+                                    $("#legend").stop().animate({"marginTop": ($(window).scrollTop() - 290 - difference) + "px"}, "slow");
+                                } else { 
+                                    $("#legend").stop().animate({"marginTop":($(window).scrollTop() - 350) + "px"}, "slow");
+                                }
+                                        
+                            } else
+                                $("#legend").stop().animate({"marginTop": ($(window).scrollTop() - 300) + "px"}, "slow");
+                            
+                        } else {
+                            $("#legend").stop().animate({"marginTop": "0px"}, "slow");
+                        }
                     }
-                    else {
-                        $("#legend").stop().animate({"marginTop": "0px"}, "slow");
-                    } 
+                        
                     /*if ($(window).scrollTop() > $(".navbar").height()+250) {
                         d3.select("#varLabels")
                             .attr('class', 'var-labels-fixed')
@@ -595,7 +607,7 @@ angular.module('dplaceMapDirective', [])
             // If not present, default to 'mapDiv'
             var mapDivId = scope.mapDivId || 'mapDiv';
             // Not possible to assign default values to bound attributes, so check
-            element.append("<div id='" + mapDivId + "' style='width:900px; height:30rem;'></div>");
+            element.append("<div id='" + mapDivId + "' style='width:800px; height:30rem;'></div>");
             scope.localRegions = [];
             scope.checkDirty = function() {
                 return !(angular.equals(scope.localRegions, scope.selectedRegions));

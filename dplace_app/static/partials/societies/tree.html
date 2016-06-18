@@ -26,12 +26,33 @@
     <div class="tree-download">
        <button ng-show="!globalTree && results.selectedTree" ng-click="treeDownload()" class="btn btn-info btn-dplace-download">Download This Phylogeny</button>
     </div>
+    <table>
+    <tr>
+    <td style="width:700px;vertical-align:top;">
     
+    <div ng-show="globalTree && variables.length > 0">
+        <h5>Choose a variable:</h4>
+        <select 
+            ng-model="results.chosenTVariable"
+            class="form-control"
+            ng-options="variable.name for variable in variables"
+            ng-init="results.chosenTVariable=variables[0]"
+            style="width:auto;"
+             >
+         </select>
+         Double click the tree or scroll to zoom.
+    </div>
+
+    <p ng-show="results.selectedTree" style="width:500px">Note: trees have been pruned to display only societies present in D-PLACE.</p>
+    <language-phylogeny>
+    
+    </language-phylogeny>
+    </td><td style="vertical-align:top;">
     <div id="legend" ng-show="results.selectedTree">
         <i ng-show="!globalTree && ((results.variable_descriptions.length > 0) || (results.environmental_variables.length > 0))">Click on a variable title to expand or collapse variable legend.</i>
             <div ng-repeat="variable in results.variable_descriptions" ng-class="{'panel panel-default':!globalTree}" style="margin-bottom:5px;">
                 <div class="panel-heading" ng-show="!globalTree"> 
-                    <a data-toggle="collapse" data-parent="#legend" data-target="#{{variable.CID}}" style="color:#000;"><b>{{variable.CID}}:</b> {{variable.variable.name}} <br><em style="font-size:12px;">{{variable.variable.codebook_info}}</em></a>
+                    <a ng-click="check(variable)" data-toggle="collapse" data-parent="#legend" data-target="#{{variable.CID}}" style="color:#000;"><b>{{variable.CID}}:</b> {{variable.variable.name}} <br><em style="font-size:12px;">{{variable.variable.codebook_info}}</em></a>
                 </div>
                 <div id="{{variable.CID}}" ng-class="{'panel-collapse collapse': !globalTree, 'in': variable.CID == 'C1'}" ng-show="(!globalTree || (globalTree && results.chosenTVariable.label==variable.variable.label))">
                     <div class="leg-panel panel-body">
@@ -118,22 +139,6 @@
                 </table>
             </div>
     </div>
-
-    <div ng-show="globalTree && variables.length > 0">
-        <h5>Choose a variable:</h4>
-        <select 
-            ng-model="results.chosenTVariable"
-            class="form-control"
-            ng-options="variable.name for variable in variables"
-            ng-init="results.chosenTVariable=variables[0]"
-            style="width:auto;"
-             >
-         </select>
-         Double click the tree or scroll to zoom.
-    </div>
-
-    <p ng-show="results.selectedTree">Note: trees have been pruned to display only societies present in D-PLACE.</p>
-    <language-phylogeny>
-    
-    </language-phylogeny>
+    </td></tr>
+</table>
 </div>
