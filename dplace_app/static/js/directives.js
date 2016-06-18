@@ -558,9 +558,10 @@ angular.module('languagePhylogenyDirective', [])
                 constructTree(args.tree);
              
                 $(window).scroll(function() {
+                    if($(".phylogeny").height() > $("#legend").height()) {
+                        
                         if ($(window).scrollTop() > $(".navbar").height()+250) {
                             if (args.tree.name.indexOf("global") == -1) {
-                                
                                 if (document.getElementsByClassName("in").length > 0) {
                                     bottom = document.getElementsByClassName("in")[0].getBoundingClientRect().top;
                                     margTop = document.getElementById("legend").getBoundingClientRect().top;
@@ -576,6 +577,7 @@ angular.module('languagePhylogenyDirective', [])
                         } else {
                             $("#legend").stop().animate({"marginTop": "0px"}, "slow");
                         }
+                    }
                         
                     /*if ($(window).scrollTop() > $(".navbar").height()+250) {
                         d3.select("#varLabels")
