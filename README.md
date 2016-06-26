@@ -1,7 +1,9 @@
 # D-PLACE  [![Build Status](https://travis-ci.org/D-PLACE/dplace.svg?branch=master)](https://travis-ci.org/D-PLACE/dplace)
+
 ## Synopsis
 
 This repository contains a [Django](http://djangoproject.com) application for the D-PLACE Project. 
+
 ## Installation
 
 ### Vagrant/Ansible
@@ -21,11 +23,10 @@ D-PLACE also requires the following software:
 - Git
 - Python (2.7 preferred)
 - python-psycopg2 (for connecting to Postgres)
-- Postgres with PostGIS (Versions 9.2 and 9.3 are used in development)
+- Postgres with PostGIS
+- the Postgres `unaccent` extension.
 
-D-PLACE has been developed on Mac OS X 10.9 as well as Ubuntu Server 12.04. Efforts to run on Windows have not been successful, but it should be possible.
-
-For information on installing PostGIS, see the [GeoDjango documentation](https://docs.djangoproject.com/en/dev/ref/contrib/gis/install/)
+D-PLACE has been developed on Mac OS X 10.9 as well as Ubuntu Server 12.04.
 
 ### Cloning the repository
 
@@ -60,6 +61,7 @@ Be sure to update the following sections:
 2. `DATABASES`: Connection info and credentials for PostgreSQL host
 3. `TEMPLATE_DIRS`: Absolute local path to `dplace_app/templates`
 4. `STATICFILES_DIRS`: Absolute local path to `dplace_app/static`
+5. `DATASETS`: Names of datasets to install.
 
 #### Database installation
 
