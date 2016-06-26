@@ -96,7 +96,7 @@ angular.module('languagePhylogenyDirective', [])
                                     .attr("stroke", "#000")
                                     .attr("stroke-width", "0.5")
                                     .attr("fill", function(n) {
-                                        value = society.languages[i].family.id;
+                                        value = results.classifications.map(function(l) { return l.id; }).indexOf(society.languages[i].family.id);
                                         rgb = colorMapService.mapColor(value, results.classifications.length);
                                         return rgb;
                                         
@@ -123,7 +123,7 @@ angular.module('languagePhylogenyDirective', [])
                                     .attr("stroke", "#000")
                                     .attr("stroke-width", "0.5")
                                     .attr("fill", function(n) {
-                                        value = society.geographic_regions[i].tdwg_code;
+                                        value = results.geographic_regions.map(function(g) { return g.tdwg_code; }).indexOf(society.geographic_regions[i].tdwg_code);
                                         rgb = colorMapService.mapColor(value, results.geographic_regions.length);
                                         return rgb;
                                     })

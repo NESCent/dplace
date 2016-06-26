@@ -38,7 +38,7 @@
     <table class="">
     <tr ng-show="(results.chosenVariable && (results.environmental_variables.indexOf(results.chosenVariable) !==-1))">
         <td class = "env-legend-td">
-            <svg height="70" width="400" class="envLegend" style="margin-left:-15px;">
+            <svg height="70" width="400" class="envLegend">
                 <rect class="envVar" height="30" width="230" x="20" />
                 <text x="0" y="45">{{results.chosenVariable.min}} {{results.chosenVariable.units}}</text>
                 <text x="230" y="45">{{results.chosenVariable.max}} {{results.chosenVariable.units}}</text>
@@ -72,7 +72,7 @@
                         cx="10"
                         cy="10"
                         r="4.5"
-                        fill="{{code.id|colorNode:results}}"
+                        fill="{{$index|colorNode:results}}"
                         stroke="#000"
                         stroke-width="0.5"
                         />
@@ -89,7 +89,7 @@
                         cx="10"
                         cy="10"
                         r="4.5"
-                        fill="{{region.tdwg_code|colorNode:results}}"
+                        fill="{{$index|colorNode:results}}"
                         stroke="#000"
                         stroke-width="0.5"
                         />
