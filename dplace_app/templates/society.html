@@ -64,7 +64,7 @@
     );
   </script>
 {% endif %}
-<h1><img height="60px" title="HOME" src="{% static "images/D-PLACE_Logo.png" %}">Society: {{ society.name }} ({{society.ext_id}})</h1>
+<h1><a href="{% url 'home' %}"><img height="60px" title="HOME" src="{% static "images/D-PLACE_Logo.png" %}"></a>Society: {{ society.name }} ({{society.ext_id}})</h1>
     {% if society.original_name %}
     <h4>Original name and ID in {{society.source.name}}: {{society.original_name}}</h4>
     {% endif %}
