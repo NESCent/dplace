@@ -9,21 +9,30 @@
     <span class="form-inline clearfix">
         <h4 class="pull-left">Search by Cultural Trait</h4>
        <div class="pull-right">
-        <span ng-show="count > 0 && !errors" style="padding-right:5mm !important" ng-class="{'text-danger': count > 4}">Number of variables selected: {{ count }}</span>
-            <button class="btn btn-primary form-control"
+            <button class="btn search-btn form-control"
+                ng-disabled="searchButton.disabled"
+                ng-click="resetSearch()">Reset
+            </button>
+            <button ng-show="checkIfSelected()" 
+                class="btn search-btn" 
+                ng-disabled="searchButton.disabled"
+                ng-click="showCriteria()">
+                {{ searchCriteria }}
+            </button>
+            <button class="btn btn- search-btn form-control"
                         ng-disabled="searchButton.disabled"
                         ng-click="doSearch()">{{ searchButton.text }}
-            </button>
-            <button class="btn btn-danger form-control"
-                        ng-click="resetSearch()">Reset
             </button>
             <span class="alert alert-danger" ng-show="errors">
                 {{ errors }}
             </span> 
         </div>
+
     </span>
-    <h5 style="padding-left: 5mm !important; line-height:10px;">Note: Search is limited to 4 cultural variables maximum</h5>
-    <form class="form-inline" role="form" style="margin-top:20px;">
+    <h5  class="pull-left" style="padding-left: 5mm !important; line-height:10px;">Note: Search is limited to 4 cultural variables maximum</h5>
+    <h5 ng-show="count > 0 && !errors" style="padding-right:5mm !important" ng-class="{'text-danger': count > 4}" class="pull-right">Number of variables selected: {{ count }}</h5>
+
+    <form class="form-inline" role="form" style="margin-top:35px;">
         <div class="panel panel-default" ng-repeat="trait in traits">
             <div class="panel-heading">
                 <div class="row">

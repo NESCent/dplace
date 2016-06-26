@@ -41,13 +41,23 @@
     <span class="form-inline clearfix">
         <h4 class="pull-left">Search by Geographic Region</h4>
         <div class="pull-right">
-            <button class="btn btn-primary form-control"
+                    
+            <button class="btn search-btn form-control"
+                    ng-disabled="searchButton.disabled"
+                    ng-click="resetSearch()">Reset
+            </button>
+            <button 
+                ng-show="checkIfSelected()" 
+                class="btn search-btn" 
+                ng-disabled="searchButton.disabled"
+                ng-click="showCriteria()">
+                {{ searchCriteria }}
+            </button>
+            <button class="btn search-btn form-control"
                         ng-disabled="searchButton.disabled"
                         ng-click="doSearch()">{{ searchButton.text }}
             </button>
-            <button class="btn btn-danger form-control"
-                        ng-click="resetSearch()">Reset
-            </button>
+
             <span class="alert alert-danger" ng-show="errors">
                 {{ errors }}
             </span> 
@@ -56,7 +66,7 @@
     <form class="form form-inline" role="form" style="margin-top:20px;">
         <div class="panel panel-default">
             <div class="panel-heading">
-                <span ng-hide="geographic.selectedRegions.length" class="search-help">Select Geographic regions by clicking the map and using the <small><span class="glyphicon glyphicon-plus-sign"></span></small> pull-down menu</span>
+                <span ng-hide="geographic.selectedRegions.length" class="search-help">Select geographic regions by clicking the map and using the <small><span class="glyphicon glyphicon-plus-sign"></span></small> pull-down menu</span>
                 <span class="region" ng-repeat="region in geographic.selectedRegions">
                     <span>{{ region.name }}</span>
                     <span class="glyphicon glyphicon-remove region-remove" ng-click="removeFromSearch(region, 'geographic')" style="cursor:pointer;"></span></span>
