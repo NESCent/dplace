@@ -252,7 +252,7 @@ def result_set_from_query_dict(query_dict):
                     Q(id=0))
                 if include_NA:
                     query = query | Q(coded_value='NA')
-                print query
+
                 values = models.CulturalValue.objects\
                     .filter(variable=variable)\
                     .filter(query)
