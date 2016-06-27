@@ -158,6 +158,10 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties) 
                     }
                 
                 }
+            case 'variable':
+                while(object.length > 0) {
+                    $scope.removeFromSearch(object[0], 'culture')
+                }
         }
         if (!$scope.checkIfSelected()) {
             d3.select("#selected-criteria").classed("hidden", true);
