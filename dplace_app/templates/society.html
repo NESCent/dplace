@@ -12,6 +12,12 @@
     $(document).ready(function() {
         $("a.comment-tooltip").tooltip();
         document.title = '{{ society.name }} – ' + document.title;
+        
+        $('.collapse').on('shown.bs.collapse', function(){
+            $(this).parent().find(".glyphicon-plus").removeClass("glyphicon-plus").addClass("glyphicon-minus");
+        }).on('hidden.bs.collapse', function(){
+            $(this).parent().find(".glyphicon-minus").removeClass("glyphicon-minus").addClass("glyphicon-plus");
+        });
     });
 </script>
 
@@ -112,10 +118,12 @@
         {% for key, value in environmentals.items %}
             <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
                 <div class="panel panel-default">
-                    <a class="panel-default" data-toggle="collapse" data-parent="#accordion" href="#e{{key|cut:" "}}" aria-expanded="true" aria-controls="e{{key|cut:" "}}">
+                    <a class="header panel-default" data-toggle="collapse" data-parent="#accordion" href="#e{{key|cut:" "}}" aria-expanded="true" aria-controls="e{{key|cut:" "}}">
                         <div class="panel-heading" role="tab" id="h{{key|cut:" "}}">
                             <h4 class="panel-title">
                                 {{key}}
+                                <span class="glyphicon glyphicon-plus pull-right" aria-hidden="true"></span>
+
                             </h4>
                         </div>
                      </a>
@@ -152,6 +160,7 @@
                     <div class="panel-heading" role="tab" id="h{{key|cut:" "}}">
                         <h4 class="panel-title">
                             {{key}}
+                            <span class="glyphicon glyphicon-plus pull-right" aria-hidden="true"></span>
                         </h4>
                     </div>
                 </a>
