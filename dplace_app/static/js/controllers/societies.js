@@ -305,6 +305,14 @@ function SocietiesCtrl($scope, $timeout, $http, searchModelService, colorMapServ
         $scope.tabs[2].active = true;
     }
     
+    $scope.nexusDownload = function() {
+        console.log($scope.results.selectedTree);
+        var filename = $scope.results.selectedTree.name+"-d-place.NEXUS";
+        string = "#NEXUS\nBEGIN TREES;\nTREE " + $scope.results.selectedTree.name+" = " + $scope.results.selectedTree.newick_string+"\nEND;"
+        file = new Blob([string], {type: 'text/nexus'});
+        saveAs(file, filename);
+    }
+    
     $scope.treeDownload = function() {
         var tree_svg = d3.select(".phylogeny")
             .attr("version", 1.1)

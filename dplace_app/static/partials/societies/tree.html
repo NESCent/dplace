@@ -23,8 +23,15 @@
         >
         <option value="">Select a Tree</option>
     </select>
-    <div class="tree-download">
-       <button ng-show="!globalTree && results.selectedTree" ng-click="treeDownload()" class="btn btn-info btn-dplace-download">Download This Phylogeny</button>
+        <div ng-show="!globalTree && results.selectedTree" class="btn-group" style="margin-top:10px;">
+          <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Download This Phylogeny
+            <span class="caret" style="margin-left:5px;"></span>
+            </button>
+          <ul class="dropdown-menu">
+            <li><a ng-click="treeDownload()">As SVG image</a></li>
+            <li><a ng-click="nexusDownload()">As NEXUS file</a></li>
+          </ul>
     </div>
     <table>
     <tr>
