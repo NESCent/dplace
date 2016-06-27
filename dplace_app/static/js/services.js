@@ -4,7 +4,7 @@ angular.module('dplaceServices', ['ngResource'])
         $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
     })
     .service('colorMapService', [ColorMapService])
-    .service('searchModelService',['VariableCategory','GeographicRegion','EnvironmentalCategory', 'LanguageFamily', 'DatasetSources', SearchModelService])
+    .service('searchModelService',['VariableCategory','GeographicRegion','EnvironmentalCategory', 'LanguageFamily', 'DatasetSources', 'Language', SearchModelService])
     .factory('LanguageFamily', function($resource) {
         return $resource(
             '/api/v1/language_families/:id',
@@ -13,7 +13,16 @@ angular.module('dplaceServices', ['ngResource'])
                     method: 'GET',
                     isArray: true,
                     transformResponse: function(data, headers) {
-                        return JSON.parse(data).results;
+                        society_count = 0;
+                        results = JSON.parse(data).results;
+                        for (var i = 0; i < results.length; i++) {
+                            society_count += results[i].language_count;
+                        }
+                        list = [{
+                            'name': 'Select All Languages',
+                            'language_count': society_count
+                        }]
+                        return list.concat(results);
                     }
                 }
             }
