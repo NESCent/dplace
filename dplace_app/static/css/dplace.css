@@ -472,3 +472,18 @@ label.light {
     display:none;
 }
 
+.search-btn, .search-btn:focus {
+    background-color: #000;
+    color: #fff;
+}
+
+.search-btn:hover {
+    background-color:#B3B3B3;
+    color:#000;
+}
+
+.search-btn:disabled {
+    background-color:#000;
+    opacity:0.25;
+}
+
