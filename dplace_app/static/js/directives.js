@@ -27,56 +27,6 @@ angular.module('languagePhylogenyDirective', [])
                 };
                 return diagonal;
             }
-                    
-            var radialRightAngleDiagonal = function() {
-                return rightAngleDiagonal()
-                  .path(function(pathData) {
-                    var src = pathData[0],
-                        mid = pathData[1],
-                        dst = pathData[2],
-                        radius = Math.sqrt(src[0]*src[0] + src[1]*src[1]),
-                        srcAngle = coordinateToAngle(src, radius),
-                        midAngle = coordinateToAngle(mid, radius),
-                        clockwise = Math.abs(midAngle - srcAngle) > Math.PI ? midAngle <= srcAngle : midAngle > srcAngle,
-                        rotation = 0,
-                        largeArc = 0,
-                        sweep = clockwise ? 0 : 1;
-                    return 'M' + src + ' ' +
-                      "A" + [radius,radius] + ' ' + rotation + ' ' + largeArc+','+sweep + ' ' + mid +
-                      'L' + dst;
-                  })
-                  .projection(function(d) {
-                    var r = d.y, a = (d.x - 90) / 180 * Math.PI;
-                    return [r * Math.cos(a), r * Math.sin(a)];
-                  })
-            }
-            // Convert XY and radius to angle of a circle centered at 0,0
-            var coordinateToAngle = function(coord, radius) {
-                var wholeAngle = 2 * Math.PI,
-                    quarterAngle = wholeAngle / 4
-                
-                var coordQuad = coord[0] >= 0 ? (coord[1] >= 0 ? 1 : 2) : (coord[1] >= 0 ? 4 : 3),
-                    coordBaseAngle = Math.abs(Math.asin(coord[1] / radius))
-                
-                // Since this is just based on the angle of the right triangle formed
-                // by the coordinate and the origin, each quad will have different 
-                // offsets
-                switch (coordQuad) {
-                  case 1:
-                    coordAngle = quarterAngle - coordBaseAngle
-                    break
-                  case 2:
-                    coordAngle = quarterAngle + coordBaseAngle
-                    break
-                  case 3:
-                    coordAngle = 2*quarterAngle + quarterAngle - coordBaseAngle
-                    break
-                  case 4:
-                    coordAngle = 3*quarterAngle + coordBaseAngle
-                }
-                return coordAngle
-            }
-
             var addMarkers = function(langTree, results, variable, node, global, translate) { 
                 scope.results.societies.forEach(function(society) {
                     var selected = node.filter(function(d) {
@@ -238,27 +188,17 @@ angular.module('languagePhylogenyDirective', [])
             var constructTree = function(langTree) {   
                 d3.select("language-phylogeny").html('');
                 var newick = Newick.parse(langTree.newick_string);
-                /*if (langTree.name.indexOf("global") != -1) var w = 900;
-                else  var w = 500;*/
                 var w = 500;
-                /*if (langTree.name.indexOf("global") != -1)  {
-                    var tree = d3.layout.cluster()
-                    .size([360, (w/2)-100])
-                    .sort(function(node) { return node.children ? node.children.length : -1; })
+                var tree = d3.layout.cluster()
+                    .children(function(node) { return node.branchset; });
+                var nodes = tree(newick);
+                var h = nodes.length * 8;
+                tree = d3.layout.cluster()
+                    .size([h, w])
+                    .sort(function comparator(a, b) { return d3.ascending(a.length, b.length); })
                     .children(function(node) { return node.branchset; })
                     .separation(function separation(a, b) { return 8; });
-                } 
-             else {*/
-                    var tree = d3.layout.cluster()
-                        .children(function(node) { return node.branchset; });
-                    var nodes = tree(newick);
-                    var h = nodes.length * 8;
-                    tree = d3.layout.cluster()
-                        .size([h, w])
-                        .sort(function comparator(a, b) { return d3.ascending(a.length, b.length); })
-                        .children(function(node) { return node.branchset; })
-                        .separation(function separation(a, b) { return 8; });
-                //}
+                
                 nodes = tree(newick);
                 var vis = d3.select("language-phylogeny").append("svg:svg")
                         .attr("width", w+200)
@@ -321,27 +261,8 @@ angular.module('languagePhylogenyDirective', [])
                     vis = vis.append("svg:g")
                         .attr("transform", "translate(0, 15)");
                     
-                }/* else {
-                    var vis = d3.select("language-phylogeny").append("svg:svg")
-                        .attr("width", w)
-                        .attr("height", w)
-                        .attr("pointer-events", "all")
-                        .call(d3.behavior.zoom().on("zoom", redraw).translate([w/2,w/2]))
-                        .attr("class", "phylogeny")
-                        .append("svg:g")
-                        .attr("transform", "translate("+w/2+","+w/2+")");
                 }
-                
-                function redraw() {
-                    vis.attr("transform",
-                        "translate(" + d3.event.translate + ")" + "scale(" + d3.event.scale + ")");
-                }   */
-
-                /*if (langTree.name.indexOf("global") != -1) {
-                    var diagonal = radialRightAngleDiagonal();
-                } else {*/
-                    var diagonal = rightAngleDiagonal();    
-                //}
+                var diagonal = rightAngleDiagonal();    
                 
                 taxa = {}
                 include = scope.results.societies.map(function(s) { return s.society.ext_id; });
@@ -367,18 +288,17 @@ angular.module('languagePhylogenyDirective', [])
 
                 var leafDistFromRoot = 0;
                 var longest_y = 0;
-               nodes.forEach(function(node) {
+                nodes.forEach(function(node) {
                     if (node.rootDist > leafDistFromRoot)
                         leafDistFromRoot = node.rootDist;
-                    //if (langTree.name.indexOf("global") == -1)
-                        node.y = yscale(node.rootDist);
+                    node.y = yscale(node.rootDist);
                     if (node.y > longest_y)
                         longest_y = node.y;
                 });
                 
                 //calculate time scale
-                var timeScaleYears = leafDistFromRoot * 100; //convert to years
-                var pixelScale = (w / timeScaleYears) * 100;
+                /*var timeScaleYears = leafDistFromRoot * 100; //convert to years
+                var pixelScale = (w / timeScaleYears) * 100;*/
                 
                 var dotted = [];
                 var links = tree.links(nodes);
@@ -398,21 +318,13 @@ angular.module('languagePhylogenyDirective', [])
                         else return "leaf-node";
                     })
                     .attr("transform", function(d) { 
-                        //if ((langTree.name.indexOf("global") != -1) || (langTree.name.indexOf("glotto") != -1)) {
                            if (!d.children) {
-                           // if (langTree.name.indexOf("global") != -1)
-                            //    return "rotate("+(d.x-90)+")translate("+d.y+")";
-                            //else {//if (langTree.name.indexOf("glotto") !=  -1) {
                                 dotted.push({'x':d.y, 'y':d.x})
                                 return "translate(" + longest_y + ", " + d.x + ")";
                             }  
-                           //}
                            return "translate(" + d.y + ", "+ d.x + ")";
-                        //}
-                        //else return "translate(" + d.y + ", "+ d.x + ")";
                          });
                 
-                //if (langTree.name.indexOf("glotto") != -1) {
                     for (var d = 0; d < dotted.length; d++) {
                         if (dotted[d].x >= longest_y-4) continue;
                         vis.append("svg:line")
@@ -523,7 +435,7 @@ angular.module('languagePhylogenyDirective', [])
                 d3.selectAll(".inner-node").select("text").remove();
                 
                 //Time Scale
-                if (langTree.name.indexOf("glotto") == -1 && langTree.name.indexOf("global") == -1) {
+                /*if (langTree.name.indexOf("glotto") == -1 && langTree.name.indexOf("global") == -1) {
                     line_svg= d3.select('language-phylogeny').append("svg:svg")
                         .attr("style", "margin-left:100px; margin-top:-100px;");
                     line_svg.append("svg:line")
@@ -540,7 +452,7 @@ angular.module('languagePhylogenyDirective', [])
                             else return text_pos;
                         })
                         .text("100 years");
-                }
+                }*/
                 
                 if (langTree.name.indexOf("global") == -1) addLogo(h/2);   
             };
