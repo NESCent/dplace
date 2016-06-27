@@ -58,7 +58,7 @@
                     <h5 data-toggle="collapse" data-target="#scCulture" ng-show="!isEmpty(searchModel.params.culturalTraits.selected, 'cultural')" style="cursor:pointer;"><strong>Culture</strong></h5>
                        <ul id="scCulture" class="list-unstyled collapse in" style="padding-left:10px;">
                         <li ng-repeat="(variable, codes) in searchModel.params.culturalTraits.selected" ng-show="codes.length > 0">
-                            {{ codes.variable_name }}
+                            <a ng-click="removeFromSearch(codes, 'variable')" style="color:red;"><span title="Remove criterion" class="glyphicon glyphicon-remove"></span></a>&nbsp;{{ codes.variable_name }}
                             <ul class="criteria-list">
                                 <li ng-repeat="code in codes">
                                     <a ng-click="removeFromSearch(code, 'culture')" style="color:red;"><span title="Remove criterion" class="glyphicon glyphicon-remove"></span></a>&nbsp;{{ code.short_description }}
