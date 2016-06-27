@@ -310,10 +310,6 @@ function SocietiesCtrl($scope, $timeout, $http, searchModelService, colorMapServ
             .attr("version", 1.1)
             .attr("xmlns", "http://www.w3.org/2000/svg")
             .node().parentNode.innerHTML;
-            
-        //need to do this to remove the time scale
-        tree_svg = tree_svg.substring(0, tree_svg.indexOf("</svg>"));
-        tree_svg = tree_svg.concat("</svg>");
         var all_legends = {};
         legends_list = [];
         var gradients_svg = d3.select("#gradients-div").node().innerHTML;
@@ -342,7 +338,8 @@ function SocietiesCtrl($scope, $timeout, $http, searchModelService, colorMapServ
             legends_list.push({'name': name.replace(/[\W]+/g, "-")+'-legend.svg', 'svg': env_svg});
         }
 
-        query = {"legends": legends_list, "tree": tree_svg, "name": $scope.results.selectedTree.name+'.svg'};
+        query = {'l': legends_list, 't': [tree_svg], 'n': [$scope.results.selectedTree.name+'.svg']};
+        console.log(query);
         var date = new Date();
         var filename = "dplace-tree-"+date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate()+".zip"
         $http.post('/api/v1/zip_legends', query, {'responseType': 'arraybuffer'}).then(function(data) {
