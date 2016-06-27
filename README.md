@@ -10,7 +10,7 @@ This repository contains a [Django](http://djangoproject.com) application for th
 
 For development purposes, the [Vagrant+Ansible](https://github.com/dleehr/dplace-vagrant) configuration is recommended. It automates the build of an Ubuntu Linux VM with D-PLACE installed and ready for testing/development.
 
-Additionally, the Anisble playbook creates OS and database users for D-PLACE, installs all software dependencies, and populates the database from the working group's data sets. You can use ansible by itself to provision D-PLACE on a host, or study the [playbooks](https://github.com/dleehr/ansible-postgresql/tree/master/roles/dplace_server/tasks) as a recipe.
+Additionally, the Ansible playbook creates OS and database users for D-PLACE, installs all software dependencies, and populates the database from the working group's data sets. You can use ansible by itself to provision D-PLACE on a host, or study the [playbooks](https://github.com/dleehr/ansible-postgresql/tree/master/roles/dplace_server/tasks) as a recipe.
 
 The rest of the information on this page assumes you are not using the [Vagrant+Ansible](https://github.com/dleehr/dplace-vagrant) configuration.
 
@@ -76,10 +76,6 @@ This requires valid database credentials in `settings.py`, and activation of you
 ### Architecture
 
 D-PLACE is mainly built with [Django](http://djangoproject.com) and [AngularJS](http://angularjs.org). Django is used to model/query data stored in the relational GIS database, and AngularJS is used to build a JavaScript-based browser application that provides an interface to the data. The [Django REST Framework](http://django-rest-framework.org) is used to build a JSON API between Django and AngularJS.
-
-#### GeoDjango - Data Models
-
-All D-PLACE datasets are represented by classes in `dplace_app/models.py`. These models are subclasses of `django.contrib.gis.db.models.Model`, which provides GIS functionality - point/geometry fields and queryability.
 
 #### Django REST Framework - REST API
 
