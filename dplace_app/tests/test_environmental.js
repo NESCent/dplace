@@ -59,6 +59,8 @@ describe('Testing environmental search', function() {
             .respond(200);
         $httpBackend.whenPOST('/api/v1/find_societies')
             .respond(200); //return a result here?
+        $httpBackend.whenGET('/api/v1/languages?page_size=1000')
+            .respond(200);
         $httpBackend.whenGET('/api/v1/environmental_variables?category=7&page_size=1000')
             .respond(200);
         $httpBackend.whenGET('/api/v1/min_and_max?query=%7B%22environmental_id%22:7%7D')

@@ -31,11 +31,12 @@ describe('Testing language factories', function() {
             .respond(JSON.stringify(results));
         response = mockLangFamilyFactory.query();
         $httpBackend.flush();
-        expect(response.length).toEqual(2);
-        expect(response[0].id).toEqual(77);
-        expect(response[1].id).toEqual(7);
-        expect(response[0].name).toEqual("Abkhaz-Adyge");
-        expect(response[1].name).toEqual("Afro-Asiatic");
+        expect(response.length).toEqual(3);
+        expect(response[0].name).toEqual("Select All Languages");
+        expect(response[1].id).toEqual(77);
+        expect(response[2].id).toEqual(7);
+        expect(response[1].name).toEqual("Abkhaz-Adyge");
+        expect(response[2].name).toEqual("Afro-Asiatic");
         
         results = {
             "count": 2,
@@ -71,8 +72,8 @@ describe('Testing language factories', function() {
         
         $httpBackend.whenGET('/api/v1/languages?family=77&page_size=1000')
             .respond(JSON.stringify(results));
-        languages = mockLangFactory.query({family: response[0].id});
-        $httpBackend.flush();
+        languages = mockLangFactory.query({family: response[1].id});
+        $httpBackend.flush()
         expect(languages.length).toEqual(2);
         expect(languages[0].id).toEqual(149);
         expect(languages[1].id).toEqual(599);
