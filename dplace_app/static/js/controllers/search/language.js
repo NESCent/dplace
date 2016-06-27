@@ -8,7 +8,10 @@ function LanguageCtrl($scope, searchModelService, Language, LanguageFamily) {
     linkModel();
     
     $scope.selectionChanged = function(scheme) {
-        scheme.languages = [];
+        if (scheme.selectedFamily.name == 'Select All Languages') {
+            scheme.languages = $scope.languageClassifications.allLanguages;//Language.query()
+        }
+        
         scheme.languages = Language.query({family: scheme.selectedFamily.id});
         
         if (!scheme.selectedFamily.alreadySelected) {
