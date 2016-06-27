@@ -112,13 +112,13 @@
         {% for key, value in environmentals.items %}
             <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
                 <div class="panel panel-default">
-                    <div class="panel-heading" role="tab" id="h{{key|cut:" "}}">
-                        <h4 class="panel-title">
-                            <a data-toggle="collapse" data-parent="#accordion" href="#e{{key|cut:" "}}" aria-expanded="true" aria-controls="e{{key|cut:" "}}">
+                    <a class="panel-default" data-toggle="collapse" data-parent="#accordion" href="#e{{key|cut:" "}}" aria-expanded="true" aria-controls="e{{key|cut:" "}}">
+                        <div class="panel-heading" role="tab" id="h{{key|cut:" "}}">
+                            <h4 class="panel-title">
                                 {{key}}
-                            </a>
-                        </h4>
-                    </div>
+                            </h4>
+                        </div>
+                     </a>
                     <div id="e{{key|cut:" "}}" class="panel-collapse collapse out" role="tabpanel" aria-labelledby="h{{key|cut:" "}}">
                         <table class="panel-body table table-condensed table-striped table-bordered">
                             <tr>
@@ -148,13 +148,13 @@
     {% for key, value in cultural_traits.items %}
         <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
             <div class="panel panel-default">
-                <div class="panel-heading" role="tab" id="h{{key|cut:" "}}">
-                    <h4 class="panel-title">
-                        <a data-toggle="collapse" data-parent="#accordion" href="#c{{key|cut:" "}}" aria-expanded="true" aria-controls="c{{key|cut:" "}}">
+                <a class="panel-default" data-toggle="collapse" data-parent="#accordion" href="#c{{key|cut:" "}}" aria-expanded="true" aria-controls="c{{key|cut:" "}}">
+                    <div class="panel-heading" role="tab" id="h{{key|cut:" "}}">
+                        <h4 class="panel-title">
                             {{key}}
-                        </a>
-                    </h4>
-                </div>
+                        </h4>
+                    </div>
+                </a>
                 <div id="c{{key|cut:" "}}" class="panel-collapse collapse out" role="tabpanel" aria-labelledby="h{{key|cut:" "}}">
                     <table class="panel-body table table-condensed table-striped table-bordered">
                         <tr>
