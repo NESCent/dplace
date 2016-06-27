@@ -215,7 +215,7 @@ describe('Color Map Service Testing', function() {
         ];
         
         var map = mockColorService.generateColorMap(mockResults);
-       expect(map[society.society.id]).toBe("rgb(0,0,255)");
+       expect(map[society.society.id]).toBe("rgb(255,0,0)");
        expect(map[society2.society.id]).toBe("rgb(0,255,0)");
        expect(map[society2.society.id]).toEqual(map[society3.society.id]);
     });
@@ -261,7 +261,7 @@ describe('Color Map Service Testing', function() {
         ];
      mockResults.societies.push(society);
     var map = mockColorService.generateColorMap(mockResults);
-    expect(map[society.society.id]).toEqual("rgb(0,0,255)")
+    expect(map[society.society.id]).toEqual("rgb(255,0,0)")
     });
     
     it('geographic region and cultural variable', function() {
