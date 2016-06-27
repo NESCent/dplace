@@ -322,6 +322,8 @@ function SocietiesCtrl($scope, $timeout, $http, searchModelService, colorMapServ
         legends_list = [];
         var gradients_svg = d3.select("#gradients-div").node().innerHTML;
         
+        
+        
         d3.selectAll(".legends").each( function(){
             leg = d3.select(this);
             if (leg.attr("var-id")) {
@@ -335,12 +337,20 @@ function SocietiesCtrl($scope, $timeout, $http, searchModelService, colorMapServ
             legend_id = all_legends[id];
             name = $scope.results.variable_descriptions[i].CID + '-'+ $scope.results.variable_descriptions[i].variable.name;
             svg_string = legend_id.node().innerHTML;
+            while (svg_string.indexOf("url(societies") != -1) { //strip out the societies part of the URL because this won't work in our download
+                index = svg_string.indexOf("url(societies");
+                svg_string = svg_string.substring(0, index+4) + svg_string.substring(index+13)
+            }
             svg_string = '<svg version="1.1" xmlns="http://www.w3.org/2000/svg" transform="translate(10, 10)">' + svg_string + gradients_svg + '</svg>';
             legends_list.push({'name': name.replace(/[\W]+/g, "-")+'-legend.svg', 'svg': svg_string});    
         }
         
         for (var i = 0; i < $scope.results.environmental_variables.length; i++) {
             env_svg = d3.select("#e"+$scope.results.environmental_variables[i].id).select("div").node().innerHTML;
+            while (env_svg.indexOf("url(societies") != -1) {
+                index = env_svg.indexOf("url(societies");
+                env_svg = env_svg.substring(0, index+4) + env_svg.substring(index+13)
+            }
             env_svg = '<svg version="1.1" xmlns="http://www.w3.org/2000/svg" transform="translate(10, 10)">'+env_svg.substring(0, env_svg.indexOf("</svg>")) + '</svg>' + gradients_svg + '</svg>';
             name = $scope.results.environmental_variables[i].CID + '-'+$scope.results.environmental_variables[i].name;
             legends_list.push({'name': name.replace(/[\W]+/g, "-")+'-legend.svg', 'svg': env_svg});
