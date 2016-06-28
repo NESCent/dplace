@@ -368,7 +368,6 @@ class Test(APITestCase):
     def test_csv_download(self):
         response = self.client.get(reverse('csv_download'))
         self.assertEqual(response.content.split()[0], '"Research')
-        print "CSVDOWNLOAD"
         response = self.get_json(
             'csv_download', 
             {'query': json.dumps({'p': [self.get(models.GeographicRegion, 1).id]})})  
