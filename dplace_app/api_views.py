@@ -506,17 +506,16 @@ def bin_cont_data(request):  # MAKE THIS GENERIC
             min_bin = min_bin + bin_size + 1
     return Response(bins)
 
-
-@api_view(['POST'])
+@api_view(['GET'])
 @permission_classes((AllowAny,))
 @renderer_classes((DPLACECSVRenderer,))
 def csv_download(request):
-    result_set = result_set_from_query_dict(request.data)
+    query_dict = get_query_from_json(request)
+    result_set = result_set_from_query_dict(query_dict)
     response = Response(serializers.SocietyResultSetSerializer(result_set).data)
     filename = "dplace-societies-%s.csv" % datetime.datetime.now().strftime("%Y-%m-%d")
     response['Content-Disposition'] = 'attachment; filename="%s"' % filename
     return response
-
 
 @api_view(['POST'])
 @permission_classes((AllowAny,))
