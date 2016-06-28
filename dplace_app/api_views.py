@@ -110,19 +110,6 @@ class SocietyViewSet(viewsets.ReadOnlyModelViewSet):
             template_name='society.html'
         )
         
-    def search(self, request, name):
-        societies = None
-        if name:
-            soc = self.queryset.filter(
-                Q(name__unaccent__icontains=name) | Q(alternate_names__unaccent__icontains=name)
-            )
-            societies = [s for s in soc if s.culturalvalue_set.count()]
-        if len(societies) == 1:
-            return HttpResponseRedirect(reverse('view_society', kwargs={'society_id':societies[0].ext_id}))
-        else:
-            return Response(
-                {'results': societies, 'query': name}, template_name='search.html')
-
 class ISOCodeViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = serializers.ISOCodeSerializer
     filter_fields = ('iso_code',)
@@ -369,14 +356,18 @@ def find_societies(request):
     query = {}
     for k, v in request.query_params.lists():
         if str(k) == 'name':
+            result_set = serializers.SocietyResultSet()
             if len(v) > 0:
                 soc = models.Society.objects.filter(
-                    Q(name__icontains=v[0])
+                    Q(name__icontains=v[0]) | Q(alternate_names__unaccent__icontains=v[0])
                 )
-                societies = [s for s in soc if s.culturalvalue_set.count()]
-                return Response({'societies': serializers.SocietySerializer(societies, many=True).data})
+                for s in soc:
+                    if s.culturalvalue_set.count():
+                        result_set._get_society_result(s)
+                result_set.finalize([])
+                return Response(serializers.SocietyResultSetSerializer(result_set).data)
             else:
-                return Response({'societies': []})
+                return Response(serializers.SocietyResultSetSerializer(result_set).data)
         query[k] = [json.loads(vv) for vv in v]
     result_set = result_set_from_query_dict(query)
     log.info('%s find_societies 2: %s queries' % (time() - s, len(connection.queries)))

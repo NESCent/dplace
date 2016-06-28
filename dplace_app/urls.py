@@ -31,12 +31,6 @@ urlpatterns = [
             renderer_classes=[renderers.TemplateHTMLRenderer]
         ),
         name='view_society'),
-    url(r'^societies/search=(?P<name>.*)$',
-        api_views.SocietyViewSet.as_view(
-            {'get': 'search'},
-            renderer_classes=[renderers.TemplateHTMLRenderer]
-        ),
-        name='search_society'),
     url(r'^language/(?P<glottocode>.*)$',
         views.view_language,
         name='view_language'),

@@ -8,7 +8,7 @@ function dplaceRouter($routeProvider, $locationProvider) {
             controller: 'SearchCtrl'
         })
         .when('/societies/search/:name', {
-            templateUrl: '/static/partials/searchr.html',
+            templateUrl: '/static/partials/societies.html',
             controller:'SearchCtrl'
         })
         .when('/societies', {

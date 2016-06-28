@@ -22,7 +22,7 @@ $(document).ready(function(){
       <ul class="nav navbar-nav">
         <!-- <li ng-class="homeActive"><a ng-href href="#/home">Home</a></li> -->
         <li ng-class="searchActive" class="searchActive"><a ng-href href="/search"><img class="navicon" src="/static/images/Search_Icon.png"><br />SEARCH</a></li>
-        <li ng-class="societiesActive" class="societiesActive"><a ng-href href="/societies"><img class="navicon" src="/static/images/Results_Icon.png"><br />RESULTS <span ng-show="model.results.societies.length">({{ model.results.societies.length }})</span></a></li>
+        <li ng-show="model.results.societies.length > 0" ng-class="societiesActive" class="societiesActive"><a ng-href href="/societies"><img class="navicon" src="/static/images/Results_Icon.png"><br />RESULTS <span ng-show="model.results.societies.length">({{ model.results.societies.length }})</span></a></li>
         <li ng-class="sourceInfoActive" class="sourceInfoActive"><a ng-href href="/howto"><img class="navicon" src="/static/images/DataSet_Icon.png"><br />HOW-TO</a></li>
         <li ng-class="aboutActive" class="aboutActive">
             <!-- <div class="btn-group"> -->

@@ -4,7 +4,7 @@ function SocietiesCtrl($scope, $timeout, $http, searchModelService, colorMapServ
     $scope.variables = [];
 
     $scope.buttons = [];
-    if ($scope.results && $scope.results.language_trees) {
+    if ($scope.results.language_trees && $scope.results.language_trees.length > 0) {
         if ($scope.results.language_trees.phylogenies.length > 0) {
             $scope.buttons.push({value:'phylogeny', name:'Phylogenies', description: "Trees derived from discrete data using phylogenetic methods (branch lengths informative)"});
         }
