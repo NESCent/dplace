@@ -47,17 +47,7 @@ function SocietiesCtrl($scope, $timeout, $http, searchModelService, colorMapServ
     $scope.setActive('societies');
     
     $scope.columnSort = { sortColumn: 'society.name', reverse: false };
-        
-    $scope.disableCSVButton = function () {
-        $scope.csvDownloadButton.disabled = true;
-        $scope.csvDownloadButton.text = 'Downloading...';
-    };
 
-    $scope.enableCSVButton = function () {
-        $scope.csvDownloadButton.disabled = false;
-        $scope.csvDownloadButton.text = 'CSV';
-    };
-    
     var num_lines = 0;              
     $scope.wrapText = function(text, string) {
         text.each(function() {
@@ -366,24 +356,37 @@ function SocietiesCtrl($scope, $timeout, $http, searchModelService, colorMapServ
         });
     };
     
-    //NEW CSV DOWNLOAD CODE
-    //Sends a POST (rather than GET) request to the server, then constructs a Blob and uses FileSaver.js to trigger the save as dialog
-    //Better because we can send more data to the server using POST request than GET request
+    $scope.disableCSVButton = function () {
+        $scope.csvDownloadButton.disabled = true;
+        $scope.csvDownloadButton.text = 'Downloading...';
+    };
+
+    $scope.enableCSVButton = function () {
+        $scope.csvDownloadButton.disabled = false;
+        $scope.csvDownloadButton.text = 'CSV';
+    };
+    
     var file;
     $scope.download = function() {
         var date = new Date();
         var filename = "dplace-societies-"+date.toJSON().replace(/T.*$/,'')+".csv"
         if (!file) {
-           $scope.disableCSVButton();
-            var queryObject = searchModelService.getModel().getQuery(); 
-            $http.post('/api/v1/csv_download', queryObject).then(function(data) {
-                file = new Blob([data.data], {type: 'text/csv'});
+            $scope.disableCSVButton();
+            // queryObject is the in-memory JS object representing the chosen search options
+            var queryObject = searchModelService.getModel().getQuery();
+            // the CSV download endpoint is a GET URL, so we must send the query object as a string.
+            var queryString = encodeURIComponent(JSON.stringify(queryObject));
+            // format (csv/svg/etc) should be an argument, and change the endpoint to /api/v1/download
+            var csvDownloadLink = "/api/v1/csv_download?query=" + queryString;
+            $http.get(csvDownloadLink).then(function(data) {
+               file = new Blob([data.data], {type: 'text/csv'});
                 saveAs(file, filename);
-                $scope.enableCSVButton();
-
+                $scope.enableCSVButton(); 
             });
         } else {
+            var filename = "dplace-societies-"+date.toJSON().replace(/T.*$/,'')+".csv"
             saveAs(file, filename);
-        }
+        }    
     };
+
 }

@@ -21,6 +21,10 @@ class Test(APITestCase):
             reverse(urlname, args=reverse_args), *args, **kw
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        try: # csv download doesn't return json
+            json.loads(response.content)
+        except:
+            return response.content
         return json.loads(response.content)
 
     def obj_in_results(self, obj, response):
@@ -364,10 +368,11 @@ class Test(APITestCase):
     def test_csv_download(self):
         response = self.client.get(reverse('csv_download'))
         self.assertEqual(response.content.split()[0], '"Research')
-
-        response = self.get_results(
-            urlname='csv_download', p=[self.get(models.GeographicRegion, 1).id])
-        self.assertIn('Region1'.encode('utf8'), response.content)
+        print "CSVDOWNLOAD"
+        response = self.get_json(
+            'csv_download', 
+            {'query': json.dumps({'p': [self.get(models.GeographicRegion, 1).id]})})  
+        self.assertIn('Region1'.encode('utf8'), response)
 
     #
     # find societies:
