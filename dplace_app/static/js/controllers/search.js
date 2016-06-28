@@ -7,9 +7,10 @@
  * @param FindSocieties
  * @constructor
  */
-function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties) {
+function SearchCtrl($scope, $window, colorMapService, searchModelService, FindSocieties) {
     $scope.setActive('search');
     $scope.searchModel = searchModelService.getModel();
+    $scope.searchBySocietyButton = {text: 'Search', disabled: false};
     $scope.selectedButton = $scope.searchModel.selectedButton;
     var rP = 'radioPlaces';
     var rL = 'radioLanguage';
@@ -56,11 +57,15 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties) 
     $scope.disableSearchButton = function () {
         $scope.searchButton.disabled = true;
         $scope.searchButton.text = 'Working...';
+        $scope.searchBySocietyButton = {text: 'Working...', disabled: true};
+
     };
 
     $scope.enableSearchButton = function () {
         $scope.searchButton.disabled = false;
         $scope.searchButton.text = 'Search';
+        $scope.searchBySocietyButton = {text: 'Search', disabled: false};
+
     };
     
     $scope.isEmpty = function(object, searchType) {
@@ -302,7 +307,12 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties) 
     };
     
     var searchBySocietyCallBack = function() {
-        $scope.switchToSocResults($scope.model.societyQuery);
+        $scope.enableSearchButton();
+        $scope.searchModel.results.searchedByName = true;
+        if ($scope.searchModel.results.societies.length == 1) 
+            $window.location.href = '/society/'+$scope.searchModel.results.societies[0].society.ext_id;
+        else 
+            $scope.switchToResults();
     };
 
         // This method merges the current searchQuery object with the incoming searchQuery
@@ -320,6 +330,7 @@ function SearchCtrl($scope, colorMapService, searchModelService, FindSocieties) 
     };
     
     $scope.searchBySociety = function() {
+        $scope.disableSearchButton();
         var query = {'name': $scope.model.societyQuery}
         $scope.searchModel.results = FindSocieties.find(query, searchBySocietyCallBack);
     };

@@ -21,7 +21,54 @@
     });
 </script>
 
-<div class="container" style="margin-top:-150px;">
+<script>
+$(document).ready(function(){
+    $('[data-toggle="tooltip"]').tooltip(); 
+});
+</script><div class="navbar navbar-default navbar-fixed-top" role="navigation">
+  <div class="container-fluid">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <div id="homeLogo" class="homeNavBarLogo">
+          <a class="navbar-brand" href="/home"><img height="10%" title="HOME" src="/static/images/D-PLACE_Logo.png"></a>
+      </div>
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse navbar-right" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <!-- <li ng-class="homeActive"><a ng-href href="#/home">Home</a></li> -->
+        <li ng-class="searchActive" class="searchActive"><a ng-href href="/search"><img class="navicon" src="/static/images/Search_Icon.png"><br />SEARCH</a></li>
+        <li ng-class="sourceInfoActive" class="sourceInfoActive"><a ng-href href="/howto"><img class="navicon" src="/static/images/DataSet_Icon.png"><br />HOW-TO</a></li>
+        <li ng-class="aboutActive" class="aboutActive">
+            <!-- <div class="btn-group"> -->
+            <a class="dropdown-toggle" data-toggle="dropdown"><img class="navicon" src="/static/images/About_Icon.png"><br />INFO</a>
+            <ul class="dropdown-menu" role="menu">
+                <li><a ng-href href="/about">ABOUT</a></li>
+                <li><a ng-href href="mailto:dplace@shh.mpg.de" title="Send email to dplace@shh.mpg.de" data-toggle="tooltip" data-placement="top">CONTACT US</a></li>
+                <li><a ng-href href="/howtocite">HOW TO CITE</a></li>
+                <li><a ng-href href="/source">DATA SOURCES</a></li>
+                <li><a ng-href href="/team">TEAM</a></li>
+                <li><a ng-href href="/technology">TECHNOLOGY</a></li>
+                <li><a ng-href href="/publication">PUBLICATIONS</a></li>
+                <li><a ng-href href="/legal">LEGAL</a></li>
+            </ul>
+        </div>
+        </li>
+        <!-- <li ng-class="aboutActive" class="aboutActive"><a ng-href href="#/about"><img class="navicon" src="/static/images/About_Icon.png"><br />ABOUT</a></li> -->
+      </ul>
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+</div>
+
+
+<div class="container">
 {% if society.location %}
     <div class="pull-right" style="margin-top:30px;">
         <div id="society-map" style="width: 150px; height: 150px; vertical-align:right; border:solid 1px black;"></div>
@@ -70,7 +117,7 @@
     );
   </script>
 {% endif %}
-<h1><a href="{% url 'home' %}"><img height="60px" title="HOME" src="{% static "images/D-PLACE_Logo.png" %}"></a>Society: {{ society.name }} ({{society.ext_id}})</h1>
+<h1>Society: {{ society.name }} ({{society.ext_id}})</h1>
     {% if society.original_name %}
     <h4>Original name and ID in {{society.source.name}}: {{society.original_name}}</h4>
     {% endif %}

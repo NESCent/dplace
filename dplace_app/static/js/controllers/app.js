@@ -1,4 +1,4 @@
-function AppCtrl($scope, $location, searchModelService) {
+function AppCtrl($scope, $location, $http, searchModelService) {
     $scope.searchButton = {'disabled': false, 'text': 'Search'};
     $scope.model = searchModelService.getModel();
     // Root controller for app

@@ -1,14 +1,15 @@
 <div class="row">
-    <div ng-show="(results.searched && (results.societies.length == 0))">
+    <div ng-show="((results.searched || results.searchedByName) && (results.societies.length == 0))">
         <p style="margin:20px;">No societies found.</p>
-        </div>
+    </div>
     <table class="table" ng-show="results.societies.length">
         <tr>
             <th><a ng-click="columnSort.sortColumn='society.name';columnSort.reverse=!columnSort.reverse">Name</a></th>
+            <th ng-show="results.searchedByName">Alternate Names</th>
             <th><a ng-click="columnSort.sortColumn='society.source.name';columnSort.reverse=!columnSort.reverse">Dataset</a></th>
             <th><a ng-click="columnSort.sortColumn='society.language.glotto_code';columnSort.reverse=!columnSort.reverse">Glottolog Code</a></th>
             <th><a ng-click="columnSort.sortColumn='society.language.name';columnSort.reverse=!columnSort.reverse">Language</a></th>
-            <th>Trees</th>
+            <th ng-show="results.language_trees.length > 0">Trees</th>
             <th ng-repeat="variable in results.variable_descriptions">{{ variable.variable.name }}</th>
             <th ng-repeat="environmental in results.environmental_variables">{{ environmental.name }}</th>
             <th ng-show="results.languages">Language Family</th>
@@ -18,6 +19,7 @@
             <td><span class="circle" ng-style="society_result.society.style"></span>
                 <a ng-href="/society/{{ society_result.society.ext_id }}" target="_blank">{{ society_result.society.name }}</a>
             </td>
+            <td ng-show="results.searchedByName">{{ society_result.society.alternate_names }}
             <td>{{ society_result.society.source.name }}</td>
             <td>{{ society_result.society.language.glotto_code }}</td>
             <td>{{ society_result.society.language | formatLanguageName }}</td>
