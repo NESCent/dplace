@@ -23,16 +23,7 @@
         >
         <option value="">Select a Tree</option>
     </select>
-        <div ng-show="!globalTree && results.selectedTree" class="btn-group" style="margin-top:10px;">
-          <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            Download This Phylogeny
-            <span class="caret" style="margin-left:5px;"></span>
-            </button>
-          <ul class="dropdown-menu">
-            <li><a ng-click="treeDownload()">As SVG image</a></li>
-            <li><a ng-click="nexusDownload()">As NEXUS file</a></li>
-          </ul>
-    </div>
+        
     <table>
     <tr>
     <td style="width:700px;vertical-align:top;">
@@ -47,7 +38,16 @@
             style="width:auto;"
              >
          </select>
-         Double click the tree or scroll to zoom.
+    </div>
+    <div ng-show="results.selectedTree" class="btn-group" style="margin-top:10px;">
+          <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Download This Tree
+            <span class="caret" style="margin-left:5px;"></span>
+            </button>
+          <ul class="dropdown-menu">
+            <li><a ng-click="treeDownload()">As SVG image</a></li>
+            <li><a ng-click="nexusDownload()">As NEXUS file</a></li>
+          </ul>
     </div>
 
     <p ng-show="results.selectedTree" style="width:500px">Note: trees have been pruned to display only societies present in D-PLACE.</p>
