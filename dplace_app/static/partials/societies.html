@@ -41,7 +41,7 @@
 
     <div class="tablead pull-left">RESULT<br>Select a viewing mode<br>for your search results:</div>
     <tabset>
-        <tab ng-repeat="tab in tabs" active="tab.active" select="visible=true" deselect="visible=false">
+        <tab ng-repeat="tab in tabs" active="tab.active" select="visible=true; addTrees()" deselect="visible=false">
             <tab-heading><div class="tabHeading tabHeading_{{tab.content}}"></div><div class="text-center">{{tab.title}}</div></tab-heading>
                 <ng-include src="'/static/partials/societies/' + tab.content + '.html'"></ng-include>
         </tab>

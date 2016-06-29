@@ -209,6 +209,7 @@ class SocietyResult(object):
         self.environmental_values = set()
         self.languages = set()
         self.geographic_regions = set()
+        self.tree_count = 0
 
     def add_variable_coded_value(self, variable_coded_value):
         self.variable_coded_values.add(variable_coded_value)
@@ -221,6 +222,9 @@ class SocietyResult(object):
 
     def add_geographic_region(self, geographic_region):
         self.geographic_regions.add(geographic_region)
+        
+    def add_count(self, count):
+        self.tree_count = count
 
     def includes_criteria(self, criteria=None):
         if not criteria:
@@ -290,6 +294,9 @@ class SocietyResultSet(object):
    
     def add_language_tree(self, language_tree):
         self.language_trees.add(language_tree)
+            
+    def set_tree_count(self, society, count):
+        self._get_society_result(society).add_count(count)
     
     def finalize(self, criteria):
         self.societies = [
@@ -310,6 +317,7 @@ class SocietyResultSerializer(serializers.Serializer):
     environmental_values = EnvironmentalValueSerializer(many=True)
     languages = LanguageSerializer(many=True)
     geographic_regions = GeographicRegionSerializer(many=True)
+    tree_count = serializers.IntegerField()
 
 
 class SocietyResultSetSerializer(serializers.Serializer):
