@@ -57,8 +57,8 @@ describe('Color Map Service Testing', function() {
             'tdwg_code': 24
         };
 
-       society.geographic_regions.push(geographic_region);
-       mockResults.geographic_regions.push(geographic_region);
+        society.society.region = geographic_region;
+        mockResults.geographic_regions.push(geographic_region);
         mockResults.societies.push(society);
         var map = mockColorService.generateColorMap(mockResults);
         expect(map[society.society.id]).toBe('rgb(255,0,0)');
