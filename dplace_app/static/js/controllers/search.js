@@ -213,8 +213,8 @@ function SearchCtrl($scope, $window, colorMapService, searchModelService, FindSo
             $scope.searchModel.results.classifications = [];
             added = [];
             for (var i = 0; i < $scope.searchModel.results.societies.length; i++) {
-                for (var s = 0; s < $scope.searchModel.results.societies[i].languages.length; s++) {
-                    language_family = $scope.searchModel.results.societies[i].languages[s].family;
+                if ($scope.searchModel.results.societies[i].society.language) {
+                    language_family = $scope.searchModel.results.societies[i].society.language.family;
                     if (added.indexOf(language_family.id) == -1) { 
                         $scope.searchModel.results.classifications.push(language_family);       
                         added.push(language_family.id);

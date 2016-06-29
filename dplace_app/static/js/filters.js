@@ -111,10 +111,12 @@ angular.module('dplaceFilters', [])
         };
     })
     .filter('formatLanguage', function () {
-        return function(values) {
-            return values.map( function(language) {
+        return function(language) {
+            if (language == null){
+                return '';
+            } else {
                 return language.family.name;
-            }).join('; ');
+            }
         };
     })
     .filter('formatLanguageTrees', function () {
@@ -147,9 +149,11 @@ angular.module('dplaceFilters', [])
         };
     })
     .filter('formatGeographicRegion', function () {
-        return function(values) {
-            return values.map( function(region) {
+        return function(region) {
+            if (region == null) {
+                return '';
+            } else {
                 return region.region_nam;
-            }).join(',');
+            }
         };
     });
