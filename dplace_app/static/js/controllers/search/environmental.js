@@ -30,8 +30,8 @@ function EnvironmentalCtrl($scope, searchModelService, EnvironmentalVariable, En
     
     $scope.filterChanged = function(variable) {
         if (variable.EnvironmentalForm.$dirty && variable.selectedFilter.operator != 'all') return;
-        selected_variable = $scope.environmentalData.selectedVariables.filter(function(env_var) {
-            return env_var.selectedVariable.id == variable.selectedVariable.id;
+            selected_variable = $scope.environmentalData.selectedVariables.filter(function(env_var) {
+            return env_var.selectedVariable == variable.selectedVariable;
         });
         if (selected_variable.length == 1) {
             $scope.values.$promise.then(function(result) {
