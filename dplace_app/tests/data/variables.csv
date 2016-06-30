@@ -1,3 +1,3 @@
 Dataset,IndexCategory,VarID,VarTitle,VarDefinition,VarType,MainCategory,Source,Changes,UserNotes,Units
-EA,Subsistence,1,The Title,"The definition.",Ordinal,Category,Source1 (2000); Source2 (1999),,,%
-Binford,Subsistence,1,The Title,"The definition.",Ordinal,Category,Source1 (2000); Source2 (1999),,,
+EA,"Economy,Demography",1,Variable 1,"Variable 1",Categorical,Category,Source1 (2000); Source2 (1999),,,%
+Binford,Economy,2,Variable 2,"Variable 2",Continuous,Category,Source1 (2000); Source2 (1999),,,

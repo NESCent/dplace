@@ -1,4 +1,4 @@
 VarID,Name,IndexCategory,VarType,Description,Units,In_DPLACE
-AnnualMeanTemperature,Annual Mean Temperature,Climate,Continuous,Mean value of monthly temperature across the year,°C,yes
-AnnualTemperatureVariance,Annual Temperature Variance,Climate,Continuous,Variance in temperature means (averaged across years),°C,yes
-TemperatureConstancy,Temperature Constancy,Climate,Continuous,Colwell's (1974) information theoretic index. Indicates the extent to which a climate patterns are predictable because conditions are constant. Varies between 0 (completely unpredictable) and 1 (fully predictable).,,yes
+Rainfall,Rainfall,Climate,Continuous,Precipitation,mm,
+Temperature,Temperature,Climate,Continuous,Temperature,C,
+Ecology1,Ecology1,Ecology,Continuous,,,

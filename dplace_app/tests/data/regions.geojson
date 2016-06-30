@@ -1,0 +1,29 @@
+{
+    "features": [
+        {
+            "geometry": {"coordinates": [], "type": "MultiPolygon"},
+            "id": "51",
+            "properties": {
+                "CONTINENT": "ANTARCTIC",
+                "COUNT": 1.0,
+                "LEVEL_2_RE": 1,
+                "REGION_NAM": "Region1",
+                "TDWG_CODE": 0
+            },
+            "type": "Feature"
+        },
+        {
+            "geometry": {"coordinates": [], "type": "MultiPolygon"},
+            "id": "51",
+            "properties": {
+                "CONTINENT": "ANTARCTIC",
+                "COUNT": 1.0,
+                "LEVEL_2_RE": 2,
+                "REGION_NAM": "Region2",
+                "TDWG_CODE": 1
+            },
+            "type": "Feature"
+        }
+    ],
+    "type": "FeatureCollection"
+}
