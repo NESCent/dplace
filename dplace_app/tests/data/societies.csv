@@ -1,6 +1,6 @@
 dataset,soc_id,xd_id,pref_name_for_society,alt_names_by_society,ORIG_name_and_ID_in_this_dataset,main_focal_year,Binford_society_equivalent1,Binford_society_equivalent2,Binford_society_equivalent3,SCCS_society_equivalent,CHIRILA_society_equivalent,HRAF_name_ID,HRAF_link,WNAI_society_equivalent1,WNAI_society_equivalent2,WNAI_society_equivalent3,WNAI_society_equivalent4,WNAI_society_equivalent5
-EA,soc1,xd1,Name1,,Orig Name 1,1910,,,,Name (SCCS2),Name1 (1), Name1 (NA1),,,,,,
-EA,soc2,xd2,Name2,"alt, names",Orig Name 2,1840,,,,Name (SCCS2), Name2 (2), Name2 (NA2),, Name2(WNAI1), AnotherName2 (WNAI2),,,
+EA,society1,xd1,Name1,,Orig Name 1,1910,,,,Name (SCCS2),Name1 (1), Name1 (NA1),,,,,,
+EA,society2,xd2,Name2,"alt, names",Orig Name 2,1840,,,,Name (SCCS2), Name2 (2), Name2 (NA2),, Name2(WNAI1), AnotherName2 (WNAI2),,,
 EA,Ca7,xd455,Amharic,"alt, names",Orig Name 2,1840,,,,Name (SCCS2), Name2 (2), Name2 (NA2),, Name2(WNAI1), AnotherName2 (WNAI2),,,
 EA,SCCS37,xd455,Amharic,"alt, names",Orig Name 2,1840,,,,Name (SCCS2), Name2 (2), Name2 (NA2),, Name2(WNAI1), AnotherName2 (WNAI2),,,
 EA,Cj3,xd589,Hebrew,"alt, names",Orig Name 2,1840,,,,Name (SCCS2), Name2 (2), Name2 (NA2),, Name2(WNAI1), AnotherName2 (WNAI2),,,

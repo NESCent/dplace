@@ -385,11 +385,8 @@ def find_societies(request):
                 )
                 for s in soc:
                     if s.culturalvalue_set.count():
-                        result_set._get_society_result(s)
-                result_set.finalize([])
-                return Response(serializers.SocietyResultSetSerializer(result_set).data)
-            else:
-                return Response(serializers.SocietyResultSetSerializer(result_set).data)
+                        result_set.societies.add(serializers.SocietyResult(s))
+            return Response(serializers.SocietyResultSetSerializer(result_set).data)
         query[k] = [json.loads(vv) for vv in v]
     result_set = result_set_from_query_dict(query)
     log.info('%s find_societies 2: %s queries' % (time() - s, len(connection.queries)))
@@ -397,7 +394,7 @@ def find_societies(request):
     log.info('%s find_societies 3: %s queries' % (time() - s, len(connection.queries)))
     for i, q in enumerate(
             sorted(connection.queries, key=lambda q: q['time'], reverse=True)):
-        if i < 5:
+        if i < 5:  # pragma: no cover
             log.info('%s for %s' % (q['time'], q['sql'][:200]))
     return Response(d)
 
