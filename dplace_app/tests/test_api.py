@@ -294,9 +294,17 @@ class Test(APITestCase):
         response = self.client.get(reverse('csv_download'))
         self.assertEqual(response.content.split()[0], '"Research')
         response = self.get_json(
-            'csv_download', 
-            {'query': json.dumps({'p': [GeographicRegion.objects.get(region_nam='Region1').id]})})  
+            'csv_download',
+            {'query': json.dumps({'p': [GeographicRegion.objects.get(region_nam='Region1').id]})})
         self.assertIn('Region1'.encode('utf8'), response)
+
+    def test_csv_download_cultural_var(self):
+        response = self.client.get(reverse('csv_download'))
+        self.assertEqual(response.content.split()[0], '"Research')
+        response = self.get_json(
+            'csv_download', 
+            {'query': json.dumps({'c': CulturalCodeDescriptionSerializer(
+                [CulturalCodeDescription.objects.get(code='1')], many=True).data})})
 
     #
     # find societies:
