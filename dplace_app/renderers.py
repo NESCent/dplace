@@ -225,7 +225,8 @@ class DPLACECSVRenderer(renderers.BaseRenderer):
             return ''
         results = DPLACECSVResults(data)
         csv_buffer = StringIO()
-        csv_writer = csv.DictWriter(csv_buffer, results.field_names)
+        csv_writer = csv.DictWriter(
+            csv_buffer, results.field_names, extrasaction='ignore')
         cite_writer = csv.writer(csv_buffer)
         cite_writer.writerow([CSV_PREAMBLE])
         csv_writer.writeheader()
