@@ -1,4 +1,6 @@
 <div class="container">
+    <div class="row text-center" ng-show="results.language_trees.length == 0"><h2>Loading trees...</h2></div>
+    
     <div class="row text-center" style="margin-top:20px">
         <div class="btn-group">
             <button ng-repeat="button in buttons"

@@ -47,6 +47,7 @@ urlpatterns = [
         name="get_dataset_sources"),
     url(r'^api/v1/csv_download', api_views.csv_download, name='csv_download'),
     url(r'^api/v1/zip', api_views.zip_legends, name='zip_legends'),
+    url(r'^api/v1/trees_from_societies', api_views.trees_from_societies, name='trees_from_societies'),
 
     # catch anything else and let decide angular what to do
     url(r'^.+?/$', views.angular),

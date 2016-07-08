@@ -1,20 +1,10 @@
-function SocietiesCtrl($scope, $timeout, $http, searchModelService, colorMapService) {
+function SocietiesCtrl($scope, $timeout, $http, searchModelService, colorMapService, TreesFromSocieties) {
     $scope.results = searchModelService.getModel().getResults();
     $scope.query = searchModelService.getModel().getQuery();
     $scope.variables = [];
 
     $scope.buttons = [];
-    if ($scope.results.language_trees && $scope.results.language_trees.length > 0) {
-        if ($scope.results.language_trees.phylogenies.length > 0) {
-            $scope.buttons.push({value:'phylogeny', name:'Phylogenies', description: "Trees derived from discrete data using phylogenetic methods (branch lengths informative)"});
-        }
-        if ($scope.results.language_trees.glotto_trees.length > 0) {
-            $scope.buttons.push({value:'glottolog', name:'Glottolog Trees', description: "Trees derived from Glottolog language family taxonomies (branch lengths uninformative)"});
-        }
-        if ($scope.results.language_trees.global_tree) {
-            $scope.buttons.push({value:'global', name:'Global Tree', description: "A global language supertree composed from language family taxonomies in Glottolog (branch lengths uninformative)"});
-        }
-    }
+    
 
     $scope.tabs = [
         { title: "Table", content: "table", active: true},
@@ -47,6 +37,46 @@ function SocietiesCtrl($scope, $timeout, $http, searchModelService, colorMapServ
     $scope.setActive('societies');
     
     $scope.columnSort = { sortColumn: 'society.name', reverse: false };
+    
+    var treeButtons = function() {
+        if ($scope.results.language_trees && $scope.results.language_trees.length > 0) {
+            if ($scope.results.language_trees.phylogenies.length > 0) {
+                $scope.buttons.push({value:'phylogeny', name:'Phylogenies', description: "Trees derived from discrete data using phylogenetic methods (branch lengths informative)"});
+            }
+            if ($scope.results.language_trees.glotto_trees.length > 0) {
+                $scope.buttons.push({value:'glottolog', name:'Glottolog Trees', description: "Trees derived from Glottolog language family taxonomies (branch lengths uninformative)"});
+            }
+            if ($scope.results.language_trees.global_tree) {
+                $scope.buttons.push({value:'global', name:'Global Tree', description: "A global language supertree composed from language family taxonomies in Glottolog (branch lengths uninformative)"});
+            }
+        }
+    }
+    
+    var sortTrees = function() {
+        $scope.results.language_trees.phylogenies = [];
+        $scope.results.language_trees.glotto_trees = [];
+        $scope.results.language_trees.forEach(function(tree) {
+            if (tree.name.indexOf("global") != -1) $scope.results.language_trees.global_tree = tree;
+            else if (tree.name.indexOf("glotto") != -1) {
+                $scope.results.language_trees.glotto_trees.push(tree);
+            }
+            else {
+                $scope.results.language_trees.phylogenies.push(tree);
+            }
+        $scope.results.language_trees.glotto_trees.sort(function(a, b) { return a.name > b.name; });
+        $scope.results.language_trees.phylogenies.sort(function(a, b) { return a.name > b.name; });
+        });
+        treeButtons();
+    }
+    
+    $scope.addTrees = function() {
+        if ($scope.results.language_trees && $scope.results.language_trees.length > 0) return;
+        if ($scope.tabs[2].active) {
+            list = $scope.results.societies.map(function(s) { return s.society.id});
+            society_ids = {'s': list};
+            $scope.results.language_trees = TreesFromSocieties.find(society_ids, sortTrees);
+    }
+    }
 
     var num_lines = 0;              
     $scope.wrapText = function(text, string) {

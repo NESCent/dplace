@@ -212,16 +212,16 @@ angular.module('dplaceServices', ['ngResource'])
                 }
             });
     })
-    //not used at the moment
-    //.factory('TreesFromLanguages', function($resource) {
-     //   return $resource(
-      //      '/api/v1/trees_from_languages',
-       //     {},{
-        //        find: {
-         //           method: 'POST',
-          //          isArray: true
-           //     }
-           // }
-        //)
-    //})
+    
+    .factory('TreesFromSocieties', function($resource) {
+        return $resource(
+            '/api/v1/trees_from_societies',
+            {},{
+                find: {
+                    method: 'GET',
+                    isArray: true
+                }
+            }
+        )
+    })
     ;
