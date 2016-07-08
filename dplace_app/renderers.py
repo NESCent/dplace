@@ -119,12 +119,9 @@ class DPLACECSVResults(object):
                 row['Glottolog language/dialect id'] = ""
                 row['Language family'] = ""
             
-            # geographic - only one
-            geographic_regions = item['geographic_regions']
-            if len(geographic_regions) == 1:
-                geographic_region = geographic_regions[0]
-                row['Continent'] = geographic_region['continent']
-                row['Region name'] = geographic_region['region_nam']
+            if society['region']:
+                row['Continent'] = society['region']['continent']
+                row['Region name'] = society['region']['region_nam']
 
             # cultural
             cultural_trait_values = item['variable_coded_values']
@@ -228,7 +225,8 @@ class DPLACECSVRenderer(renderers.BaseRenderer):
             return ''
         results = DPLACECSVResults(data)
         csv_buffer = StringIO()
-        csv_writer = csv.DictWriter(csv_buffer, results.field_names)
+        csv_writer = csv.DictWriter(
+            csv_buffer, results.field_names, extrasaction='ignore')
         cite_writer = csv.writer(csv_buffer)
         cite_writer.writerow([CSV_PREAMBLE])
         csv_writer.writeheader()

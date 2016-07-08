@@ -7,7 +7,14 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 from dplace_app.serializers import CulturalCodeDescriptionSerializer
-from dplace_app import models
+from dplace_app.models import *
+from dplace_app.load.geographic import load_regions
+from dplace_app.load.environmental import load_environmental_var, load_environmental
+from dplace_app.load.variables import load_vars, load_codes
+from dplace_app.load.values import load_data
+from dplace_app.load import sources
+from dplace_app.tests.util import data_path
+from dplace_app.load.util import csv_dict_reader
 
 
 class Test(APITestCase):
@@ -17,15 +24,12 @@ class Test(APITestCase):
     def get_json(self, urlname, *args, **kw):
         kw.setdefault('format', 'json')
         reverse_args = kw.pop('reverse_args', [])
-        response = self.client.get(
-            reverse(urlname, args=reverse_args), *args, **kw
-        )
+        response = self.client.get(reverse(urlname, args=reverse_args), *args, **kw)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        try: # csv download doesn't return json
-            json.loads(response.content)
+        try:  # csv download doesn't return json
+            return json.loads(response.content)
         except:
             return response.content
-        return json.loads(response.content)
 
     def obj_in_results(self, obj, response):
         return getattr(obj, 'id', obj) in [x['id'] for x in response['results']]
@@ -40,102 +44,48 @@ class Test(APITestCase):
         return self._data['%s%s' % (model.__name__, suffix)]
 
     def setUp(self):
-        region1 = self.set(
-            models.GeographicRegion, 1,
-            level_2_re='1', count=1, region_nam='Region1', tdwg_code=0)
-        region2 = self.set(
-            models.GeographicRegion, 2,
-            level_2_re='2', count=1, region_nam='Region2', tdwg_code=1)
-        ec1 = self.set(models.EnvironmentalCategory, 1, name='Climate')
-        ec2 = self.set(models.EnvironmentalCategory, 2, name='Ecology')
-        for i, (name, cat, units, info) in enumerate([
-            ('Rainfall', ec1, 'mm', 'Precipitation'),
-            ('Temperature', ec1, 'C', 'Temperature'),
-            ('Ecology1', ec2, '', ''),
-        ]):
-            self.set(
-                models.EnvironmentalVariable, i + 1,
-                var_id=name, name=name, category=cat, units=units, codebook_info=info)
+        sources._SOURCE_CACHE = {}
+        load_regions(data_path('regions.geojson'))
+        load_environmental_var(csv_dict_reader(data_path('envvariables.csv')))
+        load_vars(csv_dict_reader(data_path('variables.csv')))
+        source_ea = Source.objects.get(name='Ethnographic Atlas')
+        load_codes(csv_dict_reader(data_path('codes.csv')))
 
-        source_ea = self.set(
-            models.Source, 'ea',
-            year='2016',
-            author='Simon Greenhill',
-            reference='Greenhill (2016). Title.',
-            name='EA Test Dataset')
-        source_binford = self.set(
-            models.Source, 'binford',
-            year='2016',
-            author='Russell Gray',
-            reference='Gray (2016). Title.',
-            name='BF Test Dataset')
-
-        category1 = self.set(models.CulturalCategory, 1, name='Economy')
-        category2 = self.set(models.CulturalCategory, 2, name='Demography')
-
-        variable1 = self.set(
-            models.CulturalVariable, 1,
-            label='EA001',
-            name='Variable 1',
-            source=source_ea,
-            codebook_info='Variable 1',
-            data_type='Categorical')
-        variable2 = self.set(
-            models.CulturalVariable, 2,
-            label='B002',
-            name='Variable 2',
-            source=source_binford,
-            codebook_info='Variable 2',
-            data_type='Continuous')
-        variable1.index_categories.add(category1, category2)
-        variable2.index_categories.add(category2)
-
-        code1 = self.set(
-            models.CulturalCodeDescription, 1,
-            variable=variable1, code='1', description='Code 1')
-        self.set(
-            models.CulturalCodeDescription, 10,
-            variable=variable1, code='10', description='Code 10')
-        code2 = self.set(
-            models.CulturalCodeDescription, 2,
-            variable=variable1, code='2', description='Code 2')
-
-        family1 = self.set(models.LanguageFamily, 1, name='family1')
-        family2 = self.set(models.LanguageFamily, 2, name='family2')
-        iso_code = self.set(models.ISOCode, 1, iso_code='abc')
+        family1 = self.set(LanguageFamily, 1, name='family1')
+        family2 = self.set(LanguageFamily, 2, name='family2')
+        iso_code = self.set(ISOCode, 1, iso_code='abc')
         language1 = self.set(
-            models.Language, 1,
+            Language, 1,
             name='language1', family=family1, glotto_code='aaaa1234', iso_code=iso_code)
         language2 = self.set(
-            models.Language, 2,
+            Language, 2,
             name='language2', family=family2, glotto_code='dddd1234')
         language3 = self.set(
-            models.Language, 3,
+            Language, 3,
             name='language3', family=family2, glotto_code='cccc1234', iso_code=iso_code)    
         tree1 = self.set(
-            models.LanguageTree, 1,
+            LanguageTree, 1,
             newick_string='((aaaa1234:1,abc:1,abun1254:1)abun1252:1);',
             name='tree',
             source=source_ea)
         tree2 = self.set(
-            models.LanguageTree, 2,
+            LanguageTree, 2,
             newick_string='((aaaa1234:1,abc:1,abun1254:1)abun1252:1);',
             name='tree.glotto.trees',
             source=source_ea)
-            
-                    
+
         label1 = self.set(
-            models.LanguageTreeLabels, 1,
+            LanguageTreeLabels, 1,
             languageTree=tree1, label='aaaa1234',
             language=language1
         )
         label2 = self.set(
-            models.LanguageTreeLabels, 2, 
+            LanguageTreeLabels, 2, 
             languageTree=tree1, label='abun1254',
             language=language2
         )
         label3 = self.set(
-            models.LanguageTreeLabels, 3,
+            LanguageTreeLabels, 3,
             languageTree=tree2, label='abun1252',
             language=language3
         )
@@ -144,81 +94,57 @@ class Test(APITestCase):
         tree2.taxa.add(label3)
 
         society1 = self.set(
-            models.Society, 1,
+            Society, 1,
             ext_id='society1',
             xd_id='xd1',
             name='Söciety1',
-            region=region1,
+            region=GeographicRegion.objects.get(region_nam='Region1'),
             source=source_ea,
             language=language1,
             focal_year='2016',
             alternate_names='Society 1')
         society2 = self.set(
-            models.Society, 2,
+            Society, 2,
             ext_id='society2',
             xd_id='xd2',
-            region=region2,
+            region=GeographicRegion.objects.get(region_nam='Region2'),
             name='Society2',
             source=source_ea,
             language=language2)
         # Society 3 has the same language characteristics as society 1
         # but different EA Vars
         self.set(
-            models.Society, 3,
+            Society, 3,
             ext_id='society3',
             xd_id='xd1',
-            region=region1,
+            region=GeographicRegion.objects.get(region_nam='Region1'),
             name='Society3',
             source=source_ea,
             language=language3)
 
         sequenceLabel1 = self.set(
-            models.LanguageTreeLabelsSequence, 1,
+            LanguageTreeLabelsSequence, 1,
             society = society1, labels = label1,
             fixed_order=0
         )
         sequenceLabel2 = self.set(
-            models.LanguageTreeLabelsSequence, 2,
+            LanguageTreeLabelsSequence, 2,
             society = society1, labels = label2,
             fixed_order=0
         )
         sequenceLabel3 = self.set(
-            models.LanguageTreeLabelsSequence, 3,
+            LanguageTreeLabelsSequence, 3,
             society = society2, labels = label3,
             fixed_order=0
         )
         sequenceLabel4 = self.set(
-            models.LanguageTreeLabelsSequence, 4,
+            LanguageTreeLabelsSequence, 4,
             society = society2, labels = label3,
             fixed_order=1
         )
-        self.set(
-            models.CulturalValue, 1,
-            variable=variable1,
-            society=society1,
-            coded_value='1',
-            code=code1,
-            source=source_ea)
-        models.CulturalValue.objects.create(
-            variable=variable1,
-            society=society2,
-            coded_value='2',
-            code=code2,
-            source=source_ea)
 
-        env_var = self.get(models.EnvironmentalVariable, 1)
-        self.set(
-            models.EnvironmentalValue, 1,
-            variable=env_var,
-            value=1.0,
-            source=source_ea,
-            society=society1)
-        self.set(
-            models.EnvironmentalValue, 2,
-            variable=env_var,
-            value=2.0,
-            source=source_ea,
-            society=society2)
+        load_data(csv_dict_reader(data_path('data.csv')))
+        load_environmental(csv_dict_reader(data_path('envdata.csv')))
 
     def test_society_detail(self):
         self.client.get(reverse('view_society', args=('society1',)))
@@ -230,13 +156,13 @@ class Test(APITestCase):
     def test_api_culturalcategory(self):
         res = self.get_json(
             'culturalcategory-detail',
-            reverse_args=[self.get(models.CulturalCategory, 1).id])
+            reverse_args=[CulturalCategory.objects.get(name='Economy').id])
         self.assertIsInstance(res['index_variables'][0], dict)
 
     def test_api_culturalvariable(self):
         res = self.get_json(
             'culturalvariable-detail',
-            reverse_args=[self.get(models.CulturalVariable, 1).id])
+            reverse_args=[CulturalVariable.objects.get(label='EA001').id])
         self.assertIsInstance(res['index_categories'][0], dict)
 
     def test_zip_legends(self):
@@ -248,14 +174,14 @@ class Test(APITestCase):
         self.assertIsInstance(response, list)
         response = self.get_json(
             'get_categories',
-            {'query': json.dumps(dict(source=self.get(models.Source, 'ea').id))})
+            {'query': json.dumps(dict(source=Source.objects.get(name='Ethnographic Atlas').id))})
         self.assertIsInstance(response, list)
 
     def test_min_and_max(self):
         response = self.get_json(
             'min_and_max',
             {'query': json.dumps(
-                dict(environmental_id=self.get(models.EnvironmentalVariable, 1).id))})
+                dict(environmental_id=EnvironmentalVariable.objects.get(name='Rainfall').id))})
         self.assertIsInstance(response, dict)
         self.assertIn('min', response)
         self.assertIn('max', response)
@@ -269,7 +195,7 @@ class Test(APITestCase):
         self.assertEqual(response.status_code, 404)
         response = self.get_json(
             'cont_variable',
-            {'query': json.dumps(dict(bf_id=self.get(models.CulturalVariable, 2).id))})
+            {'query': json.dumps(dict(bf_id=CulturalVariable.objects.get(label='B002').id))})
         self.assertIsInstance(response, list)
 
     def test_geo_api(self):
@@ -278,43 +204,45 @@ class Test(APITestCase):
         self.assertEqual(len(response.data['results']), 2)
         self.assertEqual(
             response.data['results'][0]['region_nam'],
-            self.get(models.GeographicRegion, 1).region_nam)
+            GeographicRegion.objects.get(region_nam='Region1').region_nam)
 
     def test_isocode_api(self):
         response_dict = self.get_json('isocode-list')
         self.assertEqual(response_dict['count'], 1)
         self.assertEqual(
-            response_dict['results'][0]['iso_code'], self.get(models.ISOCode, 1).iso_code)
+            response_dict['results'][0]['iso_code'], self.get(ISOCode, 1).iso_code)
 
     def test_all_languages(self):
         response_dict = self.get_json('language-list')
         self.assertEqual(response_dict['count'], 3)
         for i in [1, 2, 3]:
             self.assertTrue(
-                self.obj_in_results(self.get(models.Language, i), response_dict))
+                self.obj_in_results(self.get(Language, i), response_dict))
 
     def test_family2_languages(self):
         response_dict = self.get_json(
             'language-list',
-            {'family': self.get(models.LanguageFamily, 2).id})
+            {'family': self.get(LanguageFamily, 2).id})
         self.assertEqual(response_dict['count'], 2)
-        self.assertFalse(self.obj_in_results(self.get(models.Language, 1), response_dict))
+        self.assertFalse(self.obj_in_results(self.get(Language, 1), response_dict))
 
     def test_all_environmental_variables(self):
         response_dict = self.get_json('environmentalvariable-list')
         self.assertEqual(response_dict['count'], 3)
-        for i in [1, 2, 3]:
-            env_var = self.get(models.EnvironmentalVariable, i)
+        for name in ['Rainfall', 'Temperature', 'Ecology1']:
+            env_var = EnvironmentalVariable.objects.get(name=name)
             self.assertTrue(self.obj_in_results(env_var, response_dict))
 
     def test_env_category1_variables(self):
         response_dict = self.get_json(
             'environmentalvariable-list',
-            {'category': self.get(models.EnvironmentalCategory, 1).id})
-        for i, assertion in [
-            (1, self.assertTrue), (2, self.assertTrue), (3, self.assertFalse)
+            {'category': EnvironmentalCategory.objects.get(name='Climate').id})
+        for name, assertion in [
+            ('Rainfall', self.assertTrue),
+            ('Temperature', self.assertTrue),
+            ('Ecology1', self.assertFalse)
         ]:
-            env_var = self.get(models.EnvironmentalVariable, i)
+            env_var = EnvironmentalVariable.objects.get(name=name)
             assertion(self.obj_in_results(env_var, response_dict))
 
     def test_code_description_order(self):
@@ -323,67 +251,75 @@ class Test(APITestCase):
         """
         response_dict = self.get_json(
             'culturalcodedescription-list',
-            {'variable': self.get(models.CulturalVariable, 1).id})
+            {'variable': CulturalVariable.objects.get(label='EA001').id})
         self.assertEqual(
             [res['code'] for res in response_dict['results']],
-            [self.get(models.CulturalCodeDescription, i).code for i in [1, 2, 10]])
+            [CulturalCodeDescription.objects.get(code=str(i)).code for i in [1, 2, 10]])
 
     def test_all_variables(self):
         response_dict = self.get_json('culturalvariable-list')
         self.assertEqual(response_dict['count'], 2)
-        for i in [1, 2]:
+        for l in ['EA001', 'B002']:
             self.assertTrue(
-                self.obj_in_results(self.get(models.CulturalVariable, i), response_dict))
+                self.obj_in_results(CulturalVariable.objects.get(label=l), response_dict))
 
     def test_filter_source(self):
         response_dict = self.get_json(
             'culturalvariable-list',
-            {'source': self.get(models.Source, 'ea').id})
+            {'source': Source.objects.get(name='Ethnographic Atlas').id})
         self.assertEqual(response_dict['count'], 1)
         self.assertTrue(
-            self.obj_in_results(self.get(models.CulturalVariable, 1), response_dict))
+            self.obj_in_results(CulturalVariable.objects.get(label='EA001'), response_dict))
         self.assertFalse(
-            self.obj_in_results(self.get(models.CulturalVariable, 2), response_dict))
+            self.obj_in_results(CulturalVariable.objects.get(label='B002'), response_dict))
 
     def test_category1_variables(self):
         response_dict = self.get_json(
             'culturalvariable-list',
-            {'index_categories': [self.get(models.CulturalCategory, 1).id]})
-        self.assertEqual(response_dict['count'], 1)
-        self.assertEqual(
-            response_dict['results'][0]['name'],
-            self.get(models.CulturalVariable, 1).name)
-        self.assertFalse(
-            self.obj_in_results(self.get(models.CulturalVariable, 2), response_dict))
+            {'index_categories': [CulturalCategory.objects.get(name='Economy').id]})
+        self.assertEqual(response_dict['count'], 2)
 
     def test_category2_variables(self):
         response_dict = self.get_json(
             'culturalvariable-list',
-            {'index_categories': [self.get(models.CulturalCategory, 2).id]})
-        self.assertEqual(response_dict['count'], 2)
-        for i in [1, 2]:
-            self.assertTrue(
-                self.obj_in_results(self.get(models.CulturalVariable, i), response_dict))
+            {'index_categories': [CulturalCategory.objects.get(name='Demography').id]})
+        self.assertEqual(response_dict['count'], 1)
+        self.assertEqual(
+            response_dict['results'][0]['name'],
+            CulturalVariable.objects.get(label='EA001').name)
+        self.assertFalse(
+            self.obj_in_results(CulturalVariable.objects.get(name='Variable 2'), response_dict))
 
     def test_csv_download(self):
         response = self.client.get(reverse('csv_download'))
         self.assertEqual(response.content.split()[0], '"Research')
         response = self.get_json(
-            'csv_download', 
-            {'query': json.dumps({'p': [self.get(models.GeographicRegion, 1).id]})})  
+            'csv_download',
+            {'query': json.dumps({'p': [GeographicRegion.objects.get(region_nam='Region1').id]})})
         self.assertIn('Region1'.encode('utf8'), response)
+
+    def test_csv_download_cultural_var(self):
+        response = self.client.get(reverse('csv_download'))
+        self.assertEqual(response.content.split()[0], '"Research')
+        response = self.get_json(
+            'csv_download', 
+            {'query': json.dumps({'c': CulturalCodeDescriptionSerializer(
+                [CulturalCodeDescription.objects.get(code='1')], many=True).data})})
 
     #
     # find societies:
     #
-    def get_results(self, urlname='find_societies', **data):
+    def get_results(self, urlname='find_societies', no_escape=False, **data):
         method = self.client.post
         if urlname == 'find_societies':
             method = self.client.get
             _data = []
             for k, v in data.items():
                 for vv in v:
-                    _data.append((k, json.dumps(vv)))
+                    if no_escape:
+                        _data.append((k, vv))
+                    else:
+                        _data.append((k, json.dumps(vv)))
             data = _data
         return method(reverse(urlname), data, format='json')
 
@@ -392,30 +328,43 @@ class Test(APITestCase):
 
     def test_find_societies_by_language(self):
         # Find the societies that use language1
-        response = self.get_results(l=[self.get(models.Language, 1).id])
+        response = self.get_results(l=[self.get(Language, 1).id])
         for i, assertion in [
             (1, self.assertTrue), (2, self.assertFalse), (3, self.assertFalse)
         ]:
-            assertion(self.society_in_results(self.get(models.Society, i), response))
+            assertion(self.society_in_results(self.get(Society, i), response))
 
     def test_find_society_by_var(self):
         response = self.get_results(c=CulturalCodeDescriptionSerializer(
-            [self.get(models.CulturalCodeDescription, 1)], many=True).data)
+            [CulturalCodeDescription.objects.get(code='1')], many=True).data)
         for i, assertion in [(1, self.assertTrue), (2, self.assertFalse)]:
-            assertion(self.society_in_results(self.get(models.Society, i), response))
+            assertion(self.society_in_results(self.get(Society, i), response))
 
     def test_find_societies_by_var(self):
         serialized_codes = CulturalCodeDescriptionSerializer(
-            [self.get(models.CulturalCodeDescription, i) for i in [1, 2]], many=True).data
+            [CulturalCodeDescription.objects.get(code=i) for i in ['1', '2']], many=True).data
         response = self.get_results(c=serialized_codes)
         for i in [1, 2]:
             self.assertTrue(
-                self.society_in_results(self.get(models.Society, i), response))
+                self.society_in_results(self.get(Society, i), response))
+
+    def test_find_society_by_name(self):
+        response = self.get_results(no_escape=True, name=["Söciety1"])
+        for i, assertion in [(1, self.assertTrue), (2, self.assertFalse)]:
+            assertion(self.society_in_results(self.get(Society, i), response))
+
+    def test_find_society_by_continuous_var(self):
+        response = self.get_results(c=[{
+            'variable': CulturalVariable.objects.get(label='B002').id,
+            'min': 0.0,
+            'max': 100}])
+        for i, assertion in [(1, self.assertTrue), (2, self.assertFalse)]:
+            assertion(self.society_in_results(self.get(Society, i), response))
 
     def test_find_no_societies(self):
         response = self.get_results(
             c=CulturalCodeDescriptionSerializer(
-                [self.get(models.CulturalCodeDescription, 10)], many=True).data)
+                [CulturalCodeDescription.objects.get(code='10')], many=True).data)
         self.assertEqual(len(response.data['societies']), 0)
 
     def test_find_society_by_language_and_var(self):
@@ -425,10 +374,10 @@ class Test(APITestCase):
         # This tests that results should be intersection (AND), not union (OR)
         # Society 3 is not coded for any variables, so it should not appear in the list.
         serialized_vcs = CulturalCodeDescriptionSerializer(
-            [self.get(models.CulturalCodeDescription, i) for i in [1, 2]], many=True).data
-        serialized_lcs = [self.get(models.Language, i).id for i in [1, 3]]
+            [CulturalCodeDescription.objects.get(code=str(i)) for i in [1, 2]], many=True).data
+        serialized_lcs = [self.get(Language, i).id for i in [1, 3]]
         response = self.get_results(c=serialized_vcs, l=serialized_lcs)
-        socs = {i: self.get(models.Society, i) for i in [1, 2, 3]}
+        socs = {i: self.get(Society, i) for i in [1, 2, 3]}
         self.assertTrue(self.society_in_results(socs[1], response))
         self.assertFalse(self.society_in_results(socs[2], response))
         self.assertFalse(self.society_in_results(socs[3], response))
@@ -440,29 +389,33 @@ class Test(APITestCase):
 
     def test_find_by_environmental_filter_gt(self):
         response = self.get_results(
-            e=[[self.get(models.EnvironmentalVariable, 1).id, 'gt', ['1.5']]])
-        socs = {i: self.get(models.Society, i) for i in [1, 2, 3]}
+            e=[[EnvironmentalVariable.objects.get(name='Rainfall').id,
+                'gt', ['1.5']]])
+        socs = {i: self.get(Society, i) for i in [1, 2, 3]}
         self.assertTrue(self.society_in_results(socs[2], response))
         self.assertFalse(self.society_in_results(socs[1], response))
 
     def test_find_by_environmental_filter_lt(self):
         response = self.get_results(
-            e=[[self.get(models.EnvironmentalVariable, 1).id, 'lt', ['1.5']]])
-        socs = {i: self.get(models.Society, i) for i in [1, 2, 3]}
+            e=[[EnvironmentalVariable.objects.get(name='Rainfall').id,
+                'lt', ['1.5']]])
+        socs = {i: self.get(Society, i) for i in [1, 2, 3]}
         self.assertTrue(self.society_in_results(socs[1], response))
         self.assertFalse(self.society_in_results(socs[2], response))
 
     def test_find_by_environmental_filter_inrange(self):
         response = self.get_results(
-            e=[[self.get(models.EnvironmentalVariable, 1).id, 'inrange', ['0.0', '1.5']]])
-        socs = {i: self.get(models.Society, i) for i in [1, 2, 3]}
+            e=[[EnvironmentalVariable.objects.get(name='Rainfall').id,
+                'inrange', ['0.0', '1.5']]])
+        socs = {i: self.get(Society, i) for i in [1, 2, 3]}
         self.assertTrue(self.society_in_results(socs[1], response))
         self.assertFalse(self.society_in_results(socs[2], response))
 
     def test_find_by_environmental_filter_outrange(self):
-        response = self.get_results(e=[
-            [self.get(models.EnvironmentalVariable, 1).id, 'outrange', ['0.0', '3.0']]])
-        socs = {i: self.get(models.Society, i) for i in [1, 2, 3]}
+        response = self.get_results(
+            e=[[EnvironmentalVariable.objects.get(name='Rainfall').id,
+                'outrange', ['0.0', '3.0']]])
+        socs = {i: self.get(Society, i) for i in [1, 2, 3]}
         self.assertFalse(self.society_in_results(socs[1], response))
         self.assertFalse(self.society_in_results(socs[2], response))
 
@@ -470,8 +423,8 @@ class Test(APITestCase):
         """
         This uses a region that contains a single polygon around society 2
         """
-        response = self.get_results(p=[self.get(models.GeographicRegion, 2).id])
-        socs = {i: self.get(models.Society, i) for i in [1, 2, 3]}
+        response = self.get_results(p=[GeographicRegion.objects.get(region_nam='Region2').id])
+        socs = {i: self.get(Society, i) for i in [1, 2, 3]}
         self.assertFalse(self.society_in_results(socs[1], response))
         self.assertTrue(self.society_in_results(socs[2], response))
         self.assertFalse(self.society_in_results(socs[3], response))
@@ -482,8 +435,8 @@ class Test(APITestCase):
         This uses a region that contains two polygons that should overlap
         societies 1 and 3
         """
-        response = self.get_results(p=[self.get(models.GeographicRegion, 1).id])
-        socs = {i: self.get(models.Society, i) for i in [1, 2, 3]}
+        response = self.get_results(p=[GeographicRegion.objects.get(region_nam='Region1').id])
+        socs = {i: self.get(Society, i) for i in [1, 2, 3]}
         self.assertTrue(self.society_in_results(socs[1], response))
         self.assertTrue(self.society_in_results(socs[3], response))
         self.assertFalse(self.society_in_results(socs[2], response))

@@ -4,6 +4,7 @@ import datetime
 from itertools import groupby
 import logging
 
+from django.db import connection
 from django.db.models import Prefetch, Q
 from django.shortcuts import get_object_or_404
 from django.http import Http404, HttpResponseRedirect
@@ -208,25 +209,18 @@ def result_set_from_query_dict(query_dict):
     log.info('enter result_set_from_query_dict')
 
     result_set = serializers.SocietyResultSet()
-    # Criteria keeps track of what types of data were searched on, so that we can
-    # AND them together
-    criteria = []
+    sql_joins, sql_where = [], []
+
+    def id_array(l):
+        return '(%s)' % ','.join('%s' % int(i) for i in l)
 
     if 'l' in query_dict:
-        criteria.append(serializers.SEARCH_LANGUAGE)
-        for society in models.Society.objects\
-                .filter(language_id__in=query_dict['l'])\
-                .select_related(
-                    'source',
-                    'language__family',
-                    'language__iso_code')\
-                .prefetch_related('culturalvalue_set'):
-            if society.culturalvalue_set.count():
-                result_set.add_language(society, society.language)
+        sql_joins.append(('language', 'l', 'l.id = s.language_id'))
+        sql_where.append('l.id IN ' + id_array(query_dict['l']))
+        for lang in models.Language.objects.filter(id__in=query_dict['l']):
+            result_set.languages.add(lang)
 
     if 'c' in query_dict:
-        criteria.append(serializers.SEARCH_VARIABLES)
-
         variables = {
             v.id: v for v in models.CulturalVariable.objects
             .filter(id__in=[x['variable'] for x in query_dict['c']])
@@ -242,72 +236,105 @@ def result_set_from_query_dict(query_dict):
         ):
             variable = variables[variable]
             codes = list(codes)
+            alias = 'cv%s' % variable.id
+            sql_joins.append((
+                "culturalvalue",
+                alias,
+                "{0}.society_id = s.id AND {0}.variable_id = {1}".format(alias, variable.id)
+            ))
 
             if variable.data_type and variable.data_type == 'Continuous':
                 include_NA = not all('min' in c for c in codes)
-                query = reduce(
-                    lambda q, x: q | Q(
-                        coded_value_float__gt=x['min'], coded_value_float__lt=x['max']),
-                    [c for c in codes if 'min' in c],
-                    Q(id=0))
+                ors = [
+                    "({0}.coded_value_float >= %(min)f AND {0}.coded_value_float <= %(max)f)".format(alias) % c
+                    for c in codes if 'min' in c]
                 if include_NA:
-                    query = query | Q(coded_value='NA')
-
-                values = models.CulturalValue.objects\
-                    .filter(variable=variable)\
-                    .filter(query)
+                    ors.append("%s.coded_value = 'NA'" % alias)
+                sql_where.append("(%s)" % ' OR '.join(ors))
                 if not include_NA:
-                    values = values.exclude(coded_value='NA')
+                    sql_where.append("{0}.coded_value != 'NA'".format(alias))
             else:
                 assert all('id' in c for c in codes)
-                values = models.CulturalValue.objects \
-                    .filter(code_id__in=[x['id'] for x in codes])
+                sql_where.append("{0}.code_id IN %s".format(alias) % id_array([x['id'] for x in codes]))
 
-            for value in values\
-                    .select_related('code')\
-                    .select_related('society__language__family')\
-                    .select_related('society__language__iso_code')\
-                    .select_related('society__source')\
-                    .prefetch_related('references'):
-                result_set.add_cultural(value.society, variable, variable.codes, value)
+            result_set.variable_descriptions.add(serializers.VariableCode(variable.codes, variable))
 
     if 'e' in query_dict:
-        criteria.append(serializers.SEARCH_ENVIRONMENTAL)
         # There can be multiple filters, so we must aggregate the results.
-        for varid, operator, params in query_dict['e']:
-            values = models.EnvironmentalValue.objects.filter(variable_id=varid)
-            if operator == 'inrange':
-                values = values.filter(value__gt=params[0]).filter(value__lt=params[1])
-            elif operator == 'outrange':
-                values = values.filter(value__gt=params[1]).filter(value__lt=params[0])
-            elif operator == 'gt':
-                values = values.filter(value__gt=params[0])
-            elif operator == 'lt':
-                values = values.filter(value__lt=params[0])
-            values = values\
-                .select_related('variable')\
-                .select_related('society__language__family') \
-                .select_related('society__language__iso_code') \
-                .select_related('society__source')
-            # get the societies from the values
-            for value in values:
-                result_set.add_environmental(value.society, value.variable, value)
+        for varid, criteria in groupby(
+            sorted(query_dict['e'], key=lambda c: c[0]),
+            key=lambda x: x[0]
+        ):
+            alias = 'ev%s' % varid
+            sql_joins.append((
+                "environmentalvalue",
+                alias,
+                "{0}.society_id = s.id AND {0}.variable_id = {1}".format(alias, int(varid))))
+
+            for varid, operator, params in criteria:
+                params = map(float, params)
+                if operator == 'inrange':
+                    sql_where.append("{0}.value >= {1:f} AND {0}.value <= {2:f}".format(alias, params[0], params[1]))
+                elif operator == 'outrange':
+                    sql_where.append("{0}.value >= {1:f} AND {0}.value <= {2:f}".format(alias, params[1], params[0]))
+                elif operator == 'gt':
+                    sql_where.append("{0}.value >= {1:f}".format(alias, params[0]))
+                elif operator == 'lt':
+                    sql_where.append("{0}.value <= {1:f}".format(alias, params[0]))
+
+        for variable in models.EnvironmentalVariable.objects.filter(id__in=[x[0] for x in query_dict['e']]):
+            result_set.environmental_variables.add(variable)
 
     if 'p' in query_dict:
-        criteria.append(serializers.SEARCH_GEOGRAPHIC)
-        for society in models.Society.objects\
-                .filter(region_id__in=query_dict['p'])\
-                .select_related(
-                    'region',
-                    'language__family',
-                    'language__iso_code')\
-                .prefetch_related('source').all():
-            result_set.add_geographic_region(society, society.region)
+        sql_joins.append(('geographicregion', 'r', 'r.id = s.region_id'))
+        sql_where.append('r.id IN %s' % id_array(query_dict['p']))
+        for region in models.GeographicRegion.objects.filter(id__in=query_dict['p']):
+            result_set.geographic_regions.add(region)
+
+    if sql_where:
+        cursor = connection.cursor()
+        sql = "select distinct s.id from dplace_app_society as s %s where %s" % (
+            ' '.join('join dplace_app_%s as %s on %s' % t for t in sql_joins),
+            ' AND '.join(sql_where))
+        cursor.execute(sql)
+        soc_ids = [r[0] for r in cursor.fetchall()]
+    else:
+        soc_ids = []
+
+    soc_query = models.Society.objects.filter(id__in=soc_ids)\
+        .select_related('source', 'language__family', 'language__iso_code', 'region')
+    if result_set.geographic_regions:
+        soc_query = soc_query.select_related('region')
+    if result_set.variable_descriptions:
+        soc_query = soc_query.prefetch_related(Prefetch(
+            'culturalvalue_set',
+            to_attr='selected_cvalues',
+            queryset=models.CulturalValue.objects
+            # FIXME: this selects possibly too many values, in case there are multiple
+            # values for the same variable, not all of them matching the criteria.
+            .filter(variable_id__in=[v.variable.id for v in result_set.variable_descriptions])
+            .prefetch_related('references')))
+    if result_set.environmental_variables:
+        soc_query = soc_query.prefetch_related(Prefetch(
+            'environmentalvalue_set',
+            to_attr='selected_evalues',
+            queryset=models.EnvironmentalValue.objects.filter(
+                variable_id__in=[v.id for v in result_set.environmental_variables])))
+
+    for i, soc in enumerate(soc_query):
+        soc_result = serializers.SocietyResult(soc)
+        if result_set.variable_descriptions:
+            for cval in soc.selected_cvalues:
+                soc_result.variable_coded_values.add(cval)
+        if result_set.environmental_variables:
+            for eval in soc.selected_evalues:
+                soc_result.environmental_values.add(eval)
+        result_set.societies.add(soc_result)
 
     log.info('mid 1: %s' % (time() - _s,))
 
     # Filter the results to those that matched all criteria
-    result_set.finalize(criteria)
+    #result_set.finalize(criteria)
     log.info('mid 2: %s' % (time() - _s,))
     return result_set
     
@@ -322,8 +349,8 @@ def trees_from_societies(request):
         global_tree = None
         global_newick = []
         global_isolates = []
-        
-        for t in models.LanguageTree.objects\
+
+    for t in models.LanguageTree.objects\
             .filter(taxa__societies__id__in=soc_ids)\
             .prefetch_related(
                 'taxa__languagetreelabelssequence_set__labels',
@@ -343,13 +370,13 @@ def trees_from_societies(request):
                         #remove last ; in order to be able to join the trees
                         global_newick.append(t.newick_string[:-1])
         
-        if global_tree:
-            langs_in_tree = [str(l.label) for l in labels]
-            #add isolates if present in current selection
-            [global_newick.append('(' + isolate + ':1)') for isolate in global_isolates if isolate in langs_in_tree]
-            #join all pruned glottolog trees into the global one
-            global_tree.newick_string = '(' + ','.join(global_newick) + ');'
-            language_trees.append(global_tree)
+    if global_tree:
+        langs_in_tree = [str(l.label) for l in labels]
+        #add isolates if present in current selection
+        [global_newick.append('(' + isolate + ':1)') for isolate in global_isolates if isolate in langs_in_tree]
+        #join all pruned glottolog trees into the global one
+        global_tree.newick_string = '(' + ','.join(global_newick) + ');'
+        language_trees.append(global_tree)
             
     return Response(serializers.LanguageTreeSerializer(language_trees, many=True).data)
 
@@ -378,11 +405,8 @@ def find_societies(request):
                 )
                 for s in soc:
                     if s.culturalvalue_set.count():
-                        result_set._get_society_result(s)
-                result_set.finalize([])
-                return Response(serializers.SocietyResultSetSerializer(result_set).data)
-            else:
-                return Response(serializers.SocietyResultSetSerializer(result_set).data)
+                        result_set.societies.add(serializers.SocietyResult(s))
+            return Response(serializers.SocietyResultSetSerializer(result_set).data)
         query[k] = [json.loads(vv) for vv in v]
     result_set = result_set_from_query_dict(query)
     log.info('%s find_societies 2: %s queries' % (time() - s, len(connection.queries)))
@@ -390,7 +414,7 @@ def find_societies(request):
     log.info('%s find_societies 3: %s queries' % (time() - s, len(connection.queries)))
     for i, q in enumerate(
             sorted(connection.queries, key=lambda q: q['time'], reverse=True)):
-        if i < 5:
+        if i < 5:  # pragma: no cover
             log.info('%s for %s' % (q['time'], q['sql'][:200]))
     return Response(d)
 

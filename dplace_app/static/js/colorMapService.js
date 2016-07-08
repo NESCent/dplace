@@ -112,15 +112,13 @@ function ColorMapService() {
         }   
         for (var i = 0; i < results.societies.length; i++) {
             var society = results.societies[i];
-            if (society.geographic_regions) {
-                for (var j = 0; j < society.geographic_regions.length; j++) {
-                    code = results.geographic_regions.map(function(a) { return a.tdwg_code; }).indexOf(society.geographic_regions[j].tdwg_code);
-                    if (code != -1)
-                        var color = this.mapColor(code, results.geographic_regions.length);
-                    else
-                        var color = this.mapColor(society.geographic_regions[j].tdwg_code, results.geographic_regions.length);
-                    colors[society.society.id] = color;
-                }
+            if (society.society.region) {
+                code = results.geographic_regions.map(function(a) { return a.tdwg_code; }).indexOf(society.society.region.tdwg_code);
+                if (code != -1)
+                    var color = this.mapColor(code, results.geographic_regions.length);
+                else
+                    var color = this.mapColor(society.society.region.tdwg_code, results.geographic_regions.length);
+                colors[society.society.id] = color;
             }
             
             if (results.languages.length > 0 && society.environmental_values.length == 0 && society.variable_coded_values.length == 0) {        
@@ -130,7 +128,6 @@ function ColorMapService() {
                 else
                     var color = this.mapColor(society.society.language.family.id, results.classifications.length);
                 colors[society.society.id] = color;
-                
             }
             
             for (var j = 0; j < society.environmental_values.length; j++) {

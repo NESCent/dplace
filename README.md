@@ -1,4 +1,7 @@
-# D-PLACE  [![Build Status](https://travis-ci.org/D-PLACE/dplace.svg?branch=master)](https://travis-ci.org/D-PLACE/dplace)
+# D-PLACE  
+
+[![Build Status](https://travis-ci.org/D-PLACE/dplace.svg?branch=master)](https://travis-ci.org/D-PLACE/dplace)
+[![codecov](https://codecov.io/gh/D-PLACE/dplace/branch/master/graph/badge.svg)](https://codecov.io/gh/D-PLACE/dplace)
 
 ## Synopsis
 

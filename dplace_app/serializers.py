@@ -160,18 +160,26 @@ class SocietySerializer(serializers.ModelSerializer):
         )
 
 
-class TreeSocietySerializer(serializers.ModelSerializer):
-    class Meta(object):
-        model = models.Society
-        fields = ('id', 'ext_id', 'name')
-
-
 class GeographicRegionSerializer(serializers.ModelSerializer):
     class Meta(object):
         model = models.GeographicRegion
         fields = (
             'id', 'level_2_re', 'count', 'region_nam', 'continent', 'tdwg_code'
         )
+
+
+class SocietyWithRegionSerializer(SocietySerializer):
+    region = GeographicRegionSerializer()
+
+    def __init__(self):
+        super(SocietyWithRegionSerializer, self).__init__()
+        self.Meta.fields = list(SocietySerializer.Meta.fields) + ['region']
+
+
+class TreeSocietySerializer(serializers.ModelSerializer):
+    class Meta(object):
+        model = models.Society
+        fields = ('id', 'ext_id', 'name')
 
 
 class LanguageTreeLabelsSequenceSerializer(serializers.HyperlinkedModelSerializer):
@@ -190,6 +198,7 @@ class LanguageTreeLabelsSerializer(serializers.ModelSerializer):
         model = models.LanguageTreeLabels
         fields = ('id', 'languageTree', 'label', 'language', 'societies')
 
+
 class LanguageTreeSerializer(serializers.ModelSerializer):
     taxa = LanguageTreeLabelsSerializer(many=True)
 
@@ -197,7 +206,6 @@ class LanguageTreeSerializer(serializers.ModelSerializer):
         model = models.LanguageTree
         fields = ('id', 'name', 'taxa', 'newick_string')
         
-
 
 class SocietyResult(object):
     """
@@ -209,7 +217,6 @@ class SocietyResult(object):
         self.environmental_values = set()
         self.languages = set()
         self.geographic_regions = set()
-        self.tree_count = 0
 
     def add_variable_coded_value(self, variable_coded_value):
         self.variable_coded_values.add(variable_coded_value)
@@ -222,22 +229,9 @@ class SocietyResult(object):
 
     def add_geographic_region(self, geographic_region):
         self.geographic_regions.add(geographic_region)
-        
-    def add_count(self, count):
-        self.tree_count = count
 
-    def includes_criteria(self, criteria=None):
-        if not criteria:
-            return True
-        if SEARCH_VARIABLES in criteria and len(self.variable_coded_values) == 0:
-            return False
-        if SEARCH_ENVIRONMENTAL in criteria and len(self.environmental_values) == 0:
-            return False
-        if SEARCH_LANGUAGE in criteria and len(self.languages) == 0:
-            return False
-        if SEARCH_GEOGRAPHIC in criteria and len(self.geographic_regions) == 0:
-            return False
-        return True
+    def __eq__(self, other):
+        return self.society.id == other.society.id
 
 
 class VariableCode(object):
@@ -248,6 +242,9 @@ class VariableCode(object):
         self.codes = codes
         self.variable = variable
 
+    def __eq__(self, other):
+        return self.variable.id == other.variable.id
+
 
 class SocietyResultSet(object):
     """
@@ -256,12 +253,9 @@ class SocietyResultSet(object):
     """
 
     def __init__(self):
-        # Use a dictionary to map society_id -> SocietyResult
-        self._society_results = dict()
-        self._codes = dict()
-        self.societies = None  # not valid until finalize() is called
+        self.societies = set()
         # These are the column headers in the search results
-        self.variable_descriptions = None
+        self.variable_descriptions = set()
         self.environmental_variables = set()
         self.languages = set()
         self.geographic_regions = set()
@@ -294,9 +288,6 @@ class SocietyResultSet(object):
    
     def add_language_tree(self, language_tree):
         self.language_trees.add(language_tree)
-            
-    def set_tree_count(self, society, count):
-        self._get_society_result(society).add_count(count)
     
     def finalize(self, criteria):
         self.societies = [
@@ -312,12 +303,11 @@ class VariableCodeSerializer(serializers.Serializer):
 
 class SocietyResultSerializer(serializers.Serializer):
     "Serializer for the SocietyResult object"
-    society = SocietySerializer()
+    society = SocietyWithRegionSerializer()
     variable_coded_values = CulturalValueSerializer(many=True)
     environmental_values = EnvironmentalValueSerializer(many=True)
     languages = LanguageSerializer(many=True)
     geographic_regions = GeographicRegionSerializer(many=True)
-    tree_count = serializers.IntegerField()
 
 
 class SocietyResultSetSerializer(serializers.Serializer):

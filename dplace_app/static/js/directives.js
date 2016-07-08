@@ -39,17 +39,15 @@ angular.module('languagePhylogenyDirective', [])
                     if (!variable) {
                         if (!global) return;
                         if (scope.query.l) {
-                            for (var i = 0; i < society.languages.length; i++) {
+                            if (society.society.language) {
 
                                 selected.append("svg:circle")
                                     .attr("r", 4.5)
                                     .attr("stroke", "#000")
                                     .attr("stroke-width", "0.5")
                                     .attr("fill", function(n) {
-                                        value = results.classifications.map(function(l) { return l.id; }).indexOf(society.languages[i].family.id);
-                                        rgb = colorMapService.mapColor(value, results.classifications.length);
-                                        return rgb;
-                                        
+                                        value = results.classifications.map(function(l) { return l.id; }).indexOf(society.society.language.family.id);
+                                        return colorMapService.mapColor(value, results.classifications.length);
                                     })
                                     .on("mouseover", function() {
                                          d3.select("body").append("div")
@@ -63,19 +61,16 @@ angular.module('languagePhylogenyDirective', [])
                                     .on("mouseout", function() {
                                         d3.select(".tree-tooltip").remove();
                                     });
-                                
                             }
-                        
                         } else if (scope.query.p) {
-                            for (var i = 0; i < society.geographic_regions.length; i++) {
+                            if (society.society.region) {
                                 selected.append("svg:circle")
                                     .attr("r", 4.5)
                                     .attr("stroke", "#000")
                                     .attr("stroke-width", "0.5")
                                     .attr("fill", function(n) {
-                                        value = results.geographic_regions.map(function(g) { return g.tdwg_code; }).indexOf(society.geographic_regions[i].tdwg_code);
-                                        rgb = colorMapService.mapColor(value, results.geographic_regions.length);
-                                        return rgb;
+                                        value = results.geographic_regions.map(function(g) { return g.tdwg_code; }).indexOf(society.society.region.tdwg_code);
+                                        return colorMapService.mapColor(value, results.geographic_regions.length);
                                     })
                                     .on("mouseover", function() {
                                          d3.select("body").append("div")

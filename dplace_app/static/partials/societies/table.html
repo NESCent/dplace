@@ -43,10 +43,14 @@
                 </div>
                 
             <td ng-show="results.languages">
-                {{ society_result.languages | formatLanguage}}
+                <span ng-hide="society_result.society.language == null">
+                    {{ society_result.society.language | formatLanguage}}
+                </span>
             </td>
             <td ng-show="results.geographic_regions">
-                {{ society_result.geographic_regions | formatGeographicRegion}}
+                <span ng-hide="society_result.society.region == null">
+                    {{ society_result.society.region | formatGeographicRegion}}
+                </span>
             </td>
         </tr>
     </table>

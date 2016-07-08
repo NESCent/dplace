@@ -1,12 +1,9 @@
 from __future__ import unicode_literals
 from collections import defaultdict
-import os
 
 from django.test import TestCase
 
-from dplace_app.models import (
-    Society, GeographicRegion, Language, LanguageTree, LanguageTreeLabels, LanguageTreeLabelsSequence, ISOCode, CulturalVariable,
-)
+from dplace_app.models import *
 from dplace_app.load.util import csv_dict_reader, var_number_to_label, configure_logging
 from dplace_app.load.isocode import load_isocode
 from dplace_app.load.society import load_societies, society_locations
@@ -16,13 +13,7 @@ from dplace_app.load.glottocode import xd_to_language
 from dplace_app.load.geographic import load_regions
 from dplace_app.load.tree import load_trees, tree_names
 from dplace_app.load.sources import load_references, get_source
-
-
-def data_path(fname=None):
-    comps = ['data']
-    if fname is not None:
-        comps.append(fname)
-    return os.path.join(os.path.dirname(__file__), *comps)
+from dplace_app.tests.util import data_path
 
 
 class LoadTestCase(TestCase):
@@ -50,7 +41,7 @@ class LoadTestCase(TestCase):
         # FIXME: assertions!
 
     def test_load_society_locations(self):
-        load_regions(data_path('test_geo.json'))
+        load_regions(data_path('regions.geojson'))
         load_societies(csv_dict_reader(data_path('societies.csv')))
         society_locations(csv_dict_reader(data_path('society_locations.csv')))
 
@@ -86,9 +77,9 @@ class LoadTestCase(TestCase):
         self.assertEqual(load_trees(data_path()), 0)
 
     def test_load_regions(self):
-        self.assertEqual(load_regions(data_path('test_geo.json')), 2)
+        self.assertEqual(load_regions(data_path('regions.geojson')), 2)
         self.assertEqual(
-            GeographicRegion.objects.filter(region_nam='Northern Europe').count(), 1)
+            GeographicRegion.objects.filter(region_nam='Region1').count(), 1)
 
     def test_load_language(self):
         soc = Society.objects.create(ext_id='socid', xd_id='socid', name='society')
@@ -150,23 +141,10 @@ class LoadTestCase(TestCase):
         self.assertEqual(res, 0)
         res = load_environmental_var(csv_dict_reader(data_path('envvariables.csv')))
         self.assertEqual(res, 3)
-        row_dict = self.get_dict(
-            dataset='EA',
-            soc_id='EA12',
-            xd_id='xd1',
-            soc_name='Example EA Society',
-            alternate_names='Example',
-            main_focal_year='2016')
-        load_societies([row_dict])
-        res = load_environmental([self.get_dict(**{
-            'Dataset': 'EA',
-            'soc_id': 'EA12',
-            'VarID': 'AnnualMeanTemperature',
-            'Code': 1,
-            'Comment': "Comment"
-        })])
-        self.assertEqual(res, 1)
-    
+        load_societies(csv_dict_reader(data_path('societies.csv')))
+        res = load_environmental(csv_dict_reader(data_path('envdata.csv')))
+        self.assertEqual(res, 2)
+
     def test_get_source_raises_ValueError(self):
         with self.assertRaises(ValueError):
             get_source(source='personal communication')
