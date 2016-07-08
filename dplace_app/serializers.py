@@ -215,20 +215,6 @@ class SocietyResult(object):
         self.society = society
         self.variable_coded_values = set()
         self.environmental_values = set()
-        self.languages = set()
-        self.geographic_regions = set()
-
-    def add_variable_coded_value(self, variable_coded_value):
-        self.variable_coded_values.add(variable_coded_value)
-
-    def add_environmental_value(self, environmental_value):
-        self.environmental_values.add(environmental_value)
-
-    def add_language(self, language):
-        self.languages.add(language)
-
-    def add_geographic_region(self, geographic_region):
-        self.geographic_regions.add(geographic_region)
 
     def __eq__(self, other):
         return self.society.id == other.society.id
@@ -261,40 +247,6 @@ class SocietyResultSet(object):
         self.geographic_regions = set()
         self.language_trees = set()
 
-    def _get_society_result(self, society):
-        if society.id not in self._society_results.keys():
-            self._society_results[society.id] = SocietyResult(society)
-        return self._society_results[society.id]
-        
-    def add_code(self, codes, variable):
-        if variable.id not in self._codes.keys():
-            self._codes[variable.id] = VariableCode(codes, variable)
-
-    def add_cultural(self, society, description, codes, value):
-        self._get_society_result(society).add_variable_coded_value(value)
-        self.add_code(codes, description)
-        
-    def add_environmental(self, society, variable, value):
-        self.environmental_variables.add(variable)
-        self._get_society_result(society).add_environmental_value(value)
-
-    def add_language(self, society, language):
-        self.languages.add(language)
-        self._get_society_result(society).add_language(language)
-
-    def add_geographic_region(self, society, region):
-        self.geographic_regions.add(region)
-        self._get_society_result(society).add_geographic_region(region)
-   
-    def add_language_tree(self, language_tree):
-        self.language_trees.add(language_tree)
-    
-    def finalize(self, criteria):
-        self.societies = [
-            x for x in self._society_results.values() if x.includes_criteria(criteria)
-        ]
-        self.variable_descriptions = [x for x in self._codes.values()]
-
 
 class VariableCodeSerializer(serializers.Serializer):
     codes = CulturalCodeDescriptionSerializer(many=True)
@@ -306,8 +258,6 @@ class SocietyResultSerializer(serializers.Serializer):
     society = SocietyWithRegionSerializer()
     variable_coded_values = CulturalValueSerializer(many=True)
     environmental_values = EnvironmentalValueSerializer(many=True)
-    languages = LanguageSerializer(many=True)
-    geographic_regions = GeographicRegionSerializer(many=True)
 
 
 class SocietyResultSetSerializer(serializers.Serializer):
