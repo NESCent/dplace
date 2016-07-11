@@ -13,15 +13,19 @@ function SocietiesCtrl($scope, $location, $timeout, $http, searchModelService, c
     
     if (!$scope.searchModel.results.searched) {
         var queryObject = $location.search();
-        var count = 0;
+        var by_name = false;
         for (var key in queryObject) {
             queryObject[key] = JSON.parse(queryObject[key]);
-            count += 1;
+            if (key == 'name') by_name = true;
         }
-        if (count > 0) {
+        if (!by_name) {
             searchModelService.updateSearchQuery(queryObject);
             $scope.searchModel.results = FindSocieties.find(queryObject, searchCompletedCallback);
+        } else {
+            $scope.results = FindSocieties.find(queryObject);
+            $scope.searchModel.results.searchedByName = true;
         }
+        
     }
 
     $scope.tabs = [

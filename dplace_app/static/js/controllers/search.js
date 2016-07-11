@@ -207,8 +207,8 @@ function SearchCtrl($scope, $window, $location, colorMapService, searchModelServ
     
     $scope.searchBySociety = function() {
         $scope.disableSearchButton();
-        var query = {'name': $scope.model.societyQuery}
-        $scope.searchModel.results = FindSocieties.find(query, searchBySocietyCallBack);
+        $scope.searchModel.query = {'name': $scope.model.societyQuery}
+        $scope.searchModel.results = FindSocieties.find($scope.searchModel.query, searchBySocietyCallBack);
     };
 
     $scope.search = function() {
