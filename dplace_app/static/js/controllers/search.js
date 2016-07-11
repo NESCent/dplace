@@ -7,7 +7,7 @@
  * @param FindSocieties
  * @constructor
  */
-function SearchCtrl($scope, $window, colorMapService, searchModelService, FindSocieties) {
+function SearchCtrl($scope, $window, $location, colorMapService, searchModelService, FindSocieties) {
     $scope.setActive('search');
     $scope.searchModel = searchModelService.getModel();
     $scope.searchBySocietyButton = {text: 'Search', disabled: false};
@@ -176,132 +176,16 @@ function SearchCtrl($scope, $window, colorMapService, searchModelService, FindSo
             else $scope.searchCriteria = "View selected search criteria";
         }
     };
-    
-    //calculates the range for environmental variables
-    //needed for coloring of markers
-    $scope.calculateRange = function(results) {
-        societies = results.societies;
-        for (var i = 0; i < results.environmental_variables.length; i++) {
-            extractedValues = societies.map(function(society) { 
-                for (var j = 0; j < society.environmental_values.length; j++) {
-                    if (society.environmental_values[j].variable == results.environmental_variables[i].id) {
-                        if (society.environmental_values[j].value) return society.environmental_values[j].value;
-                    }
-                }
-            });
-            var min_value = null; var max_value = null;
-           extractedValues.forEach(function(val) {
-            if (!min_value) min_value = val;
-            if (!max_value) max_value = val;
-            
-            if (val < min_value) min_value = val;
-            if (val > max_value) max_value = val;
-           });
-            var range = max_value - min_value;
-            results.environmental_variables[i]['range'] = range;
-            results.environmental_variables[i]['min'] = min_value.toFixed(4);
-            results.environmental_variables[i]['max'] = max_value.toFixed(4);
-        }
-        return results;
-    };
-    
-    //calculates number of codes selected for each variable and saves to coded_value
-    //needed for coloring of markers
-    $scope.getCodeIDs = function() {
-        $scope.searchModel.results.code_ids = {};
-        if ($scope.searchModel.query.l && !$scope.searchModel.query.c && !$scope.searchModel.query.e) {
-            $scope.searchModel.results.classifications = [];
-            added = [];
-            for (var i = 0; i < $scope.searchModel.results.societies.length; i++) {
-                if ($scope.searchModel.results.societies[i].society.language) {
-                    language_family = $scope.searchModel.results.societies[i].society.language.family;
-                    if (added.indexOf(language_family.id) == -1) { 
-                        $scope.searchModel.results.classifications.push(language_family);       
-                        added.push(language_family.id);
-                    }
-                }
-            }
-            
-            $scope.searchModel.results.classifications.sort(function(a,b) {
-                if (a.name < b.name) return -1;
-                else if (a.name > b.name) return 1;
-                else return 0;
-            })
-        }
-
-        for (var i = 0; i < $scope.searchModel.results.variable_descriptions.length; i++) {
-            if ($scope.searchModel.results.variable_descriptions[i].variable.data_type.toUpperCase() == 'CONTINUOUS') {
-                codes = $scope.searchModel.query.c.filter(function(code) { return code.variable == $scope.searchModel.results.variable_descriptions[i].variable.id; });
-                var min;
-                var max = 0;
-                
-                codes.forEach(function(c_var) {
-                    if (!min) {
-                        min = c_var.min;
-                    } else {
-                        if (c_var.min < min) min = c_var.min;
-                    }
-                    if (c_var.max > max) max = c_var.max;
-                });
-                
-                $scope.searchModel.results.variable_descriptions[i].variable['min'] = min.toFixed(2);
-                $scope.searchModel.results.variable_descriptions[i].variable['max'] = max.toFixed(2);
-                $scope.searchModel.results.variable_descriptions[i].codes = codes;
-            }                    
-            
-        }
-    }
-    
-    $scope.assignColors = function() {
-        results = $scope.searchModel.getResults();
-        results = $scope.calculateRange(results);
-        var colorMap = colorMapService.generateColorMap(results);
-        $scope.searchModel.getSocieties().forEach(function(container) {
-            container.society.style = {'background-color' : colorMap[container.society.id] };
-        });
-    };
-    
-    function addTreesToSocieties() {
-        $scope.searchModel.results.language_trees.phylogenies = [];
-        $scope.searchModel.results.language_trees.glotto_trees = [];
-        $scope.searchModel.results.language_trees.forEach(function(tree) {
-            if (tree.name.indexOf("global") != -1) $scope.searchModel.results.language_trees.global_tree = tree;
-            else if (tree.name.indexOf("glotto") != -1) {
-                $scope.searchModel.results.language_trees.glotto_trees.push(tree);
-            }
-            else {
-                $scope.searchModel.results.language_trees.phylogenies.push(tree);
-            }
-        $scope.searchModel.results.language_trees.glotto_trees.sort(function(a, b) { return a.name > b.name; });
-        $scope.searchModel.results.language_trees.phylogenies.sort(function(a, b) { return a.name > b.name; });
-        });
-        $scope.searchModel.getSocieties().forEach(function (container) {
-            var language = container.society.name;
-            if(language != null) {
-                container.society.trees = $scope.searchModel.results.language_trees.filter(function (tree) {
-                    return tree.taxa.some(function (item) {
-                        return item.societies.some(function(label) {
-                            return angular.equals(label.society.name, language);
-                        });
-                    });
-                });
-            } else {
-                container.society.trees = [];
-            }
-        });
-    }
-
 
     var errorCallBack = function() {
-	$scope.errors = "Invalid input.";
-	$scope.enableSearchButton();
+        $scope.errors = "Invalid input.";
+        $scope.enableSearchButton();
     };
 	
     var searchCompletedCallback = function() {
         $scope.enableSearchButton();
-        $scope.getCodeIDs();
-        $scope.assignColors();
-        addTreesToSocieties();
+        $scope.searchModel.results = searchModelService.getCodeIDs($scope.searchModel.results, $scope.searchModel.query);
+        searchModelService.assignColors($scope.searchModel.results);
         $scope.searchModel.results.searched = true;
         $scope.switchToResults();
     };
@@ -315,14 +199,6 @@ function SearchCtrl($scope, $window, colorMapService, searchModelService, FindSo
             $scope.switchToResults();
     };
 
-        // This method merges the current searchQuery object with the incoming searchQuery
-    $scope.updateSearchQuery = function(searchQuery) {
-        $scope.searchModel.query = {};
-        for(var propertyName in searchQuery) {
-            $scope.searchModel.query[propertyName] = searchQuery[propertyName];
-        }
-    };
-    
     $scope.searchSocieties = function() {
         $scope.disableSearchButton();
         var query = $scope.searchModel.query;
@@ -331,8 +207,8 @@ function SearchCtrl($scope, $window, colorMapService, searchModelService, FindSo
     
     $scope.searchBySociety = function() {
         $scope.disableSearchButton();
-        var query = {'name': $scope.model.societyQuery}
-        $scope.searchModel.results = FindSocieties.find(query, searchBySocietyCallBack);
+        $scope.searchModel.query = {'name': $scope.model.societyQuery}
+        $scope.searchModel.results = FindSocieties.find($scope.searchModel.query, searchBySocietyCallBack);
     };
 
     $scope.search = function() {
@@ -412,8 +288,10 @@ function SearchCtrl($scope, $window, colorMapService, searchModelService, FindSo
                 }
            }
         }
-        $scope.updateSearchQuery(searchQuery);
+        searchModelService.updateSearchQuery(searchQuery);
+        console.log(searchQuery);
         $scope.searchSocieties();
+
     };
     
     // resets this object state and the search query.

@@ -13,7 +13,8 @@ function dplaceRouter($routeProvider, $locationProvider) {
         })
         .when('/societies', {
             templateUrl: '/static/partials/societies.html',
-            controller: 'SocietiesCtrl'
+            controller: 'SocietiesCtrl',
+            reloadOnSearch: false
         })
         .when('/societies/search', {
             templateUrl: '/static/partials/societies.html',

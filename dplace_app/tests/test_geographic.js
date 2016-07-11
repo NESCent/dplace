@@ -22,7 +22,7 @@ describe('Testing geographic search', function() {
             FindSocieties: mockFindSocieties
         });
         spyOn(searchScope, 'search').and.callThrough();
-        spyOn(searchScope, 'updateSearchQuery');
+        spyOn(mockSearchModelService, 'updateSearchQuery');
         spyOn(searchScope, 'searchSocieties');
 
         geographicScope = searchScope.$new();
@@ -86,8 +86,8 @@ describe('Testing geographic search', function() {
         expected_searchQuery = {
             'p': [geographicScope.geographic.selectedRegions[0].id]
         };
-        expect(searchScope.updateSearchQuery).toHaveBeenCalled();
-        expect(searchScope.updateSearchQuery).toHaveBeenCalledWith(expected_searchQuery);
+        expect(mockSearchModelService.updateSearchQuery).toHaveBeenCalled();
+        expect(mockSearchModelService.updateSearchQuery).toHaveBeenCalledWith(expected_searchQuery);
         expect(searchScope.searchSocieties).toHaveBeenCalled();
     });
 });
