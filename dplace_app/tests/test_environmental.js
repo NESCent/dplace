@@ -30,7 +30,7 @@ describe('Testing environmental search', function() {
             FindSocieties: mockFindSocieties
         });
         spyOn(searchScope, 'search').and.callThrough();
-        spyOn(searchScope, 'updateSearchQuery');
+        spyOn(mockSearchModelService, 'updateSearchQuery');
         spyOn(searchScope, 'searchSocieties').and.callThrough();
         spyOn(searchScope, 'getCodeIDs');
 
@@ -141,8 +141,8 @@ describe('Testing environmental search', function() {
             ]]
         };
         
-        expect(searchScope.updateSearchQuery).toHaveBeenCalled();
-        expect(searchScope.updateSearchQuery).toHaveBeenCalledWith(expected_query);
+        expect(mockSearchModelService.updateSearchQuery).toHaveBeenCalled();
+        expect(mockSearchModelService.updateSearchQuery).toHaveBeenCalledWith(expected_query);
         expect(searchScope.searchSocieties).toHaveBeenCalled();
         expect(mockFindSocieties.find).toHaveBeenCalled();
        
