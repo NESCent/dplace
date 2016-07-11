@@ -32,7 +32,7 @@ describe('Testing environmental search', function() {
         spyOn(searchScope, 'search').and.callThrough();
         spyOn(mockSearchModelService, 'updateSearchQuery');
         spyOn(searchScope, 'searchSocieties').and.callThrough();
-        spyOn(searchScope, 'getCodeIDs');
+        spyOn(mockSearchModelService, 'getCodeIDs');
 
         envScope = searchScope.$new();
         
