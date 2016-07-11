@@ -16,13 +16,13 @@ REPO_DEST="${BASEDIR}/datasets"
 DPLACE_PATH="${BASEDIR}"
 
 # Clone the repository
-if [ ! -d "$REPO_DEST" ]; then
-	mkdir -p "$REPO_DEST"
-	git clone $REPO_SRC $REPO_DEST
-else
-	orig=`pwd`
-	cd $REPO_DEST && git pull origin master && cd "$orig"
-fi
+#if [ ! -d "$REPO_DEST" ]; then
+#	mkdir -p "$REPO_DEST"
+#	git clone $REPO_SRC $REPO_DEST
+#else
+#	orig=`pwd`
+#	cd $REPO_DEST && git pull origin master && cd "$orig"
+#fi
 
 ## import the data
 

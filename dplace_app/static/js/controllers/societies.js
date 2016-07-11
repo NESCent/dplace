@@ -1,10 +1,28 @@
-function SocietiesCtrl($scope, $timeout, $http, searchModelService, colorMapService, TreesFromSocieties) {
+function SocietiesCtrl($scope, $location, $timeout, $http, searchModelService, colorMapService, TreesFromSocieties, FindSocieties) {
     $scope.results = searchModelService.getModel().getResults();
     $scope.query = searchModelService.getModel().getQuery();
+    $scope.searchModel = searchModelService.getModel();
     $scope.variables = [];
-
     $scope.buttons = [];
     
+    var searchCompletedCallback = function() {
+        $scope.results = searchModelService.getCodeIDs($scope.searchModel.results, $scope.searchModel.query);
+        searchModelService.assignColors($scope.results);
+        $scope.searchModel.results.searched = true;
+    };
+    
+    if (!$scope.searchModel.results.searched) {
+        var queryObject = $location.search();
+        var count = 0;
+        for (var key in queryObject) {
+            queryObject[key] = JSON.parse(queryObject[key]);
+            count += 1;
+        }
+        if (count > 0) {
+            searchModelService.updateSearchQuery(queryObject);
+            $scope.searchModel.results = FindSocieties.find(queryObject, searchCompletedCallback);
+        }
+    }
 
     $scope.tabs = [
         { title: "Table", content: "table", active: true},

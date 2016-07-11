@@ -49,7 +49,7 @@ def main():  # pragma: no cover
         # Linking Societies to Languoids
         (
             xd_to_language,
-            csv_items('xd_id_to_language.csv'), csv_items('glottolog.csv')),
+            csv_items('xd_id_to_language_26May2016.csv'), csv_items('glottolog.csv')),
         (
             load_references,
             csv_items('ReferenceMapping.csv', 'BinfordReferenceMapping.csv')),

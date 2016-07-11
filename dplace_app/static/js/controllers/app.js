@@ -1,6 +1,7 @@
 function AppCtrl($scope, $location, $http, searchModelService) {
     $scope.searchButton = {'disabled': false, 'text': 'Search'};
     $scope.model = searchModelService.getModel();
+    
     // Root controller for app
     $scope.setActive = function(tabName) {
         $scope.searchActive = '';
@@ -18,6 +19,10 @@ function AppCtrl($scope, $location, $http, searchModelService) {
 
     $scope.switchToResults = function() {
         $location.path('/societies');
+        var queryObject = $scope.model.getQuery();
+        for (var key in queryObject) {
+            $location.search(key, JSON.stringify(queryObject[key]));
+        }
     };
     
     $scope.switchToSocResults = function(name) {
