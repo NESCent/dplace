@@ -17,7 +17,7 @@
 <td style="vertical-align: top;">
 <dplace-map results="results" map-div-id="result-map" visible="visible" query="query" chosen="results.chosenVariable"></dplace-map>
 </td><td style="vertical-align: top;">
-<table class="" ng-show="results.chosenVariable.data_type !== 'Continuous' && (results.environmental_variables.indexOf(results.chosenVariable) == -1)" ng-repeat="variable in results.variable_descriptions" ng-if="variable.variable.id==results.chosenVariable.id">
+<table class="" ng-show="results.chosenVariable && results.chosenVariable.data_type !== 'Continuous' && (results.environmental_variables.indexOf(results.chosenVariable) == -1)" ng-repeat="variable in results.variable_descriptions" ng-if="variable.variable.id==results.chosenVariable.id">
   
     <tr ng-repeat="code in variable.codes" ng-show="code.code !== 'NA'">
         <td>
