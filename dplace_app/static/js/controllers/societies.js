@@ -15,9 +15,25 @@ function SocietiesCtrl($scope, $location, $timeout, $http, searchModelService, c
         var queryObject = $location.search();
         var by_name = false;
         for (var key in queryObject) {
-            queryObject[key] = JSON.parse(queryObject[key]);
-            if (key == 'name') by_name = true;
+            if (key == 'c') {
+                queryString = queryObject[key].replace("[", "").replace("]","").split(",");
+                to_search = [];
+                for (var v = 0; v < queryString.length; v++) {
+                    to_search.push({
+                        'variable': parseInt(queryString[v].split("-")[0]),
+                        'id': parseInt(queryString[v].split("-")[1])
+                    });
+                }
+                queryObject[key] = to_search;
+            } else if (key == 'name') {
+                 by_name = true;
+            } else {
+                queryObject[key] = JSON.parse(queryObject[key]);
+
+            }
+            
         }
+        console.log(queryObject);
         if (!by_name) {
             searchModelService.updateSearchQuery(queryObject);
             $scope.searchModel.results = FindSocieties.find(queryObject, searchCompletedCallback);

@@ -21,7 +21,18 @@ function AppCtrl($scope, $location, $http, searchModelService) {
         $location.path('/societies');
         var queryObject = $scope.model.getQuery();
         for (var key in queryObject) {
-            $location.search(key, JSON.stringify(queryObject[key]));
+            if (key == 'c') {
+                queryString = "["
+                for (var v = 0; v < queryObject[key].length; v++) {
+                    queryString += queryObject[key][v].variable + '-' + queryObject[key][v].id;
+                    if (v < queryObject[key].length-1)
+                        queryString += ',';
+                }
+                queryString += "]"
+                $location.search(key, queryString);
+            } else {
+                $location.search(key, JSON.stringify(queryObject[key]));
+            }
         }
     };
     
