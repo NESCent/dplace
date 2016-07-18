@@ -2,21 +2,92 @@ function SocietiesCtrl($scope, $location, $timeout, $http, searchModelService, c
     $scope.results = searchModelService.getModel().getResults();
     $scope.query = searchModelService.getModel().getQuery();
     $scope.searchModel = searchModelService.getModel();
+    $scope.csvDownloadButton = {text: 'CSV', disabled: false};
     $scope.variables = [];
     $scope.buttons = [];
+    $scope.setActive('societies');
+    $scope.columnSort = { sortColumn: 'society.name', reverse: false };
+    
+    $scope.tabs = [
+        { title: "Table", content: "table", active: true},
+        { title: "Map", content: "map", active: false},
+        { title: "Tree", content: "tree", active: false},
+        { title: "Download", content: "download", active: false},
+    ];
+    
+        
+    
+    var forLegends = function() {
+        if ($scope.results.variable_descriptions) {
+            $scope.results.variable_descriptions.forEach(function(variable) {
+                if (variable.variable.data_type.toUpperCase() == 'CONTINUOUS') {
+                    variable.variable.fill = "/"+window.location.href.split('/').pop()+"#grad1";
+                }
+                $scope.variables.push(variable.variable);
+                variable['svgHeight'] = variable.codes.length * 27;
+                
+            });
+        }
+            
+        if ($scope.query.e) {
+            $scope.variables = $scope.variables.concat($scope.results.environmental_variables);
+            $scope.results.environmental_variables.forEach(function(variable) {
+             if (variable.name == "Monthly Mean Precipitation") variable.fill = "/"+window.location.href.split('/').pop()+"#blue";
+                else if (variable.name == "Monthly Mean Net Primary Production" || variable.name == "Mean Growing Season NPP") variable.fill = "/"+window.location.href.split('/').pop()+"#earthy";
+                else variable.fill = "/"+window.location.href.split('/').pop()+"#temp";
+            });
+        }
+        if ($scope.variables.length > 0) {
+            $scope.results.chosenVariable = $scope.variables[0];
+        }
+        $scope.results.chosenTVariable = null;
+
+    }
+    
     
     var searchCompletedCallback = function() {
         $scope.results = searchModelService.getCodeIDs($scope.searchModel.results, $scope.searchModel.query);
+        $scope.query = $scope.searchModel.query;
         searchModelService.assignColors($scope.results);
         $scope.searchModel.results.searched = true;
+        forLegends();
     };
     
     if (!$scope.searchModel.results.searched) {
         var queryObject = $location.search();
         var by_name = false;
         for (var key in queryObject) {
-            queryObject[key] = JSON.parse(queryObject[key]);
-            if (key == 'name') by_name = true;
+            if (key == 'c') {
+                queryString = queryObject[key].replace("[", "").replace("]","").split(",");
+                to_search = [];
+                for (var v = 0; v < queryString.length; v++) {
+                    array = queryString[v].split("-");
+                    if (array.length == 3) { //continuous variable
+                        if (array[1] == 'undefined') {
+                            to_search.push({'variable': parseInt(array[0])});
+                        } else {
+                            to_search.push({
+                                'variable': parseInt(array[0]),
+                                'min': parseInt(array[1]),
+                                'max': parseInt(array[2])
+                            })
+                        }
+                        
+                    } else {
+                        to_search.push({
+                            'variable': parseInt(array[0]),
+                            'id': parseInt(array[1])
+                        });
+                    }
+                }
+                queryObject[key] = to_search;
+            } else if (key == 'name') {
+                 by_name = true;
+            } else {
+                queryObject[key] = JSON.parse(queryObject[key]);
+
+            }
+            
         }
         if (!by_name) {
             searchModelService.updateSearchQuery(queryObject);
@@ -26,40 +97,12 @@ function SocietiesCtrl($scope, $location, $timeout, $http, searchModelService, c
             $scope.searchModel.results.searchedByName = true;
         }
         
+    } else {
+        forLegends();
+
     }
 
-    $scope.tabs = [
-        { title: "Table", content: "table", active: true},
-        { title: "Map", content: "map", active: false},
-        { title: "Tree", content: "tree", active: false},
-        { title: "Download", content: "download", active: false},
-    ];
-        
-    console.log($scope.results);
-    
-    $scope.csvDownloadButton = {text: 'CSV', disabled: false};
-
-    if ($scope.results.variable_descriptions) {
-        $scope.results.variable_descriptions.forEach(function(variable) {
-            $scope.variables.push(variable.variable);
-            variable['svgHeight'] = variable.codes.length * 27;
-        });
-    }
-    
-        
-    if ($scope.query.e) {
-        $scope.variables = $scope.variables.concat($scope.results.environmental_variables);
-        $scope.results.environmental_variables.forEach(function(variable) {
-         if (variable.name == "Monthly Mean Precipitation") variable.fill = "url(societies#blue)";
-            else if (variable.name == "Net Primary Production" || variable.name == "Mean Growing Season NPP") variable.fill = "url(societies#earthy)";
-            else variable.fill = "url(societies#temp)";
-        });
-    }
-    
-    $scope.setActive('societies');
-    
-    $scope.columnSort = { sortColumn: 'society.name', reverse: false };
-    
+       
     var treeButtons = function() {
         if ($scope.results.language_trees && $scope.results.language_trees.length > 0) {
             if ($scope.results.language_trees.phylogenies.length > 0) {
@@ -304,15 +347,6 @@ function SocietiesCtrl($scope, $location, $timeout, $http, searchModelService, c
             $scope.globalTree = true;
         }
         
-        //for environmental legend
-        if ($scope.results.environmental_variables.length > 0) {
-            if ($scope.results.environmental_variables[0].name == 'Net Primary Production' || $scope.results.environmental_variables[0].name == 'Mean Growing Season NPP') 
-                d3.selectAll(".envVar").attr("fill", "url(societies#earthy)");
-            else if ($scope.results.environmental_variables[0].name == "Annual Mean Precipitation")
-                d3.selectAll(".envVar").attr("fill", "url(societies#blue)");
-            else 
-                d3.selectAll(".envVar").attr("fill", "url(societies#temp)");
-        }
         
     };
     
@@ -379,27 +413,20 @@ function SocietiesCtrl($scope, $location, $timeout, $http, searchModelService, c
             legend_id = all_legends[id];
             name = $scope.results.variable_descriptions[i].CID + '-'+ $scope.results.variable_descriptions[i].variable.name;
             svg_string = legend_id.node().innerHTML;
-            while (svg_string.indexOf("url(societies") != -1) { //strip out the societies part of the URL because this won't work in our download
-                index = svg_string.indexOf("url(societies");
-                svg_string = svg_string.substring(0, index+4) + svg_string.substring(index+13)
-            }
+            svg_string = svg_string.replace(/url\(.*?#/, 'url(#');
             svg_string = '<svg version="1.1" xmlns="http://www.w3.org/2000/svg" transform="translate(10, 10)">' + svg_string + gradients_svg + '</svg>';
             legends_list.push({'name': name.replace(/[\W]+/g, "-")+'-legend.svg', 'svg': svg_string});    
         }
         
         for (var i = 0; i < $scope.results.environmental_variables.length; i++) {
             env_svg = d3.select("#e"+$scope.results.environmental_variables[i].id).select("div").node().innerHTML;
-            while (env_svg.indexOf("url(societies") != -1) {
-                index = env_svg.indexOf("url(societies");
-                env_svg = env_svg.substring(0, index+4) + env_svg.substring(index+13)
-            }
+            env_svg = env_svg.replace(/url\(.*?#/, 'url(#');
             env_svg = '<svg version="1.1" xmlns="http://www.w3.org/2000/svg" transform="translate(10, 10)">'+env_svg.substring(0, env_svg.indexOf("</svg>")) + '</svg>' + gradients_svg + '</svg>';
             name = $scope.results.environmental_variables[i].CID + '-'+$scope.results.environmental_variables[i].name;
             legends_list.push({'name': name.replace(/[\W]+/g, "-")+'-legend.svg', 'svg': env_svg});
         }
 
         query = {'l': legends_list, 't': [tree_svg], 'n': [$scope.results.selectedTree.name+'.svg']};
-        console.log(query);
         var date = new Date();
         var filename = "dplace-tree-"+date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate()+".zip"
         $http.post('/api/v1/zip_legends', query, {'responseType': 'arraybuffer'}).then(function(data) {

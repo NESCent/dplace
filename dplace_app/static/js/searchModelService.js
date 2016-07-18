@@ -60,7 +60,9 @@ function SearchModelService(VariableCategory, GeographicRegion, EnvironmentalCat
     };
     
     var calculateRange = function(results) {
-        societies = results.societies;
+        if (results.societies.length == 0) return results;
+
+        societies = results.societies;         
         for (var i = 0; i < results.environmental_variables.length; i++) {
             extractedValues = societies.map(function(society) { 
                 for (var j = 0; j < society.environmental_values.length; j++) {
@@ -77,6 +79,7 @@ function SearchModelService(VariableCategory, GeographicRegion, EnvironmentalCat
             if (val < min_value) min_value = val;
             if (val > max_value) max_value = val;
            });
+           console.log(min_value);
             var range = max_value - min_value;
             results.environmental_variables[i]['range'] = range;
             results.environmental_variables[i]['min'] = min_value.toFixed(4);

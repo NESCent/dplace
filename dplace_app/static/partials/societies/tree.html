@@ -88,7 +88,7 @@
                                 stroke-width="0.5"
                                 />
                             <text x="20" y="15">Missing Data</text>
-                        <rect x="10" y="25" fill="url(societies#grad1)" height="30" width="250" />
+                        <rect x="10" y="25" fill = "url({{variable.variable.fill}})" height="30" width="250" />
                         <text x="0" y="70">{{variable.variable.min}} {{variable.variable.units}}</text>
                         <text x="240" y="70">{{variable.variable.max}} {{variable.variable.units}}</text>
                     </svg>
@@ -102,7 +102,7 @@
                 <div id="e{{environmental.id}}" ng-class="{'panel-collapse collapse':!globalTree, 'in': (environmental.CID == 'E1' && results.variable_descriptions.length == 0)}" ng-show="(!globalTree || (globalTree && results.chosenTVariable.name==environmental.name))">
                     <div class="leg-panel panel-body">
                     <svg height="70" width="400" class="envLegend legends" style="font-size: 12px;">
-                        <rect y="10" height="30" width="230" x="20" ng-attr-fill="{{environmental.fill}}"/>
+                        <rect y="10" height="30" width="230" x="20" fill="url({{environmental.fill}})"/>
                         <text x="0" y="60">{{environmental.min}} {{environmental.units}}</text>
                         <text x="230" y="60">{{environmental.max}} {{environmental.units}}</text>
                     </svg>

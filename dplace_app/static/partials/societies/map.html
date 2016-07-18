@@ -17,7 +17,7 @@
 <td style="vertical-align: top;">
 <dplace-map results="results" map-div-id="result-map" visible="visible" query="query" chosen="results.chosenVariable"></dplace-map>
 </td><td style="vertical-align: top;">
-<table class="" ng-show="results.chosenVariable.data_type !== 'Continuous' && (results.environmental_variables.indexOf(results.chosenVariable) == -1)" ng-repeat="variable in results.variable_descriptions" ng-if="variable.variable.id==results.chosenVariable.id">
+<table class="" ng-show="results.chosenVariable && results.chosenVariable.data_type !== 'Continuous' && (results.environmental_variables.indexOf(results.chosenVariable) == -1)" ng-repeat="variable in results.variable_descriptions" ng-if="variable.variable.id==results.chosenVariable.id">
   
     <tr ng-repeat="code in variable.codes" ng-show="code.code !== 'NA'">
         <td>
@@ -39,10 +39,10 @@
     <tr ng-show="(results.chosenVariable && (results.environmental_variables.indexOf(results.chosenVariable) !==-1))">
         <td class = "env-legend-td">
             <svg height="70" width="400" class="envLegend">
-                <rect class="envVar" height="30" width="230" x="20" />
+                <rect class="envVar" height="30" width="230" x="20" ng-attr-fill="url({{results.chosenVariable.fill}})"/>
                 <text x="0" y="45">{{results.chosenVariable.min}} {{results.chosenVariable.units}}</text>
                 <text x="230" y="45">{{results.chosenVariable.max}} {{results.chosenVariable.units}}</text>
-          </svg>
+            </svg>
         </td>
     </tr>
     <tr ng-show="results.chosenVariable.data_type == 'Continuous'">
@@ -57,7 +57,7 @@
                         stroke-width="0.5"
                         />
                     <text x="20" y="18">Missing Data</text>-->
-                <rect x="10" y="25" fill="url(societies#grad1)" height="30" width="230" />
+                <rect class="cultureVar" x="10" y="25" height="30" width="230" ng-attr-fill="url({{results.chosenVariable.fill}})"/>
                 <text x="0" y="70">{{results.chosenVariable.min}} {{results.chosenVariable.units}}</text>
                 <text x="230" y="70">{{results.chosenVariable.max}} {{results.chosenVariable.units}}</text>
                 </svg>
