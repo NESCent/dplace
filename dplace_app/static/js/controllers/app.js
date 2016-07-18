@@ -24,7 +24,11 @@ function AppCtrl($scope, $location, $http, searchModelService) {
             if (key == 'c') {
                 queryString = "["
                 for (var v = 0; v < queryObject[key].length; v++) {
-                    queryString += queryObject[key][v].variable + '-' + queryObject[key][v].id;
+                    if (queryObject[key][v].id)
+                        queryString += queryObject[key][v].variable + '-' + queryObject[key][v].id;
+                    else {
+                        queryString += queryObject[key][v].variable + '-' + queryObject[key][v].min + '-' + queryObject[key][v].max;
+                    }
                     if (v < queryObject[key].length-1)
                         queryString += ',';
                 }

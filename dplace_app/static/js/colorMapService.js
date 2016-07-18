@@ -68,7 +68,7 @@ function ColorMapService() {
 
     //blue to red gradient for environmental variables
     this.tempColor = function(index, min, max, name) {
-    if (name == "Net Primary Production" || name == "Mean Growing Season NPP") {
+    if (name == "Monthly Mean Net Primary Production" || name == "Mean Growing Season NPP") {
         hue = 30 + (((index - min) / (max - min)) * 88);
     } else if (name == "Monthly Mean Precipitation"){
         color = this.mapColorMonochrome(min, max, index, 252);

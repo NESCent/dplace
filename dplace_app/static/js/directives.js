@@ -264,7 +264,6 @@ angular.module('languagePhylogenyDirective', [])
                 include = scope.results.societies.map(function(s) { return s.society.ext_id; });
                 for (var i = 0; i < langTree.taxa.length; i++) {
                    for (var t = 0; t < langTree.taxa[i].societies.length; t++) {
-                       console.log(langTree.taxa[i].societies[t].society.ext_id)
                         //if (include.indexOf(langTree.taxa[i].societies[t].society.ext_id) != -1) {
                             if (langTree.taxa[i].label in taxa) {
                                 continue; 
@@ -349,11 +348,6 @@ angular.module('languagePhylogenyDirective', [])
                             if (chosen_var_id.length > 0)
                                 addMarkers(langTree, scope.results, chosen_var_id[0], node, true, translate);
                             else {
-                                d3.select(".envVar").attr("fill", function() {
-                                    if (scope.results.chosenTVariable.name == "Monthly Mean Precipitation") {console.log("blue"); return "url(societies#blue)";}
-                                    else if (scope.results.chosenTVariable.name == "Net Primary Production" || scope.results.chosenTVariable.name == "Mean Growing Season NPP") return "url(societies#earthy)";
-                                    else return "url(societies#temp)";
-                                });
                                 addMarkers(langTree, scope.results,scope.results.chosenTVariable, node, true, translate);
                             }
                         } 
@@ -458,7 +452,6 @@ angular.module('languagePhylogenyDirective', [])
 
             scope.$on('treeSelected', function(event, args) {
                 constructTree(args.tree);
-             
                 $(window).scroll(function() {
                     if($(".phylogeny").height() > $("#legend").height()) {
                         
@@ -671,19 +664,8 @@ angular.module('dplaceMapDirective', [])
                     for (var i = 0; i < societyIds.length; i++) {
                         if (societyIds[i] in colorMap) continue;
                         else scope.map.removeMarkers([societyIds[i]]);
-                    }
-                };
-
-                scope.mapLegend = function() {
-                    if (!scope.chosen) return;
-                    if (scope.chosen.name == "Net Primary Production" || scope.chosen.name == "Mean Growing Season NPP") {
-                        d3.selectAll(".envVar").attr("fill", "url(societies#earthy)");
-                    } else if (scope.chosen.name == "Monthly Mean Precipitation") {
-                        d3.selectAll(".envVar").attr("fill", "url(societies#blue)");
-                    }
-                    else {
-                        d3.selectAll(".envVar").attr("fill", "url(societies#temp)");
-                    }
+                    }       
+                    
                 };
 
                 if(attrs.results) {
@@ -695,7 +677,6 @@ angular.module('dplaceMapDirective', [])
                 if (attrs.chosen) {
                     scope.$watchCollection('chosen', function(oldvalue, newvalue) {
                         scope.addMarkers(); 
-                        scope.mapLegend();                        
                     });
                 }
                 
