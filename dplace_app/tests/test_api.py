@@ -303,8 +303,7 @@ class Test(APITestCase):
         self.assertEqual(response.content.split()[0], '"Research')
         response = self.get_json(
             'csv_download', 
-            {'query': json.dumps({'c': CulturalCodeDescriptionSerializer(
-                [CulturalCodeDescription.objects.get(code='1')], many=True).data})})
+            {'query': json.dumps({'c': ['%s-%s' % (CulturalCodeDescription.objects.get(code='1').variable.id, CulturalCodeDescription.objects.get(code='1').id)]})})
 
     #
     # find societies:
@@ -319,7 +318,10 @@ class Test(APITestCase):
                     if no_escape:
                         _data.append((k, vv))
                     else:
-                        _data.append((k, json.dumps(vv)))
+                        if str(k) == 'c':
+                            _data.append((k, vv))
+                        else:
+                            _data.append((k, json.dumps(vv)))
             data = _data
         return method(reverse(urlname), data, format='json')
 
@@ -335,14 +337,14 @@ class Test(APITestCase):
             assertion(self.society_in_results(self.get(Society, i), response))
 
     def test_find_society_by_var(self):
-        response = self.get_results(c=CulturalCodeDescriptionSerializer(
-            [CulturalCodeDescription.objects.get(code='1')], many=True).data)
+        response = self.get_results(c=['%s-%s' % (CulturalCodeDescription.objects.get(code='1').variable.id, CulturalCodeDescription.objects.get(code='1').id)])
         for i, assertion in [(1, self.assertTrue), (2, self.assertFalse)]:
             assertion(self.society_in_results(self.get(Society, i), response))
 
     def test_find_societies_by_var(self):
-        serialized_codes = CulturalCodeDescriptionSerializer(
-            [CulturalCodeDescription.objects.get(code=i) for i in ['1', '2']], many=True).data
+        serialized_codes = [
+            '%s-%s' % (CulturalCodeDescription.objects.get(code=i).variable.id, CulturalCodeDescription.objects.get(code=i).id) for i in ['1', '2']
+        ]
         response = self.get_results(c=serialized_codes)
         for i in [1, 2]:
             self.assertTrue(
@@ -354,17 +356,18 @@ class Test(APITestCase):
             assertion(self.society_in_results(self.get(Society, i), response))
 
     def test_find_society_by_continuous_var(self):
-        response = self.get_results(c=[{
-            'variable': CulturalVariable.objects.get(label='B002').id,
-            'min': 0.0,
-            'max': 100}])
+        response = self.get_results(c=['%s-%s-%s' % (CulturalVariable.objects.get(label='B002').id, 0.0, 100)])
+        
+  #      {
+  #          'variable': CulturalVariable.objects.get(label='B002').id,
+  #          'min': 0.0,
+  #          'max': 100}])
         for i, assertion in [(1, self.assertTrue), (2, self.assertFalse)]:
             assertion(self.society_in_results(self.get(Society, i), response))
 
     def test_find_no_societies(self):
         response = self.get_results(
-            c=CulturalCodeDescriptionSerializer(
-                [CulturalCodeDescription.objects.get(code='10')], many=True).data)
+            c=['%s-%s' % (CulturalCodeDescription.objects.get(code='1').variable.id, CulturalCodeDescription.objects.get(code='10').id)])
         self.assertEqual(len(response.data['societies']), 0)
 
     def test_find_society_by_language_and_var(self):
@@ -373,8 +376,7 @@ class Test(APITestCase):
         # this should return only 1 and not 2 or 3
         # This tests that results should be intersection (AND), not union (OR)
         # Society 3 is not coded for any variables, so it should not appear in the list.
-        serialized_vcs = CulturalCodeDescriptionSerializer(
-            [CulturalCodeDescription.objects.get(code=str(i)) for i in [1, 2]], many=True).data
+        serialized_vcs = ['%s-%s' % (CulturalCodeDescription.objects.get(code=i).variable.id, CulturalCodeDescription.objects.get(code=i).id) for i in ['1', '2']]
         serialized_lcs = [self.get(Language, i).id for i in [1, 3]]
         response = self.get_results(c=serialized_vcs, l=serialized_lcs)
         socs = {i: self.get(Society, i) for i in [1, 2, 3]}

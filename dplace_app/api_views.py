@@ -220,6 +220,8 @@ def result_set_from_query_dict(query_dict):
             result_set.languages.add(lang)
 
     if 'c' in query_dict:
+        f = open('text.txt', 'w')
+        f.write(query_dict['c'][0].split('-')[0])
         variables = {
             v.id: v for v in models.CulturalVariable.objects
             .filter(id__in=[int(x.split('-')[0]) for x in query_dict['c']])
