@@ -210,7 +210,6 @@ def result_set_from_query_dict(query_dict):
 
     result_set = serializers.SocietyResultSet()
     sql_joins, sql_where = [], []
-
     def id_array(l):
         return '(%s)' % ','.join('%s' % int(i) for i in l)
 
@@ -223,19 +222,25 @@ def result_set_from_query_dict(query_dict):
     if 'c' in query_dict:
         variables = {
             v.id: v for v in models.CulturalVariable.objects
-            .filter(id__in=[x['variable'] for x in query_dict['c']])
+            .filter(id__in=[int(x.split('-')[0]) for x in query_dict['c']])
             .prefetch_related(Prefetch(
                 'codes',
                 queryset=models.CulturalCodeDescription.objects
-                .filter(id__in=[x.get('id') for x in query_dict['c']])))
+                .filter(id__in=[int(x.split('-')[1]) for x in query_dict['c'] if len(x.split('-')) == 2])))
         }
 
         for variable, codes in groupby(
-            sorted(query_dict['c'], key=lambda c: c['variable']),
-            key=lambda x: x['variable']
+            sorted(query_dict['c'], key=lambda c: int(c.split('-')[0])),
+            key=lambda x: int(x.split('-')[0])
         ):
             variable = variables[variable]
-            codes = list(codes)
+            
+            codes = [{
+                'id': None if (len(c.split('-')) > 2 or len(c.split('-')) == 1) else int(c.split('-')[1]),
+                'min': None if len(c.split('-')) < 3 else float(c.split('-')[1]),
+                'max': None if len(c.split('-')) < 3 else float(c.split('-')[2])
+            } for c in list(codes)]
+            
             alias = 'cv%s' % variable.id
             sql_joins.append((
                 "culturalvalue",
@@ -244,10 +249,10 @@ def result_set_from_query_dict(query_dict):
             ))
 
             if variable.data_type and variable.data_type == 'Continuous':
-                include_NA = not all('min' in c for c in codes)
+                include_NA = not all((c['min'] is not None) for c in codes)
                 ors = [
                     "({0}.coded_value_float >= %(min)f AND {0}.coded_value_float <= %(max)f)".format(alias) % c
-                    for c in codes if 'min' in c]
+                    for c in codes if ('min' in c and c['min']  is not None)]
                 if include_NA:
                     ors.append("%s.coded_value = 'NA'" % alias)
                 sql_where.append("(%s)" % ' OR '.join(ors))
@@ -256,7 +261,6 @@ def result_set_from_query_dict(query_dict):
             else:
                 assert all('id' in c for c in codes)
                 sql_where.append("{0}.code_id IN %s".format(alias) % id_array([x['id'] for x in codes]))
-
             result_set.variable_descriptions.add(serializers.VariableCode(variable.codes, variable))
 
     if 'e' in query_dict:
@@ -407,7 +411,10 @@ def find_societies(request):
                     if s.culturalvalue_set.count():
                         result_set.societies.add(serializers.SocietyResult(s))
             return Response(serializers.SocietyResultSetSerializer(result_set).data)
-        query[k] = [json.loads(vv) for vv in v]
+        if str(k) == 'c':
+            query[k] = v
+        else:
+            query[k] = [json.loads(vv) for vv in v]
     result_set = result_set_from_query_dict(query)
     log.info('%s find_societies 2: %s queries' % (time() - s, len(connection.queries)))
     d = serializers.SocietyResultSetSerializer(result_set).data

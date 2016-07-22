@@ -57,31 +57,7 @@ function SocietiesCtrl($scope, $location, $timeout, $http, searchModelService, c
         var queryObject = $location.search();
         var by_name = false;
         for (var key in queryObject) {
-            if (key == 'c') {
-                queryString = queryObject[key].replace("[", "").replace("]","").split(",");
-                to_search = [];
-                for (var v = 0; v < queryString.length; v++) {
-                    array = queryString[v].split("-");
-                    if (array.length == 3) { //continuous variable
-                        if (array[1] == 'undefined') {
-                            to_search.push({'variable': parseInt(array[0])});
-                        } else {
-                            to_search.push({
-                                'variable': parseInt(array[0]),
-                                'min': parseInt(array[1]),
-                                'max': parseInt(array[2])
-                            })
-                        }
-                        
-                    } else {
-                        to_search.push({
-                            'variable': parseInt(array[0]),
-                            'id': parseInt(array[1])
-                        });
-                    }
-                }
-                queryObject[key] = to_search;
-            } else if (key == 'name') {
+            if (key == 'name') {
                  by_name = true;
             } else {
                 queryObject[key] = JSON.parse(queryObject[key]);

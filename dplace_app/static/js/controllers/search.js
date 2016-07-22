@@ -226,15 +226,15 @@ function SearchCtrl($scope, $window, $location, colorMapService, searchModelServ
                 if (codes.length > 0) {
                     searchQuery['c'] = [];
                     for (i = 0; i < codes.length; i++) {
-                        pruned = {variable: codes[i].variable};
+                        pruned = codes[i].variable;
                         if ('id' in codes[i]) {
-                            pruned['id'] = codes[i].id;
+                            pruned += '-' + codes[i].id;
                         }
                         if ('min' in codes[i]) {
-                            pruned['min'] = codes[i].min;
+                            pruned += '-' + codes[i].min;
                         }
                         if ('max' in codes[i]) {
-                            pruned['max'] = codes[i].max;
+                            pruned += '-' + codes[i].max;
                         }
                         searchQuery['c'].push(pruned);
                     }
