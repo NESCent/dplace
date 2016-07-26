@@ -404,12 +404,16 @@ def find_societies(request):
         if str(k) == 'name':
             result_set = serializers.SocietyResultSet()
             if len(v) > 0:
-                soc = models.Society.objects.filter(
-                    Q(name__icontains=v[0]) | Q(alternate_names__unaccent__icontains=v[0])
-                )
-                for s in soc:
-                    if s.culturalvalue_set.count():
-                        result_set.societies.add(serializers.SocietyResult(s))
+                # TODO quick fix - should be made cleaner
+                # remove all " incl. escaped ones since search string is wrapped by "..."
+                v0 = v[0].replace('\\"', '').replace('"', '')
+                if len(v0) > 0:
+                    soc = models.Society.objects.filter(
+                        Q(name__icontains=v0) | Q(alternate_names__unaccent__icontains=v0)
+                    )
+                    for s in soc:
+                        if s.culturalvalue_set.count():
+                            result_set.societies.add(serializers.SocietyResult(s))
             return Response(serializers.SocietyResultSetSerializer(result_set).data)
         if str(k) == 'c':
             query[k] = v
