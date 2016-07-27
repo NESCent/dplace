@@ -6,7 +6,6 @@ from django.core.urlresolvers import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from dplace_app.serializers import CulturalCodeDescriptionSerializer
 from dplace_app.models import *
 from dplace_app.load.geographic import load_regions
 from dplace_app.load.environmental import load_environmental_var, load_environmental
@@ -351,17 +350,13 @@ class Test(APITestCase):
                 self.society_in_results(self.get(Society, i), response))
 
     def test_find_society_by_name(self):
-        response = self.get_results(no_escape=True, name=["Söciety1"])
+        response = self.get_results(no_escape=True, name=[json.dumps('Söciety1')])
         for i, assertion in [(1, self.assertTrue), (2, self.assertFalse)]:
             assertion(self.society_in_results(self.get(Society, i), response))
 
     def test_find_society_by_continuous_var(self):
-        response = self.get_results(c=['%s-%s-%s' % (CulturalVariable.objects.get(label='B002').id, 0.0, 100)])
-        
-  #      {
-  #          'variable': CulturalVariable.objects.get(label='B002').id,
-  #          'min': 0.0,
-  #          'max': 100}])
+        response = self.get_results(c=['%s-%s-%s' % (
+            CulturalVariable.objects.get(label='B002').id, 0.0, 100)])
         for i, assertion in [(1, self.assertTrue), (2, self.assertFalse)]:
             assertion(self.society_in_results(self.get(Society, i), response))
 
