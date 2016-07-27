@@ -293,7 +293,7 @@ function SearchCtrl($scope, $window, $location, colorMapService, searchModelServ
         $scope.searchSocieties();
 
     };
-    
+
     // resets this object state and the search query.
     $scope.resetSearch = function() {
 		$scope.errors = "";

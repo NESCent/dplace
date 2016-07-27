@@ -350,7 +350,7 @@ class Test(APITestCase):
                 self.society_in_results(self.get(Society, i), response))
 
     def test_find_society_by_name(self):
-        response = self.get_results(no_escape=True, name=[json.dumps('Söciety1')])
+        response = self.get_results(no_escape=True, name=['Söciety1'])
         for i, assertion in [(1, self.assertTrue), (2, self.assertFalse)]:
             assertion(self.society_in_results(self.get(Society, i), response))
 
