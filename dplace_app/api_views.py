@@ -384,6 +384,7 @@ def trees_from_societies(request):
             
     return Response(serializers.LanguageTreeSerializer(language_trees, many=True).data)
 
+
 @api_view(['GET'])
 @permission_classes((AllowAny,))
 def find_societies(request):
@@ -400,18 +401,18 @@ def find_societies(request):
     s = time()
     log.info('%s find_societies 1: %s queries' % (time() - s, len(connection.queries)))
     query = {}
+    if 'name' in request.query_params:
+        result_set = serializers.SocietyResultSet()
+        q = request.query_params['name']
+        if q:
+            soc = models.Society.objects.filter(
+                Q(name__icontains=q) | Q(alternate_names__unaccent__icontains=q))
+            for s in soc:
+                if s.culturalvalue_set.count():
+                    result_set.societies.add(serializers.SocietyResult(s))
+        return Response(serializers.SocietyResultSetSerializer(result_set).data)
+
     for k, v in request.query_params.lists():
-        if str(k) == 'name':
-            result_set = serializers.SocietyResultSet()
-            if len(v) > 0:
-                q = json.loads(v[0])
-                if q:
-                    soc = models.Society.objects.filter(
-                        Q(name__icontains=q) | Q(alternate_names__unaccent__icontains=q))
-                    for s in soc:
-                        if s.culturalvalue_set.count():
-                            result_set.societies.add(serializers.SocietyResult(s))
-            return Response(serializers.SocietyResultSetSerializer(result_set).data)
         if str(k) == 'c':
             query[k] = v
         else:

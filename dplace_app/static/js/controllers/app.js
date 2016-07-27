@@ -20,9 +20,13 @@ function AppCtrl($scope, $location, $http, searchModelService) {
     $scope.switchToResults = function() {
         $location.path('/societies');
         var queryObject = $scope.model.getQuery();
-        for (var key in queryObject) {
-            $location.search(key, JSON.stringify(queryObject[key]));
-            
+        var key, val;
+        for (key in queryObject) {
+            val = queryObject[key];
+            if (key != 'name') {
+                val = JSON.stringify(val);
+            }
+            $location.search(key, val);
         }
     };
     
