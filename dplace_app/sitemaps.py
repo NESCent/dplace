@@ -11,20 +11,22 @@ class SocietySitemap(Sitemap):
         return Society.objects.all()
 
 
-class LanguageSitemap(Sitemap):
-    changefreq = "weekly"
-    priority = 0.5
-
-    def items(self):
-        return Language.objects.all()
+# TODO Should we provide this? If so, what kind of URLs should be generated?
+# class LanguageSitemap(Sitemap):
+#     changefreq = "weekly"
+#     priority = 0.5
+#
+#     def items(self):
+#         return Language.objects.all()
 
 
 class StaticViewSitemap(Sitemap):
-    priority = 0.5
+    priority = 0.9
     changefreq = 'weekly'
 
     def items(self):
-        return ['home']  # TODO: add others here once angular urls are settled
+        return ['home', 'about', 'howto', 'howtocite', 
+                'source', 'team', 'publication']
 
     def location(self, item):
         return reverse(item)
@@ -32,6 +34,6 @@ class StaticViewSitemap(Sitemap):
 
 SITEMAP = {
     'society': SocietySitemap(),
-    'language': LanguageSitemap(),
+    # 'language': LanguageSitemap(),
     'static': StaticViewSitemap(),
 }

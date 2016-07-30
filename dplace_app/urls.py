@@ -25,6 +25,15 @@ router.register(r'language_tree_labels', api_views.LanguageTreeLabelsViewSet)
 urlpatterns = [
 
     url(r'^$', RedirectView.as_view(url='angular/', permanent=True), name='home'),
+
+    # This is needed in order to auto-generate sitemaps links
+    url(r'^about/?$', views.angular, name='about'),
+    url(r'^howto/?$', views.angular, name='howto'),
+    url(r'^howtocite/?$', views.angular, name='howtocite'),
+    url(r'^source/?$', views.angular, name='source'),
+    url(r'^team/?$', views.angular, name='team'),
+    url(r'^publication/?$', views.angular, name='publication'),
+
     url(r'^society/(?P<society_id>.*)$',
         api_views.SocietyViewSet.as_view(
             {'get': 'detail'},
