@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<browserconfig>
+   <msapplication>
+     <tile>
+        <square70x70logo src="apple-touch-icon-70x70.png"/>
+        <square150x150logo src="apple-touch-icon-150x150wintile.png"/>
+        <wide310x150logo src="apple-touch-icon-310x150wintile.png"/>
+        <square310x310logo src="apple-touch-icon-310x310wintile.png"/>
+        <TileImage src="apple-touch-icon-150x150wintile.png" />
+        <TileColor>#ffffff</TileColor>
+     </tile>
+   </msapplication>
+</browserconfig>
