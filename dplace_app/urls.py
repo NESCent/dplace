@@ -26,6 +26,13 @@ urlpatterns = [
 
     url(r'^$', RedirectView.as_view(url='angular/', permanent=True), name='home'),
 
+    # Redirect all static icon images (different sizes) crawled by any sites and bots
+    url(r'^favicon\.ico/?$', RedirectView.as_view(url='/static/images/icons/favicon.ico')),
+    url(r'^apple\-touch\-icon(\-precomposed)?\.png/?$', RedirectView.as_view(url='/static/images/icons/D-PLACE_Favicon_57x57.png')),
+    url(r'^touch\-icon\iphone-\.png/?$', RedirectView.as_view(url='/static/images/icons/D-PLACE_Favicon_57x57.png')),
+    url(r'^(apple\-)?touch\-icon\-(?P<size>.+?)(\-precomposed)?\.png/?$', RedirectView.as_view(url='/static/images/icons/D-PLACE_Favicon_%(size)s.png')),
+    url(r'^browserconfig\.xml/?$', RedirectView.as_view(url='/static/images/icons/browserconfig.xml')),
+
     # This is needed in order to auto-generate sitemaps links
     url(r'^about/?$', views.angular, name='about'),
     url(r'^howto/?$', views.angular, name='howto'),
