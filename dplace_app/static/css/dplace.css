@@ -49,13 +49,15 @@ a {
     background-color: #0a0c0c;
     color: #fff;
     margin-top: 75px;
-    margin-right: 1%;
-    margin-left: 1%;
-    width:98%;
+    height: 100px;
+    min-height: 100px;
 }
 .footer a {
     text-decoration: none;
     color: #fff;
+}
+.homeNavBarLogo {
+    margin-left:-30px;
 }
 .navicon {
     height: 50px;
@@ -65,12 +67,31 @@ a {
 .navIsNotCollapsed {
     display: block;
 }
+.navIsNotCollapsedInline {
+    display: inline;
+}
 .navIsCollapsed {
     display: none;
 }
 @media (max-width: 767px) {
     body {
         padding-top: 90px;
+    }
+    .navIsNotCollapsedInline {
+        display: none;
+    }
+    .homeNavBarLogo {
+        margin-left:-13px;
+    }
+    .footer {
+        height: 50px;
+        min-height: 50px;
+    }
+    .navicon {
+        height: 30px;
+        width: 30px;
+        margin-right:10px;
+        opacity: 0.3;
     }
     .navbar-brand {
         height: 75px;
@@ -157,7 +178,9 @@ a {
 .navbar-default .navbar-nav > li > a {
     color: #000;
     text-align: center;
+    min-width: 130px;
     width: 130px;
+    min-height: 90px;
     height: 90px;
 }
 .navbar-default .navbar-nav > li > a:hover,
@@ -336,6 +359,7 @@ label.light {
 
 .leftParaTab {
     float: left;
+    z-index: 5;
     position: relative;
     margin-left:10px;
     margin-right:100px;
