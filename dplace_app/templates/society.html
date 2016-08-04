@@ -90,7 +90,7 @@ $(document).ready(function(){
 </nav>
 
 <div class="container">
-{% if society.location %}
+{% if society.location and location.lat and location.lng %}
     <div class="pull-right socMapCollapsedView" style="margin-top:30px;">
         <div id="society-map" style="width: 150px; height: 150px; vertical-align:right; border:solid 1px black;"></div>
     </div>
@@ -225,6 +225,8 @@ $(document).ready(function(){
             </div>
         {% endfor %}
     {% endif %}
+
+    {% if cultural_traits.items %}
     <h2>Cultural Trait Data</h2>
     {% for key, value in cultural_traits.items %}
         <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
@@ -276,6 +278,8 @@ $(document).ready(function(){
             </div>
         </div>
     {% endfor %}
+    {% endif %}
+
     {% if references %}
         <h2>References</h2>
         <ul>
