@@ -610,7 +610,11 @@ angular.module('dplaceMapDirective', [])
                     scope.results.societies.forEach(function(societyResult) {
                         var society = societyResult.society;
                         // Add a marker for each point
-                        var marker = {latLng: [society.location.coordinates[1], society.location.coordinates[0]], name: society.name, weburl: society.ext_id}
+                        if (society.location && society.location.coordinates[1] && society.location.coordinates[0]) {
+                            var marker = {latLng: [society.location.coordinates[1], society.location.coordinates[0]], name: society.name, weburl: society.ext_id}
+                        } else {
+                            return;
+                        }
                         
                          if (!scope.chosen) {   
                             results = scope.results;
