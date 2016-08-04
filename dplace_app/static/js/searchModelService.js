@@ -37,7 +37,7 @@ function SearchModelService(VariableCategory, GeographicRegion, EnvironmentalCat
                 else return 0;
             });
         }
-            console.log(results.variable_descriptions);
+            // console.log(results.variable_descriptions);
 
         for (var i = 0; i < results.variable_descriptions.length; i++) {
             if (results.variable_descriptions[i].variable.data_type.toUpperCase() == 'CONTINUOUS') {
@@ -88,7 +88,7 @@ function SearchModelService(VariableCategory, GeographicRegion, EnvironmentalCat
             if (val < min_value) min_value = val;
             if (val > max_value) max_value = val;
            });
-           console.log(min_value);
+           // console.log(min_value);
             var range = max_value - min_value;
             results.environmental_variables[i]['range'] = range;
             results.environmental_variables[i]['min'] = min_value.toFixed(4);

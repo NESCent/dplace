@@ -289,7 +289,7 @@ function SearchCtrl($scope, $window, $location, colorMapService, searchModelServ
            }
         }
         searchModelService.updateSearchQuery(searchQuery);
-        console.log(searchQuery);
+        // console.log(searchQuery);
         $scope.searchSocieties();
 
     };

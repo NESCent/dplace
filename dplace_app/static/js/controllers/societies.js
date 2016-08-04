@@ -358,7 +358,7 @@ function SocietiesCtrl($scope, $location, $timeout, $http, searchModelService, c
     }
     
     $scope.nexusDownload = function() {
-        console.log($scope.results.selectedTree);
+        // console.log($scope.results.selectedTree);
         var filename = $scope.results.selectedTree.name+"-d-place.NEXUS";
         string = "#NEXUS\nBEGIN TREES;\nTREE " + $scope.results.selectedTree.name+" = " + $scope.results.selectedTree.newick_string+"\nEND;"
         file = new Blob([string], {type: 'text/nexus'});

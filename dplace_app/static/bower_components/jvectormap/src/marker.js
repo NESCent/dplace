@@ -13,7 +13,7 @@ jvm.Marker = function(config){
     offsets = this.getLabelOffsets(config.code);
     this.labelX = (config.cx + offsets[0]) / this.map.scale - this.map.transX;
     this.labelY = (config.cy + offsets[1]) / this.map.scale - this.map.transY;
-    console.log(this.labelX, this.labelY);
+    // console.log(this.labelX, this.labelY);
     this.label = config.canvas.addText({
       text: text,
       'data-index': config.index,

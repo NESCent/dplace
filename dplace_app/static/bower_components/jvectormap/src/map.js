@@ -610,7 +610,7 @@ jvm.Map.prototype = {
         point = this.latLngToPoint(config.lat, config.lng);
         config.x = this.transX - point.x / this.scale;
         config.y = this.transY - point.y / this.scale;
-        console.log(config.x, config.y);
+        // console.log(config.x, config.y);
       } else if (config.x && config.y) {
         config.x *= -this.defaultWidth;
         config.y *= -this.defaultHeight;
