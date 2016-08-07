@@ -16,9 +16,8 @@ function AppCtrl($scope, $location, $http, searchModelService) {
             $('#homeLogo').css('visibility', 'visible');
         }
     };
-
-    $scope.switchToResults = function() {
-        $location.path('/societies');
+    
+        $scope.appendQueryString = function() {
         var queryObject = $scope.model.getQuery();
         var key, val;
         for (key in queryObject) {
@@ -28,8 +27,17 @@ function AppCtrl($scope, $location, $http, searchModelService) {
             }
             $location.search(key, val);
         }
+        
+    }
+    
+
+    $scope.switchToResults = function() {
+        $location.path('/societies');
+        $scope.appendQueryString();
+        
     };
     
+
     $scope.switchToSocResults = function(name) {
         $location.path('/societies/search/'+name);
     };

@@ -1,4 +1,7 @@
 function SocietiesCtrl($scope, $location, $timeout, $http, searchModelService, colorMapService, TreesFromSocieties, FindSocieties) {
+    
+    $scope.appendQueryString();
+    
     $scope.results = searchModelService.getModel().getResults();
     $scope.query = searchModelService.getModel().getQuery();
     $scope.searchModel = searchModelService.getModel();
