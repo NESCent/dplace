@@ -1,4 +1,7 @@
 function SocietiesCtrl($scope, $location, $timeout, $http, searchModelService, colorMapService, TreesFromSocieties, FindSocieties) {
+    
+    $scope.appendQueryString();
+    
     $scope.results = searchModelService.getModel().getResults();
     $scope.query = searchModelService.getModel().getQuery();
     $scope.searchModel = searchModelService.getModel();
@@ -53,7 +56,7 @@ function SocietiesCtrl($scope, $location, $timeout, $http, searchModelService, c
         forLegends();
     };
     
-    if (!$scope.searchModel.results.searched) {
+    if (!$scope.searchModel.results.searched && !$scope.searchModel.results.searchedByName) {
         var queryObject = $location.search();
         var by_name = false;
         for (var key in queryObject) {
