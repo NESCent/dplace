@@ -296,11 +296,18 @@ function SearchCtrl($scope, $window, $location, colorMapService, searchModelServ
 
     // resets this object state and the search query.
     $scope.resetSearch = function() {
-		$scope.errors = "";
-		$scope.enableSearchButton();
+        $scope.errors = "";
+        $scope.enableSearchButton();
         $scope.searchModel.reset();
         // send a notification so that the individual controllers reload their state
         $scope.$broadcast('searchModelReset');
+
+        // hide selected search criteria div if shown
+        if (!$("#selected-criteria").hasClass('hidden')) {
+            $("#selected-criteria").addClass('hidden');
+            $scope.searchCriteria = "View selected search criteria";
+            $("#search-panel").toggleClass('col-md-9', 'col-md-12');
+        }
     };
 
 }
