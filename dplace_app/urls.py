@@ -24,6 +24,13 @@ router.register(r'language_tree_labels', api_views.LanguageTreeLabelsViewSet)
 
 urlpatterns = [
 
+    #   !!!!!!  Important  !!!!!!
+    #   To reduce traffic caused by bots, spiders, etc
+    #   all URL paths with "...?param1=a&param2=b" etc. will return HTTP 404
+    #   It's set in:
+    #   - "views.py" => def angular(request): [for all pages passed to angular]
+    #   - "api_views.py" => def detail(self, request, society_id): [for /society/...?...&]
+
     url(r'^$', RedirectView.as_view(url='angular/', permanent=True), name='home'),
 
     # Redirect all static icon images (different sizes) crawled by any sites and bots
@@ -34,6 +41,10 @@ urlpatterns = [
     url(r'^browserconfig\.xml/?$', RedirectView.as_view(url='/static/images/icons/browserconfig.xml')),
 
     # This is needed in order to auto-generate sitemaps links
+    # and to pass only valid paths to angular
+    url(r'^home/?$', views.angular),
+    url(r'^search/?$', views.angular, name='search'),
+    url(r'^societies/?$', views.angular, name='societies'),
     url(r'^about/?$', views.angular, name='about'),
     url(r'^howto/?$', views.angular, name='howto'),
     url(r'^howtocite/?$', views.angular, name='howtocite'),
@@ -66,6 +77,7 @@ urlpatterns = [
     url(r'^api/v1/trees_from_societies', api_views.trees_from_societies, name='trees_from_societies'),
 
     # catch anything else and let decide angular what to do
-    url(r'^.+?/$', views.angular),
+    # [is not a good idea for stopping bots]
+    # url(r'^.+?/$', views.angular),
 
 ]

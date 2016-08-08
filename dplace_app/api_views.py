@@ -71,6 +71,11 @@ class SocietyViewSet(viewsets.ReadOnlyModelViewSet):
     lookup_field = 'ext_id'
 
     def detail(self, request, society_id):
+
+        # block spider attacks
+        if len(request.GET) > 0 and request.path.startswith('/society'):
+            raise Http404
+
         society = get_object_or_404(models.Society, ext_id=society_id)
         # gets the society's location for inset map
         location = {}

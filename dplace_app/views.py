@@ -18,4 +18,9 @@ def view_language(request, glottocode):
 
 
 def angular(request):
+
+    # block spider attacks
+    if len(request.GET) > 0 and request.path.startswith('/home'):
+        raise Http404
+
     return render(request, 'angular.html', dict())
