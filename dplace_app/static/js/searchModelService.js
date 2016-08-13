@@ -55,9 +55,9 @@ function SearchModelService(VariableCategory, GeographicRegion, EnvironmentalCat
                     
                     if (!min) min = parseFloat(c_var.split('-')[1]);
                     else {
-                        if (c_var.min < min) min = parseFloat(c_var.split('-')[1]);
+                        if (parseFloat(c_var.split('-')[1]) < min) min = parseFloat(c_var.split('-')[1]);
                     }
-                    if (c_var.max > max) max = parseFloat(c_var.split('-')[2]);
+                    if (parseFloat(c_var.split('-')[2]) > max) max = parseFloat(c_var.split('-')[2]);
                 });
                 results.variable_descriptions[i].variable['min'] = min.toFixed(2);
                 results.variable_descriptions[i].variable['max'] = max.toFixed(2);
