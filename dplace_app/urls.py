@@ -61,6 +61,7 @@ urlpatterns = [
     url(r'^language/(?P<glottocode>.*)$',
         views.view_language,
         name='view_language'),
+    url(r'^download$', views.download_file, name='download'),
     url(r'^angular/$', views.angular, name='angular'),
     # API
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
