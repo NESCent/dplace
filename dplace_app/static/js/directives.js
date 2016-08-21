@@ -351,6 +351,7 @@ angular.module('languagePhylogenyDirective', [])
                                 addMarkers(langTree, scope.results,scope.results.chosenTVariable, node, true, translate);
                             }
                         } 
+                        scope.treeDownload();
                     });
                 } 
                 else {

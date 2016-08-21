@@ -30,7 +30,7 @@ function SocietiesCtrl($scope, $location, $timeout, $http, searchModelService, c
         { title: "Tree", content: "tree", active: false},
         { title: "Download", content: "download", active: false},
     ];
-        
+
     
     var forLegends = function() {
         if ($scope.results.variable_descriptions) {
@@ -331,15 +331,18 @@ function SocietiesCtrl($scope, $location, $timeout, $http, searchModelService, c
     };
     
     $scope.treeDownload = function() {
+        try {
         var tree_svg = d3.select(".phylogeny")
             .attr("version", 1.1)
             .attr("xmlns", "http://www.w3.org/2000/svg")
             .node().parentNode.innerHTML;
+        }
+        catch(e){
+            return;
+        }
         var all_legends = {};
         legends_list = [];
         var gradients_svg = d3.select("#gradients-div").node().innerHTML;
-        
-        
         
         d3.selectAll(".legends").each( function(){
             leg = d3.select(this);
@@ -368,8 +371,9 @@ function SocietiesCtrl($scope, $location, $timeout, $http, searchModelService, c
         }
 
         $scope.toSendquery = {'l': legends_list, 't': [tree_svg], 'n': [$scope.results.selectedTree.name+'.svg']};
-        var date = new Date();
-        var filename = "dplace-tree-"+date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate()+".zip"
+         $scope.toSendquery = JSON.stringify($scope.toSendquery);
+      // var date = new Date();
+       // var filename = "dplace-tree-"+date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate()+".zip"
         //$http.post('/api/v1/zip_legends', query, {'responseType': 'arraybuffer'}).then(function(data) {
         //    file = new Blob([data.data], {type: 'application/zip'});
         //    saveAs(file, filename);
@@ -387,8 +391,6 @@ function SocietiesCtrl($scope, $location, $timeout, $http, searchModelService, c
         }
         
         $scope.treeDownload();
-        $scope.toSendquery = JSON.stringify($scope.toSendquery);
-        
     };
     
     $scope.clicked = function(trees) {
