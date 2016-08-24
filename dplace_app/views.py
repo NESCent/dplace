@@ -3,7 +3,7 @@ from django.shortcuts import render, get_object_or_404
 from dplace_app.models import Language
 from django.views.decorators.csrf import ensure_csrf_cookie
 from six import StringIO
-import csv, json, zipfile, datetime
+import csv, json, zipfile, datetime, sys
 
 def view_language(request, glottocode):
     language = get_object_or_404(Language, glottocode=glottocode)
@@ -23,7 +23,10 @@ def download_file(request):
         s = StringIO()
         zf = zipfile.ZipFile(s, "w")
         try:
-            result_set = json.loads(request.POST.get('values'))
+            if 'values' in request.POST:
+                result_set = json.loads(request.POST.get('values'))
+            else:
+                result_set = {}
             name = 'tree.svg'
             tree = ''
             if 'n' in result_set:

@@ -347,7 +347,7 @@ function SocietiesCtrl($scope, $location, $timeout, $http, searchModelService, c
         d3.selectAll(".legends").each( function(){
             leg = d3.select(this);
             if (leg.attr("var-id")) {
-               if (leg.attr("class").indexOf("hide") == -1)
+               if (leg.attr("class").indexOf("hide") == -1 && leg.attr("class").indexOf("ng-hide") == -1)
                 all_legends[leg.attr("var-id")] = leg;
             }
         });
@@ -372,12 +372,6 @@ function SocietiesCtrl($scope, $location, $timeout, $http, searchModelService, c
 
         $scope.toSendquery = {'l': legends_list, 't': [tree_svg], 'n': [$scope.results.selectedTree.name+'.svg']};
          $scope.toSendquery = JSON.stringify($scope.toSendquery);
-      // var date = new Date();
-       // var filename = "dplace-tree-"+date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate()+".zip"
-        //$http.post('/api/v1/zip_legends', query, {'responseType': 'arraybuffer'}).then(function(data) {
-        //    file = new Blob([data.data], {type: 'application/zip'});
-        //    saveAs(file, filename);
-        //});
         
     };
     

@@ -18,7 +18,7 @@ from rest_framework.renderers import JSONRenderer
 from rest_framework.reverse import reverse
 
 from dplace_app.filters import GeographicRegionFilter
-from dplace_app.renderers import DPLACECSVRenderer, ZipRenderer
+from dplace_app.renderers import DPLACECSVRenderer
 from dplace_app import serializers
 from dplace_app import models
 from dplace_app.tree import update_newick
@@ -548,22 +548,3 @@ def csv_download(request):
     response['Content-Disposition'] = 'attachment; filename="%s"' % filename
     return response
 
-@api_view(['POST'])
-@permission_classes((AllowAny,))
-@renderer_classes((ZipRenderer,))
-def zip_legends(request):
-    # query_string = request.QUERY_PARAMS['query']
-    result_set = request.data  # json.loads(query_string)
-    to_download = serializers.ZipResultSet()
-    if 't' in result_set:
-        to_download.tree = result_set['t'][0]
-    if 'n' in result_set:
-        to_download.name = result_set['n'][0]
-    if 'l' in result_set:
-        for l in result_set['l']:
-            legend = serializers.Legend(l['name'], l['svg'])
-            to_download.legends.append(legend)
-    response = Response(serializers.ZipResultSetSerializer(to_download).data)
-    filename = "dplace-trees-%s.zip" % datetime.datetime.now().strftime("%Y-%m-%d")
-    response['Content-Disposition'] = 'attachment; filename="%s"' % filename
-    return response
