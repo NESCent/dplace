@@ -165,7 +165,7 @@ class Test(APITestCase):
         self.assertIsInstance(res['index_categories'][0], dict)
 
     def test_zip_legends(self):
-        response = self.client.post(reverse('zip_legends'))
+        response = self.client.post(reverse('download'))
         self.assertIn('attachment', response['Content-Disposition'])
 
     def test_get_categories(self):
