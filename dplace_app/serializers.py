@@ -287,15 +287,3 @@ class LegendSerializer(serializers.Serializer):
     name = serializers.CharField()
     svg = serializers.CharField()
 
-
-class ZipResultSet(object):
-    def __init__(self):
-        self.tree = None
-        self.name = None
-        self.legends = []
-
-
-class ZipResultSetSerializer (serializers.Serializer):
-    tree = serializers.CharField()
-    name = serializers.CharField()
-    legends = LegendSerializer(many=True)

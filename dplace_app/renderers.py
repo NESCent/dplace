@@ -236,33 +236,3 @@ class DPLACECSVRenderer(renderers.BaseRenderer):
         return csv_buffer.getvalue()
 
 
-class ZipRenderer(renderers.BaseRenderer):
-    media_type = 'application/zip'
-    format = 'zip'
-
-    def render(self, data, accepted_media_type=None, renderer_context=None):
-        """Renders zip file for phylogeny download"""
-        if data is None:
-            return ''
-
-        s = StringIO()
-        zf = zipfile.ZipFile(s, "w")
-        try:
-            if 'legends' in data:
-                for l in data['legends'] or []:
-                    if 'svg' in l:
-                        if 'name' in l:
-                            zf.writestr(
-                                l['name'].encode('utf-8'),
-                                l['svg'].encode('utf-8')
-                            )
-            if 'tree' in data:
-                if 'name' in data:
-                    zf.writestr(
-                        (data['name'] or 'x').encode('utf-8'),
-                        (data['tree'] or '').encode('utf-8'))
-                else:
-                    zf.writestr('tree.svg', (data['tree'] or '').encode('utf-8'))
-        finally:
-            zf.close()
-        return s.getvalue()

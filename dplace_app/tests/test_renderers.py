@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from dplace_app.renderers import DPLACECSVResults, DPLACECSVRenderer, ZipRenderer
+from dplace_app.renderers import DPLACECSVResults, DPLACECSVRenderer
 
 
 class DPLACECSVResultsTestCase(TestCase):
@@ -38,20 +38,4 @@ class DPLACECSVRendererTestCase(TestCase):
     
     def test_safe_handling_of_no_data(self):
         assert self.renderer.render(data=None) == ''
-    
 
-class ZipRendererTestCase(TestCase):
-    """
-    Tests basic functionality of ZipRenderer
-    """
-    def setUp(self):
-        self.renderer = ZipRenderer()
-
-    def test_media_type(self):
-        assert self.renderer.media_type == 'application/zip'
-
-    def test_format(self):
-        assert self.renderer.format == 'zip'
-    
-    def test_safe_handling_of_no_data(self):
-        assert self.renderer.render(data=None) == ''

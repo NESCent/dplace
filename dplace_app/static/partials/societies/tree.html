@@ -47,7 +47,13 @@
             <span class="caret" style="margin-left:5px;"></span>
             </button>
           <ul class="dropdown-menu">
-            <li><a ng-click="treeDownload()">As SVG image</a></li>
+            <li>
+                <form action="/download" method="POST">
+                    <input type="hidden" name="csrfmiddlewaretoken" value="{{ cookieValue }}">
+                    <input type="hidden" name="values" value="{{toSendquery}}">
+                    <input type="submit" name="submit" value="As SVG image"/>
+                </form>
+            </li>
             <li><a ng-click="nexusDownload()">As NEXUS file</a></li>
           </ul>
     </div>
