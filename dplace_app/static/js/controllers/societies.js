@@ -422,8 +422,8 @@ function SocietiesCtrl($scope, $location, $timeout, $http, searchModelService, c
         // console.log($scope.results.selectedTree);
         var filename = $scope.results.selectedTree.name+"-d-place.NEXUS";
         string = "#NEXUS\nBEGIN TREES;\nTREE " + $scope.results.selectedTree.name+" = " + $scope.results.selectedTree.newick_string+"\nEND;"
-        file = new Blob([string], {type: 'text/nexus'});
-        saveAs(file, filename);
+        nexus_file = new Blob([string], {type: 'text/nexus'});
+        saveAs(nexus_file, filename);
     }
     
     
