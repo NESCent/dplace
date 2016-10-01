@@ -48,7 +48,7 @@ function SocietiesCtrl($scope, $location, $timeout, $http, searchModelService, c
         if ($scope.query.e) {
             $scope.variables = $scope.variables.concat($scope.results.environmental_variables);
             $scope.results.environmental_variables.forEach(function(variable) {
-             if (variable.name == "Monthly Mean Precipitation") variable.fill = "/"+window.location.href.split('/').pop()+"#blue";
+             if (variable.name == "Annual Mean Precipitation") variable.fill = "/"+window.location.href.split('/').pop()+"#blue";
                 else if (variable.name == "Monthly Mean Net Primary Production" || variable.name == "Mean Growing Season NPP") variable.fill = "/"+window.location.href.split('/').pop()+"#earthy";
                 else variable.fill = "/"+window.location.href.split('/').pop()+"#temp";
             });

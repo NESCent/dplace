@@ -70,7 +70,7 @@ function ColorMapService() {
     this.tempColor = function(index, min, max, name) {
     if (name == "Monthly Mean Net Primary Production" || name == "Mean Growing Season NPP") {
         hue = 30 + (((index - min) / (max - min)) * 88);
-    } else if (name == "Monthly Mean Precipitation"){
+    } else if (name == "Annual Mean Precipitation"){
         color = this.mapColorMonochrome(min, max, index, 252);
         return color;
     }
