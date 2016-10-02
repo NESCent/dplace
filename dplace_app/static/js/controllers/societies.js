@@ -19,6 +19,7 @@ function SocietiesCtrl($scope, $location, $timeout, $http, searchModelService, c
     $scope.query = searchModelService.getModel().getQuery();
     $scope.searchModel = searchModelService.getModel();
     $scope.csvDownloadButton = {text: 'CSV', disabled: false};
+    $scope.globalTree = false;
     $scope.variables = [];
     $scope.buttons = [];
     $scope.setActive('societies');
@@ -47,7 +48,7 @@ function SocietiesCtrl($scope, $location, $timeout, $http, searchModelService, c
         if ($scope.query.e) {
             $scope.variables = $scope.variables.concat($scope.results.environmental_variables);
             $scope.results.environmental_variables.forEach(function(variable) {
-             if (variable.name == "Monthly Mean Precipitation") variable.fill = "/"+window.location.href.split('/').pop()+"#blue";
+             if (variable.name == "Annual Mean Precipitation") variable.fill = "/"+window.location.href.split('/').pop()+"#blue";
                 else if (variable.name == "Monthly Mean Net Primary Production" || variable.name == "Mean Growing Season NPP") variable.fill = "/"+window.location.href.split('/').pop()+"#earthy";
                 else variable.fill = "/"+window.location.href.split('/').pop()+"#temp";
             });
@@ -55,7 +56,6 @@ function SocietiesCtrl($scope, $location, $timeout, $http, searchModelService, c
         if ($scope.variables.length > 0) {
             $scope.results.chosenVariable = $scope.variables[0];
         }
-        $scope.results.chosenTVariable = null;
 
     }
     
@@ -316,16 +316,17 @@ function SocietiesCtrl($scope, $location, $timeout, $http, searchModelService, c
     
     $scope.buttonChanged = function(buttonVal) {
         d3.select('language-phylogeny').html('');
-        $scope.globalTree = false;
         $scope.results.selectedTree = null;
         if (buttonVal.indexOf("global") != -1) {
             $scope.globalTree = true;
             $scope.results.selectedTree = $scope.results.language_trees.global_tree;
+            $scope.results.chosenTVariable = $scope.variables[0];
             $scope.treeSelected();
-        }
-        if (buttonVal.indexOf('phylogeny') != -1) {
+        } else if (buttonVal.indexOf('phylogeny') != -1) {
+            $scope.globalTree = false;
             $scope.trees = $scope.results.language_trees.phylogenies;
         } else {
+            $scope.globalTree = false;
             $scope.trees = $scope.results.language_trees.glotto_trees;
         }
     };
@@ -346,28 +347,45 @@ function SocietiesCtrl($scope, $location, $timeout, $http, searchModelService, c
         
         d3.selectAll(".legends").each( function(){
             leg = d3.select(this);
-            if (leg.attr("var-id")) {
-               if (leg.attr("class").indexOf("hide") == -1 && leg.attr("class").indexOf("ng-hide") == -1)
-                all_legends[leg.attr("var-id")] = leg;
+            if (leg.attr("var-id") && leg.attr("class").indexOf("hide") == -1) {
+               if ($scope.globalTree) {
+                   if ($scope.results.chosenTVariable.var_id) {
+                       if (leg.attr("var-id") == $scope.results.chosenTVariable.var_id) 
+                        all_legends[leg.attr("var-id")] = leg;
+                    
+                   } else if (parseInt(leg.attr("var-id")) == $scope.results.chosenTVariable.id) {
+                       all_legends[leg.attr("var-id")] = leg;
+                   }
+               } else 
+                    all_legends[leg.attr("var-id")] = leg;
             }
         });
-            
+                    
         for (var i = 0; i < $scope.results.variable_descriptions.length; i++) {
             id = $scope.results.variable_descriptions[i].variable.id;
+            name = ''
+            if (!all_legends[id]) continue;
             legend_id = all_legends[id];
-            name = $scope.results.variable_descriptions[i].CID + '-'+ $scope.results.variable_descriptions[i].variable.name;
+            if ($scope.results.variable_descriptions[i].CID) name += $scope.results.variable_descriptions[i].CID + '-';
+            name += $scope.results.variable_descriptions[i].variable.name;
             svg_string = legend_id.node().innerHTML;
             svg_string = svg_string.replace(/url\(.*?#/, 'url(#');
             svg_string = '<svg version="1.1" xmlns="http://www.w3.org/2000/svg" transform="translate(10, 10)">' + svg_string + gradients_svg + '</svg>';
             legends_list.push({'name': name.replace(/[\W]+/g, "-")+'-legend.svg', 'svg': svg_string});    
         }
-        
+                
         for (var i = 0; i < $scope.results.environmental_variables.length; i++) {
-            env_svg = d3.select("#e"+$scope.results.environmental_variables[i].id).select("div").node().innerHTML;
-            env_svg = env_svg.replace(/url\(.*?#/, 'url(#');
-            env_svg = '<svg version="1.1" xmlns="http://www.w3.org/2000/svg" transform="translate(10, 10)">'+env_svg.substring(0, env_svg.indexOf("</svg>")) + '</svg>' + gradients_svg + '</svg>';
-            name = $scope.results.environmental_variables[i].CID + '-'+$scope.results.environmental_variables[i].name;
-            legends_list.push({'name': name.replace(/[\W]+/g, "-")+'-legend.svg', 'svg': env_svg});
+            id = $scope.results.environmental_variables[i].var_id;
+            name = ''
+            if (!all_legends[id]) continue;
+            legend_id = all_legends[id];
+            if ($scope.results.environmental_variables[i].CID) name += $scope.results.environmenal_variables[i].CID;
+            name += $scope.results.environmental_variables[i].name;
+            svg_string = legend_id.node().innerHTML;
+            console.log(svg_string);
+            svg_string = svg_string.replace(/url\(.*?#/, 'url(#');
+            svg_string = '<svg version="1.1" xmlns="http://www.w3.org/2000/svg" transform="translate(10, 10)">'+svg_string + gradients_svg + '</svg>';
+            legends_list.push({'name': name.replace(/[\W]+/g, "-")+'-legend.svg', 'svg': svg_string});
         }
 
         $scope.toSendquery = {'l': legends_list, 't': [tree_svg], 'n': [$scope.results.selectedTree.name+'.svg']};
