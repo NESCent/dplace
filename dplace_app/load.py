@@ -62,10 +62,10 @@ def main():  # pragma: no cover
     ]:
         with transaction.atomic():
             loader, args = spec[0], spec[1:]
-            print loader.__name__, '...'
+            print("%s..." % loader.__name__)
             start = time()
             res = loader(*args)
-            print res, 'loaded in', time() - start, 'secs'
+            print("%s loaded in %s secs" % (res, time() - start))
 
 
 if __name__ == '__main__':  # pragma: no cover
