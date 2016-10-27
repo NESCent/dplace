@@ -8,3 +8,4 @@ datasets
 uploads
 .DS_Store
 language_trees
+node_modules
