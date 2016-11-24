@@ -227,23 +227,23 @@ def result_set_from_query_dict(query_dict):
     if 'c' in query_dict:
         variables = {
             v.id: v for v in models.CulturalVariable.objects
-            .filter(id__in=[int(x.split('-')[0]) for x in query_dict['c']])
+            .filter(id__in=[int(str(x).split('-')[0]) for x in query_dict['c']])
             .prefetch_related(Prefetch(
                 'codes',
                 queryset=models.CulturalCodeDescription.objects
-                .filter(id__in=[int(x.split('-')[1]) for x in query_dict['c'] if len(x.split('-')) == 2])))
+                .filter(id__in=[int(str(x).split('-')[1]) for x in query_dict['c'] if len(str(x).split('-')) == 2])))
         }
 
         for variable, codes in groupby(
-            sorted(query_dict['c'], key=lambda c: int(c.split('-')[0])),
-            key=lambda x: int(x.split('-')[0])
+            sorted(query_dict['c'], key=lambda c: int(str(c).split('-')[0])),
+            key=lambda x: int(str(x).split('-')[0])
         ):
             variable = variables[variable]
             
             codes = [{
-                'id': None if (len(c.split('-')) > 2 or len(c.split('-')) == 1) else int(c.split('-')[1]),
-                'min': None if len(c.split('-')) < 3 else float(c.split('-')[1]),
-                'max': None if len(c.split('-')) < 3 else float(c.split('-')[2])
+                'id': None if (len(str(c).split('-')) > 2 or len(str(c).split('-')) == 1) else int(str(c).split('-')[1]),
+                'min': None if len(str(c).split('-')) < 3 else float(str(c).split('-')[1]),
+                'max': None if len(str(c).split('-')) < 3 else float(str(c).split('-')[2])
             } for c in list(codes)]
             
             alias = 'cv%s' % variable.id
