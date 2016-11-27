@@ -236,7 +236,7 @@ function SearchCtrl($scope, $window, $location, colorMapService, searchModelServ
                         if ('max' in codes[i]) {
                             pruned += '-' + codes[i].max;
                         }
-                        searchQuery['c'].push(pruned);
+                        searchQuery['c'].push(pruned.toString());
                     }
                 }
             }
