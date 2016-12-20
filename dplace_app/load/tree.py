@@ -3,7 +3,7 @@ import logging
 import os
 from collections import defaultdict
 
-from django.core.files import File
+from django.core.files.base import ContentFile
 from nexus import NexusReader
 from ete2 import Tree
 from ete2.coretype.tree import TreeError
@@ -26,21 +26,21 @@ def _tree_names(tree_name, items, label_sequences):
         tree = LanguageTree.objects.get(name=tree_name+'.trees')
     except:
         return False
-        
+
     try:
         newick = Tree(tree.newick_string, format=1)
     except TreeError:
         return False
-        
+
     for item in items:
         name_on_tip = item['Name_on_tree_tip']
         xd_ids = [i.strip() for i in item['xd_id'].split(',')]
         society_ids = [i.strip() for i in item['soc_id'].split(',')]
         order = item['fixed_order']
-        
+
         if not xd_ids: # pragma: no cover
             continue
-        
+
         label, created = LanguageTreeLabels.objects.get_or_create(
             languageTree=tree,
             label=name_on_tip
@@ -61,7 +61,7 @@ def _tree_names(tree_name, items, label_sequences):
             )
     tree.save()
     return True
-    
+
 
 def load_trees(tree_dir, verbose=False):
     l_by_iso, l_by_glotto, l_by_name = \
@@ -91,14 +91,12 @@ def load_trees(tree_dir, verbose=False):
 
 def _load_tree(file_name, get_language, verbose=False):
     # make a tree if not exists. Use the name of the tree
-    tree, created = LanguageTree.objects.get_or_create(
-        name=os.path.basename(file_name)
-    )
+    tree, created = LanguageTree.objects.get_or_create(name=os.path.basename(file_name))
     if not created:
         return False
 
-    with open(file_name, 'r') as f:
-        tree.file = File(f)
+    with open(file_name, 'rb') as f:
+        tree.file = ContentFile(f.read())
         tree.save()
 
     # now add languages to the tree
@@ -110,7 +108,7 @@ def _load_tree(file_name, get_language, verbose=False):
         newick = newick[newick.index('=') + 1:]
     except ValueError:  # pragma: no cover
         newick = newick
-        
+
     if verbose:  # pragma: no cover
         logging.info("Formatting newick string %s" % (newick))
         
@@ -118,7 +116,7 @@ def _load_tree(file_name, get_language, verbose=False):
     if 'global' not in file_name and'glotto' not in file_name:
         tree.save()
         return True
-       
+
     # phylogeny taxa require reading of CSV mapping files, glottolog trees do not
     for taxon_name in reader.trees.taxa:
         if taxon_name is '1':
