@@ -34,8 +34,9 @@ CLASSIFICATION_SCHEMES = (
 
 
 class ISOCode(models.Model):
-    iso_code = models.CharField(
-        'ISO Code', db_index=True, max_length=3, unique=True, null=False)
+    iso_code = models.CharField('ISO Code',
+        db_index=True, max_length=3, unique=True, null=False
+    )
 
     def __unicode__(self):
         return self.iso_code
@@ -45,14 +46,22 @@ class ISOCode(models.Model):
 
 
 class Society(models.Model):
-    ext_id = models.CharField('External ID', db_index=True, unique=True, max_length=20)
-    xd_id = models.CharField('Cross ID', db_index=True, default=None, null=True, max_length=10)
+    ext_id = models.CharField('External ID',
+        db_index=True, unique=True, max_length=20
+    )
+    xd_id = models.CharField('Cross ID',
+        db_index=True, default=None, null=True, max_length=10
+    )
     name = models.CharField('Name', db_index=True, max_length=200)
     latitude = models.FloatField('Latitude', null=True)
     longitude = models.FloatField('Longitude', null=True)
-    focal_year = models.CharField('Focal Year', null=True, blank=True, max_length=100)
+    focal_year = models.CharField('Focal Year',
+        null=True, blank=True, max_length=100
+    )
     alternate_names = models.TextField(default="")
-    original_name = models.CharField('ORIG_name', max_length=200, default=None, null=True)
+    original_name = models.CharField('ORIG_name',
+        max_length=200, default=None, null=True
+    )
     original_latitude = models.FloatField('ORIG_latitude', null=True)
     original_longitude = models.FloatField('ORIG_longitude', null=True)
     
@@ -61,7 +70,9 @@ class Society(models.Model):
     language = models.ForeignKey('Language', null=True, related_name="societies")
     
     hraf_link = models.CharField('HRAF', null=True, default=None, max_length=200)
-    chirila_link = models.CharField('CHIRILA', default = None, null=True, max_length=200)
+    chirila_link = models.CharField('CHIRILA',
+        default = None, null=True, max_length=200
+    )
 
     @property
     def location(self):
@@ -222,9 +233,12 @@ class CulturalCodeDescription(models.Model):
     This model is not used by every value in the EA.
 
     """
-    variable = models.ForeignKey('CulturalVariable', db_index=True, related_name="codes")
+    variable = models.ForeignKey('CulturalVariable',
+        db_index=True, related_name="codes"
+    )
     code = models.CharField(
-        max_length=20, db_index=True, null=False, default='.')
+        max_length=20, db_index=True, null=False, default='.'
+    )
     code_number = models.IntegerField(null=True, db_index=True)
     description = models.CharField(max_length=500, default='Unknown')
     short_description = models.CharField(max_length=500, default="")

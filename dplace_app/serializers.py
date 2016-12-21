@@ -12,7 +12,7 @@ SEARCH_GEOGRAPHIC = 'g'
 class SourceSerializer(serializers.ModelSerializer):
     class Meta(object):
         model = models.Source
-
+        fields = '__all__'
 
 # Cultural Trait Variables
 class CulturalCodeDescriptionSerializer(serializers.ModelSerializer):
@@ -86,26 +86,30 @@ class CulturalValueSerializer(serializers.ModelSerializer):
 class ISOCodeSerializer(serializers.ModelSerializer):
     class Meta(object):
         model = models.ISOCode
-
+        fields = '__all__'
 
 class EnvironmentalCategorySerializer(serializers.ModelSerializer):
     class Meta(object):
         model = models.EnvironmentalCategory
+        fields = '__all__'
 
 
 class EnvironmentalVariableSerializer(serializers.ModelSerializer):
     class Meta(object):
         model = models.EnvironmentalVariable
+        fields = '__all__'
 
 
 class EnvironmentalValueSerializer(serializers.ModelSerializer):
     class Meta(object):
         model = models.EnvironmentalValue
+        fields = '__all__'
 
 
 class LanguageFamilySerializer(serializers.ModelSerializer):
     class Meta(object):
         model = models.LanguageFamily
+        fields = '__all__'
 
 
 class LanguageSerializer(serializers.ModelSerializer):
