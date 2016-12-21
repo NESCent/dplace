@@ -1,7 +1,11 @@
 from __future__ import unicode_literals
+import os
+from tempfile import mkdtemp
 from collections import defaultdict
+from shutil import rmtree
 
 from django.test import TestCase
+from django.conf import settings
 
 from dplace_app.models import *
 from dplace_app.load.util import csv_dict_reader, var_number_to_label, configure_logging
@@ -22,7 +26,21 @@ class LoadTestCase(TestCase):
     """
     def setUp(self):
         TestCase.setUp(self)
+        self._prev_mr = settings.MEDIA_ROOT
+        self.media = settings.MEDIA_ROOT = mkdtemp()
+        os.makedirs(os.path.join(self.media, 'language_trees'))
         configure_logging(test=True)
+
+    def tearDown(self):
+        rmtree(self.media, ignore_errors=True)
+        settings.MEDIA_ROOT = self._prev_mr
+        TestCase.tearDown(self)
+
+    def _fixture_teardown(self):
+        try:
+            TestCase._fixture_teardown(self)
+        except:
+            pass
 
     def get_dict(self, **kw):
         return defaultdict(lambda: '', **kw)
@@ -51,23 +69,23 @@ class LoadTestCase(TestCase):
         lang.save()
         load_societies(csv_dict_reader(data_path('societies.csv')))
         society = Society.objects.create(
-            ext_id = '455',
-            xd_id = 'xd455',
-            name = 'test',
+            ext_id='455',
+            xd_id='xd455',
+            name='test',
             language=lang
         )
         society.save()
-        res = load_trees(data_path())
-        self.assertEqual(res, 2)
+
+        self.assertEqual(load_trees(data_path()), 2)
         sequences = tree_names(data_path())
         #labels should be created for the 5 societies in the semitic tree in societies.csv, plus the test society above
         self.assertEqual(sequences, 6)
-        
+
         tree = LanguageTree.objects.filter(name='Abkhaz-Adyge.glotto.trees').first()
         label = LanguageTreeLabels.objects.filter(label='ubyk1235').first()
         self.assertIn(label, tree.taxa.all())
         self.assertIn(society, label.societies.all())
-        
+
         tree = LanguageTree.objects.filter(name='semitic.trees').first()
         labels = LanguageTreeLabels.objects.filter(label='Amharic').first()
         self.assertEqual(tree.taxa.count(), 25)
