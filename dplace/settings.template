@@ -95,6 +95,9 @@ MIDDLEWARE_CLASSES = (
 
 ROOT_URLCONF = 'dplace.urls'
 
+# Since Django 1.10 the max number of fields was set to 1000
+DATA_UPLOAD_MAX_NUMBER_FIELDS = 3000
+
 # Python dotted path to the WSGI application used by Django's runserver.
 WSGI_APPLICATION = 'dplace.wsgi.application'
 
