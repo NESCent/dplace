@@ -25,11 +25,13 @@
             <td ng-repeat="variable in results.variable_descriptions">
             <div ng-repeat="coded_value in society_result.variable_coded_values|formatVariableCodeValues:variable.variable" ng-show="coded_value">
                 {{ coded_value|formatValue }} {{ variable.variable.units }}
-                <a ng-show="coded_value.references.length > 0" data-toggle="collapse" data-target="#s{{society_result.society.ext_id}}{{variable.variable.label}}" class="source-link">(Source)</a>
+                <a ng-show="coded_value.references.length > 0" data-toggle="collapse" data-target="#s{{society_result.society.ext_id}}{{variable.variable.label}}" class="source-link">(Source<span ng-show="coded_value.references.length > 1">s</span>)</a>
                 <a ng-show="coded_value.comment.length > 0 || coded_value.subcase.length > 0 || (coded_value.focal_year.length > 0 && coded_value.focal_year != 'NA')" class="comment-tooltip" tooltip = "{{ coded_value|formatComment }}">
                     <span class="glyphicon glyphicon-comment" aria-hidden="true"></span></a>
                 <div id="s{{society_result.society.ext_id}}{{variable.variable.label}}" class="collapse val-sources">
-                    {{ coded_value | formatValueSources }}
+                    • <span ng-repeat="cv in coded_value.references|orderBy:['author','year']" ><a
+                    popover="{{cv.reference}}" popover-placement="left"
+                    popover-title="{{cv.author}} ({{cv.year}})">{{cv.author}} ({{cv.year}})</a> • </span>
                 </div>
                 <div ng-show="(society_result.variable_coded_values|numValues:variable.variable.id ) > 0" style="font-size:12px;"> {{ society_result.variable_coded_values|numValues:variable.variable.id }} more values for this society</div>
 
