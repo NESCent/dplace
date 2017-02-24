@@ -11,7 +11,7 @@ export LC_ALL="en_US.UTF-8"
 
 BASEDIR=$(dirname $0)
 
-REPO_SRC="git@github.com:SimonGreenhill/dplace-data.git"
+REPO_SRC="git@github.com:D-PLACE/dplace-data.git"
 REPO_DEST="${BASEDIR}/datasets"
 DPLACE_PATH="${BASEDIR}"
 
