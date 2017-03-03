@@ -6,7 +6,7 @@ djangorestframework==3.5.4
 djangorestframework-csv==2.0.0
 djangorestframework-gis==0.11
 ete2==2.3.10
-psycopg2==2.6.2
+psycopg2==2.7
 python-nexus==1.35
 six==1.10.0
 wsgiref==0.1.2
