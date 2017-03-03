@@ -1,4 +1,4 @@
-Django==1.10.4
+Django==1.10.6
 django-appconf==1.0.2
 django-bootstrap3==7.1.0
 django-filter==1.0.1
