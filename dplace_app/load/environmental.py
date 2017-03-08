@@ -7,7 +7,7 @@ from django.conf import settings
 from dplace_app.models import ISOCode, Society, LanguageFamily
 from dplace_app.models import EnvironmentalCategory
 from dplace_app.models import EnvironmentalVariable, EnvironmentalValue
-from sources import get_source
+from dplace_app.load.sources import get_source
 
 _ISO_CODES = None
 
