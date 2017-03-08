@@ -9,7 +9,6 @@ ete3==3.0.0b35
 psycopg2==2.7
 python-nexus==1.42
 six==1.10.0
-wsgiref==0.1.2
 coverage==4.3.4
 flake8==3.3.0
 newick==0.7
