@@ -5,7 +5,7 @@ django-filter==1.0.1
 djangorestframework==3.5.4
 djangorestframework-csv==2.0.0
 djangorestframework-gis==0.11
-ete2==2.3.10
+ete3==3.0.0b35
 psycopg2==2.7
 python-nexus==1.42
 six==1.10.0
