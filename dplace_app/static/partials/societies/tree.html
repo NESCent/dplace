@@ -58,7 +58,9 @@
           </ul>
     </div>
 
-    <p ng-show="results.selectedTree" style="width:500px">Note: trees have been pruned to display only societies present in D-PLACE.</p>
+    <p ng-show="results.selectedTree" style="width:500px">
+        Note: trees have been pruned to display only societies present in D-PLACE.</p>
+        <blockquote ng-show="results.selectedTree.source">{{ results.selectedTree.source.reference }}</blockquote>
     <language-phylogeny>
     
     </language-phylogeny>

@@ -29,17 +29,20 @@ SOURCE_DATA = {
     'SCCS': dict(
         year="1969",
         author="Murdock",
-        reference=""
+        reference="",
+        name="SCCS",
     ),
     'WNAI': dict(
         year="1966",
         author="Jorgensen",
-        reference=""
+        reference="",
+        name="WNAI",
     ),
     'Jorgensen': dict(
         year="1966",
         author="Jorgensen",
-        reference=""
+        reference="",
+        name="Jorgensen",
     )
 }
 assert all(dataset in SOURCE_DATA for dataset in settings.DATASETS)
