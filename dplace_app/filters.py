@@ -2,7 +2,7 @@ from rest_framework_gis.filterset import GeoFilterSet
 from rest_framework_gis.filters import GeometryFilter
 import django_filters
 
-from models import GeographicRegion
+from dplace_app.models import GeographicRegion
 
 
 class GeographicRegionFilter(GeoFilterSet):
