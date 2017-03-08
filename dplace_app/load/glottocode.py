@@ -4,7 +4,7 @@ from collections import defaultdict
 
 from dplace_app.models import Language, ISOCode, Society, LanguageFamily
 
-from util import delete_all
+from dplace_app.load.util import delete_all
 
 
 def xd_to_language(items, languoids):

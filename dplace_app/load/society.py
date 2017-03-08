@@ -6,8 +6,8 @@ from django.conf import settings
 
 from dplace_app.models import Society, GeographicRegion
 
-from util import delete_all
-from sources import get_source
+from dplace_app.load.util import delete_all
+from dplace_app.load.sources import get_source
 
 
 def society_locations(items):

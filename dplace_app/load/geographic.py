@@ -2,7 +2,7 @@ import json
 
 from dplace_app.models import GeographicRegion
 
-from util import delete_all
+from dplace_app.load.util import delete_all
 
 
 def load_regions(geojson):

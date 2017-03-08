@@ -2,8 +2,8 @@
 import logging
 from dplace_app.models import CulturalVariable, CulturalCategory, CulturalCodeDescription
 
-from sources import get_source
-from util import var_number_to_label
+from dplace_app.load.sources import get_source
+from dplace_app.load.util import var_number_to_label
 
 
 def clean_category(category):

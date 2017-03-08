@@ -8,8 +8,8 @@ from django.conf import settings
 from dplace_app.models import (
     Society, Source, CulturalValue, CulturalVariable, CulturalCodeDescription,
 )
-from sources import get_source
-from util import var_number_to_label
+from dplace_app.load.sources import get_source
+from dplace_app.load.util import var_number_to_label
 
 
 BINFORD_REF_PATTERN = re.compile('(?P<author>[^0-9]+)(?P<year>[0-9]{4}a-z?):')
