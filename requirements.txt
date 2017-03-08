@@ -12,3 +12,5 @@ six==1.10.0
 wsgiref==0.1.2
 coverage==4.2
 flake8==3.2.1
+newick==0.7
+clldutils==1.9.4

@@ -1,10 +1,9 @@
 # coding: utf8
 from __future__ import unicode_literals
-import csv
 import logging
 
-from six import BytesIO
 from django.db import connection
+from clldutils.dsv import reader
 
 
 DATASET_SHORT = {'Binford': 'B'}
@@ -13,9 +12,7 @@ DATASET_SHORT = {'Binford': 'B'}
 def delete_all(model):
     model.objects.all().delete()
     with connection.cursor() as c:
-        c.execute(
-            "ALTER SEQUENCE %s_id_seq RESTART WITH 1" % model._meta.db_table
-        )
+        c.execute("ALTER SEQUENCE %s_id_seq RESTART WITH 1" % model._meta.db_table)
 
 
 def var_number_to_label(dataset, number):
@@ -40,27 +37,9 @@ def configure_logging(test=False):
     logger.addHandler(ch)
 
 
-def stream(fname):
-    with open(fname, 'rb') as fp:
-        stream_ = BytesIO(fp.read())
-        stream_.seek(0)
-        return stream_
-
-
 def csv_reader(fname):
-    for row in csv.reader(stream(fname)):
-        yield [
-            col if col is None else col.decode('utf8').strip() for col in row
-        ]
+    return reader(fname)
 
 
 def csv_dict_reader(fname):
-    for dict_row in csv.DictReader(stream(fname)):
-        for k in dict_row:
-            if dict_row[k] is None:
-                continue
-            try:
-                dict_row[k] = dict_row[k].decode('utf8').strip()
-            except:
-                logging.warn('cannot decode row item %s in %s' % (k, dict_row))
-        yield dict_row
+    return reader(fname, dicts=True)

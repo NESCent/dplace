@@ -205,10 +205,11 @@ class LanguageTreeLabelsSerializer(serializers.ModelSerializer):
 
 class LanguageTreeSerializer(serializers.ModelSerializer):
     taxa = LanguageTreeLabelsSerializer(many=True)
+    source = SourceSerializer()
 
     class Meta(object):
         model = models.LanguageTree
-        fields = ('id', 'name', 'taxa', 'newick_string')
+        fields = ('id', 'name', 'taxa', 'newick_string', 'source')
         
 
 class SocietyResult(object):
