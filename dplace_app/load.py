@@ -58,7 +58,7 @@ def main():  # pragma: no cover
         (load_environmental_var, csv_items('environmentalVariableList.csv')),
         (load_environmental, csv_items('environmental_data.csv')),
         (load_trees, data_path()),
-        (tree_names, data_path('csv')),
+        (tree_names, data_path()),
         (prune_trees,),
     ]:
         with transaction.atomic():
