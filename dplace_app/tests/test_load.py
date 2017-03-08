@@ -81,12 +81,12 @@ class LoadTestCase(TestCase):
         #labels should be created for the 5 societies in the semitic tree in societies.csv, plus the test society above
         self.assertEqual(sequences, 6)
 
-        tree = LanguageTree.objects.filter(name='Abkhaz-Adyge.glotto.trees').first()
+        tree = LanguageTree.objects.filter(name='Abkhaz-Adyge.glotto').first()
         label = LanguageTreeLabels.objects.filter(label='ubyk1235').first()
         self.assertIn(label, tree.taxa.all())
         self.assertIn(society, label.societies.all())
 
-        tree = LanguageTree.objects.filter(name='semitic.trees').first()
+        tree = LanguageTree.objects.filter(name='semitic').first()
         labels = LanguageTreeLabels.objects.filter(label='Amharic').first()
         self.assertEqual(tree.taxa.count(), 25)
         self.assertEqual(labels.societies.count(), 3)

@@ -7,9 +7,14 @@ from django.core.files.base import ContentFile
 from nexus import NexusReader
 from ete2 import Tree
 from ete2.coretype.tree import TreeError
-from dplace_app.models import Society, LanguageTree, Language, LanguageTreeLabels, LanguageTreeLabelsSequence
+from dplace_app.models import (
+    Society, LanguageTree, Language, LanguageTreeLabels, LanguageTreeLabelsSequence,
+    Source,
+)
 from dplace_app.tree import update_newick
 from util import csv_dict_reader
+from clldutils.path import Path
+from clldutils import dsv
 
 
 def tree_names(name_dir):
@@ -23,7 +28,7 @@ def tree_names(name_dir):
 
 def _tree_names(tree_name, items, label_sequences):
     try:
-        tree = LanguageTree.objects.get(name=tree_name+'.trees')
+        tree = LanguageTree.objects.get(name=tree_name)
     except:
         return False
 
@@ -63,7 +68,8 @@ def _tree_names(tree_name, items, label_sequences):
     return True
 
 
-def load_trees(tree_dir, verbose=False):
+def load_trees(data_dir, verbose=False):
+    data_dir = Path(data_dir)
     l_by_iso, l_by_glotto, l_by_name = \
         defaultdict(list), defaultdict(list), defaultdict(list)
 
@@ -82,25 +88,50 @@ def load_trees(tree_dir, verbose=False):
             return l_by_name[taxon_name]
 
     count = 0
-    for fname in os.listdir(tree_dir):
-        if fname.endswith('.trees'):
-            if _load_tree(os.path.join(tree_dir, fname), get_language):
+    if data_dir.joinpath('phylogenies', 'phylogenies.csv').exists():
+        for phylo in dsv.reader(
+                data_dir.joinpath('phylogenies', 'phylogenies.csv'), dicts=True):
+            fname = data_dir.joinpath('phylogenies', phylo['Directory'])
+            assert fname.is_dir() and fname.joinpath('summary.trees').exists()
+            taxa_map = dsv.reader(fname.joinpath('languages.csv'), dicts=True)
+            if _load_tree(
+                    fname.name,
+                    fname.joinpath('summary.trees'),
+                    get_language,
+                    taxa_map={d['Taxon']: d['GlottoCode'] for d in taxa_map},
+                    source=phylo):
+                count += 1
+
+    for fname in data_dir.joinpath('trees').iterdir():
+        if fname.name.endswith('.trees'):
+            if _load_tree(fname.stem, fname, get_language):
                 count += 1
     return count
 
 
-def _load_tree(file_name, get_language, verbose=False):
+def _load_tree(name, fname, get_language, verbose=False, taxa_map=None, source=None):
+    # now add languages to the tree
+    try:
+        reader = NexusReader(fname.as_posix())
+    except:
+        print(fname)
+        return False
+
     # make a tree if not exists. Use the name of the tree
-    tree, created = LanguageTree.objects.get_or_create(name=os.path.basename(file_name))
+    tree, created = LanguageTree.objects.get_or_create(name=name)
     if not created:
         return False
 
-    with open(file_name, 'rb') as f:
+    if source:
+        source = Source.objects.create(
+            **{k.lower(): source[k] for k in 'Year Author Name Reference'.split()})
+        source.save()
+        tree.source = source
+
+    with open(fname.as_posix(), 'rb') as f:
         tree.file = ContentFile(f.read())
         tree.save()
 
-    # now add languages to the tree
-    reader = NexusReader(file_name)
     # Remove '[&R]' from newick string
     reader.trees.detranslate()
     newick = re.sub(r'\[.*?\]', '', reader.trees.trees[0])
@@ -113,15 +144,19 @@ def _load_tree(file_name, get_language, verbose=False):
         logging.info("Formatting newick string %s" % (newick))
         
     tree.newick_string = str(newick)
-    if 'global' not in file_name and'glotto' not in file_name:
-        tree.save()
-        return True
+    #if 'global' not in fname.name and 'glotto' not in fname.name:
+    #    tree.save()
+    #    return True
 
     # phylogeny taxa require reading of CSV mapping files, glottolog trees do not
     for taxon_name in reader.trees.taxa:
         if taxon_name is '1':
             continue  # pragma: no cover
-        languages = get_language(taxon_name)
+
+        if taxa_map:
+            languages = get_language(taxa_map.get(taxon_name))
+        else:
+            languages = get_language(taxon_name)
         if not languages:
             continue
 
