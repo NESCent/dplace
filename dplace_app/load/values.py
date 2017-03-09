@@ -9,19 +9,18 @@ from dplace_app.models import (
     Society, Source, CulturalValue, CulturalVariable, CulturalCodeDescription,
 )
 from sources import get_source
-from util import var_number_to_label
 
 
 BINFORD_REF_PATTERN = re.compile('(?P<author>[^0-9]+)(?P<year>[0-9]{4}a-z?):')
 
 
-def load_data(items):
+def load_data(datasets):
     refs = []
     objs = []
+    societies = {s.ext_id: s for s in Society.objects.all()}
+    variables = {vd.label: vd for vd in CulturalVariable.objects.all()}
     kw = dict(
-        societies={s.ext_id: s for s in Society.objects.all()},
         sources={(s.author, s.year): s for s in Source.objects.all()},
-        variables={vd.label: vd for vd in CulturalVariable.objects.all()},
         descriptions={(vcd.variable_id, vcd.code): vcd
                       for vcd in CulturalCodeDescription.objects.all()})
 
@@ -39,25 +38,26 @@ def load_data(items):
 
     inserted = set()
     pk = 0
-    for i, item in enumerate(items):
-        if item['Dataset'] not in settings.DATASETS:
+    for ds in datasets:
+        if ds.id not in settings.DATASETS:
             continue
-        res = _load_data(item, **kw)
-        if res:
-            key = (
-                res[0]['variable'].label,
-                res[0]['society'].ext_id,
-                res[0]['coded_value'],
-                res[0]['focal_year'],
-                res[0]['comment'],
-                res[0]['subcase'])
-            if key in inserted:  # pragma: no cover
-                logging.warn("duplicate value %s" % item)
-            else:
-                inserted.add(key)
-                pk += 1
-                objs.append(CulturalValue(**res[0]))
-                refs.extend([(pk, sid) for sid in res[1] or []])
+        for item in ds.data:
+            res = _load_data(ds, item, societies[item.soc_id], variables[item.var_label], **kw)
+            if res:
+                key = (
+                    res[0]['variable'].label,
+                    res[0]['society'].ext_id,
+                    res[0]['coded_value'],
+                    res[0]['focal_year'],
+                    res[0]['comment'],
+                    res[0]['subcase'])
+                if key in inserted:  # pragma: no cover
+                    logging.warn("duplicate value %s" % item)
+                else:
+                    inserted.add(key)
+                    pk += 1
+                    objs.append(CulturalValue(**res[0]))
+                    refs.extend([(pk, sid) for sid in res[1] or []])
 
     CulturalValue.objects.bulk_create(objs, batch_size=1000)
 
@@ -70,39 +70,22 @@ VALUES (%s, %s)""",
     return CulturalValue.objects.count()
 
 
-def _load_data(val_row, societies=None, sources=None, variables=None, descriptions=None):
-    ext_id = val_row.get('soc_id')
-    if ext_id not in societies:
-        logging.warn(
-            "Attempting to load values for %s but no Society object exists, skipping"
-            % ext_id)
-        return
-
-    society = societies[ext_id]
-    variable_id = val_row['VarID']
-
-    variable = variables.get(var_number_to_label(val_row['Dataset'], variable_id))
-    if variable is None:
-        logging.warn(
-            "Could not find variable %s for society %s" % (variable_id, society.name))
-        return
-
+def _load_data(ds, val, society, variable, sources=None, descriptions=None):
     v = dict(
         variable=variable,
         society=society,
-        source=get_source(val_row['Dataset']),
-        coded_value=val_row['Code'],
-        code=descriptions.get((variable.id, val_row['Code'].strip())),
-        focal_year=val_row['Year'],
-        comment=val_row['Comment'],
-        subcase=val_row['SubCase'])
+        source=get_source(ds),
+        coded_value=val.code,
+        code=descriptions.get((variable.id, val.code)),
+        focal_year=val.year,
+        comment=val.comment,
+        subcase=val.sub_case)
 
-    if variable.data_type == 'Continuous' and val_row['Code'] and val_row['Code'] != 'NA':
-        v['coded_value_float'] = float(val_row['Code'])
+    if variable.data_type == 'Continuous' and val.code and val.code != 'NA':
+        v['coded_value_float'] = float(val.code)
 
     refs = set()
-    for r in val_row['EthnoReferences'].split(";"):
-        r = r.strip()
+    for r in val.references:
         author, year = None, None
         m = BINFORD_REF_PATTERN.match(r)
         if m:

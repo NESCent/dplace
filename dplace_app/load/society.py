@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 import logging
 
 from django.conf import settings
+from clldutils.dsv import reader
 
 from dplace_app.models import Society, GeographicRegion
 
@@ -10,30 +11,18 @@ from util import delete_all
 from sources import get_source
 
 
-def society_locations(items):
+def society_locations(fname):
     societies = {s.ext_id: s for s in Society.objects.all()}
     regions = {r.region_nam: r for r in GeographicRegion.objects.all()}
-    
+
     count = 0
-    for item in items:
+    for item in reader(fname, dicts=True):
         if item['dataset'] not in settings.DATASETS:
             continue
         society = societies.get(item['soc_id'])
         if not society:
             logging.warn("No matching society found for %s" % item)
             continue
-
-        try:
-            society.latitude, society.longitude = map(
-                float, [item['Lat'], item['Long']])
-        except (TypeError, ValueError):
-            logging.warn("Unable to create coordinates for %s" % item)
-        
-        try:
-            society.original_latitude, society.original_longitude = map(
-                float, [item['origLat'], item['origLong']])
-        except (TypeError, ValueError):
-            logging.warn("Unable to create original coordinates for %s" % item)
 
         region = regions.get(item['region'])
         if not region:
@@ -45,47 +34,41 @@ def society_locations(items):
     return count
 
 
-def load_societies(items):
-    society_links = [
-        'SCCS_society_equivalent',
-        'WNAI_society_equivalent1',
-        'WNAI_society_equivalent2',
-        'WNAI_society_equivalent3',
-        'WNAI_society_equivalent4',
-        'WNAI_society_equivalent5',
-    ]
+def load_societies(datasets):
     delete_all(Society)
     societies = []
-    for item in items:
-        societies.append(Society(
-            ext_id=item['soc_id'],
-            xd_id=item['xd_id'],
-            original_name=item['ORIG_name_and_ID_in_this_dataset'],
-            name=item['pref_name_for_society'], 
-            source=get_source(item['dataset']),
-            alternate_names=item['alt_names_by_society'],
-            focal_year=item['main_focal_year'],
-            hraf_link=item['HRAF_name_ID'],
-            chirila_link=item['CHIRILA_society_equivalent']
-        ))
-        for key in society_links:
-            value = item.get(key)
-            if value:
-                ext_id = value.split('(')[len(value.split('(')) - 1]
-                society = Society(
-                    ext_id=ext_id[0:len(ext_id) - 1],
-                    xd_id=item['xd_id'],
-                    original_name=value,
-                    name=item['pref_name_for_society'],
-                    alternate_names=item['alt_names_by_society'],
-                    focal_year=item['main_focal_year'],
-                    source=get_source(key[0:key.find('_')])
-                )
-                if society.ext_id not in [x.ext_id for x in societies]:
-                    societies.append(society)
-                    logging.info("Saving society %s" % society.ext_id)
+    for ds in datasets:
+        for item in ds.societies:
+            lat, lon, olat, olon = None, None, None, None
+            try:
+                lat, lon = map(float, [item.Lat, item.Long])
+            except (TypeError, ValueError):
+                logging.warn("Unable to create coordinates for %s" % item)
+            try:
+                olat, olon = map(float, [item.origLat, item.origLong])
+            except (TypeError, ValueError):
+                logging.warn("Unable to create original coordinates for %s" % item)
 
-        logging.info("Saving society %s" % item)
+            societies.append(Society(
+                ext_id=item.id,
+                xd_id=item.xd_id,
+                original_name=item.ORIG_name_and_ID_in_this_dataset,
+                name=item.pref_name_for_society,
+                source=get_source(ds),
+                alternate_names=item.alt_names_by_society,
+                focal_year=item.main_focal_year,
+                hraf_link=item.HRAF_name_ID,
+                #chirila_link=item.CHIRILA_society_equivalent,
+                latitude=lat,
+                longitude=lon,
+                original_latitude=olat,
+                original_longitude=olon,
+            ))
+            logging.info("Saving society %s" % item.id)
 
     Society.objects.bulk_create(societies)
+
+    #
+    # TODO: load cross-dataset relations!
+    #
     return len(societies)

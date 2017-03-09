@@ -25,17 +25,12 @@ def clean_category(category):
 
 def load_environmental_var(items):
     categories = {}
-
-    count = 0
-    for item in items:
-        if load_env_var(item, categories):
-            count += 1
-    return count
+    return sum(load_env_var(item, categories) for item in items)
 
 
 def load_env_var(var_dict, categories):
     if var_dict['VarType'].strip() != 'Continuous':
-        return False
+        return 0
     index_category = None
     for c in map(clean_category, var_dict['IndexCategory'].split(',')):
         index_category = categories.get(c)
@@ -52,7 +47,7 @@ def load_env_var(var_dict, categories):
     )
     if created:
         logging.info("Saved environmental variable %s" % variable)
-    return True
+    return 1
 
 
 def load_environmental(items):
