@@ -1,10 +1,8 @@
 # coding: utf8
 from __future__ import unicode_literals, print_function, division
-import os
+
+from clldutils.path import Path
 
 
-def data_path(fname=None):
-    comps = ['data']
-    if fname is not None:
-        comps.append(fname)
-    return os.path.join(os.path.dirname(__file__), *comps)
+def data_path(*comps):
+    return Path(__file__).parent.joinpath('data', *comps)

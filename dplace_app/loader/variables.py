@@ -8,13 +8,9 @@ from dplace_app.models import (
 from sources import get_source
 
 
-def clean_category(category):
-    return category.strip().capitalize()
-
-
-def load_vars(datasets):
+def load_vars(repos):
     categories, count = {}, 0
-    for ds in datasets:
+    for ds in repos.datasets:
         for var in ds.variables:
             count += load_var(ds, var, categories)
     return count
@@ -31,8 +27,6 @@ def load_var(ds, var, categories):
             source=get_source(ds))
         cat_class = CulturalCategory
     else:
-        if len(var.title) > 150:
-            print(len(var.title), var.title)
         if var.type != 'Continuous':
             return 0
         variable = EnvironmentalVariable.objects.create(

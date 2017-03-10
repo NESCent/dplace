@@ -4,7 +4,6 @@ import re
 from operator import attrgetter
 
 from django.db import connection
-from django.conf import settings
 
 from dplace_app.models import (
     Society, Source, CulturalValue, CulturalVariable, CulturalCodeDescription,
@@ -16,7 +15,7 @@ from sources import get_source
 BINFORD_REF_PATTERN = re.compile('(?P<author>[^0-9]+)(?P<year>[0-9]{4}a-z?):')
 
 
-def load_data(datasets):
+def load_data(repos):
     refs = []
     societies = {s.ext_id: s for s in Society.objects.all()}
     kw = dict(
@@ -45,16 +44,22 @@ def load_data(datasets):
         variables = {var_id_attr(var): var for var in var_cls.objects.all()}
         objs = []
         pk = 0
-        for ds in datasets:
-            if (ds.id not in settings.DATASETS) or (ds.type != dstype):
-                continue
-            for item in ds.data:
-                vid = val_var_id_attr(item)
-                v, _refs = _load_data(
-                    ds, item, societies[item.soc_id], variables[vid], **kw)
-                pk += 1
-                objs.append(val_cls(**v))
-                refs.extend([(pk, sid) for sid in _refs or []])
+        for ds in repos.datasets:
+            if ds.type == dstype:
+                for item in ds.data:
+                    if item.soc_id not in societies:
+                        logging.warn('value for unknown society {0}'.format(item.soc_id))
+                        continue
+                    vid = val_var_id_attr(item)
+                    if vid not in variables:
+                        logging.warn('value for unknown variable {0}'.format(vid))
+                        continue
+                    v, _refs = _load_data(
+                        ds, item, societies[item.soc_id], variables[vid], **kw)
+                    if v:
+                        pk += 1
+                        objs.append(val_cls(**v))
+                        refs.extend([(pk, sid) for sid in _refs or []])
 
         val_cls.objects.bulk_create(objs, batch_size=1000)
 
@@ -82,7 +87,10 @@ def _load_data(ds, val, society, variable, sources=None, descriptions=None):
         if variable.data_type == 'Continuous' and val.code and val.code != 'NA':
             v['coded_value_float'] = float(val.code)
     else:
-        v['value'] = float(val.code)
+        if val.code != 'NA':
+            v['value'] = float(val.code)
+        else:
+            return None, None
 
     refs = set()
     if ds.type == 'cultural':

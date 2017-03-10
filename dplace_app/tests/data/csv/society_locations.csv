@@ -1,0 +1,6 @@
+dataset,soc_id,origLat,origLong,Lat,Long,Comment,region
+dscultural,society1,3.00,114.00,3.00,114.00,Original,Region1
+dscultural,society2,8.58,81.25,8.59,81.19,Revised,Region2
+dscultural,unknown,-15.32,124.72,-15.32,124.72,Original,Region1
+dscultural,society3,-16.91,127.83,-16.91,127.83,Original,Region1
+dscultural,society4,-16.30,139.30,-16.48,139.32,Revised,Region2

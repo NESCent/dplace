@@ -4,11 +4,13 @@ import logging
 from dplace_app.models import Language, ISOCode, LanguageFamily, Society
 
 
-def load_languages(datasets, languoids):
+def load_languages(repos):
+    languoids = {
+        l.id: l for l in repos.read_csv('csv', 'glottolog.csv', namedtuples=True)}
     families, languages, isocodes = {}, {}, {}
     societies = {s.ext_id: s for s in Society.objects.all()}
     count = 0
-    for ds in datasets:
+    for ds in repos.datasets:
         for soc in ds.societies:
             ldata = languoids.get(soc.glottocode)
             if not ldata:  # pragma: no cover

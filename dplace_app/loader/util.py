@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 import logging
 
-from clldutils.dsv import reader
+from dplace_app.models import GeographicRegion
 
 
 def configure_logging(test=False):
@@ -23,5 +23,8 @@ def configure_logging(test=False):
     logger.addHandler(ch)
 
 
-def csv_dict_reader(fname):
-    return reader(fname, dicts=True)
+def load_regions(repos):
+    regions = [r['properties'] for r in repos.read_json('geo', 'level2.json')['features']]
+    GeographicRegion.objects.bulk_create([
+        GeographicRegion(**{k.lower(): v for k, v in r.items()}) for r in regions])
+    return len(regions)

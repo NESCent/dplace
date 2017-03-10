@@ -14,16 +14,15 @@ def get_source(ds):
         try:
             o = Source.objects.get(year=ds.year, author=ds.author)
         except Source.DoesNotExist:
-            o = Source.objects.create(
-                name=ds.name, reference=ds.citation, year=ds.year, author=ds.author)
+            o = ds.as_source()
             o.save()
         _SOURCE_CACHE[ds.id] = o
     return _SOURCE_CACHE[dsid]
 
 
-def load_references(datasets):
+def load_references(repos):
     keys = set()
-    for ds in datasets:
+    for ds in repos.datasets:
         for r in ds.references:
             if ':' in r.key:
                 # skip keys with page numbers.
