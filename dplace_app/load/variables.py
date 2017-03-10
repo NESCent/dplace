@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 import logging
 
-from dplace_app.models import CulturalVariable, CulturalCategory, CulturalCodeDescription
-
+from dplace_app.models import (
+    CulturalVariable, CulturalCategory, CulturalCodeDescription,
+    EnvironmentalCategory, EnvironmentalVariable,
+)
 from sources import get_source
 
 
@@ -19,21 +21,38 @@ def load_vars(datasets):
 
 
 def load_var(ds, var, categories):
-    variable, created = CulturalVariable.objects.get_or_create(
-        label=var.label, source=get_source(ds))
-    variable.name = var.title
-    variable.codebook_info = var.definition
-    variable.data_type = var.type
-    variable.units = var.units
+    if ds.type == 'cultural':
+        variable = CulturalVariable.objects.create(
+            name=var.title,
+            codebook_info=var.definition,
+            data_type=var.type,
+            units=var.units,
+            label=var.label,
+            source=get_source(ds))
+        cat_class = CulturalCategory
+    else:
+        if len(var.title) > 150:
+            print(len(var.title), var.title)
+        if var.type != 'Continuous':
+            return 0
+        variable = EnvironmentalVariable.objects.create(
+            var_id=var.id,
+            name=var.title,
+            units=var.units,
+            codebook_info=var.definition)
+        cat_class = EnvironmentalCategory
 
     for c in var.category:
-        index_category = categories.get(c)
+        index_category = categories.get((ds.type, c))
         if not index_category:
-            index_category = categories[c] = CulturalCategory.objects.create(name=c)
-            logging.info("Created CulturalCategory: %s" % c)
+            index_category = categories[(ds.type, c)] = cat_class.objects.create(name=c)
+            logging.info("Created %s: %s" % (cat_class.__name__, c))
 
-        if index_category not in variable.index_categories.all():
-            variable.index_categories.add(index_category)
+        if ds.type == 'cultural':
+            if index_category not in variable.index_categories.all():
+                variable.index_categories.add(index_category)
+        else:
+            variable.category = index_category
 
     for code in var.codes:
         code_description, created = CulturalCodeDescription.objects.get_or_create(

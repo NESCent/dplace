@@ -3,14 +3,8 @@ import logging
 
 from dplace_app.models import Language, ISOCode, LanguageFamily, Society
 
-from util import delete_all
-
 
 def load_languages(datasets, languoids):
-    delete_all(Language)
-    delete_all(LanguageFamily)
-    delete_all(ISOCode)
-
     families, languages, isocodes = {}, {}, {}
     societies = {s.ext_id: s for s in Society.objects.all()}
     count = 0
@@ -18,7 +12,7 @@ def load_languages(datasets, languoids):
         for soc in ds.societies:
             ldata = languoids.get(soc.glottocode)
             if not ldata:  # pragma: no cover
-                logging.warning("No language found for %s, skipping" % (soc,))
+                logging.warning("No language found for %s, skipping" % soc.glottocode)
                 continue
 
             soc = societies[soc.id]

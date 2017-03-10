@@ -7,7 +7,6 @@ from clldutils.dsv import reader
 
 from dplace_app.models import Society, GeographicRegion
 
-from util import delete_all
 from sources import get_source
 
 
@@ -35,7 +34,6 @@ def society_locations(fname):
 
 
 def load_societies(datasets):
-    delete_all(Society)
     societies = []
     for ds in datasets:
         for item in ds.societies:

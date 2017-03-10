@@ -2,14 +2,7 @@
 from __future__ import unicode_literals
 import logging
 
-from django.db import connection
 from clldutils.dsv import reader
-
-
-def delete_all(model):
-    model.objects.all().delete()
-    with connection.cursor() as c:
-        c.execute("ALTER SEQUENCE %s_id_seq RESTART WITH 1" % model._meta.db_table)
 
 
 def configure_logging(test=False):

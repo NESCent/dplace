@@ -18,7 +18,6 @@ import attr
 
 from load.util import configure_logging
 from load.society import society_locations, load_societies
-from load.environmental import load_environmental, load_environmental_var
 from load.geographic import load_regions
 from load.tree import load_trees, tree_names, prune_trees
 from load.variables import load_vars
@@ -78,11 +77,20 @@ class Data(object):
         return _var_label(self.dataset, self.var_id)
 
 
+@attr.s
 class Dataset(object):
-    def __init__(self, spec):
-        self.spec = spec
-        self.id = spec['id']
-        self.dir = DATA_DIR.joinpath('datasets', self.id)
+    id = attr.ib()
+    type = attr.ib(validator=partial(valid_enum_member, ['cultural', 'environmental']))
+    abbr = attr.ib()
+    name = attr.ib()
+    description = attr.ib()
+    year = attr.ib()
+    author = attr.ib()
+    citation = attr.ib()
+
+    @property
+    def dir(self):
+        return DATA_DIR.joinpath('datasets', self.id)
 
     def _items(self, what, **kw):
         fname = self.dir.joinpath('{0}.csv'.format(what))
@@ -113,7 +121,7 @@ class Dataset(object):
 def main():  # pragma: no cover
     configure_logging()
 
-    datasets = [Dataset(r) for r in
+    datasets = [Dataset(**r) for r in
                 reader(DATA_DIR.joinpath('datasets', 'index.csv'), dicts=True)]
     for spec in [
         (load_societies, datasets),
@@ -127,13 +135,6 @@ def main():  # pragma: no cover
              reader(DATA_DIR.joinpath('csv', 'glottolog.csv'), namedtuples=True)}),
         (load_references, datasets),
         (load_data, datasets),
-        (
-            load_environmental_var,
-            reader(DATA_DIR.joinpath('csv', 'environmentalVariableList.csv'), dicts=True)
-        ),
-        (
-            load_environmental,
-            reader(DATA_DIR.joinpath('csv', 'environmental_data.csv'), dicts=True)),
         (load_trees, DATA_DIR.joinpath()),
         (tree_names, DATA_DIR.joinpath()),
         (prune_trees,),

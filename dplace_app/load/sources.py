@@ -9,18 +9,16 @@ _SOURCE_CACHE = {}
 
 
 def get_source(ds):
-    if ds.id not in _SOURCE_CACHE:
+    dsid = getattr(ds, 'id', ds)
+    if dsid not in _SOURCE_CACHE:
         try:
-            o = Source.objects.get(year=ds.spec['year'], author=ds.spec['author'])
+            o = Source.objects.get(year=ds.year, author=ds.author)
         except Source.DoesNotExist:
             o = Source.objects.create(
-                name=ds.spec['name'],
-                reference=ds.spec['citation'],
-                year=ds.spec['year'],
-                author=ds.spec['author'])
+                name=ds.name, reference=ds.citation, year=ds.year, author=ds.author)
             o.save()
         _SOURCE_CACHE[ds.id] = o
-    return _SOURCE_CACHE[ds.id]
+    return _SOURCE_CACHE[dsid]
 
 
 def load_references(datasets):
