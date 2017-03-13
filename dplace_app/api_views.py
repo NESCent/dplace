@@ -305,6 +305,7 @@ def result_set_from_query_dict(query_dict):
             # FIXME: this selects possibly too many values, in case there are multiple
             # values for the same variable, not all of them matching the criteria.
             .filter(variable_id__in=[v.variable.id for v in result_set.variable_descriptions])
+            .select_related('code')
             .prefetch_related('references')))
     if result_set.environmental_variables:
         soc_query = soc_query.prefetch_related(Prefetch(
