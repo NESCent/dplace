@@ -2,8 +2,7 @@
 import logging
 
 from dplace_app.models import (
-    CulturalVariable, CulturalCategory, CulturalCodeDescription,
-    EnvironmentalCategory, EnvironmentalVariable,
+    CulturalVariable, Category, CulturalCodeDescription, EnvironmentalVariable,
 )
 from sources import get_source
 
@@ -25,7 +24,6 @@ def load_var(ds, var, categories):
             units=var.units,
             label=var.label,
             source=get_source(ds))
-        cat_class = CulturalCategory
     else:
         if var.type != 'Continuous':
             return 0
@@ -34,13 +32,12 @@ def load_var(ds, var, categories):
             name=var.title,
             units=var.units,
             codebook_info=var.definition)
-        cat_class = EnvironmentalCategory
 
     for c in var.category:
         index_category = categories.get((ds.type, c))
         if not index_category:
-            index_category = categories[(ds.type, c)] = cat_class.objects.create(name=c)
-            logging.info("Created %s: %s" % (cat_class.__name__, c))
+            index_category = categories[(ds.type, c)] = Category.objects.create(name=c, type=ds.type)
+            logging.info("Created %s category: %s" % (ds.type, c))
 
         if ds.type == 'cultural':
             if index_category not in variable.index_categories.all():

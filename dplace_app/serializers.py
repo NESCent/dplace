@@ -36,15 +36,15 @@ class CulturalVariableSerializer(serializers.ModelSerializer):
         )
 
 
-class CulturalCategorySerializer(serializers.ModelSerializer):
+class CategorySerializer(serializers.ModelSerializer):
     class Meta(object):
-        model = models.CulturalCategory
-        fields = ('id', 'name',)
+        model = models.Category
+        fields = ('id', 'name', 'type')
 
 
 class CulturalVariableDetailSerializer(serializers.ModelSerializer):
-    index_categories = CulturalCategorySerializer(many=True)
-    niche_categories = CulturalCategorySerializer(many=True)
+    index_categories = CategorySerializer(many=True)
+    niche_categories = CategorySerializer(many=True)
 
     class Meta(object):
         model = models.CulturalVariable
@@ -53,14 +53,14 @@ class CulturalVariableDetailSerializer(serializers.ModelSerializer):
         )
 
 
-class CulturalCategoryDetailSerializer(serializers.ModelSerializer):
+class CategoryDetailSerializer(serializers.ModelSerializer):
     # Use a Primary key related field or just get the variable
     index_variables = CulturalVariableSerializer(many=True)
     niche_variables = CulturalVariableSerializer(many=True)
 
     class Meta(object):
-        model = models.CulturalCategory
-        fields = ('id', 'name', 'index_variables', 'niche_variables')
+        model = models.Category
+        fields = ('id', 'name', 'type', 'index_variables', 'niche_variables')
 
 
 class CulturalValueSerializer(serializers.ModelSerializer):
@@ -86,11 +86,6 @@ class CulturalValueSerializer(serializers.ModelSerializer):
 class ISOCodeSerializer(serializers.ModelSerializer):
     class Meta(object):
         model = models.ISOCode
-        fields = '__all__'
-
-class EnvironmentalCategorySerializer(serializers.ModelSerializer):
-    class Meta(object):
-        model = models.EnvironmentalCategory
         fields = '__all__'
 
 

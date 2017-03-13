@@ -15,7 +15,7 @@ from rest_framework.decorators import api_view, permission_classes, renderer_cla
 from rest_framework.permissions import AllowAny
 from rest_framework.views import Response
 from rest_framework.renderers import JSONRenderer
-from rest_framework.reverse import reverse
+from rest_framework.decorators import detail_route
 
 from dplace_app.filters import GeographicRegionFilter
 from dplace_app.renderers import DPLACECSVRenderer
@@ -40,14 +40,14 @@ class CulturalVariableViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class CulturalCategoryViewSet(viewsets.ReadOnlyModelViewSet):
-    serializer_class = serializers.CulturalCategorySerializer
-    filter_fields = ('name', 'index_variables', 'niche_variables')
-    queryset = models.CulturalCategory.objects.all()
+    serializer_class = serializers.CategorySerializer
+    filter_fields = ('name', 'type', 'index_variables', 'niche_variables')
+    queryset = models.Category.objects.filter(type='cultural').all()
     # Override retrieve to use the detail serializer, which includes variables
 
     def retrieve(self, request, *args, **kwargs):
         self.object = self.get_object()
-        serializer = serializers.CulturalCategoryDetailSerializer(self.object)
+        serializer = serializers.CategoryDetailSerializer(self.object)
         return Response(serializer.data)
 
 
@@ -115,7 +115,8 @@ class SocietyViewSet(viewsets.ReadOnlyModelViewSet):
             },
             template_name='society.html'
         )
-        
+
+
 class ISOCodeViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = serializers.ISOCodeSerializer
     filter_fields = ('iso_code',)
@@ -123,9 +124,9 @@ class ISOCodeViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class EnvironmentalCategoryViewSet(viewsets.ReadOnlyModelViewSet):
-    serializer_class = serializers.EnvironmentalCategorySerializer
+    serializer_class = serializers.CategorySerializer
     filter_fields = ('name',)
-    queryset = models.EnvironmentalCategory.objects.all()
+    queryset = models.Category.objects.filter(type='environmental').all()
 
 
 class EnvironmentalVariableViewSet(viewsets.ReadOnlyModelViewSet):
@@ -440,7 +441,7 @@ def get_categories(request):
     Filters categories for sources, as some categories are empty for some sources
     """
     query_dict = get_query_from_json(request)
-    categories = models.CulturalCategory.objects.all()
+    categories = models.Category.objects.filter(type='cultural')
     source_categories = []
     if 'source' in query_dict:
         source = models.Source.objects.filter(id=query_dict['source'])
@@ -449,8 +450,8 @@ def get_categories(request):
             if variables.filter(index_categories=c.id):
                 source_categories.append(c)
         return Response(
-            serializers.CulturalCategorySerializer(source_categories, many=True).data)
-    return Response(serializers.CulturalCategorySerializer(categories, many=True).data)
+            serializers.CategorySerializer(source_categories, many=True).data)
+    return Response(serializers.CategorySerializer(categories, many=True).data)
 
 
 @api_view(['GET'])

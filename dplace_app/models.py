@@ -6,8 +6,8 @@ from django.core.urlresolvers import reverse
 from django.db import models
 
 __all__ = [
-    'ISOCode', 'Society', 'EnvironmentalCategory', 'EnvironmentalVariable',
-    'EnvironmentalValue', 'CulturalVariable', 'CulturalValue', 'CulturalCategory',
+    'ISOCode', 'Society', 'Category', 'EnvironmentalVariable',
+    'EnvironmentalValue', 'CulturalVariable', 'CulturalValue',
     'CulturalCodeDescription', 'Source', 'Language', 'LanguageFamily', 'LanguageTree',
     'LanguageTreeLabels', 'LanguageTreeLabelsSequence', 'GeographicRegion']
 
@@ -132,8 +132,9 @@ class Society(models.Model):
         verbose_name_plural = "Societies"
 
 
-class EnvironmentalCategory(models.Model):
+class Category(models.Model):
     name = models.CharField(max_length=30, db_index=True, unique=True)
+    type = models.CharField(max_length=13)
 
     def __unicode__(self):
         return self.name
@@ -141,13 +142,13 @@ class EnvironmentalCategory(models.Model):
     class Meta(object):
         verbose_name = "Category"
         verbose_name_plural = "Categories"
-        ordering = ("name",)
+        ordering = ("type", "name")
 
 
 class EnvironmentalVariable(models.Model):
     var_id = models.CharField(max_length=50, unique=True)
     name = models.CharField(max_length=200, unique=True)
-    category = models.ForeignKey('EnvironmentalCategory', null=True)
+    category = models.ForeignKey('Category', null=True)
     units = models.CharField(max_length=100, choices=UNIT_CHOICES)
     codebook_info = models.CharField(max_length=500, default='None')
     
@@ -189,13 +190,12 @@ class CulturalVariable(models.Model):
     name = models.CharField(max_length=200, db_index=True, default='Unknown')
     source = models.ForeignKey('Source', null=True)
     index_categories = models.ManyToManyField(
-        'CulturalCategory', related_name='index_variables')
+        'Category', related_name='index_variables')
     niche_categories = models.ManyToManyField(
-        'CulturalCategory', related_name='niche_variables')
+        'Category', related_name='niche_variables')
     codebook_info = models.TextField(default='None')
     data_type = models.CharField(max_length=200, null=True)
     units = models.CharField(max_length=100, default='')
-
 
     def coded_societies(self):
         return Society.objects.filter(culturalvalue__in=self.values.all())
@@ -206,18 +206,6 @@ class CulturalVariable(models.Model):
     class Meta(object):
         verbose_name = "Variable"
         ordering = ["label"]
-
-
-class CulturalCategory(models.Model):
-    name = models.CharField(max_length=30, db_index=True, unique=True)
-
-    def __unicode__(self):
-        return self.name
-
-    class Meta(object):
-        verbose_name = "Category"
-        verbose_name_plural = "Categories"
-        ordering = ["name"]
 
 
 class CulturalCodeDescription(models.Model):
