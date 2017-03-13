@@ -20,7 +20,7 @@ class Migration(migrations.Migration):
             name='Category',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(db_index=True, max_length=30, unique=True)),
+                ('name', models.CharField(db_index=True, max_length=30)),
                 ('type', models.CharField(max_length=13)),
             ],
             options={

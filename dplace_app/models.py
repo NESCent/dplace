@@ -133,7 +133,7 @@ class Society(models.Model):
 
 
 class Category(models.Model):
-    name = models.CharField(max_length=30, db_index=True, unique=True)
+    name = models.CharField(max_length=30, db_index=True)
     type = models.CharField(max_length=13)
 
     def __unicode__(self):
