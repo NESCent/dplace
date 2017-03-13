@@ -5,12 +5,6 @@ from collections import defaultdict
 from django.core.urlresolvers import reverse
 from django.db import models
 
-__all__ = [
-    'ISOCode', 'Society', 'Category', 'EnvironmentalVariable',
-    'EnvironmentalValue', 'CulturalVariable', 'CulturalValue',
-    'CulturalCodeDescription', 'Source', 'Language', 'LanguageFamily', 'LanguageTree',
-    'LanguageTreeLabels', 'LanguageTreeLabelsSequence', 'GeographicRegion']
-
 UNIT_CHOICES = (
     ('mm', 'mm'),
     ('℃', '℃'),
@@ -34,9 +28,8 @@ CLASSIFICATION_SCHEMES = (
 
 
 class ISOCode(models.Model):
-    iso_code = models.CharField('ISO Code',
-        db_index=True, max_length=3, unique=True, null=False
-    )
+    iso_code = models.CharField(
+        'ISO Code', db_index=True, max_length=3, unique=True, null=False)
 
     def __unicode__(self):
         return self.iso_code
@@ -46,22 +39,16 @@ class ISOCode(models.Model):
 
 
 class Society(models.Model):
-    ext_id = models.CharField('External ID',
-        db_index=True, unique=True, max_length=20
-    )
-    xd_id = models.CharField('Cross ID',
-        db_index=True, default=None, null=True, max_length=10
+    ext_id = models.CharField('External ID', db_index=True, unique=True, max_length=20)
+    xd_id = models.CharField(
+        'Cross ID', db_index=True, default=None, null=True, max_length=10
     )
     name = models.CharField('Name', db_index=True, max_length=200)
     latitude = models.FloatField('Latitude', null=True)
     longitude = models.FloatField('Longitude', null=True)
-    focal_year = models.CharField('Focal Year',
-        null=True, blank=True, max_length=100
-    )
+    focal_year = models.CharField('Focal Year', null=True, blank=True, max_length=100)
     alternate_names = models.TextField(default="")
-    original_name = models.CharField('ORIG_name',
-        max_length=200, default=None, null=True
-    )
+    original_name = models.CharField('ORIG_name', max_length=200, default=None, null=True)
     original_latitude = models.FloatField('ORIG_latitude', null=True)
     original_longitude = models.FloatField('ORIG_longitude', null=True)
     
@@ -70,9 +57,7 @@ class Society(models.Model):
     language = models.ForeignKey('Language', null=True, related_name="societies")
     
     hraf_link = models.CharField('HRAF', null=True, default=None, max_length=200)
-    chirila_link = models.CharField('CHIRILA',
-        default = None, null=True, max_length=200
-    )
+    chirila_link = models.CharField('CHIRILA', default=None, null=True, max_length=200)
 
     @property
     def location(self):
@@ -85,37 +70,43 @@ class Society(models.Model):
     def get_environmental_data(self):
         """Returns environmental data for the given society"""
         valueDict = defaultdict(list)
-        for value in self.environmentalvalue_set.select_related('variable').order_by('variable__name').all():
-            valueDict[str(value.variable.category)].append({
-                'name': value.variable.name,
-                'value': format(value.value, '.4f'),
-                'units': value.variable.units,
-                'comment': value.comment
-            })
+        for value in self.value_set\
+                .select_related('variable').order_by('variable__name').all():
+            if value.variable.type == 'environmental':
+                categories = value.variable.index_categories.all()
+                valueDict[str(categories[0])].append({
+                    'name': value.variable.name,
+                    'value': '{0}'.format(value),
+                    'units': value.variable.units,
+                    'comment': value.comment
+                })
         return valueDict
 
     def get_cultural_trait_data(self):
         """Returns the data for the given society"""
         valueDict = defaultdict(list)
-        for value in self.culturalvalue_set.select_related('code').select_related('variable').order_by('variable__label').all():
-            categories = value.variable.index_categories.all()
-            for c in categories:
-                valueDict[str(c)].append({
-                    'id': value.id,
-                    'label': value.variable.label,
-                    'name': value.variable.name,
-                    'code': value.coded_value,
-                    'description': value.get_description(),
-                    'year': value.focal_year,
-                    'comment': value.comment,
-                    'sources': value.references.all(),
-                })
+        for value in self.value_set\
+                .select_related('code').\
+                select_related('variable').order_by('variable__label').all():
+            if value.variable.type == 'cultural':
+                categories = value.variable.index_categories.all()
+                for c in categories:
+                    valueDict[str(c)].append({
+                        'id': value.id,
+                        'label': value.variable.label,
+                        'name': value.variable.name,
+                        'code': value.coded_value,
+                        'description': value.get_description(),
+                        'year': value.focal_year,
+                        'comment': value.comment,
+                        'sources': value.references.all(),
+                    })
         return valueDict
 
     def get_data_references(self):
         """Returns the references for the cultural trait data"""
         refs = []
-        qset = self.culturalvalue_set
+        qset = self.value_set
         for value in qset.all():
             for r in value.references.all():
                 if r not in refs:
@@ -145,39 +136,7 @@ class Category(models.Model):
         ordering = ("type", "name")
 
 
-class EnvironmentalVariable(models.Model):
-    var_id = models.CharField(max_length=50, unique=True)
-    name = models.CharField(max_length=200, unique=True)
-    category = models.ForeignKey('Category', null=True)
-    units = models.CharField(max_length=100, choices=UNIT_CHOICES)
-    codebook_info = models.CharField(max_length=500, default='None')
-    
-    def __unicode__(self):
-        if self.units:
-            return "%s (%s)" % (self.name, self.units)
-        return self.name
-
-    class Meta(object):
-        ordering = ["name"]
-
-
-class EnvironmentalValue(models.Model):
-    variable = models.ForeignKey('EnvironmentalVariable', related_name="values")
-    value = models.FloatField(db_index=True)
-    society = models.ForeignKey('Society')
-    source = models.ForeignKey('Source', null=True)
-    comment = models.TextField(default="")
-
-    def __unicode__(self):
-        return "%f" % self.value
-
-    class Meta(object):
-        ordering = ["variable"]
-        unique_together = ('variable', 'society')
-        index_together = ['variable', 'value']
-
-
-class CulturalVariable(models.Model):
+class Variable(models.Model):
     """
     Variables in the Ethnographic Atlas have a number and are accompanied
     by a description, e.g.
@@ -186,8 +145,9 @@ class CulturalVariable(models.Model):
 
     This number is converted to a label: EA006
     """
-    label = models.CharField(max_length=25, db_index=True)
+    label = models.CharField(max_length=50, db_index=True, unique=True)
     name = models.CharField(max_length=200, db_index=True, default='Unknown')
+    type = models.CharField(max_length=13)
     source = models.ForeignKey('Source', null=True)
     index_categories = models.ManyToManyField(
         'Category', related_name='index_variables')
@@ -198,17 +158,20 @@ class CulturalVariable(models.Model):
     units = models.CharField(max_length=100, default='')
 
     def coded_societies(self):
-        return Society.objects.filter(culturalvalue__in=self.values.all())
+        return Society.objects.filter(value__in=self.values.all())
 
     def __unicode__(self):
-        return "%s - %s" % (self.label, self.name)
+        res = "%s - %s" % (self.label, self.name)
+        if self.units:
+            res += " (%s)" % self.units
+        return res
 
     class Meta(object):
         verbose_name = "Variable"
         ordering = ["label"]
 
 
-class CulturalCodeDescription(models.Model):
+class CodeDescription(models.Model):
     """
     Most of the variables in the Ethnographic Atlas are coded with
     discrete values that map to a text description, e.g.
@@ -221,12 +184,8 @@ class CulturalCodeDescription(models.Model):
     This model is not used by every value in the EA.
 
     """
-    variable = models.ForeignKey('CulturalVariable',
-        db_index=True, related_name="codes"
-    )
-    code = models.CharField(
-        max_length=20, db_index=True, null=False, default='.'
-    )
+    variable = models.ForeignKey('Variable', db_index=True, related_name="codes")
+    code = models.CharField(max_length=20, db_index=True, null=False, default='.')
     code_number = models.IntegerField(null=True, db_index=True)
     description = models.CharField(max_length=500, default='Unknown')
     short_description = models.CharField(max_length=500, default="")
@@ -234,7 +193,7 @@ class CulturalCodeDescription(models.Model):
 
     def save(self, *args, **kwargs):
         self.read_code_number()
-        super(CulturalCodeDescription, self).save(*args, **kwargs)
+        super(CodeDescription, self).save(*args, **kwargs)
 
     def read_code_number(self):
         try:
@@ -243,7 +202,7 @@ class CulturalCodeDescription(models.Model):
             pass
 
     def coded_societies(self):
-        return Society.objects.filter(culturalvalue__coded_value=self.code)
+        return Society.objects.filter(value__coded_value=self.code)
 
     def __unicode__(self):
         return "%s - %s" % (self.code, self.description)
@@ -253,7 +212,7 @@ class CulturalCodeDescription(models.Model):
         ordering = ("variable", "code_number", "code")
 
 
-class CulturalValue(models.Model):
+class Value(models.Model):
     """
     The values coded in the EA are typically discrete codes
     that map to a description.  Some are not and
@@ -268,11 +227,11 @@ class CulturalValue(models.Model):
     This model is not used by every code
 
     """
-    variable = models.ForeignKey('CulturalVariable', related_name="values")
+    variable = models.ForeignKey('Variable', related_name="values")
     society = models.ForeignKey('Society')
     coded_value = models.CharField(max_length=100, db_index=True, null=False, default='.')
-    coded_value_float = models.FloatField(null=True)
-    code = models.ForeignKey('CulturalCodeDescription', db_index=True, null=True)
+    coded_value_float = models.FloatField(null=True, db_index=True)
+    code = models.ForeignKey('CodeDescription', db_index=True, null=True)
     source = models.ForeignKey('Source', null=True)
     comment = models.TextField(default="")
     references = models.ManyToManyField('Source', related_name="references")
@@ -283,11 +242,13 @@ class CulturalValue(models.Model):
         return self.code.description if self.code else ''
 
     def __unicode__(self):
+        if self.coded_value_float is not None:
+            return "%f" % self.coded_value_float
         return "%s" % self.coded_value
 
     class Meta(object):
         verbose_name = "Value"
-        ordering = ("variable", "coded_value")
+        ordering = ("variable", "coded_value", "coded_value_float")
         index_together = [
             ['variable', 'society', 'focal_year'],
             ['variable', 'coded_value', 'focal_year', 'subcase'],
@@ -300,7 +261,7 @@ class CulturalValue(models.Model):
 
 class Source(models.Model):
     """
-    Stores references for VariableCodedValues, also for dataset sources.
+    Stores references for Value, also for dataset sources.
     """
     # Not really sure if we should separate dataset sources from references (I
     # think we should), but since all the code has already been written with
@@ -308,8 +269,8 @@ class Source(models.Model):
 
     # text, because might be '1996', '1999-2001', or 'ND'
     year = models.CharField(max_length=30, db_index=True)
-    author = models.CharField(max_length=50, db_index=True)
-    reference = models.CharField(max_length=500)
+    author = models.TextField(db_index=True)
+    reference = models.TextField()
     name = models.CharField(max_length=100, db_index=True, default="")
 
     def __unicode__(self):
@@ -327,7 +288,7 @@ class LanguageFamily(models.Model):
     def update_counts(self):
         self.language_count = 0
         for society in Society.objects.all().filter(language__family=self):
-            if society.culturalvalue_set.count() > 0:
+            if society.value_set.count() > 0:
                 self.language_count += 1
         self.save()
 

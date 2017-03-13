@@ -6,14 +6,11 @@ from rest_framework import renderers
 from dplace_app import views, api_views
 
 router = routers.DefaultRouter()
-router.register(r'variables', api_views.CulturalVariableViewSet)
-router.register(r'categories', api_views.CulturalCategoryViewSet)
-router.register(r'codes', api_views.CulturalCodeDescriptionViewSet)
-router.register(r'values', api_views.CulturalValueViewSet)
+router.register(r'variables', api_views.VariableViewSet)
+router.register(r'categories', api_views.CategoryViewSet)
+router.register(r'codes', api_views.CodeDescriptionViewSet)
+router.register(r'values', api_views.ValueViewSet)
 router.register(r'societies', api_views.SocietyViewSet)
-router.register(r'environmental_categories', api_views.EnvironmentalCategoryViewSet)
-router.register(r'environmental_variables', api_views.EnvironmentalVariableViewSet)
-router.register(r'environmental_values', api_views.EnvironmentalValueViewSet)
 router.register(r'isocodes', api_views.ISOCodeViewSet)
 router.register(r'language_families', api_views.LanguageFamilyViewSet)
 router.register(r'languages', api_views.LanguageViewSet)

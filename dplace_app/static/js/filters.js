@@ -86,7 +86,9 @@ angular.module('dplaceFilters', [])
                     // TODO why is called this filter twice?
                     // First environmental_value.value is a float un-toFixed(4)
                     // then as string whereby the value is already toFixed(4)
-                    try{environmental_value.value = environmental_value.value.toFixed(4)}catch(e){}
+                    try{
+                        environmental_value.coded_value_float = environmental_value.coded_value_float.toFixed(4)
+                    }catch(e){}
                     return environmental_value;
                 }
             });

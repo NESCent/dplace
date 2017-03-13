@@ -34,13 +34,8 @@ def valid_enum_member(choices, instance, attribute, value):
         raise ValueError(value)
 
 
-def _var_label(dataset, var_id):
-    return "{0}{1:0>3}".format({'Binford': 'B'}.get(dataset, dataset), var_id)
-
-
 @attr.s
 class Variable(object):
-    dataset = attr.ib()
     category = attr.ib(convert=lambda s: [c.capitalize() for c in comma_split(s)])
     id = attr.ib()
     title = attr.ib()
@@ -53,14 +48,9 @@ class Variable(object):
     notes = attr.ib()
     codes = attr.ib(default=attr.Factory(list))
 
-    @property
-    def label(self):
-        return _var_label(self.dataset, self.id)
-
 
 @attr.s
 class Data(object):
-    dataset = attr.ib()
     soc_id = attr.ib()
     sub_case = attr.ib()
     year = attr.ib()
@@ -70,10 +60,6 @@ class Data(object):
     references = attr.ib(convert=semicolon_split)
     source_coded_data = attr.ib()
     admin_comment = attr.ib()
-
-    @property
-    def var_label(self):
-        return _var_label(self.dataset, self.var_id)
 
 
 @attr.s
@@ -97,7 +83,6 @@ class ObjectWithSource(object):
 @attr.s
 class Dataset(ObjectWithSource):
     type = attr.ib(validator=partial(valid_enum_member, ['cultural', 'environmental']))
-    abbr = attr.ib()
     description = attr.ib()
 
     def _items(self, what, **kw):
@@ -122,7 +107,7 @@ class Dataset(ObjectWithSource):
             sorted(self._items('codes', namedtuples=True), key=lambda c: c.var_id),
             lambda c: c.var_id)}
         return [
-            Variable(dataset=self.id, codes=codes.get(v['id'], []), **v)
+            Variable(codes=codes.get(v['id'], []), **v)
             for v in self._items('variables', dicts=True)]
 
 

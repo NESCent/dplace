@@ -15,7 +15,6 @@ from rest_framework.decorators import api_view, permission_classes, renderer_cla
 from rest_framework.permissions import AllowAny
 from rest_framework.views import Response
 from rest_framework.renderers import JSONRenderer
-from rest_framework.decorators import detail_route
 
 from dplace_app.filters import GeographicRegionFilter
 from dplace_app.renderers import DPLACECSVRenderer
@@ -27,22 +26,23 @@ from dplace_app.tree import update_newick
 log = logging.getLogger('profile')
 
 
-class CulturalVariableViewSet(viewsets.ReadOnlyModelViewSet):
-    serializer_class = serializers.CulturalVariableSerializer
+class VariableViewSet(viewsets.ReadOnlyModelViewSet):
+    serializer_class = serializers.VariableSerializer
     filter_fields = ('label', 'name', 'index_categories', 'niche_categories', 'source')
-    queryset = models.CulturalVariable.objects.all().prefetch_related('index_categories', 'niche_categories')
+    queryset = models.Variable.objects\
+        .prefetch_related('index_categories', 'niche_categories')
 
     # Override retrieve to use the detail serializer, which includes categories
     def retrieve(self, request, *args, **kwargs):
         self.object = self.get_object()
-        serializer = serializers.CulturalVariableDetailSerializer(self.object)
+        serializer = serializers.VariableDetailSerializer(self.object)
         return Response(serializer.data)
 
 
-class CulturalCategoryViewSet(viewsets.ReadOnlyModelViewSet):
+class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = serializers.CategorySerializer
     filter_fields = ('name', 'type', 'index_variables', 'niche_variables')
-    queryset = models.Category.objects.filter(type='cultural').all()
+    queryset = models.Category.objects.all()
     # Override retrieve to use the detail serializer, which includes variables
 
     def retrieve(self, request, *args, **kwargs):
@@ -51,17 +51,18 @@ class CulturalCategoryViewSet(viewsets.ReadOnlyModelViewSet):
         return Response(serializer.data)
 
 
-class CulturalCodeDescriptionViewSet(viewsets.ReadOnlyModelViewSet):
-    serializer_class = serializers.CulturalCodeDescriptionSerializer
+class CodeDescriptionViewSet(viewsets.ReadOnlyModelViewSet):
+    serializer_class = serializers.CodeDescriptionSerializer
     filter_fields = ('variable',)
-    queryset = models.CulturalCodeDescription.objects.all()
+    queryset = models.CodeDescription.objects.all()
 
 
-class CulturalValueViewSet(viewsets.ReadOnlyModelViewSet):
-    serializer_class = serializers.CulturalValueSerializer
+class ValueViewSet(viewsets.ReadOnlyModelViewSet):
+    serializer_class = serializers.ValueSerializer
     filter_fields = ('variable', 'coded_value', 'code', 'society',)
     # Avoid additional database trips by select_related for foreign keys
-    queryset = models.CulturalValue.objects.select_related('variable', 'code', 'source').all()
+    queryset = models.Value.objects.filter(variable__type='cultural')\
+        .select_related('variable', 'code', 'source').all()
 
 
 class SocietyViewSet(viewsets.ReadOnlyModelViewSet):
@@ -71,7 +72,6 @@ class SocietyViewSet(viewsets.ReadOnlyModelViewSet):
     lookup_field = 'ext_id'
 
     def detail(self, request, society_id):
-
         # block spider attacks
         if len(request.GET) > 0 and request.path.startswith('/society'):
             raise Http404
@@ -123,24 +123,6 @@ class ISOCodeViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = models.ISOCode.objects.all()
 
 
-class EnvironmentalCategoryViewSet(viewsets.ReadOnlyModelViewSet):
-    serializer_class = serializers.CategorySerializer
-    filter_fields = ('name',)
-    queryset = models.Category.objects.filter(type='environmental').all()
-
-
-class EnvironmentalVariableViewSet(viewsets.ReadOnlyModelViewSet):
-    serializer_class = serializers.EnvironmentalVariableSerializer
-    filter_fields = ('name', 'category', 'units',)
-    queryset = models.EnvironmentalVariable.objects.all()
-
-
-class EnvironmentalValueViewSet(viewsets.ReadOnlyModelViewSet):
-    serializer_class = serializers.EnvironmentalValueSerializer
-    filter_fields = ('variable', 'society',)
-    queryset = models.EnvironmentalValue.objects.all()
-
-
 class LargeResultsSetPagination(PageNumberPagination):
     page_size = 1000
     page_size_query_param = 'page_size'
@@ -154,7 +136,7 @@ class LanguageViewSet(viewsets.ReadOnlyModelViewSet):
         .select_related('family', 'iso_code')\
         .prefetch_related(Prefetch(
             'societies',
-            queryset=models.Society.objects.exclude(culturalvalue__isnull=True)
+            queryset=models.Society.objects.exclude(value__isnull=True)
         ))
     pagination_class = LargeResultsSetPagination
 
@@ -216,6 +198,7 @@ def result_set_from_query_dict(query_dict):
 
     result_set = serializers.SocietyResultSet()
     sql_joins, sql_where = [], []
+
     def id_array(l):
         return '(%s)' % ','.join('%s' % int(i) for i in l)
 
@@ -227,11 +210,11 @@ def result_set_from_query_dict(query_dict):
 
     if 'c' in query_dict:
         variables = {
-            v.id: v for v in models.CulturalVariable.objects
+            v.id: v for v in models.Variable.objects
             .filter(id__in=[int(x.split('-')[0]) for x in query_dict['c']])
             .prefetch_related(Prefetch(
                 'codes',
-                queryset=models.CulturalCodeDescription.objects
+                queryset=models.CodeDescription.objects
                 .filter(id__in=[int(x.split('-')[1]) for x in query_dict['c'] if len(x.split('-')) == 2])))
         }
 
@@ -240,7 +223,6 @@ def result_set_from_query_dict(query_dict):
             key=lambda x: int(str(x).split('-')[0])
         ):
             variable = variables[variable]
-            
             codes = [{
                 'id': None if (len(c.split('-')) > 2 or len(c.split('-')) == 1) else int(c.split('-')[1]),
                 'min': None if len(c.split('-')) < 3 else float(c.split('-')[1]),
@@ -249,7 +231,7 @@ def result_set_from_query_dict(query_dict):
             
             alias = 'cv%s' % variable.id
             sql_joins.append((
-                "culturalvalue",
+                "value",
                 alias,
                 "{0}.society_id = s.id AND {0}.variable_id = {1}".format(alias, variable.id)
             ))
@@ -258,7 +240,7 @@ def result_set_from_query_dict(query_dict):
                 include_NA = not all((c['min'] is not None) for c in codes)
                 ors = [
                     "({0}.coded_value_float >= %(min)f AND {0}.coded_value_float <= %(max)f)".format(alias) % c
-                    for c in codes if ('min' in c and c['min']  is not None)]
+                    for c in codes if ('min' in c and c['min'] is not None)]
                 if include_NA:
                     ors.append("%s.coded_value = 'NA'" % alias)
                 sql_where.append("(%s)" % ' OR '.join(ors))
@@ -277,22 +259,22 @@ def result_set_from_query_dict(query_dict):
         ):
             alias = 'ev%s' % varid
             sql_joins.append((
-                "environmentalvalue",
+                "value",
                 alias,
                 "{0}.society_id = s.id AND {0}.variable_id = {1}".format(alias, int(varid))))
 
             for varid, operator, params in criteria:
                 params = map(float, params)
                 if operator == 'inrange':
-                    sql_where.append("{0}.value >= {1:f} AND {0}.value <= {2:f}".format(alias, params[0], params[1]))
+                    sql_where.append("{0}.coded_value_float >= {1:f} AND {0}.coded_value_float <= {2:f}".format(alias, params[0], params[1]))
                 elif operator == 'outrange':
-                    sql_where.append("{0}.value >= {1:f} AND {0}.value <= {2:f}".format(alias, params[1], params[0]))
+                    sql_where.append("{0}.coded_value_float >= {1:f} AND {0}.coded_value_float <= {2:f}".format(alias, params[1], params[0]))
                 elif operator == 'gt':
-                    sql_where.append("{0}.value >= {1:f}".format(alias, params[0]))
+                    sql_where.append("{0}.coded_value_float >= {1:f}".format(alias, params[0]))
                 elif operator == 'lt':
-                    sql_where.append("{0}.value <= {1:f}".format(alias, params[0]))
+                    sql_where.append("{0}.coded_value_float <= {1:f}".format(alias, params[0]))
 
-        for variable in models.EnvironmentalVariable.objects.filter(id__in=[x[0] for x in query_dict['e']]):
+        for variable in models.Variable.objects.filter(id__in=[x[0] for x in query_dict['e']]):
             result_set.environmental_variables.add(variable)
 
     if 'p' in query_dict:
@@ -317,19 +299,20 @@ def result_set_from_query_dict(query_dict):
         soc_query = soc_query.select_related('region')
     if result_set.variable_descriptions:
         soc_query = soc_query.prefetch_related(Prefetch(
-            'culturalvalue_set',
+            'value_set',
             to_attr='selected_cvalues',
-            queryset=models.CulturalValue.objects
+            queryset=models.Value.objects
             # FIXME: this selects possibly too many values, in case there are multiple
             # values for the same variable, not all of them matching the criteria.
             .filter(variable_id__in=[v.variable.id for v in result_set.variable_descriptions])
             .prefetch_related('references')))
     if result_set.environmental_variables:
         soc_query = soc_query.prefetch_related(Prefetch(
-            'environmentalvalue_set',
+            'value_set',
             to_attr='selected_evalues',
-            queryset=models.EnvironmentalValue.objects.filter(
-                variable_id__in=[v.id for v in result_set.environmental_variables])))
+            queryset=models.Value.objects
+            .filter(variable_id__in=[v.id for v in result_set.environmental_variables])
+            .prefetch_related('references')))
 
     for i, soc in enumerate(soc_query):
         soc_result = serializers.SocietyResult(soc)
@@ -347,7 +330,8 @@ def result_set_from_query_dict(query_dict):
     #result_set.finalize(criteria)
     log.info('mid 2: %s' % (time() - _s,))
     return result_set
-    
+
+
 @api_view(['GET'])
 @permission_classes((AllowAny,))
 def trees_from_societies(request):
@@ -355,7 +339,7 @@ def trees_from_societies(request):
     for k, v in request.query_params.lists():
         soc_ids = v
         labels = models.LanguageTreeLabels.objects.filter(societies__id__in=soc_ids).all()
-        
+
         global_tree = None
         global_newick = []
         global_isolates = []
@@ -414,7 +398,7 @@ def find_societies(request):
             soc = models.Society.objects.filter(
                 Q(name__icontains=q) | Q(alternate_names__unaccent__icontains=q))
             for s in soc:
-                if s.culturalvalue_set.count():
+                if s.value_set.count():
                     result_set.societies.add(serializers.SocietyResult(s))
         return Response(serializers.SocietyResultSetSerializer(result_set).data)
 
@@ -429,8 +413,8 @@ def find_societies(request):
     log.info('%s find_societies 3: %s queries' % (time() - s, len(connection.queries)))
     for i, q in enumerate(
             sorted(connection.queries, key=lambda q: q['time'], reverse=True)):
-        if i < 5:  # pragma: no cover
-            log.info('%s for %s' % (q['time'], q['sql'][:200]))
+        if 10 < i < 20:  # pragma: no cover
+            log.info('%s for %s' % (q['time'], q['sql'][:500]))
     return Response(d)
 
 
@@ -445,7 +429,7 @@ def get_categories(request):
     source_categories = []
     if 'source' in query_dict:
         source = models.Source.objects.filter(id=query_dict['source'])
-        variables = models.CulturalVariable.objects.filter(source=source)
+        variables = models.Variable.objects.filter(source=source)
         for c in categories:
             if variables.filter(index_categories=c.id):
                 source_categories.append(c)
@@ -474,20 +458,14 @@ class GeographicRegionViewSet(viewsets.ReadOnlyModelViewSet):
 @renderer_classes((JSONRenderer,))
 def get_min_and_max(request):
     res = {}
-    environmental_id = get_query_from_json(request).get('environmental_id')
-    if environmental_id:
-        values = models.EnvironmentalValue.objects.filter(variable__id=environmental_id)
-        min_value = None
-        max_value = 0
-        for v in values:
-            if min_value is None:
-                min_value = v.value
-
-            if v.value < min_value:
-                min_value = v.value
-            elif v.value > max_value:
-                max_value = v.value
-        res = {'min': format(min_value or 0.0, '.4f'), 'max': format(max_value, '.4f')}
+    varid = get_query_from_json(request).get('environmental_id')
+    if varid:
+        values = [
+            v.coded_value_float for v in models.Value.objects.filter(variable__id=varid)
+            if v.coded_value_float is not None]
+        vmin = min(values) if values else 0.0
+        vmax = max(values) if values else 0.0
+        res = {'min': format(vmin, '.4f'), 'max': format(vmax, '.4f')}
     return Response(res)
 
 
@@ -498,7 +476,7 @@ def bin_cont_data(request):  # MAKE THIS GENERIC
     bf_id = get_query_from_json(request).get('bf_id')
     bins = []
     if bf_id:
-        values = models.CulturalValue.objects.filter(variable__id=bf_id)
+        values = models.Value.objects.filter(variable__id=bf_id)
         min_value = None
         max_value = 0.0
         missing_data_option = False
@@ -538,6 +516,7 @@ def bin_cont_data(request):  # MAKE THIS GENERIC
             min_bin = min_bin + bin_size + 1
     return Response(bins)
 
+
 @api_view(['GET'])
 @permission_classes((AllowAny,))
 @renderer_classes((DPLACECSVRenderer,))
@@ -548,4 +527,3 @@ def csv_download(request):
     filename = "dplace-societies-%s.csv" % datetime.datetime.now().strftime("%Y-%m-%d")
     response['Content-Disposition'] = 'attachment; filename="%s"' % filename
     return response
-

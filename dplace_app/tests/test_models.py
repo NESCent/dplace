@@ -22,23 +22,23 @@ class EATestCase(TestCase):
             ext_id='binfordsoc',
             name='Binford Society',
             source=self.source)
-        self.variable = models.CulturalVariable.objects.create(
+        self.variable = models.Variable.objects.create(
             label='EA001',
             name='Variable 1',
             source=self.source)
-        self.code10 = models.CulturalCodeDescription.objects.create(
+        self.code10 = models.CodeDescription.objects.create(
             variable=self.variable,
             code='10',
             description='Code 10')
-        self.code1 = models.CulturalCodeDescription.objects.create(
+        self.code1 = models.CodeDescription.objects.create(
             variable=self.variable,
             code='1',
             description='Code 1')
-        self.code2 = models.CulturalCodeDescription.objects.create(
+        self.code2 = models.CodeDescription.objects.create(
             variable=self.variable,
             code='2',
             description='Code 2')
-        self.value = models.CulturalValue.objects.create(
+        self.value = models.Value.objects.create(
             variable=self.variable,
             society=self.ea_society,
             coded_value='1',
@@ -47,7 +47,7 @@ class EATestCase(TestCase):
 
     def test_society_coded_value(self):
         society = models.Society.objects.get(ext_id='easoc')
-        self.assertIn(self.value, society.culturalvalue_set.all())
+        self.assertIn(self.value, society.value_set.all())
 
     def test_coded_variable(self):
         self.assertEqual(self.code1.variable, self.variable)
@@ -78,7 +78,7 @@ class EATestCase(TestCase):
         assert self.value.get_description() == self.value.code.description
     
     def test_get_description_no_code(self):
-        obj = models.CulturalValue.objects.create(
+        obj = models.Value.objects.create(
             variable=self.variable,
             society=self.ea_society,
             coded_value='5',

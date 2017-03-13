@@ -1,14 +1,10 @@
 # -*- coding: utf-8 -*-
 import logging
 import re
-from operator import attrgetter
 
 from django.db import connection
 
-from dplace_app.models import (
-    Society, Source, CulturalValue, CulturalVariable, CulturalCodeDescription,
-    EnvironmentalVariable, EnvironmentalValue,
-)
+from dplace_app.models import Society, Source, Value, Variable, CodeDescription
 from sources import get_source
 
 
@@ -21,7 +17,7 @@ def load_data(repos):
     kw = dict(
         sources={(s.author, s.year): s for s in Source.objects.all()},
         descriptions={(vcd.variable_id, vcd.code): vcd
-                      for vcd in CulturalCodeDescription.objects.all()})
+                      for vcd in CodeDescription.objects.all()})
 
     #
     # To speed up the data load, we first delete all relevant objects, and then recreate
@@ -35,62 +31,45 @@ def load_data(repos):
     #    for table in ['culturalvalue_references', 'culturalvalue']:
     #        c.execute("ALTER SEQUENCE dplace_app_%s_id_seq RESTART WITH 1" % table)
 
-    for dstype, var_cls, var_id_attr, val_cls, val_var_id_attr in [
-        ('cultural', CulturalVariable, 'label', CulturalValue, 'var_label'),
-        ('environmental', EnvironmentalVariable, 'var_id', EnvironmentalValue, 'var_id')
-    ]:
-        var_id_attr = attrgetter(var_id_attr)
-        val_var_id_attr = attrgetter(val_var_id_attr)
-        variables = {var_id_attr(var): var for var in var_cls.objects.all()}
-        objs = []
-        pk = 0
-        for ds in repos.datasets:
-            if ds.type == dstype:
-                for item in ds.data:
-                    if item.soc_id not in societies:
-                        logging.warn('value for unknown society {0}'.format(item.soc_id))
-                        continue
-                    vid = val_var_id_attr(item)
-                    if vid not in variables:
-                        logging.warn('value for unknown variable {0}'.format(vid))
-                        continue
-                    v, _refs = _load_data(
-                        ds, item, societies[item.soc_id], variables[vid], **kw)
-                    if v:
-                        pk += 1
-                        objs.append(val_cls(**v))
-                        refs.extend([(pk, sid) for sid in _refs or []])
+    variables = {var.label: var for var in Variable.objects.all()}
+    objs = []
+    pk = 0
+    for ds in repos.datasets:
+        for item in ds.data:
+            if item.soc_id not in societies:
+                logging.warn('value for unknown society {0}'.format(item.soc_id))
+                continue
+            if item.var_id not in variables:
+                logging.warn('value for unknown variable {0}'.format(item.var_id))
+                continue
+            v, _refs = _load_data(
+                ds, item, get_source(ds), societies[item.soc_id], variables[item.var_id], **kw)
+            if v:
+                pk += 1
+                objs.append(Value(**v))
+                refs.extend([(pk, sid) for sid in _refs or []])
 
-        val_cls.objects.bulk_create(objs, batch_size=1000)
+    Value.objects.bulk_create(objs, batch_size=1000)
 
     with connection.cursor() as c:
         c.executemany(
             """\
-INSERT INTO dplace_app_culturalvalue_references (culturalvalue_id, source_id)
-VALUES (%s, %s)""",
-            refs)
-    return CulturalValue.objects.count() + EnvironmentalValue.objects.count()
+INSERT INTO dplace_app_value_references (value_id, source_id) VALUES (%s, %s)""", refs)
+    return Value.objects.count()
 
 
-def _load_data(ds, val, society, variable, sources=None, descriptions=None):
+def _load_data(ds, val, source, society, variable, sources=None, descriptions=None):
     v = dict(
         variable=variable,
         comment=val.comment,
         society=society,
-        source=get_source(val.dataset))
-    if ds.type == 'cultural':
-        v.update(
-            coded_value=val.code,
-            code=descriptions.get((variable.id, val.code)),
-            focal_year=val.year,
-            subcase=val.sub_case)
-        if variable.data_type == 'Continuous' and val.code and val.code != 'NA':
-            v['coded_value_float'] = float(val.code)
-    else:
-        if val.code != 'NA':
-            v['value'] = float(val.code)
-        else:
-            return None, None
+        source=source,
+        coded_value=val.code,
+        coded_value_float=float(val.code)
+        if variable.data_type == 'Continuous' and val.code and val.code != 'NA' else None,
+        code=descriptions.get((variable.id, val.code)),
+        focal_year=val.year,
+        subcase=val.sub_case)
 
     refs = set()
     if ds.type == 'cultural':

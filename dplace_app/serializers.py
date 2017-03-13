@@ -14,18 +14,19 @@ class SourceSerializer(serializers.ModelSerializer):
         model = models.Source
         fields = '__all__'
 
-# Cultural Trait Variables
-class CulturalCodeDescriptionSerializer(serializers.ModelSerializer):
+
+class CodeDescriptionSerializer(serializers.ModelSerializer):
     class Meta(object):
-        model = models.CulturalCodeDescription
+        model = models.CodeDescription
         fields = ('id', 'code', 'description', 'short_description', 'variable')
 
 
-class CulturalVariableSerializer(serializers.ModelSerializer):
+class VariableSerializer(serializers.ModelSerializer):
     class Meta(object):
-        model = models.CulturalVariable
+        model = models.Variable
         fields = (
             'id',
+            'type',
             'label',
             'name',
             'codebook_info',
@@ -42,38 +43,37 @@ class CategorySerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'type')
 
 
-class CulturalVariableDetailSerializer(serializers.ModelSerializer):
+class VariableDetailSerializer(serializers.ModelSerializer):
     index_categories = CategorySerializer(many=True)
     niche_categories = CategorySerializer(many=True)
 
     class Meta(object):
-        model = models.CulturalVariable
-        fields = (
-            'id', 'label', 'name', 'index_categories', 'niche_categories'
-        )
+        model = models.Variable
+        fields = ('id', 'label', 'name', 'index_categories', 'niche_categories')
 
 
 class CategoryDetailSerializer(serializers.ModelSerializer):
     # Use a Primary key related field or just get the variable
-    index_variables = CulturalVariableSerializer(many=True)
-    niche_variables = CulturalVariableSerializer(many=True)
+    index_variables = VariableSerializer(many=True)
+    niche_variables = VariableSerializer(many=True)
 
     class Meta(object):
         model = models.Category
         fields = ('id', 'name', 'type', 'index_variables', 'niche_variables')
 
 
-class CulturalValueSerializer(serializers.ModelSerializer):
-    code_description = CulturalCodeDescriptionSerializer(source='code')
+class ValueSerializer(serializers.ModelSerializer):
+    code_description = CodeDescriptionSerializer(source='code')
     references = SourceSerializer(many=True)
 
     class Meta(object):
-        model = models.CulturalValue
+        model = models.Value
         fields = (
             'id',
             'variable',
             'society',
             'coded_value',
+            'coded_value_float',
             'code_description',
             'source',
             'references',
@@ -89,18 +89,6 @@ class ISOCodeSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class EnvironmentalVariableSerializer(serializers.ModelSerializer):
-    class Meta(object):
-        model = models.EnvironmentalVariable
-        fields = '__all__'
-
-
-class EnvironmentalValueSerializer(serializers.ModelSerializer):
-    class Meta(object):
-        model = models.EnvironmentalValue
-        fields = '__all__'
-
-
 class LanguageFamilySerializer(serializers.ModelSerializer):
     class Meta(object):
         model = models.LanguageFamily
@@ -113,13 +101,7 @@ class LanguageSerializer(serializers.ModelSerializer):
 
     class Meta(object):
         model = models.Language
-        fields = (
-            'id',
-            'name',
-            'glotto_code',
-            'iso_code',
-            'family',
-        )
+        fields = ('id', 'name', 'glotto_code', 'iso_code', 'family')
 
 
 class LanguageSerializerWithSocieties(serializers.ModelSerializer):
@@ -128,14 +110,7 @@ class LanguageSerializerWithSocieties(serializers.ModelSerializer):
 
     class Meta(object):
         model = models.Language
-        fields = (
-            'id',
-            'name',
-            'glotto_code',
-            'iso_code',
-            'family',
-            'societies',
-        )
+        fields = ('id', 'name', 'glotto_code', 'iso_code', 'family', 'societies')
 
 
 class SocietySerializer(serializers.ModelSerializer):
@@ -191,7 +166,8 @@ class LanguageTreeLabelsSequenceSerializer(serializers.HyperlinkedModelSerialize
 
 
 class LanguageTreeLabelsSerializer(serializers.ModelSerializer):
-    societies = LanguageTreeLabelsSequenceSerializer(source='languagetreelabelssequence_set', many=True)
+    societies = LanguageTreeLabelsSequenceSerializer(
+        source='languagetreelabelssequence_set', many=True)
 
     class Meta(object):
         model = models.LanguageTreeLabels
@@ -249,15 +225,15 @@ class SocietyResultSet(object):
 
 
 class VariableCodeSerializer(serializers.Serializer):
-    codes = CulturalCodeDescriptionSerializer(many=True)
-    variable = CulturalVariableSerializer()
+    codes = CodeDescriptionSerializer(many=True)
+    variable = VariableSerializer()
 
 
 class SocietyResultSerializer(serializers.Serializer):
     "Serializer for the SocietyResult object"
     society = SocietyWithRegionSerializer()
-    variable_coded_values = CulturalValueSerializer(many=True)
-    environmental_values = EnvironmentalValueSerializer(many=True)
+    variable_coded_values = ValueSerializer(many=True)
+    environmental_values = ValueSerializer(many=True)
 
 
 class SocietyResultSetSerializer(serializers.Serializer):
@@ -268,7 +244,7 @@ class SocietyResultSetSerializer(serializers.Serializer):
     # variable descriptions -> variable codes
     variable_descriptions = VariableCodeSerializer(many=True)
     # environmental variables -> environmental values
-    environmental_variables = EnvironmentalVariableSerializer(many=True)
+    environmental_variables = VariableSerializer(many=True)
     # languages - Does not map to a more specific value
     languages = LanguageSerializer(many=True)
     # Geographic Regions - does not map to a more specific value
@@ -286,4 +262,3 @@ class Legend(object):
 class LegendSerializer(serializers.Serializer):
     name = serializers.CharField()
     svg = serializers.CharField()
-

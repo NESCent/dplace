@@ -76,7 +76,7 @@ function SearchModelService(VariableCategory, GeographicRegion, EnvironmentalCat
             extractedValues = societies.map(function(society) { 
                 for (var j = 0; j < society.environmental_values.length; j++) {
                     if (society.environmental_values[j].variable == results.environmental_variables[i].id) {
-                        if (society.environmental_values[j].value) return society.environmental_values[j].value;
+                        if (society.environmental_values[j].coded_value_float) return society.environmental_values[j].coded_value_float;
                     }
                 }
             });

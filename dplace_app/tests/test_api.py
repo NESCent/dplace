@@ -14,8 +14,6 @@ from dplace_app.loader import sources
 
 class Test(APITestCase):
     """Tests rest-framework API"""
-    _data = {}
-
     def _fixture_teardown(self):
         try:
             APITestCase._fixture_teardown(self)
@@ -35,15 +33,6 @@ class Test(APITestCase):
     def obj_in_results(self, obj, response):
         return getattr(obj, 'id', obj) in [x['id'] for x in response['results']]
 
-    def set(self, model, suffix, **kw):
-        obj = model.objects.create(**kw)
-        obj.save()
-        self._data['%s%s' % (model.__name__, suffix)] = obj
-        return obj
-
-    def get(self, model, suffix):
-        return self._data['%s%s' % (model.__name__, suffix)]
-
     def setUp(self):
         sources._SOURCE_CACHE = {}
         load(Path(__file__).parent.joinpath('data'))
@@ -55,16 +44,10 @@ class Test(APITestCase):
         res = self.client.get(reverse('view_society', args=('society1',)))
         self.assertIn('Söciety1'.encode('utf8'), res.content)
 
-    #def test_api_culturalcategory(self):
-    #    res = self.get_json(
-    #        'category-detail',
-    #        reverse_args=[Category.objects.get(name='Economy', type='cultural').id])
-    #    self.assertIsInstance(res['index_variables'][0], dict)
-
-    def test_api_culturalvariable(self):
+    def test_api_variable(self):
         res = self.get_json(
-            'culturalvariable-detail',
-            reverse_args=[CulturalVariable.objects.get(label='dscultural001').id])
+            'variable-detail',
+            reverse_args=[Variable.objects.get(label='1').id])
         self.assertIsInstance(res['index_categories'][0], dict)
 
     def test_zip_legends(self):
@@ -83,7 +66,7 @@ class Test(APITestCase):
         response = self.get_json(
             'min_and_max',
             {'query': json.dumps(
-                dict(environmental_id=EnvironmentalVariable.objects.get(name='Rainfall').id))})
+                dict(environmental_id=Variable.objects.get(name='Rainfall').id))})
         self.assertIsInstance(response, dict)
         self.assertIn('min', response)
         self.assertIn('max', response)
@@ -97,8 +80,7 @@ class Test(APITestCase):
         self.assertEqual(response.status_code, 404)
         response = self.get_json(
             'cont_variable',
-            {'query': json.dumps(dict(
-                bf_id=CulturalVariable.objects.get(label='dscultural002').id))})
+            {'query': json.dumps(dict(bf_id=Variable.objects.get(label='2').id))})
         self.assertIsInstance(response, list)
 
     def test_geo_api(self):
@@ -125,23 +107,25 @@ class Test(APITestCase):
             {'family': LanguageFamily.objects.first().id})
         self.assertEqual(response_dict['count'], 2)
 
-    def test_all_environmental_variables(self):
-        response_dict = self.get_json('environmentalvariable-list')
-        self.assertEqual(response_dict['count'], 3)
-        for name in ['Rainfall', 'Temperature', 'Ecology1']:
-            env_var = EnvironmentalVariable.objects.get(name=name)
+    def test_all_variables(self):
+        response_dict = self.get_json('variable-list')
+        self.assertEqual(response_dict['count'], 5)
+        self.assertEqual(
+            len([x for x in response_dict['results'] if x['type'] == 'cultural']), 2)
+        for name in ['Rainfall', 'Temperature', 'Subsistence economy: gathering']:
+            env_var = Variable.objects.get(name=name)
             self.assertTrue(self.obj_in_results(env_var, response_dict))
 
-    def test_env_category1_variables(self):
+    def test_category1_variables(self):
         response_dict = self.get_json(
-            'environmentalvariable-list',
-            {'category': Category.objects.get(name='Climate').id})
+            'variable-list',
+            {'index_categories': [Category.objects.get(name='Climate').id]})
         for name, assertion in [
             ('Rainfall', self.assertTrue),
             ('Temperature', self.assertTrue),
             ('Ecology1', self.assertFalse)
         ]:
-            env_var = EnvironmentalVariable.objects.get(name=name)
+            env_var = Variable.objects.get(name=name)
             assertion(self.obj_in_results(env_var, response_dict))
 
     def test_code_description_order(self):
@@ -149,55 +133,57 @@ class Test(APITestCase):
         Make sure 2 comes before 10
         """
         response_dict = self.get_json(
-            'culturalcodedescription-list',
-            {'variable': CulturalVariable.objects.get(label='dscultural001').id})
+            'codedescription-list', {'variable': Variable.objects.get(label='1').id})
         self.assertEqual(
             [res['code'] for res in response_dict['results']],
             ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'NA'])
 
-    def test_all_variables(self):
-        response_dict = self.get_json('culturalvariable-list')
-        self.assertEqual(response_dict['count'], 2)
-        for cv in CulturalVariable.objects.all():
-            self.assertTrue(self.obj_in_results(cv, response_dict))
-
     def test_filter_source(self):
         response_dict = self.get_json(
-            'culturalvariable-list',
-            {'source': Source.objects.get(name='Ethnographic Atlas').id})
-        self.assertEqual(response_dict['count'], 2)
-
-    def test_category1_variables(self):
-        response_dict = self.get_json(
-            'culturalvariable-list',
-            {'index_categories': [Category.objects.get(name='Economy').id]})
+            'variable-list', {'source': Source.objects.get(name='Ethnographic Atlas').id})
         self.assertEqual(response_dict['count'], 2)
 
     def test_category2_variables(self):
         response_dict = self.get_json(
-            'culturalvariable-list',
+            'variable-list',
+            {'index_categories': [Category.objects.get(name='Economy').id]})
+        self.assertEqual(response_dict['count'], 2)
+
+    def test_category3_variables(self):
+        response_dict = self.get_json(
+            'variable-list',
             {'index_categories': [Category.objects.get(name='Subsistence').id]})
         self.assertEqual(response_dict['count'], 1)
         self.assertEqual(
             response_dict['results'][0]['name'],
-            CulturalVariable.objects.get(label='dscultural001').name)
+            Variable.objects.get(label='1').name)
         self.assertFalse(self.obj_in_results(
-            CulturalVariable.objects.get(label='dscultural002'), response_dict))
+            Variable.objects.get(label='2'), response_dict))
 
     def test_csv_download(self):
         response = self.client.get(reverse('csv_download'))
         self.assertEqual(response.content.split()[0], '"Research')
         response = self.get_json(
             'csv_download',
-            {'query': json.dumps({'p': [GeographicRegion.objects.get(region_nam='Region1').id]})})
+            {'query': json.dumps({'p': [
+                GeographicRegion.objects.get(region_nam='Region1').id]})})
         self.assertIn('Region1'.encode('utf8'), response)
 
-    def test_csv_download_cultural_var(self):
+    def test_csv_download_var(self):
         response = self.client.get(reverse('csv_download'))
         self.assertEqual(response.content.split()[0], '"Research')
         response = self.get_json(
             'csv_download', 
-            {'query': json.dumps({'c': ['%s-%s' % (CulturalCodeDescription.objects.get(code='1').variable.id, CulturalCodeDescription.objects.get(code='1').id)]})})
+            {'query': json.dumps({'c': ['%s-%s' % (
+                CodeDescription.objects.get(code='1').variable.id,
+                CodeDescription.objects.get(code='1').id)]})})
+        self.assertIn('Herero', response.decode('utf8'))
+
+    def test_trees_from_societies(self):
+        response = self.get_json(
+            'trees_from_societies',
+            {s.ext_id: s.id for s in Society.objects.all()})
+        self.assertEqual(response, [])
 
     #
     # find societies:
@@ -230,8 +216,8 @@ class Test(APITestCase):
 
     def test_find_society_by_var(self):
         response = self.get_results(c=['%s-%s' % (
-            CulturalCodeDescription.objects.get(code='1').variable.id,
-            CulturalCodeDescription.objects.get(code='1').id)])
+            CodeDescription.objects.get(code='1').variable.id,
+            CodeDescription.objects.get(code='1').id)])
         self.assertTrue(
             self.society_in_results(Society.objects.get(ext_id='society1'), response))
         self.assertFalse(
@@ -239,8 +225,8 @@ class Test(APITestCase):
 
     def test_find_societies_by_var(self):
         serialized_codes = [
-            '%s-%s' % (CulturalCodeDescription.objects.get(code=i).variable.id,
-                       CulturalCodeDescription.objects.get(code=i).id) for i in ['1', '4']
+            '%s-%s' % (CodeDescription.objects.get(code=i).variable.id,
+                       CodeDescription.objects.get(code=i).id) for i in ['1', '4']
         ]
         response = self.get_results(c=serialized_codes)
         self.assertTrue(
@@ -257,7 +243,7 @@ class Test(APITestCase):
 
     def test_find_society_by_continuous_var(self):
         response = self.get_results(c=['%s-%s-%s' % (
-            CulturalVariable.objects.get(label='dscultural002').id, 0.0, 100)])
+            Variable.objects.get(label='2').id, 0.0, 100)])
         self.assertTrue(
             self.society_in_results(Society.objects.get(ext_id='society1'), response))
         self.assertFalse(
@@ -265,8 +251,8 @@ class Test(APITestCase):
 
     def test_find_no_societies(self):
         response = self.get_results(
-            c=['%s-%s' % (CulturalCodeDescription.objects.get(code='1').variable.id,
-                          CulturalCodeDescription.objects.get(code='9').id)])
+            c=['%s-%s' % (CodeDescription.objects.get(code='1').variable.id,
+                          CodeDescription.objects.get(code='9').id)])
         self.assertEqual(len(response.data['societies']), 0)
 
     def test_find_society_by_language_and_var(self):
@@ -276,8 +262,8 @@ class Test(APITestCase):
         # This tests that results should be intersection (AND), not union (OR)
         # Society 3 is not coded for any variables, so it should not appear in the list.
         serialized_vcs = ['%s-%s' % (
-            CulturalCodeDescription.objects.get(code=i).variable.id,
-            CulturalCodeDescription.objects.get(code=i).id) for i in ['1', '4']]
+            CodeDescription.objects.get(code=i).variable.id,
+            CodeDescription.objects.get(code=i).id) for i in ['1', '4']]
         serialized_lcs = [
             Language.objects.get(glotto_code=i).id for i in ['aaaa1234', 'cccc1234']]
         response = self.get_results(c=serialized_vcs, l=serialized_lcs)
@@ -295,8 +281,7 @@ class Test(APITestCase):
 
     def test_find_by_environmental_filter_gt(self):
         response = self.get_results(
-            e=[[EnvironmentalVariable.objects.get(name='Rainfall').id,
-                'gt', ['1.5']]])
+            e=[[Variable.objects.get(name='Rainfall').id, 'gt', ['1.5']]])
         self.assertTrue(
             self.society_in_results(Society.objects.get(ext_id='society2'), response))
         self.assertFalse(
@@ -304,7 +289,7 @@ class Test(APITestCase):
 
     def test_find_by_environmental_filter_lt(self):
         response = self.get_results(
-            e=[[EnvironmentalVariable.objects.get(name='Rainfall').id,
+            e=[[Variable.objects.get(name='Rainfall').id,
                 'lt', ['1.5']]])
         self.assertTrue(
             self.society_in_results(Society.objects.get(ext_id='society1'), response))
@@ -313,7 +298,7 @@ class Test(APITestCase):
 
     def test_find_by_environmental_filter_inrange(self):
         response = self.get_results(
-            e=[[EnvironmentalVariable.objects.get(name='Rainfall').id,
+            e=[[Variable.objects.get(name='Rainfall').id,
                 'inrange', ['0.0', '1.5']]])
         self.assertTrue(
             self.society_in_results(Society.objects.get(ext_id='society1'), response))
@@ -322,7 +307,7 @@ class Test(APITestCase):
 
     def test_find_by_environmental_filter_outrange(self):
         response = self.get_results(
-            e=[[EnvironmentalVariable.objects.get(name='Rainfall').id,
+            e=[[Variable.objects.get(name='Rainfall').id,
                 'outrange', ['0.0', '3.0']]])
         self.assertFalse(
             self.society_in_results(Society.objects.get(ext_id='society1'), response))
