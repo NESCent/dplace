@@ -4,8 +4,8 @@ from collections import defaultdict
 
 from django.core.files.base import ContentFile
 from nexus import NexusReader
-from ete2 import Tree
-from ete2.coretype.tree import TreeError
+from ete3 import Tree
+from ete3.coretype.tree import TreeError
 from dplace_app.models import (
     Society, LanguageTree, Language, LanguageTreeLabels, LanguageTreeLabelsSequence,
 )

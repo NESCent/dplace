@@ -1,6 +1,6 @@
 # coding: utf8
 """
-We provide a customized alternative to ete2.Tree.prune to increase the speed of tree
+We provide a customized alternative to ete3.Tree.prune to increase the speed of tree
 pruning for the special case of
 - nodes being specified by node name
 - branch lengths always 1 for Glottolog trees
@@ -8,8 +8,8 @@ pruning for the special case of
 from __future__ import unicode_literals
 from collections import defaultdict
 
-from ete2 import Tree
-from ete2.coretype.tree import TreeError
+from ete3 import Tree
+from ete3.coretype.tree import TreeError
 
 
 def prune(tree, nodes, const_depth=True, keep_root=False):

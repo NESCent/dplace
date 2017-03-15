@@ -1,7 +1,7 @@
 # coding: utf8
 from __future__ import unicode_literals
 
-from ete2 import Tree
+from ete3 import Tree
 from django.test import TestCase
 
 from dplace_app.tree import prune
