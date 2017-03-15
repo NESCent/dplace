@@ -5,9 +5,9 @@ from itertools import groupby
 import logging
 
 from django.db import connection
-from django.db.models import Prefetch, Q
+from django.db.models import Prefetch, Q, Count
 from django.shortcuts import get_object_or_404
-from django.http import Http404, HttpResponseRedirect
+from django.http import Http404
 
 from rest_framework import viewsets
 from rest_framework.pagination import PageNumberPagination
@@ -100,7 +100,7 @@ class SocietyViewSet(viewsets.ReadOnlyModelViewSet):
         if society.language:
             # just glottolog at the moment
             language_classification = models.LanguageFamily.objects\
-                .filter(name=society.language.family.name, scheme='G')
+                .filter(name=society.language.family.name)
 
         return Response(
             {
@@ -143,8 +143,10 @@ class LanguageViewSet(viewsets.ReadOnlyModelViewSet):
 
 class LanguageFamilyViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = serializers.LanguageFamilySerializer
-    filter_fields = ('name', 'scheme',)
-    queryset = models.LanguageFamily.objects.all().order_by('name')
+    filter_fields = ('name',)
+    queryset = models.LanguageFamily.objects.all()\
+        .annotate(language_count=Count('language__societies'))\
+        .order_by('name')
     pagination_class = LargeResultsSetPagination
 
 
