@@ -5,27 +5,6 @@ from collections import defaultdict
 from django.core.urlresolvers import reverse
 from django.db import models
 
-UNIT_CHOICES = (
-    ('mm', 'mm'),
-    ('℃', '℃'),
-    ('mo', 'mo'),
-    ('', ''),
-    ('gC m-2 day-1', 'gC m-2 day-1')
-)
-
-CLASS_LEVELS = (
-    (1, 'Family'),
-    (2, 'Subfamily'),
-    (3, 'Subsubfamily')
-)
-
-
-CLASSIFICATION_SCHEMES = (
-    ('E', 'Ethnologue17',),
-    ('R', 'Ethnologue17-Revised',),
-    ('G', 'Glottolog',),
-)
-
 
 class ISOCode(models.Model):
     iso_code = models.CharField(
@@ -293,16 +272,7 @@ class Source(models.Model):
 
 
 class LanguageFamily(models.Model):
-    scheme = models.CharField(max_length=1, choices=CLASSIFICATION_SCHEMES, default='G')
     name = models.CharField(max_length=50, db_index=True)
-    language_count = models.IntegerField(default=0, null=False)
-
-    def update_counts(self):
-        self.language_count = 0
-        for society in Society.objects.all().filter(language__family=self):
-            if society.value_set.count() > 0:
-                self.language_count += 1
-        self.save()
 
 
 class Language(models.Model):

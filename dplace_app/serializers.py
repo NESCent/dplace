@@ -90,6 +90,8 @@ class ISOCodeSerializer(serializers.ModelSerializer):
 
 
 class LanguageFamilySerializer(serializers.ModelSerializer):
+    language_count = serializers.IntegerField(read_only=True)
+
     class Meta(object):
         model = models.LanguageFamily
         fields = '__all__'

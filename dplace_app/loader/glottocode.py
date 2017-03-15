@@ -32,7 +32,7 @@ def load_language(ldata, languages, families, isocodes):
     family = families.get(family_id)
     if not family:
         family_name = ldata.family_name or ldata.name
-        family = LanguageFamily.objects.create(name=family_name, scheme='G')
+        family = LanguageFamily.objects.create(name=family_name)
         family.save()
         families[family_id] = family
 
