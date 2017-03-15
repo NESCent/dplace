@@ -26,8 +26,7 @@ D-PLACE also requires the following software:
 - Git
 - Python (2.7 preferred)
 - python-psycopg2 (for connecting to Postgres)
-- Postgres with PostGIS
-- the Postgres `unaccent` extension.
+- Postgres with the `unaccent` extension.
 
 D-PLACE has been developed on Mac OS X 10.9 as well as Ubuntu Server 12.04.
 
@@ -70,7 +69,7 @@ Be sure to update the following sections:
 
 To install the database, run
 
-	python manage.py migrate
+	make install
 
 This requires valid database credentials in `settings.py`, and activation of your virtualenv if enabled.
 
@@ -112,7 +111,14 @@ D-PLACE uses Django's built-in testing framework, tests can be run with
 
 	python manage.py test
         
-Test scripts located in `dplace_app/tests` and should be kept up-to-date with new functionality. The tests cover model and API functionality, but not yet the AngularJS layer.
+The front-end tests can be run with `node`:
+
+	npm test
+
+All the tests can be run at the same time by running:
+
+	make test
+
 
 ### Running Development Server
 
