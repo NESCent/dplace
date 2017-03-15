@@ -1,8 +1,5 @@
-import csv
-import zipfile
-
 from rest_framework import renderers
-from six import StringIO, text_type
+from clldutils.dsv import UnicodeWriter
 
 # TODO: add in 'How to cite' here
 CSV_PREAMBLE = """
@@ -36,8 +33,11 @@ class DPLACECSVResults(object):
             ]
         self.rows = []
         self.parse()
-        self.encode_field_names()
         self.flatten()
+
+    def __iter__(self):
+        for row in self.rows:
+            yield [row.get(field, '') for field in self.field_names]
 
     def field_names_for_cultural_variable(self, variable):
         v = "%s %s" % (variable['label'], variable['name'])
@@ -81,12 +81,6 @@ class DPLACECSVResults(object):
                 self.field_map['environmental_variables'][v['id']] = field_names
                 self.field_names.append(field_names['name'])
                 self.field_names.append(field_names['comments'])
-
-    def encode_field_names(self):
-        # Field names must also be utf-8 encoded
-        self.field_names = [
-            field.encode("utf-8") for field in self.field_names
-        ]
 
     def flatten(self):
         # data is a dictionary with a list of societies
@@ -202,19 +196,6 @@ class DPLACECSVResults(object):
                 self.rows.append(extra)
 
 
-def encode_if_text(val):
-    return val.encode('utf-8') if isinstance(val, text_type) else val
-
-
-def encode_rowdict(rowdict):
-    encoded = dict()
-    for k in rowdict:
-        encoded_k = encode_if_text(k)
-        elem = rowdict[k]
-        encoded[encoded_k] = encode_if_text(elem)
-    return encoded
-
-
 class DPLACECSVRenderer(renderers.BaseRenderer):
     media_type = 'text/csv'
     format = 'csv'
@@ -224,15 +205,9 @@ class DPLACECSVRenderer(renderers.BaseRenderer):
         if data is None:
             return ''
         results = DPLACECSVResults(data)
-        csv_buffer = StringIO()
-        csv_writer = csv.DictWriter(
-            csv_buffer, results.field_names, extrasaction='ignore')
-        cite_writer = csv.writer(csv_buffer)
-        cite_writer.writerow([CSV_PREAMBLE])
-        csv_writer.writeheader()
-        for row in results.rows:
-            csv_writer.writerow(encode_rowdict(row))
-
-        return csv_buffer.getvalue()
-
-
+        with UnicodeWriter() as writer:
+            writer.writerow([CSV_PREAMBLE])
+            writer.writerow(results.field_names)
+            for row in results:
+                writer.writerow(row)
+        return writer.read()

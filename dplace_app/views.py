@@ -1,9 +1,13 @@
+import json
+import zipfile
+import datetime
+
 from django.http import Http404, HttpResponse
 from django.shortcuts import render, get_object_or_404
 from dplace_app.models import Language
 from django.views.decorators.csrf import ensure_csrf_cookie
 from six import StringIO
-import csv, json, zipfile, datetime, sys
+
 
 def view_language(request, glottocode):
     language = get_object_or_404(Language, glottocode=glottocode)
@@ -17,6 +21,7 @@ def view_language(request, glottocode):
         'environmentals': environmentals,
         'ea_values': ea_values
     })
+
 
 def download_file(request):
     if request.method =='POST':
@@ -52,9 +57,9 @@ def download_file(request):
     response['Content-Disposition'] = 'attachment; filename='+filename
     return response
 
+
 @ensure_csrf_cookie
 def angular(request):
-
     # block spider attacks
     if len(request.GET) > 0 and request.path.startswith('/home'):
         raise Http404

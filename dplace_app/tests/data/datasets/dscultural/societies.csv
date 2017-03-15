@@ -1,0 +1,5 @@
+id,xd_id,pref_name_for_society,glottocode,ORIG_name_and_ID_in_this_dataset,alt_names_by_society,main_focal_year,HRAF_name_ID,HRAF_link,origLat,origLong,Lat,Long,Comment,glottocode_comment
+society1,xd1,Söciety1,aaaa1234,Herero (Ab1),"Damara, Ovaherero",1900,,,-21,16,-21,16,Original,
+society2,xd2,Society2,dddd1234,Duruma (Ad31),Waduruma,1910,,,-4,39,-4,39,Original,
+society3,xd1,Society3,cccc1234,Giriama (Ad32),"Kiriama, Wagiryama",1900,,,-3,40,-3,40,Original,
+society4,xd3,Pokomo,abcd1237,Pokomo (Ad33),Wapokomo,1900,,,-1,40,-1,40,Original,

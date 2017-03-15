@@ -11,7 +11,7 @@ function EnvironmentalCtrl($scope, searchModelService, EnvironmentalVariable, En
     linkModel();
     
     $scope.categoryChanged = function(variable) {
-        variable.variables = EnvironmentalVariable.query({category: variable.selectedCategory.id});    
+        variable.variables = EnvironmentalVariable.query({index_categories: [variable.selectedCategory.id]});
     };
     
     $scope.addVariable = function() {

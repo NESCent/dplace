@@ -53,7 +53,7 @@ describe('Testing environmental search', function() {
             .respond(200);
         $httpBackend.whenGET('/api/v1/geographic_regions?page_size=1000')
             .respond(200);
-        $httpBackend.whenGET('/api/v1/environmental_categories')
+        $httpBackend.whenGET('/api/v1/categories?type=environmental')
             .respond(200);
         $httpBackend.whenGET('/api/v1/language_families?page_size=1000')
             .respond(200);

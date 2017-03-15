@@ -1,4 +1,0 @@
-VarID,Name,IndexCategory,VarType,Description,Units,In_DPLACE
-Rainfall,Rainfall,Climate,Continuous,Precipitation,mm,
-Temperature,Temperature,Climate,Continuous,Temperature,C,
-Ecology1,Ecology1,Ecology,Continuous,,,

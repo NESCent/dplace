@@ -165,8 +165,8 @@ angular.module('dplaceServices', ['ngResource'])
     })
     .factory('EnvironmentalCategory', function($resource) {
         return $resource(
-            '/api/v1/environmental_categories/:id',
-            {}, {
+            '/api/v1/categories/:id',
+            {type: "environmental"}, {
                 query: {
                     method: 'GET',
                     isArray: true,
@@ -178,8 +178,8 @@ angular.module('dplaceServices', ['ngResource'])
     })
     .factory('EnvironmentalVariable', function ($resource) {
         return $resource(
-            '/api/v1/environmental_variables/:id',
-            {page_size: 1000}, {
+            '/api/v1/variables/:id',
+            {page_size: 1000, type: "environmental"}, {
                 query: {
                     method: 'GET',
                     isArray: true,

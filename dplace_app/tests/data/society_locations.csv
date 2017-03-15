@@ -1,6 +1,0 @@
-dataset,soc_id,origLat,origLong,Lat,Long,Comment,region
-Binford,society1,3.00,114.00,3.00,114.00,Original,Northern Europe
-Binford,society2,8.58,81.25,8.59,81.19,Revised,Middle Europe
-Binford,unknown,-15.32,124.72,-15.32,124.72,Original,Middle Europe
-Binford,soc2,-16.91,127.83,-16.91,127.83,Original,Middle Europe
-Binford,soc2,-16.30,139.30,-16.48,139.32,Revised,Unknown Region

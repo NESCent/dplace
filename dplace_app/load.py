@@ -1,74 +1,203 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import sys
-from itertools import chain
+from itertools import groupby
 from time import time
-import os
 from functools import partial
+import re
 
 import django
 django.setup()
 
 from django.db import transaction
-from django.conf import settings
 from clldutils.dsv import reader
+from clldutils.path import Path
+from clldutils.text import split_text
+from clldutils import jsonlib
+import attr
 
-from load.util import configure_logging
-from load.society import society_locations, load_societies
-from load.environmental import load_environmental, load_environmental_var
-from load.geographic import load_regions
-from load.tree import load_trees, tree_names, prune_trees
-from load.variables import load_vars, load_codes
-from load.values import load_data
-from load.sources import load_references
-from load.glottocode import xd_to_language
+from dplace_app.models import Source
+from loader.util import configure_logging, load_regions
+from loader.society import society_locations, load_societies, load_society_relations
+from loader.tree import load_trees, tree_names, prune_trees
+from loader.variables import load_vars
+from loader.values import load_data
+from loader.sources import load_references
+from loader.glottocode import load_languages
 
-
-def data_path(*comps):
-    return os.path.join(os.path.dirname(__file__), '..', 'datasets', *comps)
-
-csv_path = partial(data_path, 'csv')
-
-
-def csv_items(*names):
-    return chain(*[reader(csv_path(name), dicts=True) for name in names])
+DATA_DIR = Path(__file__).parent.parent.joinpath('datasets')
+comma_split = partial(split_text, separators=',', strip=True, brackets={})
+semicolon_split = partial(split_text, separators=';', strip=True, brackets={})
 
 
-def csv_names(pattern):
-    return [pattern % dataset for dataset in settings.DATASETS]
+def valid_enum_member(choices, instance, attribute, value):
+    if value not in choices:
+        raise ValueError(value)
 
 
-def main():  # pragma: no cover
-    configure_logging()
+@attr.s
+class Variable(object):
+    category = attr.ib(convert=lambda s: [c.capitalize() for c in comma_split(s)])
+    id = attr.ib()
+    title = attr.ib()
+    definition = attr.ib()
+    type = attr.ib(
+        validator=partial(valid_enum_member, ['Continuous', 'Categorical', 'Ordinal']))
+    units = attr.ib()
+    source = attr.ib()
+    changes = attr.ib()
+    notes = attr.ib()
+    codes = attr.ib(default=attr.Factory(list))
 
-    for spec in [
-        (load_societies, csv_items(*csv_names('%s_societies.csv'))),
-        (load_regions, data_path('geo', 'level2.json')),
-        (society_locations, csv_items('society_locations.csv')),
-        (load_vars, csv_items(*csv_names('%sVariableList.csv'))),
-        (load_codes, csv_items(*csv_names('%sCodeDescriptions.csv'))),
-        # Linking Societies to Languoids
-        (
-            xd_to_language,
-            csv_items('xd_id_to_language.csv'), csv_items('glottolog.csv')),
-        (
-            load_references,
-            csv_items('ReferenceMapping.csv', 'BinfordReferenceMapping.csv')),
-        (load_data, csv_items(*csv_names('%s_data.csv'))),
-        (load_environmental_var, csv_items('environmentalVariableList.csv')),
-        (load_environmental, csv_items('environmental_data.csv')),
-        (load_trees, data_path()),
-        (tree_names, data_path()),
-        (prune_trees,),
+
+@attr.s
+class Data(object):
+    soc_id = attr.ib()
+    sub_case = attr.ib()
+    year = attr.ib()
+    var_id = attr.ib()
+    code = attr.ib()
+    comment = attr.ib()
+    references = attr.ib(convert=semicolon_split)
+    source_coded_data = attr.ib()
+    admin_comment = attr.ib()
+
+
+@attr.s
+class ObjectWithSource(object):
+    id = attr.ib()
+    name = attr.ib()
+    year = attr.ib()
+    author = attr.ib()
+    reference = attr.ib()
+    base_dir = attr.ib()
+
+    @property
+    def dir(self):
+        return self.base_dir.joinpath(self.id)
+
+    def as_source(self):
+        return Source.objects.create(
+            **{k: getattr(self, k) for k in 'year author name reference'.split()})
+
+
+@attr.s
+class RelatedSociety(object):
+    dataset = attr.ib(convert=lambda s: s.strip())
+    name = attr.ib(convert=lambda s: s.strip())
+    id = attr.ib(convert=lambda s: s.strip())
+
+    @classmethod
+    def from_string(cls, s):
+        match = re.match('([A-Za-z]+):\s*([^\[]+)\[([^\]]+)\]$', s)
+        if not match:
+            raise ValueError(s)
+        return cls(*match.groups())
+
+
+@attr.s
+class RelatedSocieties(object):
+    id = attr.ib()
+    related = attr.ib(convert=lambda s: [
+        RelatedSociety.from_string(ss) for ss in semicolon_split(s)])
+
+
+@attr.s
+class Dataset(ObjectWithSource):
+    type = attr.ib(validator=partial(valid_enum_member, ['cultural', 'environmental']))
+    description = attr.ib()
+
+    def _items(self, what, **kw):
+        fname = self.dir.joinpath('{0}.csv'.format(what))
+        return list(reader(fname, **kw)) if fname.exists() else []
+
+    @property
+    def data(self):
+        return [Data(**d) for d in self._items('data', dicts=True)]
+
+    @property
+    def references(self):
+        return self._items('references', namedtuples=True)
+
+    @property
+    def societies(self):
+        return self._items('societies', namedtuples=True)
+
+    @property
+    def society_relations(self):
+        return [
+            RelatedSocieties(**d) for d in self._items('societies_mapping', dicts=True)]
+
+    @property
+    def variables(self):
+        codes = {vid: list(c) for vid, c in groupby(
+            sorted(self._items('codes', namedtuples=True), key=lambda c: c.var_id),
+            lambda c: c.var_id)}
+        return [
+            Variable(codes=codes.get(v['id'], []), **v)
+            for v in self._items('variables', dicts=True)]
+
+
+@attr.s
+class Phylogeny(ObjectWithSource):
+    scaling = attr.ib()
+
+    @property
+    def trees(self):
+        return self.dir.joinpath('summary.trees')
+
+    @property
+    def xdid_socid_links(self):
+        return list(reader(self.dir.joinpath('xdid_socid_links.csv'), dicts=True))
+
+
+class Repos(object):
+    def __init__(self, dir_):
+        self.dir = dir_
+        self.datasets = [
+            Dataset(base_dir=self.dir.joinpath('datasets'), **r) for r in
+            reader(self.dir.joinpath('datasets', 'index.csv'), dicts=True)]
+        self.phylogenies = [
+            Phylogeny(base_dir=self.dir.joinpath('phylogenies'), **r) for r in
+            reader(self.dir.joinpath('phylogenies', 'index.csv'), dicts=True)]
+
+    def path(self, *comps):
+        return self.dir.joinpath(*comps)
+
+    def read_csv(self, *comps, **kw):
+        return list(reader(self.path(*comps), **kw))
+
+    def read_json(self, *comps):
+        return jsonlib.load(self.path(*comps))
+
+
+def load(repos=None):
+    test = repos is not None
+    configure_logging(test=test)
+    repos = Repos(repos or DATA_DIR)
+
+    for func in [
+        load_societies,
+        load_society_relations,
+        load_regions,
+        society_locations,
+        load_vars,
+        load_languages,
+        load_references,
+        load_data,
+        load_trees,
+        tree_names,
+        prune_trees,
     ]:
         with transaction.atomic():
-            loader, args = spec[0], spec[1:]
-            print("%s..." % loader.__name__)
+            if not test:
+                print("%s..." % func.__name__)  # pragma: no cover
             start = time()
-            res = loader(*args)
-            print("%s loaded in %s secs" % (res, time() - start))
+            res = func(repos)
+            if not test:
+                print("%s loaded in %s secs" % (res, time() - start))  # pragma: no cover
 
 
 if __name__ == '__main__':  # pragma: no cover
-    main()
+    load()
     sys.exit(0)

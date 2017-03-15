@@ -8,26 +8,21 @@ from ete3 import Tree
 from ete3.coretype.tree import TreeError
 from dplace_app.models import (
     Society, LanguageTree, Language, LanguageTreeLabels, LanguageTreeLabelsSequence,
-    Source,
 )
 from dplace_app.tree import update_newick
-from clldutils.path import Path
-from clldutils import dsv
 
 
-def tree_names(data_dir):
+def tree_names(repos):
     sequences = []
-    phylo_dir = Path(data_dir).joinpath('phylogenies')
-    if phylo_dir.joinpath('phylogenies.csv').exists():
-        for phylo in dsv.reader(phylo_dir.joinpath('phylogenies.csv'), dicts=True):
-            _tree_names(phylo_dir.joinpath(phylo['Directory']), sequences)
+    for phylo in repos.phylogenies:
+        _tree_names(phylo, sequences)
     LanguageTreeLabelsSequence.objects.bulk_create(sequences)
     return len(sequences)
             
 
-def _tree_names(tree_dir, label_sequences):
+def _tree_names(phylo, label_sequences):
     try:
-        tree = LanguageTree.objects.get(name=tree_dir.name)
+        tree = LanguageTree.objects.get(name=phylo.id)
     except:
         return False
 
@@ -36,7 +31,7 @@ def _tree_names(tree_dir, label_sequences):
     except TreeError:
         return False
 
-    for item in dsv.reader(tree_dir.joinpath('xdid_socid_links.csv'), dicts=True):
+    for item in phylo.xdid_socid_links:
         name_on_tip = item['Name_on_tree_tip']
         xd_ids = [i.strip() for i in item['xd_id'].split(',')]
         society_ids = [i.strip() for i in item['soc_id'].split(',')]
@@ -60,8 +55,7 @@ def _tree_names(tree_dir, label_sequences):
     return True
 
 
-def load_trees(data_dir, verbose=False):
-    data_dir = Path(data_dir)
+def load_trees(repos, verbose=False):
     l_by_iso, l_by_glotto, l_by_name = \
         defaultdict(list), defaultdict(list), defaultdict(list)
 
@@ -80,41 +74,26 @@ def load_trees(data_dir, verbose=False):
             return l_by_name[taxon_name]
 
     count = 0
-    if data_dir.joinpath('phylogenies', 'phylogenies.csv').exists():
-        for phylo in dsv.reader(
-                data_dir.joinpath('phylogenies', 'phylogenies.csv'), dicts=True):
-            fname = data_dir.joinpath('phylogenies', phylo['Directory'])
-            assert fname.is_dir() and fname.joinpath('summary.trees').exists()
-            if _load_tree(
-                    fname.name,
-                    fname.joinpath('summary.trees'),
-                    get_language,
-                    source=phylo):
-                count += 1
+    for phylo in repos.phylogenies:
+        count += _load_tree(phylo.id, phylo.trees, get_language, phylo=phylo)
 
-    for fname in data_dir.joinpath('trees').iterdir():
+    for fname in repos.path('trees').iterdir():
         if fname.name.endswith('.trees'):
-            if _load_tree(fname.stem, fname, get_language):
-                count += 1
+            count += _load_tree(fname.stem, fname, get_language)
     return count
 
 
-def _load_tree(name, fname, get_language, verbose=False, source=None):
+def _load_tree(name, fname, get_language, verbose=False, phylo=None):
     # now add languages to the tree
-    try:
-        reader = NexusReader(fname.as_posix())
-    except:
-        print(fname)
-        raise
+    reader = NexusReader(fname.as_posix())
 
     # make a tree if not exists. Use the name of the tree
     tree, created = LanguageTree.objects.get_or_create(name=name)
     if not created:
-        return False
+        return 0
 
-    if source:
-        source = Source.objects.create(
-            **{k.lower(): source[k] for k in 'Year Author Name Reference'.split()})
+    if phylo:
+        source = phylo.as_source()
         source.save()
         tree.source = source
 
@@ -134,9 +113,9 @@ def _load_tree(name, fname, get_language, verbose=False, source=None):
         logging.info("Formatting newick string %s" % (newick))
         
     tree.newick_string = str(newick)
-    if source:
+    if phylo:
         tree.save()
-        return True
+        return 1
 
     # phylogeny taxa require reading of CSV mapping files, glottolog trees do not
     for taxon_name in reader.trees.taxa:
@@ -162,10 +141,10 @@ def _load_tree(name, fname, get_language, verbose=False, source=None):
                 )
             tree.taxa.add(label)
     tree.save()
-    return True
+    return 1
 
 
-def prune_trees():
+def prune_trees(_):
     labels = LanguageTreeLabels.objects.all()
     count = 0
     for t in LanguageTree.objects.order_by('name').all():
