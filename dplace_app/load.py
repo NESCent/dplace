@@ -4,6 +4,7 @@ import sys
 from itertools import groupby
 from time import time
 from functools import partial
+import re
 
 import django
 django.setup()
@@ -17,7 +18,7 @@ import attr
 
 from dplace_app.models import Source
 from loader.util import configure_logging, load_regions
-from loader.society import society_locations, load_societies
+from loader.society import society_locations, load_societies, load_society_relations
 from loader.tree import load_trees, tree_names, prune_trees
 from loader.variables import load_vars
 from loader.values import load_data
@@ -25,8 +26,8 @@ from loader.sources import load_references
 from loader.glottocode import load_languages
 
 DATA_DIR = Path(__file__).parent.parent.joinpath('datasets')
-comma_split = partial(split_text, separators=',', strip=True)
-semicolon_split = partial(split_text, separators=';', strip=True)
+comma_split = partial(split_text, separators=',', strip=True, brackets={})
+semicolon_split = partial(split_text, separators=';', strip=True, brackets={})
 
 
 def valid_enum_member(choices, instance, attribute, value):
@@ -81,6 +82,27 @@ class ObjectWithSource(object):
 
 
 @attr.s
+class RelatedSociety(object):
+    dataset = attr.ib(convert=lambda s: s.strip())
+    name = attr.ib(convert=lambda s: s.strip())
+    id = attr.ib(convert=lambda s: s.strip())
+
+    @classmethod
+    def from_string(cls, s):
+        match = re.match('([A-Za-z]+):\s*([^\[]+)\[([^\]]+)\]$', s)
+        if not match:
+            raise ValueError(s)
+        return cls(*match.groups())
+
+
+@attr.s
+class RelatedSocieties(object):
+    id = attr.ib()
+    related = attr.ib(convert=lambda s: [
+        RelatedSociety.from_string(ss) for ss in semicolon_split(s)])
+
+
+@attr.s
 class Dataset(ObjectWithSource):
     type = attr.ib(validator=partial(valid_enum_member, ['cultural', 'environmental']))
     description = attr.ib()
@@ -100,6 +122,11 @@ class Dataset(ObjectWithSource):
     @property
     def societies(self):
         return self._items('societies', namedtuples=True)
+
+    @property
+    def society_relations(self):
+        return [
+            RelatedSocieties(**d) for d in self._items('societies_mapping', dicts=True)]
 
     @property
     def variables(self):
@@ -151,6 +178,7 @@ def load(repos=None):
 
     for func in [
         load_societies,
+        load_society_relations,
         load_regions,
         society_locations,
         load_vars,

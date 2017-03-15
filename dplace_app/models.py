@@ -58,6 +58,12 @@ class Society(models.Model):
     
     hraf_link = models.CharField('HRAF', null=True, default=None, max_length=200)
     chirila_link = models.CharField('CHIRILA', default=None, null=True, max_length=200)
+    relationships = models.ManyToManyField(
+        'self', through='SocietyRelation', symmetrical=False)
+
+    @property
+    def related(self):
+        return list(self.relationships)
 
     @property
     def location(self):
@@ -121,6 +127,12 @@ class Society(models.Model):
     
     class Meta(object):
         verbose_name_plural = "Societies"
+
+
+class SocietyRelation(models.Model):
+    from_society = models.ForeignKey(Society, related_name='from_societies')
+    to_society = models.ForeignKey(Society, related_name='to_societies')
+    type = models.CharField(max_length=100, default='similar')
 
 
 class Category(models.Model):

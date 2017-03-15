@@ -167,7 +167,7 @@ $(document).ready(function(){
         {% if xd_id %}
             <h4>Name and ID in other cross-cultural databases:</h4>
             <h5><ul style="line-height:25px;">
-            {% for x in xd_id %} 
+            {% for x in society.related %}
                 {% if x.source.name %}
                     <li><a href="/society/{{ x.ext_id }}" target="_blank">{{ x.name }} ({{x.ext_id}}) ({{x.source.name}})</a></li>
                 {% elif x.source.author == 'Murdock' %}

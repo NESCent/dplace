@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 import logging
 
-from dplace_app.models import Society, GeographicRegion
+from dplace_app.models import Society, GeographicRegion, SocietyRelation
 
 from sources import get_source
 
@@ -25,6 +25,23 @@ def society_locations(repos):
             society.region = region
         society.save()
         count += 1
+    return count
+
+
+def load_society_relations(repos):
+    count = 0
+    societies = {s.ext_id: s for s in Society.objects.all()}
+    for ds in repos.datasets:
+        for item in ds.society_relations:
+            if item.id in societies:
+                for rel in item.related:
+                    if rel.id in societies:
+                        SocietyRelation.objects.create(
+                            from_society=societies[item.id], to_society=societies[rel.id])
+                        count += 1
+                    elif rel.dataset == 'CHIRILA':
+                        societies[item.id].chirila_link = rel.name
+                        societies[item.id].save()
     return count
 
 
