@@ -1,6 +1,8 @@
 language: python
 python:
   - "2.7"
+node_js:
+  - "node"
 before_install:
   - pip install coverage codecov
 # command to install dependencies
