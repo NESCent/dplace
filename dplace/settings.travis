@@ -1,5 +1,4 @@
 # Django settings for dplace project.
-DATASETS = ['EA', 'Binford']
 
 DEBUG = True
 

@@ -16,7 +16,6 @@ from rest_framework.permissions import AllowAny
 from rest_framework.views import Response
 from rest_framework.renderers import JSONRenderer
 
-from dplace_app.filters import GeographicRegionFilter
 from dplace_app.renderers import DPLACECSVRenderer
 from dplace_app import serializers
 from dplace_app import models
@@ -460,7 +459,7 @@ def get_dataset_sources(request):
 class GeographicRegionViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = serializers.GeographicRegionSerializer
     model = models.GeographicRegion
-    filter_class = GeographicRegionFilter
+    filter_fields = ('region_nam', 'continent')
     queryset = models.GeographicRegion.objects.all()
 
 
