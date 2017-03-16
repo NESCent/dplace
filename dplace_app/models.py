@@ -6,17 +6,6 @@ from django.core.urlresolvers import reverse
 from django.db import models
 
 
-class ISOCode(models.Model):
-    iso_code = models.CharField(
-        'ISO Code', db_index=True, max_length=3, unique=True, null=False)
-
-    def __unicode__(self):
-        return self.iso_code
-
-    class Meta(object):
-        verbose_name = "ISO Code"
-
-
 class Society(models.Model):
     ext_id = models.CharField('External ID', db_index=True, unique=True, max_length=20)
     xd_id = models.CharField(
@@ -280,7 +269,7 @@ class Language(models.Model):
     glotto_code = models.CharField(max_length=8, null=False, unique=True)
 
     # needs to be null=True because some glottolog languages do not have isocodes
-    iso_code = models.ForeignKey('ISOCode', null=True)
+    iso_code = models.CharField(max_length=3, null=True)
     family = models.ForeignKey('LanguageFamily', null=True)
 
     def __unicode__(self):
@@ -292,7 +281,6 @@ class Language(models.Model):
     
     class Meta(object):
         verbose_name = "Language"
-        unique_together = ('iso_code', 'glotto_code')
 
 
 class GeographicRegion(models.Model):

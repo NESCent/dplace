@@ -66,8 +66,7 @@ class ValueViewSet(viewsets.ReadOnlyModelViewSet):
 
 class SocietyViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = serializers.SocietySerializer
-    queryset = models.Society.objects.all().select_related(
-        'source', 'language__iso_code', 'language__family')
+    queryset = models.Society.objects.all().select_related('source', 'language__family')
     lookup_field = 'ext_id'
 
     def detail(self, request, society_id):
@@ -116,12 +115,6 @@ class SocietyViewSet(viewsets.ReadOnlyModelViewSet):
         )
 
 
-class ISOCodeViewSet(viewsets.ReadOnlyModelViewSet):
-    serializer_class = serializers.ISOCodeSerializer
-    filter_fields = ('iso_code',)
-    queryset = models.ISOCode.objects.all()
-
-
 class LargeResultsSetPagination(PageNumberPagination):
     page_size = 1000
     page_size_query_param = 'page_size'
@@ -139,7 +132,7 @@ class LanguageViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = serializers.LanguageSerializerWithSocieties
     filter_fields = ('name', 'iso_code', 'societies', 'family',)
     queryset = models.Language.objects.all()\
-        .select_related('family', 'iso_code')\
+        .select_related('family')\
         .prefetch_related(Prefetch(
             'societies',
             queryset=models.Society.objects.exclude(value__isnull=True)
@@ -303,7 +296,7 @@ def result_set_from_query_dict(query_dict):
         soc_ids = []
 
     soc_query = models.Society.objects.filter(id__in=soc_ids)\
-        .select_related('source', 'language__family', 'language__iso_code', 'region')
+        .select_related('source', 'language__family', 'region')
     if result_set.geographic_regions:
         soc_query = soc_query.select_related('region')
     if result_set.variable_descriptions:

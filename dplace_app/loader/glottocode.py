@@ -1,15 +1,14 @@
 # -*- coding: utf-8 -*-
 import logging
 
-from dplace_app.models import Language, ISOCode, LanguageFamily, Society
+from dplace_app.models import Language, LanguageFamily, Society
 
 
 def load_languages(repos):
     languoids = {
         l.id: l for l in repos.read_csv('csv', 'glottolog.csv', namedtuples=True)}
-    families, languages, isocodes = {}, {}, {}
+    families, languages = {}, {}
     societies = {s.ext_id: s for s in Society.objects.all()}
-    count = 0
     for ds in repos.datasets:
         for soc in ds.societies:
             ldata = languoids.get(soc.glottocode)
@@ -18,13 +17,12 @@ def load_languages(repos):
                 continue
 
             soc = societies[soc.id]
-            soc.language = load_language(ldata, languages, families, isocodes)
+            soc.language = load_language(ldata, languages, families)
             soc.save()
-            count += 1
-    return count
+    return len(languages)
 
 
-def load_language(ldata, languages, families, isocodes):
+def load_language(ldata, languages, families):
     # get or create the language family:
     # Note: If the related languoid is an isolate or a top-level family, we create a
     # LanguageFamily object with the data of the languoid.
@@ -39,16 +37,9 @@ def load_language(ldata, languages, families, isocodes):
     # get or create the language:
     language = languages.get(ldata.id)
     if not language:
-        language = Language.objects.create(name=ldata.name, glotto_code=ldata.id)
+        language = Language.objects.create(
+            name=ldata.name, glotto_code=ldata.id, iso_code=ldata.iso_code)
         language.family = family
-
-        if ldata.iso_code:
-            isocode = isocodes.get(ldata.iso_code)
-            if not isocode:
-                isocode = ISOCode.objects.create(iso_code=ldata.iso_code)
-                isocodes[ldata.iso_code] = isocode
-            language.iso_code = isocode
-
         language.save()
         languages[ldata.id] = language
     return language

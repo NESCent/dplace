@@ -59,9 +59,9 @@ def load_trees(repos, verbose=False):
     l_by_iso, l_by_glotto, l_by_name = \
         defaultdict(list), defaultdict(list), defaultdict(list)
 
-    for lang in Language.objects.all().select_related('iso_code'):
+    for lang in Language.objects.all():
         if lang.iso_code:
-            l_by_iso[lang.iso_code.iso_code].append(lang)
+            l_by_iso[lang.iso_code].append(lang)
         l_by_glotto[lang.glotto_code].append(lang)
         l_by_name[lang.name].append(lang)
 

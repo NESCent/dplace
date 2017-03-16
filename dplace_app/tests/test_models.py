@@ -9,7 +9,6 @@ class EATestCase(TestCase):
     """
 
     def setUp(self):
-        self.iso_code = models.ISOCode.objects.create(iso_code='abc')
         self.source = models.Source.objects.create(
             year="2014",
             author="Greenhill",
