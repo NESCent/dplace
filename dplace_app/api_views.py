@@ -129,6 +129,13 @@ class LargeResultsSetPagination(PageNumberPagination):
     max_page_size = 1000
 
 
+class VeryLargeResultsSetPagination(PageNumberPagination):
+    page_size = 3000
+    # do not set: page_size_query_param = 'page_size' 
+    # it sets page_size to default 1000 - internal bug??
+    max_page_size = 3000
+
+
 class LanguageViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = serializers.LanguageSerializerWithSocieties
     filter_fields = ('name', 'iso_code', 'societies', 'family',)
@@ -138,7 +145,8 @@ class LanguageViewSet(viewsets.ReadOnlyModelViewSet):
             'societies',
             queryset=models.Society.objects.exclude(value__isnull=True)
         ))
-    pagination_class = LargeResultsSetPagination
+    # 'Select All Languages' has to return a list with more than 1000 items
+    pagination_class = VeryLargeResultsSetPagination
 
 
 class LanguageFamilyViewSet(viewsets.ReadOnlyModelViewSet):
