@@ -74,7 +74,7 @@ describe('Color Map Service Testing', function() {
         };
         
         var environmental_value = {
-            'value': 18.25,
+            'coded_value_float': 18.25,
             'variable': 317,
         };
         mockResults.environmental_variables.push(environmental_variable);
