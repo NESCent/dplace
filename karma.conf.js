@@ -28,13 +28,7 @@ module.exports = function(config) {
         'static/js/directives.js',
         'static/bower_components/angular-ui-bootstrap-bower/ui-bootstrap-tpls.min.js',
         'static/js/controllers/search/*.js',
-        'tests/*.js',
-        {
-            pattern: 'dplace_app/tests/data/*.json',
-            watched: true,
-            served: true,
-            included: false
-        }
+        'tests/*.js'
     ],
 
     // list of files to exclude
