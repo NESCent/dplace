@@ -100,7 +100,7 @@ angular.module('languagePhylogenyDirective', [])
                                     .attr("stroke-width", "0.5")
                                     .attr("transform", "translate("+translate+",0)")
                                     .attr("fill", function(n) {
-                                        rgb = colorMapService.tempColor(society.environmental_values[i].value, variable.min, variable.max, variable.name);
+                                        rgb = colorMapService.tempColor(society.environmental_values[i].coded_value_float, variable.min, variable.max, variable.name);
                                         return rgb;
                                     })
                                     .on("mouseover", function() {
