@@ -30,7 +30,7 @@ def load_references(repos):
 
             # key is in the format Author, Year
             try:
-                author, year = split_text(r.key, separators=',', strip=True)
+                author, year = split_text(r.key, separators=',', strip=True, brackets={})
                 if (author, year) not in keys:
                     keys.add((author, year))
                     reference = Source.objects.create(
