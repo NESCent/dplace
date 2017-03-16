@@ -185,7 +185,7 @@ class SourceViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = serializers.SourceSerializer
     filter_fields = ('author', 'name')
     queryset = models.Source.objects.all()
-    
+
 
 def get_query_from_json(request):
     query_string = request.query_params.get('query')
@@ -453,7 +453,8 @@ def get_categories(request):
 def get_dataset_sources(request):
     return Response(
         serializers.SourceSerializer(
-            models.Source.objects.all().exclude(name=""), many=True).data)
+            models.Source.objects.filter(societies__isnull=False).distinct(),
+            many=True).data)
 
 
 class GeographicRegionViewSet(viewsets.ReadOnlyModelViewSet):

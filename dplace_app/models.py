@@ -32,7 +32,7 @@ class Society(models.Model):
     original_longitude = models.FloatField('ORIG_longitude', null=True)
     
     region = models.ForeignKey('GeographicRegion', null=True)
-    source = models.ForeignKey('Source', null=True)
+    source = models.ForeignKey('Source', null=True, related_name="societies")
     language = models.ForeignKey('Language', null=True, related_name="societies")
     
     hraf_link = models.CharField('HRAF', null=True, default=None, max_length=200)
