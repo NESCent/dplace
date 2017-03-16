@@ -1,10 +1,9 @@
 language: python
 python:
   - "2.7"
-node_js:
-  - "6"
 before_install:
-  - pip install coverage codecov
+  - pip install codecov
+  - nvm install 7
 # command to install dependencies
 install:
   - pip install -r requirements.txt
