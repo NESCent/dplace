@@ -135,7 +135,7 @@ function ColorMapService() {
                     return env_var.id == society.environmental_values[j].variable;
                 });
                 if (variable.length > 0) {
-                    var color = this.tempColor(society.environmental_values[j].value,  variable[0].min, variable[0].max, variable[0].name);
+                    var color = this.tempColor(society.environmental_values[j].coded_value_float,  variable[0].min, variable[0].max, variable[0].name);
                     colors[society.society.id] = color;
                 }    
             }
