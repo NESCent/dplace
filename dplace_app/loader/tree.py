@@ -1,5 +1,4 @@
 import re
-import logging
 from collections import defaultdict
 
 from django.core.files.base import ContentFile
@@ -73,31 +72,27 @@ def load_trees(repos, verbose=False):
         if taxon_name in l_by_name:
             return l_by_name[taxon_name]
 
-    count = 0
-    for phylo in repos.phylogenies:
-        count += _load_tree(phylo.id, phylo.trees, get_language, phylo=phylo)
-
-    for fname in repos.path('trees').iterdir():
-        if fname.name.endswith('.trees'):
-            count += _load_tree(fname.stem, fname, get_language)
-    return count
+    sources = {}
+    return sum(_load_tree(obj, get_language, sources)
+               for obj in repos.phylogenies + repos.trees)
 
 
-def _load_tree(name, fname, get_language, verbose=False, phylo=None):
+def _load_tree(obj, get_language, sources):
     # now add languages to the tree
-    reader = NexusReader(fname.as_posix())
+    reader = NexusReader(obj.trees.as_posix())
 
     # make a tree if not exists. Use the name of the tree
-    tree, created = LanguageTree.objects.get_or_create(name=name)
+    tree, created = LanguageTree.objects.get_or_create(name=obj.id)
     if not created:
         return 0
 
-    if phylo:
-        source = phylo.as_source()
+    source = sources.get((obj.author, obj.year))
+    if not source:
+        sources[(obj.author, obj.year)] = source = obj.as_source()
         source.save()
-        tree.source = source
+    tree.source = source
 
-    with open(fname.as_posix(), 'rb') as f:
+    with open(obj.trees.as_posix(), 'rb') as f:
         tree.file = ContentFile(f.read())
         tree.save()
 
@@ -109,37 +104,21 @@ def _load_tree(name, fname, get_language, verbose=False, phylo=None):
     except ValueError:  # pragma: no cover
         newick = newick
 
-    if verbose:  # pragma: no cover
-        logging.info("Formatting newick string %s" % (newick))
-        
     tree.newick_string = str(newick)
-    if phylo:
-        tree.save()
-        return 1
+    if obj.__class__.__name__ == 'Tree':
+        for taxon_name in reader.trees.taxa:
+            languages = get_language(taxon_name)
+            if not languages:
+                continue
 
-    # phylogeny taxa require reading of CSV mapping files, glottolog trees do not
-    for taxon_name in reader.trees.taxa:
-        if taxon_name is '1':
-            continue  # pragma: no cover
-
-        languages = get_language(taxon_name)
-        if not languages:
-            continue
-
-        for l in languages:
-            society = Society.objects.filter(language=l)
-            label, created = LanguageTreeLabels.objects.get_or_create(
-                languageTree=tree,
-                label=taxon_name,
-                language=l
-            )
-            for s in society:
-                LanguageTreeLabelsSequence.objects.get_or_create(
-                    society=s,
-                    labels=label,
-                    fixed_order=0
-                )
-            tree.taxa.add(label)
+            for l in languages:
+                society = Society.objects.filter(language=l)
+                label = LanguageTreeLabels.objects.create(
+                    languageTree=tree, label=taxon_name, language=l)
+                for s in society:
+                    LanguageTreeLabelsSequence.objects.create(
+                        society=s, labels=label, fixed_order=0)
+                tree.taxa.add(label)
     tree.save()
     return 1
 
