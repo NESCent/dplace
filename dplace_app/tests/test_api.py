@@ -91,10 +91,6 @@ class Test(APITestCase):
             response.data['results'][0]['region_nam'],
             GeographicRegion.objects.get(region_nam='Region1').region_nam)
 
-    def test_isocode_api(self):
-        response_dict = self.get_json('isocode-list')
-        self.assertEqual(response_dict['count'], 2)
-
     def test_all_languages(self):
         response_dict = self.get_json('language-list')
         self.assertEqual(response_dict['count'], 3)

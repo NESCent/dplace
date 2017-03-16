@@ -83,12 +83,6 @@ class ValueSerializer(serializers.ModelSerializer):
         )
 
 
-class ISOCodeSerializer(serializers.ModelSerializer):
-    class Meta(object):
-        model = models.ISOCode
-        fields = '__all__'
-
-
 class LanguageFamilySerializer(serializers.ModelSerializer):
     language_count = serializers.IntegerField(read_only=True)
 
@@ -98,7 +92,6 @@ class LanguageFamilySerializer(serializers.ModelSerializer):
 
 
 class LanguageSerializer(serializers.ModelSerializer):
-    iso_code = serializers.CharField(source='iso_code.iso_code')
     family = LanguageFamilySerializer()
 
     class Meta(object):
@@ -107,7 +100,6 @@ class LanguageSerializer(serializers.ModelSerializer):
 
 
 class LanguageSerializerWithSocieties(serializers.ModelSerializer):
-    iso_code = serializers.CharField(source='iso_code.iso_code')
     family = LanguageFamilySerializer()
 
     class Meta(object):
