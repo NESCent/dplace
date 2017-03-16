@@ -5,7 +5,7 @@ module.exports = function(config) {
   config.set({
 
     // base path that will be used to resolve all patterns (eg. files, exclude)
-    basePath: '',
+    basePath: 'dplace_app',
 
     // frameworks to use
     // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
@@ -13,22 +13,22 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-        'dplace_app/static/bower_components/angular/angular.min.js',
-        'dplace_app/static/bower_components/angular-resource/angular-resource.min.js',
-        'dplace_app/static/bower_components/angular-route/angular-route.min.js',
-        'dplace_app/static/bower_components/angular-mocks/angular-mocks.js',
-        'dplace_app/static/js/app.js',
-        'dplace_app/static/js/controllers/app.js',
-        'dplace_app/static/js/controllers/*.js',
-        'dplace_app/static/js/models.js',
-        'dplace_app/static/js/colorMapService.js',
-        'dplace_app/static/js/searchModelService.js',
-        'dplace_app/static/js/services.js',
-        'dplace_app/static/js/filters.js',
-        'dplace_app/static/js/directives.js',
-        'dplace_app/static/bower_components/angular-ui-bootstrap-bower/ui-bootstrap-tpls.min.js',
-        'dplace_app/static/js/controllers/search/*.js',
-        'dplace_app/tests/*.js',
+        'static/bower_components/angular/angular.min.js',
+        'static/bower_components/angular-resource/angular-resource.min.js',
+        'static/bower_components/angular-route/angular-route.min.js',
+        'static/bower_components/angular-mocks/angular-mocks.js',
+        'static/js/app.js',
+        'static/js/controllers/app.js',
+        'static/js/controllers/*.js',
+        'static/js/models.js',
+        'static/js/colorMapService.js',
+        'static/js/searchModelService.js',
+        'static/js/services.js',
+        'static/js/filters.js',
+        'static/js/directives.js',
+        'static/bower_components/angular-ui-bootstrap-bower/ui-bootstrap-tpls.min.js',
+        'static/js/controllers/search/*.js',
+        'tests/*.js',
         {pattern: 'dplace_app/tests/data/*.json', watched: true, served: true, included: false}
     ],
 
