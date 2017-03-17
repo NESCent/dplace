@@ -1,4 +1,4 @@
-Name_on_tree_tip,xd_id,soc_id,fixed_order
+taxon,xd_ids,soc_ids,glottocode
 Bar,xd1,society1,
 Bas,xd2,society2,
 Des,,,
