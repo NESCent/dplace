@@ -151,6 +151,13 @@ class Phylogeny(ObjectWithSource):
         return list(reader(self.dir.joinpath('xdid_socid_links.csv'), dicts=True))
 
 
+@attr.s
+class Tree(ObjectWithSource):
+    @property
+    def trees(self):
+        return self.dir
+
+
 class Repos(object):
     def __init__(self, dir_):
         self.dir = dir_
@@ -160,6 +167,9 @@ class Repos(object):
         self.phylogenies = [
             Phylogeny(base_dir=self.dir.joinpath('phylogenies'), **r) for r in
             reader(self.dir.joinpath('phylogenies', 'index.csv'), dicts=True)]
+        self.trees = [
+            Tree(base_dir=self.dir.joinpath('trees'), **r) for r in
+            reader(self.dir.joinpath('trees', 'index.csv'), dicts=True)]
 
     def path(self, *comps):
         return self.dir.joinpath(*comps)

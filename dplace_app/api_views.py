@@ -338,14 +338,11 @@ def result_set_from_query_dict(query_dict):
 @api_view(['GET'])
 @permission_classes((AllowAny,))
 def trees_from_societies(request):
-    language_trees = []
+    language_trees, labels, soc_ids = [], [], []
+
     for k, v in request.query_params.lists():
         soc_ids = v
         labels = models.LanguageTreeLabels.objects.filter(societies__id__in=soc_ids).all()
-
-        global_tree = None
-        global_newick = []
-        global_isolates = []
 
     for t in models.LanguageTree.objects\
             .filter(taxa__societies__id__in=soc_ids)\
@@ -354,27 +351,9 @@ def trees_from_societies(request):
                 'taxa__languagetreelabelssequence_set__society',
             )\
             .distinct():
-            
-            if 'global' in t.name:
-                global_tree = t
-                # TODO ask @Bibiko once the isolates are in the db under global.tree as string: isol1,isol2,isol3,...
-                # global_isolates.extend(t.newick_string.split(','))
-                global_isolates.extend(['alse1251','amas1236','bana1292','calu1239','chim1301','chit1248','chon1248','coah1252','coos1249','furr1244','gaga1251','guai1237','guat1253','hadz1240','high1242','kara1289','karo1304','klam1254','kute1249','lara1258','mull1237','natc1249','nort2938','paez1247','pume1238','pura1257','pure1242','sali1253','sand1273','seri1257','shom1245','sius1254','sout1439','take1257','ticu1245','timu1245','tiwi1244','toll1241','trum1247','uruu1244','wara1303','wash1253','yama1264','yuch1247','zuni1245'])
-            else:
-                if update_newick(t, labels):
-                    language_trees.append(t)
-                    if 'glotto' in t.name:
-                        #remove last ; in order to be able to join the trees
-                        global_newick.append(t.newick_string[:-1])
-        
-    if global_tree:
-        langs_in_tree = [str(l.label) for l in labels]
-        #add isolates if present in current selection
-        [global_newick.append('(' + isolate + ':1)') for isolate in global_isolates if isolate in langs_in_tree]
-        #join all pruned glottolog trees into the global one
-        global_tree.newick_string = '(' + ','.join(global_newick) + ');'
-        language_trees.append(global_tree)
-            
+        if update_newick(t, labels):
+            language_trees.append(t)
+
     return Response(serializers.LanguageTreeSerializer(language_trees, many=True).data)
 
 
