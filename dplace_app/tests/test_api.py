@@ -100,7 +100,9 @@ class Test(APITestCase):
     def test_all_language_trees(self):
         response_dict = self.get_json('languagetree-list')
         self.assertEqual(response_dict['count'], 3)
-        self.assertEqual(response_dict['results'][0]['source']['name'], 'semitic')
+        self.assertEqual(
+            set(t['source']['name'] for t in response_dict['results']),
+            {'semitic', 'a phylogeny', 'Abkhaz-Adyge'})
 
     def test_family2_languages(self):
         response_dict = self.get_json(
