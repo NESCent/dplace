@@ -296,7 +296,6 @@ class GeographicRegion(models.Model):
 
 class LanguageTree(models.Model):
     name = models.CharField(max_length=50, db_index=True)
-    file = models.FileField(upload_to='language_trees', null=True)
     newick_string = models.TextField(default='')
     source = models.ForeignKey('Source', null=True)
     taxa = models.ManyToManyField('LanguageTreeLabels')
