@@ -11,8 +11,8 @@ django.setup()
 
 from django.db import transaction
 from clldutils.dsv import reader
-from clldutils.path import Path
 from clldutils.text import split_text
+from clldutils.path import Path
 from clldutils import jsonlib
 import attr
 
@@ -25,7 +25,6 @@ from loader.values import load_data
 from loader.sources import load_references
 from loader.glottocode import load_languages
 
-DATA_DIR = Path(__file__).parent.parent.joinpath('datasets')
 comma_split = partial(split_text, separators=',', strip=True, brackets={})
 semicolon_split = partial(split_text, separators=';', strip=True, brackets={})
 
@@ -181,10 +180,9 @@ class Repos(object):
         return jsonlib.load(self.path(*comps))
 
 
-def load(repos=None):
-    test = repos is not None
+def load(repos, test=True):
     configure_logging(test=test)
-    repos = Repos(repos or DATA_DIR)
+    repos = Repos(repos)
 
     for func in [
         load_societies,
@@ -209,5 +207,5 @@ def load(repos=None):
 
 
 if __name__ == '__main__':  # pragma: no cover
-    load()
+    load(Path(sys.argv[1]), test=False)
     sys.exit(0)

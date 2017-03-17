@@ -1,0 +1,32 @@
+{
+    "society1": {
+        "lat": 3.00,
+        "code": null,
+        "lon": 114.00,
+        "name": "Region1"
+    },
+    "society2": {
+        "lat": null,
+        "code": null,
+        "lon": null,
+        "name": "Region2"
+    },
+    "unknown": {
+        "lat": null,
+        "code": null,
+        "lon": null,
+        "name": "Region1"
+    },
+    "society3": {
+        "lat": null,
+        "code": null,
+        "lon": null,
+        "name": "Region1"
+    },
+    "society4": {
+        "lat": null,
+        "code": null,
+        "lon": null,
+        "name": "Region2"
+    }
+}

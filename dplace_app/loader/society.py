@@ -12,15 +12,15 @@ def society_locations(repos):
     regions = {r.region_nam: r for r in GeographicRegion.objects.all()}
 
     count = 0
-    for item in repos.read_csv('csv', 'society_locations.csv', dicts=True):
-        society = societies.get(item['soc_id'])
+    for soc_id, spec in repos.read_json('geo', 'societies_tdwg.json').items():
+        society = societies.get(soc_id)
         if not society:
-            logging.warn("No matching society found for %s" % item)
+            logging.warn("No matching society found for %s" % soc_id)
             continue
 
-        region = regions.get(item['region'])
+        region = regions.get(spec['name'])
         if not region:
-            logging.warn("No matching region found for %s" % item)
+            logging.warn("No matching region found for %s" % spec['name'])
         else:
             society.region = region
         society.save()
