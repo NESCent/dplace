@@ -1,7 +1,6 @@
 import re
 from collections import defaultdict
 
-from django.core.files.base import ContentFile
 from nexus import NexusReader
 from ete3 import Tree
 from ete3.coretype.tree import TreeError
@@ -91,10 +90,6 @@ def _load_tree(obj, get_language, sources):
         sources[(obj.author, obj.year)] = source = obj.as_source()
         source.save()
     tree.source = source
-
-    with open(obj.trees.as_posix(), 'rb') as f:
-        tree.file = ContentFile(f.read())
-        tree.save()
 
     # Remove '[&R]' from newick string
     reader.trees.detranslate()

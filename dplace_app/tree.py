@@ -1,10 +1,4 @@
 # coding: utf8
-"""
-We provide a customized alternative to ete3.Tree.prune to increase the speed of tree
-pruning for the special case of
-- nodes being specified by node name
-- branch lengths always 1 for Glottolog trees
-"""
 from __future__ import unicode_literals
 from collections import defaultdict
 
@@ -13,6 +7,12 @@ from ete3.coretype.tree import TreeError
 
 
 def prune(tree, nodes, const_depth=True, keep_root=False):
+    """
+    We provide a customized alternative to ete3.Tree.prune to increase the speed of tree
+    pruning for the special case of
+    - nodes being specified by node name
+    - branch lengths always 1 for Glottolog trees
+    """
     to_keep = set(n for n in tree.traverse() if n.name in nodes)
     n2depth, n2count, visitors2nodes = {}, defaultdict(set), defaultdict(set)
 
@@ -51,21 +51,20 @@ def prune(tree, nodes, const_depth=True, keep_root=False):
 
 
 def update_newick(t, labels):
-    langs_in_tree = [str(l.label) for l in labels if l.languageTree_id == t.id]
-    is_glottolog_tree = '.glotto' in t.name
+    langs_in_tree = set(str(l.label) for l in labels if l.languageTree_id == t.id)
+    if not langs_in_tree:
+        return False
 
+    is_glottolog_tree = '.glotto' in t.name
     try:
         newick = Tree(t.newick_string, format=1)
         if is_glottolog_tree and len(langs_in_tree) == 1:
             # kind of hacky, but needed for when langs_in_tree is only 1
             # in future, maybe exclude these trees from the search results?
-            node = newick.search_nodes(name=langs_in_tree[0])
-            if len(node[0].get_leaves()) > 1:
-                t.newick_string = "(%s:1);" % (langs_in_tree[0])
-                return True
-            elif (len(node[0].get_leaves()) == 1) \
-                    and not (node[0].get_leaves()[0].name == langs_in_tree[0]):
-                t.newick_string = "(%s:1);" % (langs_in_tree[0])
+            lang = list(langs_in_tree)[0]
+            leaves = newick.search_nodes(name=lang)[0].get_leaves()
+            if len(leaves) > 1 or (len(leaves) == 1 and leaves[0].name == lang):
+                t.newick_string = "(%s:1);" % lang
                 return True
 
         prune(newick, langs_in_tree, const_depth=is_glottolog_tree)
