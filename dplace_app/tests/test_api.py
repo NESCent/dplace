@@ -97,6 +97,11 @@ class Test(APITestCase):
         for lang in Language.objects.all():
             self.assertTrue(self.obj_in_results(lang, response_dict))
 
+    def test_all_language_trees(self):
+        response_dict = self.get_json('languagetree-list')
+        self.assertEqual(response_dict['count'], 3)
+        self.assertEqual(response_dict['results'][0]['source']['name'], 'semitic')
+
     def test_family2_languages(self):
         response_dict = self.get_json(
             'language-list',
