@@ -85,7 +85,7 @@ The Django REST Framework is a powerful framework for building RESTful web servi
 
 Most of the Models are exposed as simple `ReadOnlyModelViewSet`s, which means the REST framework creates methods to list all objects and get individual objects.
 
-In order to convert data between JSON (or XML) and Python model objects, the REST framework uses Seriializers. These are classes located in `dplace_app/serializers.py`, and they describe what fields and related objects to include when serializing an object to JSON. Serializers can also represent arbitrary (non-model-backed) objects like search queries or results.
+In order to convert data between JSON (or XML) and Python model objects, the REST framework uses serializers. These are classes located in `dplace_app/serializers.py`, and they describe what fields and related objects to include when serializing an object to JSON. Serializers can also represent arbitrary (non-model-backed) objects like search queries or results.
 
 #### AngularJS - Client Application
 
@@ -99,11 +99,11 @@ As a best practice, avoid putting AngularJS code into Django templates. This cou
 
 ### Loading Data
 
-D-PLACE data is collected/curated by the Working Group, and periodic CSV exports have been stored in a [private Github repository](https://github.com/SimonGreenhill/dplace-data). 
+D-PLACE data is collected/curated by the Working Group, and periodic CSV exports have been stored in a [private Github repository](https://github.com/D-PLACE/dplace-data). 
 
-To load the data, run the `load_all_datasets.sh` script. This scripts clones the repository, and runs `dplace_app/load.py` with appropriate parameters for each of the CSV files we import.  The python files in `dplace_app/load/` are tailored to each CSV file format.
+To load the data, run the `load_all_datasets.sh` script. This scripts clones the [dplace-data](https://github.com/D-PLACE/dplace-data) repository, and installs the latest data.
 
-The [Vagrant+Ansible](https://github.com/dleehr/dplace-vagrant) configuration will perform the first data load, but this step can be repeated to load new data.
+The [Vagrant+Ansible](https://github.com/D-PLACE/dplace-vagrant) configuration will perform the first data load, but this step can be repeated to load new data.
 
 ### Running Tests
 
