@@ -57,11 +57,12 @@
                                 ng-options="environmental.name for environmental in variable.variables"
                                 ng-change="variableChanged(variable)"
                                 ng-show="variable.variables.length > 0"
+                                style="width:100%;"
                                 >
                             <option value="">Select an environmental variable</option>
                         </select>
                     </div>
-                    <div ng-show="variable.selectedVariable">
+                    <div ng-show="variable.selectedVariable && variable.selectedVariable.data_type == 'Continuous'">
                         <div class="form-group col-xs-2">
                             <div class="dropdown">
                                 <button class="btn btn-default dropdown-toggle form-control">{{ variable.selectedFilter.name }} <span class="caret"></span></button>
