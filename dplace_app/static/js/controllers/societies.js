@@ -16,6 +16,7 @@ function SocietiesCtrl($scope, $location, $timeout, $http, searchModelService, c
     $scope.cookieValue = cookieValue;
     
     $scope.results = searchModelService.getModel().getResults();
+    console.log($scope.results);
     $scope.query = searchModelService.getModel().getQuery();
     $scope.searchModel = searchModelService.getModel();
     $scope.csvDownloadButton = {text: 'CSV', disabled: false};

@@ -260,11 +260,21 @@ function SearchCtrl($scope, $window, $location, colorMapService, searchModelServ
             if (propertyName == 'environmentalData') {
                 searchParams[propertyName].selectedVariables.forEach(function(variable) {
                     if (variable.selectedVariable) {
-                        filters = [
-                            variable.selectedVariable.id,
-                            variable.selectedFilter.operator,
-                            variable.vals
-                        ];
+                        filters = []
+                        if (variable.selectedVariable.data_type == 'Continuous') {
+                            filters = [
+                                variable.selectedVariable.id,
+                                variable.selectedFilter.operator,
+                                variable.vals
+                            ];
+                            
+                        } else { 
+                            filters = [
+                                variable.selectedVariable.id,
+                                'categorical',
+                                variable.selectedVariable.selected
+                            ]
+                        }
                         if ('e' in searchQuery) {
                             searchQuery['e'].push(filters);
                         } else {
@@ -289,7 +299,7 @@ function SearchCtrl($scope, $window, $location, colorMapService, searchModelServ
            }
         }
         searchModelService.updateSearchQuery(searchQuery);
-        // console.log(searchQuery);
+        console.log(searchQuery);
         $scope.searchSocieties();
 
     };

@@ -73,6 +73,7 @@ function SearchModelService(VariableCategory, GeographicRegion, EnvironmentalCat
 
         societies = results.societies;         
         for (var i = 0; i < results.environmental_variables.length; i++) {
+            if (results.environmental_variables[i].data_type != 'Continuous') continue;
             extractedValues = societies.map(function(society) { 
                 for (var j = 0; j < society.environmental_values.length; j++) {
                     if (society.environmental_values[j].variable == results.environmental_variables[i].id) {

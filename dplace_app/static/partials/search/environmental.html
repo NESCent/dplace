@@ -62,6 +62,7 @@
                             <option value="">Select an environmental variable</option>
                         </select>
                     </div>
+                    
                     <div ng-show="variable.selectedVariable && variable.selectedVariable.data_type == 'Continuous'">
                         <div class="form-group col-xs-2">
                             <div class="dropdown">
@@ -135,6 +136,15 @@
                 </div>
                 <div ng-show="variable.selectedVariable">Further information: {{ variable.selectedVariable.codebook_info }}</div>
             </div>
+            
+            <div class="panel-body scrollable" ng-show="variable.selectedVariable && variable.selectedVariable.data_type == 'Categorical'">
+                <div ng-repeat="code in variable.selectedVariable.codes">
+                    <input type="checkbox" class="pull-left" ng-model="code.isSelected" ng-change="codeSelected(variable.selectedVariable, code)"/>
+                    <span class="variable-description">{{ code.description }}</span>
+                </div>
+            
+            </div>
+            
         </div>
     </form>
     <div class="pull-right">
