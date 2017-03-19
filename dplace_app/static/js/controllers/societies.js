@@ -16,7 +16,6 @@ function SocietiesCtrl($scope, $location, $timeout, $http, searchModelService, c
     $scope.cookieValue = cookieValue;
     
     $scope.results = searchModelService.getModel().getResults();
-    console.log($scope.results);
     $scope.query = searchModelService.getModel().getQuery();
     $scope.searchModel = searchModelService.getModel();
     $scope.csvDownloadButton = {text: 'CSV', disabled: false};
@@ -383,7 +382,6 @@ function SocietiesCtrl($scope, $location, $timeout, $http, searchModelService, c
             if ($scope.results.environmental_variables[i].CID) name += $scope.results.environmenal_variables[i].CID;
             name += $scope.results.environmental_variables[i].name;
             svg_string = legend_id.node().innerHTML;
-            console.log(svg_string);
             svg_string = svg_string.replace(/url\(.*?#/, 'url(#');
             svg_string = '<svg version="1.1" xmlns="http://www.w3.org/2000/svg" transform="translate(10, 10)">'+svg_string + gradients_svg + '</svg>';
             legends_list.push({'name': name.replace(/[\W]+/g, "-")+'-legend.svg', 'svg': svg_string});

@@ -31,13 +31,12 @@ function EnvironmentalCtrl($scope, searchModelService, EnvironmentalVariable, En
     
     $scope.codeSelected = function(variable, code) {
         if (code.isSelected) {
-            if (variable.selected.indexOf(code.id) == -1) {
-                variable.selected.push(code.id);
+            if (variable.selected.map(function(v) { return v.id; }).indexOf(code.id) == -1) {
+                variable.selected.push(code);
             }
         } else {
-            variable.selected.splice(variable.selected.indexOf(code.id), 1);
+            variable.selected.splice(variable.selected.indexOf(code), 1);
         }
-        console.log($scope.environmentalData);
         if (variable.selected.length == variable.codes.length) variable.allSelected = true;
         else variable.allSelected = false;
 
@@ -47,12 +46,12 @@ function EnvironmentalCtrl($scope, searchModelService, EnvironmentalVariable, En
         if (variable.allSelected) {
             variable.codes.forEach(function(c) {
                 c.isSelected = true;
-                if (variable.selected.indexOf(c.id) == -1) variable.selected.push(c.id);
+                if (variable.selected.map(function(v) { return v.id; }).indexOf(c.id) == -1) variable.selected.push(c);
             });
         } else {
             variable.codes.forEach(function(c) {
                c.isSelected = false;
-               variable.selected.splice(variable.selected.indexOf(c.id), 1);
+               variable.selected.splice(variable.selected.indexOf(c), 1);
             });
         }
     };
