@@ -268,7 +268,6 @@ def result_set_from_query_dict(query_dict):
 
             for varid, operator, params in criteria:
                 params = map(float, params)
-                f = open("CAT.TXT", "wb")
                 if operator == 'inrange':
                     sql_where.append("{0}.coded_value_float >= {1:f} AND {0}.coded_value_float <= {2:f}".format(alias, params[0], params[1]))
                 elif operator == 'outrange':

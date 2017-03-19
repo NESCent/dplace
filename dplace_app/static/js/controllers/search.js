@@ -269,16 +269,20 @@ function SearchCtrl($scope, $window, $location, colorMapService, searchModelServ
                             ];
                             
                         } else { 
-                            filters = [
-                                variable.selectedVariable.id,
-                                'categorical',
-                                variable.selectedVariable.selected
-                            ]
+                            if (variable.selectedVariable.selected.length>0) {
+                                filters = [
+                                    variable.selectedVariable.id,
+                                    'categorical',
+                                    variable.selectedVariable.selected
+                                ]
+                            } else filters = []
                         }
-                        if ('e' in searchQuery) {
-                            searchQuery['e'].push(filters);
-                        } else {
-                            searchQuery['e'] = [filters];
+                        if (filters.length > 0){
+                            if ('e' in searchQuery) {
+                                searchQuery['e'].push(filters);
+                            } else {
+                                searchQuery['e'] = [filters];
+                            }
                         }
                     }
                 });

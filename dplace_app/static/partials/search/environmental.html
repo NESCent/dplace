@@ -138,6 +138,9 @@
             </div>
             
             <div class="panel-body scrollable" ng-show="variable.selectedVariable && variable.selectedVariable.data_type == 'Categorical'">
+                <span class="variable-description" ng-show="variable.selectedVariable.codes.length > 1">Select All
+                    <input type="checkbox" class="pull-left" ng-model="variable.selectedVariable.allSelected" ng-change="selectAll(variable.selectedVariable)" />
+                </span>
                 <div ng-repeat="code in variable.selectedVariable.codes">
                     <input type="checkbox" class="pull-left" ng-model="code.isSelected" ng-change="codeSelected(variable.selectedVariable, code)"/>
                     <span class="variable-description">{{ code.description }}</span>

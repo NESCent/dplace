@@ -38,7 +38,24 @@ function EnvironmentalCtrl($scope, searchModelService, EnvironmentalVariable, En
             variable.selected.splice(variable.selected.indexOf(code.id), 1);
         }
         console.log($scope.environmentalData);
+        if (variable.selected.length == variable.codes.length) variable.allSelected = true;
+        else variable.allSelected = false;
+
     }
+    
+    $scope.selectAll = function(variable) {
+        if (variable.allSelected) {
+            variable.codes.forEach(function(c) {
+                c.isSelected = true;
+                if (variable.selected.indexOf(c.id) == -1) variable.selected.push(c.id);
+            });
+        } else {
+            variable.codes.forEach(function(c) {
+               c.isSelected = false;
+               variable.selected.splice(variable.selected.indexOf(c.id), 1);
+            });
+        }
+    };
     
     $scope.filterChanged = function(variable) {
         if (variable.EnvironmentalForm.$dirty && variable.selectedFilter.operator != 'all') return;
