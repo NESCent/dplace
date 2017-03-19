@@ -70,7 +70,9 @@ describe('Color Map Service Testing', function() {
             'max': 29,
             'min': -17,
             'name': "Temperature",
-            'range': 46
+            'range': 46,
+            'data_type': 'Continuous',
+            'type': 'environmental'
         };
         
         var environmental_value = {
