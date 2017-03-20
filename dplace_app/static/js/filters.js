@@ -25,6 +25,14 @@ angular.module('dplaceFilters', [])
                     return rgb;
                 } 
             }
+            
+            if (codes.type == 'environmental') {
+                min = Math.min.apply(null,codes.codes.map(function(c) { return c.id; }));
+                max = Math.max.apply(null,codes.codes.map(function(c) { return c.id; }));
+                rgb = colorMapService.tempColor(value, min, max, '');
+                return rgb;
+            }
+            
         
             var missingData = false;
             var missingDataValue;
