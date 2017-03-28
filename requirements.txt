@@ -1,7 +1,7 @@
 Django==1.10.6
 django-appconf==1.0.2
 django-bootstrap3==8.2.1
-django-filter==1.0.1
+django-filter==1.0.2
 djangorestframework==3.6.2
 ete3==3.0.0b35
 psycopg2==2.7.1
@@ -10,5 +10,5 @@ six==1.10.0
 coverage==4.3.4
 flake8==3.3.0
 newick==0.7
-clldutils==1.9.4
+clldutils==1.9.5
 attrs==16.3.0
