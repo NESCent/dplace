@@ -1,2 +1,4 @@
 id,name,author,year,scaling,reference
 author_year,a phylogeny,author et al.,1999,x,"the recerence"
+glottolog_abkh1234,Abkhaz-Adyge,Glottolog,2016,,The Ref
+semitic,semitic,author,2000,,ref

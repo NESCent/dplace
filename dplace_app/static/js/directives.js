@@ -264,13 +264,12 @@ angular.module('languagePhylogenyDirective', [])
                 include = scope.results.societies.map(function(s) { return s.society.ext_id; });
                 for (var i = 0; i < langTree.taxa.length; i++) {
                    for (var t = 0; t < langTree.taxa[i].societies.length; t++) {
-                        //if (include.indexOf(langTree.taxa[i].societies[t].society.ext_id) != -1) {
+                        if (include.indexOf(langTree.taxa[i].societies[t].society.ext_id) != -1) {
                             if (langTree.taxa[i].label in taxa) {
                                 continue; 
                             }
                             taxa[langTree.taxa[i].label] = langTree.taxa[i].societies[t];
-                            
-                       // }
+                        }
                     }
                 }
                 nodes.forEach(function(node) {

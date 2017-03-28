@@ -68,15 +68,15 @@ function ColorMapService() {
 
     //blue to red gradient for environmental variables
     this.tempColor = function(index, min, max, name) {
-    if (name == "Monthly Mean Net Primary Production" || name == "Mean Growing Season NPP") {
-        hue = 30 + (((index - min) / (max - min)) * 88);
-    } else if (name == "Annual Mean Precipitation"){
-        color = this.mapColorMonochrome(min, max, index, 252);
-        return color;
-    }
-    else {
-        hue = 240 - (((index - min) / (max - min))*240);
-    }
+        if (name == "Monthly Mean Net Primary Production" || name == "Mean Growing Season NPP") {
+            hue = 30 + (((index - min) / (max - min)) * 88);
+        } else if (name == "Annual Mean Precipitation"){
+            color = this.mapColorMonochrome(min, max, index, 252);
+            return color;
+        }
+        else {
+            hue = 240 - (((index - min) / (max - min))*240);
+        }
         rgb = hslToRgb(hue, 1, 0.5);
         return 'rgb('+rgb[0]+','+rgb[1]+','+rgb[2]+')';
     }
@@ -135,7 +135,11 @@ function ColorMapService() {
                     return env_var.id == society.environmental_values[j].variable;
                 });
                 if (variable.length > 0) {
-                    var color = this.tempColor(society.environmental_values[j].coded_value_float,  variable[0].min, variable[0].max, variable[0].name);
+                    if (variable[0].data_type.toUpperCase() == 'CATEGORICAL') {
+                        var color = this.tempColor(society.environmental_values[j].code_description.id, Math.min.apply(null,variable[0].codes.map(function(c) { return c.id; })), Math.max.apply(null,variable[0].codes.map(function(c) { return c.id; })), variable[0].name);
+                    } else {
+                        var color = this.tempColor(society.environmental_values[j].coded_value_float,  variable[0].min, variable[0].max, variable[0].name);
+                    }
                     colors[society.society.id] = color;
                 }    
             }

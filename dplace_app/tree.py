@@ -55,20 +55,10 @@ def update_newick(t, labels):
     if not langs_in_tree:
         return False
 
-    is_glottolog_tree = '.glotto' in t.name
     try:
-        newick = Tree(t.newick_string, format=1)
-        if is_glottolog_tree and len(langs_in_tree) == 1:
-            # kind of hacky, but needed for when langs_in_tree is only 1
-            # in future, maybe exclude these trees from the search results?
-            lang = list(langs_in_tree)[0]
-            leaves = newick.search_nodes(name=lang)[0].get_leaves()
-            if len(leaves) > 1 or (len(leaves) == 1 and leaves[0].name == lang):
-                t.newick_string = "(%s:1);" % lang
-                return True
-
-        prune(newick, langs_in_tree, const_depth=is_glottolog_tree)
-        t.newick_string = newick.write(format=1)
+        tree = Tree(t.newick_string, format=1)
+        prune(tree, langs_in_tree, const_depth=t.name.startswith('glottolog_'))
+        t.newick_string = tree.write(format=1)
         return True
     except TreeError:
         return False

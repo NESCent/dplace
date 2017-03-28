@@ -260,15 +260,29 @@ function SearchCtrl($scope, $window, $location, colorMapService, searchModelServ
             if (propertyName == 'environmentalData') {
                 searchParams[propertyName].selectedVariables.forEach(function(variable) {
                     if (variable.selectedVariable) {
-                        filters = [
-                            variable.selectedVariable.id,
-                            variable.selectedFilter.operator,
-                            variable.vals
-                        ];
-                        if ('e' in searchQuery) {
-                            searchQuery['e'].push(filters);
-                        } else {
-                            searchQuery['e'] = [filters];
+                        filters = []
+                        if (variable.selectedVariable.data_type == 'Continuous') {
+                            filters = [
+                                variable.selectedVariable.id,
+                                variable.selectedFilter.operator,
+                                variable.vals
+                            ];
+                            
+                        } else { 
+                            if (variable.selectedVariable.selected.length>0) {
+                                filters = [
+                                    variable.selectedVariable.id,
+                                    'categorical',
+                                    variable.selectedVariable.selected
+                                ]
+                            } else filters = []
+                        }
+                        if (filters.length > 0){
+                            if ('e' in searchQuery) {
+                                searchQuery['e'].push(filters);
+                            } else {
+                                searchQuery['e'] = [filters];
+                            }
                         }
                     }
                 });
@@ -289,7 +303,6 @@ function SearchCtrl($scope, $window, $location, colorMapService, searchModelServ
            }
         }
         searchModelService.updateSearchQuery(searchQuery);
-        // console.log(searchQuery);
         $scope.searchSocieties();
 
     };

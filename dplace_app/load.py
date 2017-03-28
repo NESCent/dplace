@@ -19,7 +19,7 @@ import attr
 from dplace_app.models import Source
 from loader.util import configure_logging, load_regions
 from loader.society import society_locations, load_societies, load_society_relations
-from loader.tree import load_trees
+from loader.phylogenies import load_phylogenies
 from loader.variables import load_vars
 from loader.values import load_data
 from loader.sources import load_references
@@ -150,13 +150,6 @@ class Phylogeny(ObjectWithSource):
         return list(reader(self.dir.joinpath('taxa.csv'), dicts=True))
 
 
-@attr.s
-class Tree(ObjectWithSource):
-    @property
-    def trees(self):
-        return self.dir
-
-
 class Repos(object):
     def __init__(self, dir_):
         self.dir = dir_
@@ -166,9 +159,6 @@ class Repos(object):
         self.phylogenies = [
             Phylogeny(base_dir=self.dir.joinpath('phylogenies'), **r) for r in
             reader(self.dir.joinpath('phylogenies', 'index.csv'), dicts=True)]
-        self.trees = [
-            Tree(base_dir=self.dir.joinpath('trees'), **r) for r in
-            reader(self.dir.joinpath('trees', 'index.csv'), dicts=True)]
 
     def path(self, *comps):
         return self.dir.joinpath(*comps)
@@ -193,15 +183,15 @@ def load(repos, test=True):
         load_languages,
         load_references,
         load_data,
-        load_trees,
+        load_phylogenies,
     ]:
         with transaction.atomic():
             if not test:
                 print("%s..." % func.__name__)  # pragma: no cover
             start = time()
             res = func(repos)
-            if not test:
-                print("%s loaded in %s secs" % (res, time() - start))  # pragma: no cover
+            if not test:  # pragma: no cover
+                print("{0} loaded in {1:.2f} secs".format(res, time() - start))
 
 
 if __name__ == '__main__':  # pragma: no cover

@@ -63,6 +63,8 @@ describe('Testing environmental search', function() {
             .respond(200);
         $httpBackend.whenGET('/api/v1/environmental_variables?category=7&page_size=1000')
             .respond(200);
+        $httpBackend.whenGET('/api/v1/codes/?variable=7&page_size=1000')
+            .respond(200);
         $httpBackend.whenGET('/api/v1/min_and_max?query=%7B%22environmental_id%22:7%7D')
             .respond(JSON.stringify({
                 "min": 1.111,
@@ -78,7 +80,8 @@ describe('Testing environmental search', function() {
             'min': 1.111,
             'name': "Precipitation",
             'range': 409.999,
-            'units': 'mm'
+            'units': 'mm',
+            'data_type': 'Continuous'
         };
         var category = {
             'id': 7,
