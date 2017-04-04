@@ -105,6 +105,7 @@ class RelatedSocieties(object):
 class Dataset(ObjectWithSource):
     type = attr.ib(validator=partial(valid_enum_member, ['cultural', 'environmental']))
     description = attr.ib()
+    url = attr.ib()
 
     def _items(self, what, **kw):
         fname = self.dir.joinpath('{0}.csv'.format(what))
