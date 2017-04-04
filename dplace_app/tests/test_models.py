@@ -7,42 +7,42 @@ class EATestCase(TestCase):
     """
     Tests basic functionality of Ethnographic Atlas variable codings in model
     """
-
-    def setUp(self):
-        self.source = models.Source.objects.create(
+    @classmethod
+    def setUpTestData(cls):
+        cls.source = models.Source.objects.create(
             year="2014",
             author="Greenhill",
             reference="Great paper")
-        self.ea_society = models.Society.objects.create(
+        cls.ea_society = models.Society.objects.create(
             ext_id='easoc',
             name='EA Society',
-            source=self.source)
-        self.binford_society = models.Society.objects.create(
+            source=cls.source)
+        cls.binford_society = models.Society.objects.create(
             ext_id='binfordsoc',
             name='Binford Society',
-            source=self.source)
-        self.variable = models.Variable.objects.create(
+            source=cls.source)
+        cls.variable = models.Variable.objects.create(
             label='EA001',
             name='Variable 1',
-            source=self.source)
-        self.code10 = models.CodeDescription.objects.create(
-            variable=self.variable,
+            source=cls.source)
+        cls.code10 = models.CodeDescription.objects.create(
+            variable=cls.variable,
             code='10',
             description='Code 10')
-        self.code1 = models.CodeDescription.objects.create(
-            variable=self.variable,
+        cls.code1 = models.CodeDescription.objects.create(
+            variable=cls.variable,
             code='1',
             description='Code 1')
-        self.code2 = models.CodeDescription.objects.create(
-            variable=self.variable,
+        cls.code2 = models.CodeDescription.objects.create(
+            variable=cls.variable,
             code='2',
             description='Code 2')
-        self.value = models.Value.objects.create(
-            variable=self.variable,
-            society=self.ea_society,
+        cls.value = models.Value.objects.create(
+            variable=cls.variable,
+            society=cls.ea_society,
             coded_value='1',
-            code=self.code1,
-            source=self.source)
+            code=cls.code1,
+            source=cls.source)
 
     def test_society_coded_value(self):
         society = models.Society.objects.get(ext_id='easoc')
@@ -85,3 +85,10 @@ class EATestCase(TestCase):
             source=self.source
         )
         assert obj.get_description() == ''
+
+    def test_get_absolute_url_language(self):
+        L = models.Language.objects.create(
+            name='test',
+            glotto_code='xxxx1234'
+        )
+        assert L.get_absolute_url().endswith(L.glotto_code)
