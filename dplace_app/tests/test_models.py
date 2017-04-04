@@ -86,3 +86,9 @@ class EATestCase(TestCase):
         )
         assert obj.get_description() == ''
 
+    def test_get_absolute_url_language(self):
+        L = models.Language.objects.create(
+            name='test',
+            glotto_code='xxxx1234'
+        )
+        assert L.get_absolute_url().endswith(L.glotto_code)
