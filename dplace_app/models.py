@@ -95,6 +95,7 @@ class Society(models.Model):
     
     class Meta(object):
         verbose_name_plural = "Societies"
+        ordering = ('name', )
 
 
 class SocietyRelation(models.Model):
@@ -148,7 +149,7 @@ class Variable(models.Model):
 
     class Meta(object):
         verbose_name = "Variable"
-        ordering = ["label"]
+        ordering = ("label", )
 
 
 class CodeDescription(models.Model):
@@ -258,10 +259,14 @@ class Source(models.Model):
 
     class Meta(object):
         unique_together = ('year', 'author')
-
+        ordering = ('name', )
+        
 
 class LanguageFamily(models.Model):
     name = models.CharField(max_length=50, db_index=True)
+
+    class Meta(object):
+        ordering = ('name', )
 
 
 class Language(models.Model):
@@ -281,6 +286,7 @@ class Language(models.Model):
     
     class Meta(object):
         verbose_name = "Language"
+        ordering = ('name', )
 
 
 class GeographicRegion(models.Model):
@@ -293,12 +299,18 @@ class GeographicRegion(models.Model):
     def __unicode__(self):
         return "Region: %s, Continent %s" % (self.region_nam, self.continent)
 
+    class Meta(object):
+        ordering = ('region_nam', )
+
 
 class LanguageTree(models.Model):
     name = models.CharField(max_length=50, db_index=True)
     newick_string = models.TextField(default='')
     source = models.ForeignKey('Source', null=True)
     taxa = models.ManyToManyField('LanguageTreeLabels')
+
+    class Meta(object):
+        ordering = ('name', )
 
 
 class LanguageTreeLabels(models.Model):
