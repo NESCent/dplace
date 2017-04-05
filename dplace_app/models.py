@@ -292,8 +292,8 @@ class Language(models.Model):
 class GeographicRegion(models.Model):
     level_2_re = models.FloatField()
     count = models.FloatField()
-    region_nam = models.CharField(max_length=254)
-    continent = models.CharField(max_length=254)
+    region_nam = models.CharField(max_length=254, db_index=True)
+    continent = models.CharField(max_length=254,  db_index=True)
     tdwg_code = models.IntegerField()
 
     def __unicode__(self):
