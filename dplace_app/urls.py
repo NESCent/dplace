@@ -62,7 +62,6 @@ urlpatterns = [
     url(r'^download$', views.download_file, name='download'),
     url(r'^angular/$', views.angular, name='angular'),
     # API
-    url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     url(r'^api/v1/', include(router.urls)),
     url(r'^api/v1/find_societies', api_views.find_societies, name='find_societies'),
     url(r'^api/v1/min_and_max', api_views.get_min_and_max, name="min_and_max"),
