@@ -31,7 +31,7 @@ class Society(models.Model):
 
     @property
     def related(self):
-        return list(self.relationships)
+        return list(self.relationships.all())
 
     @property
     def location(self):
