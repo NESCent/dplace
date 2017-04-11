@@ -141,6 +141,7 @@ class Dataset(ObjectWithSource):
 @attr.s
 class Phylogeny(ObjectWithSource):
     scaling = attr.ib()
+    url = attr.ib()
 
     @property
     def trees(self):
