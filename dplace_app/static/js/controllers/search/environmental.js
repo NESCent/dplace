@@ -1,4 +1,4 @@
-function EnvironmentalCtrl($scope, searchModelService, EnvironmentalVariable, EnvironmentalValue, MinAndMax) {
+function EnvironmentalCtrl($scope, searchModelService, EnvironmentalVariable, EnvironmentalValue, MinAndMax, CodeDescription) {
     var linkModel = function() {
         // Get a reference to the environmental search params from the model
         $scope.environmentalData = searchModelService.getModel().getEnvironmentalData();
@@ -11,33 +11,55 @@ function EnvironmentalCtrl($scope, searchModelService, EnvironmentalVariable, En
     linkModel();
     
     $scope.categoryChanged = function(variable) {
-        variable.variables = EnvironmentalVariable.query({category: variable.selectedCategory.id});    
+        variable.variables = EnvironmentalVariable.query({index_categories: [variable.selectedCategory.id]});
     };
     
     $scope.addVariable = function() {
         $scope.environmentalData.selectedVariables.push({'vals': ['', ''], 'selectedFilter': $scope.environmentalData.selectedFilter, 'variables': []});
     };
     
-    $scope.removeVariable = function(variable) {
-        var index = $scope.environmentalData.selectedVariables.indexOf(variable);
-        $scope.environmentalData.selectedVariables.splice(index, 1);
-        $scope.environmentalData.badgeValue -= 1;
-    };
-
     $scope.variableChanged = function(variable) {
         if(variable.selectedVariable != null) {
-            $scope.environmentalData.badgeValue += 1;
+            if (variable.selectedVariable.data_type == 'Categorical') variable.selectedVariable.selected = [];
+            variable.selectedVariable.codes = CodeDescription.query({variable: variable.selectedVariable.id });
+            $scope.environmentalData.badgeValue = $scope.environmentalData.selectedVariables.map(function(e) { return e.selectedVariable != null; }).length;
             variable.EnvironmentalForm.$setPristine();
             $scope.values = MinAndMax.query({query: {environmental_id: variable.selectedVariable.id}});
             $scope.filterChanged(variable);
         }
     };
     
+    $scope.codeSelected = function(variable, code) {
+        if (code.isSelected) {
+            if (variable.selected.map(function(v) { return v.id; }).indexOf(code.id) == -1) {
+                variable.selected.push(code);
+            }
+        } else {
+            variable.selected.splice(variable.selected.indexOf(code), 1);
+        }
+        if (variable.selected.length == variable.codes.length) variable.allSelected = true;
+        else variable.allSelected = false;
+
+    }
+    
+    $scope.selectAll = function(variable) {
+        if (variable.allSelected) {
+            variable.codes.forEach(function(c) {
+                c.isSelected = true;
+                if (variable.selected.map(function(v) { return v.id; }).indexOf(c.id) == -1) variable.selected.push(c);
+            });
+        } else {
+            variable.codes.forEach(function(c) {
+               c.isSelected = false;
+               variable.selected.splice(variable.selected.indexOf(c), 1);
+            });
+        }
+    };
     
     $scope.filterChanged = function(variable) {
         if (variable.EnvironmentalForm.$dirty && variable.selectedFilter.operator != 'all') return;
-        selected_variable = $scope.environmentalData.selectedVariables.filter(function(env_var) {
-            return env_var.selectedVariable.id == variable.selectedVariable.id;
+            selected_variable = $scope.environmentalData.selectedVariables.filter(function(env_var) {
+            return env_var.selectedVariable == variable.selectedVariable;
         });
         if (selected_variable.length == 1) {
             $scope.values.$promise.then(function(result) {

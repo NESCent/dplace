@@ -22,7 +22,7 @@ describe('Testing geographic search', function() {
             FindSocieties: mockFindSocieties
         });
         spyOn(searchScope, 'search').and.callThrough();
-        spyOn(searchScope, 'updateSearchQuery');
+        spyOn(mockSearchModelService, 'updateSearchQuery');
         spyOn(searchScope, 'searchSocieties');
 
         geographicScope = searchScope.$new();
@@ -38,9 +38,11 @@ describe('Testing geographic search', function() {
             .respond(200);
         $httpBackend.whenGET('/api/v1/geographic_regions?page_size=1000')
             .respond(200);
-        $httpBackend.whenGET('/api/v1/environmental_categories')
+        $httpBackend.whenGET('/api/v1/categories?type=environmental')
             .respond(200);
         $httpBackend.whenGET('/api/v1/language_families?page_size=1000')
+            .respond(200);
+        $httpBackend.whenGET('/api/v1/languages?page_size=1000')
             .respond(200);
         $httpBackend.whenPOST('/api/v1/find_societies')
             .respond(200);
@@ -69,11 +71,11 @@ describe('Testing geographic search', function() {
         expect(geographicScope.geographic.badgeValue).toEqual(2);
         
         //test remove region
-        geographicScope.removeRegion({
+        searchScope.removeFromSearch({
                 "code": "20",
                 "id": 4,
                 "name": "Asia"
-            });
+            }, 'geographic');
         geographicScope.$digest();
         expect(geographicScope.geographic.badgeValue).toEqual(1);
         
@@ -82,10 +84,10 @@ describe('Testing geographic search', function() {
         searchScope.$digest();
                 
         expected_searchQuery = {
-            'geographic_regions': geographicScope.geographic.selectedRegions
+            'p': [geographicScope.geographic.selectedRegions[0].id]
         };
-        expect(searchScope.updateSearchQuery).toHaveBeenCalled();
-        expect(searchScope.updateSearchQuery).toHaveBeenCalledWith(expected_searchQuery);
+        expect(mockSearchModelService.updateSearchQuery).toHaveBeenCalled();
+        expect(mockSearchModelService.updateSearchQuery).toHaveBeenCalledWith(expected_searchQuery);
         expect(searchScope.searchSocieties).toHaveBeenCalled();
     });
 });

@@ -68,15 +68,15 @@ function ColorMapService() {
 
     //blue to red gradient for environmental variables
     this.tempColor = function(index, min, max, name) {
-    if (name == "Net Primary Production" || name == "Mean Growing Season NPP") {
-        hue = 30 + (((index - min) / (max - min)) * 88);
-    } else if (name == "Annual Mean Precipitation"){
-        color = this.mapColorMonochrome(min, max, index, 252);
-        return color;
-    }
-    else {
-        hue = 240 - (((index - min) / (max - min))*240);
-    }
+        if (name == "Monthly Mean Net Primary Production" || name == "Mean Growing Season NPP") {
+            hue = 30 + (((index - min) / (max - min)) * 88);
+        } else if (name == "Annual Mean Precipitation"){
+            color = this.mapColorMonochrome(min, max, index, 252);
+            return color;
+        }
+        else {
+            hue = 240 - (((index - min) / (max - min))*240);
+        }
         rgb = hslToRgb(hue, 1, 0.5);
         return 'rgb('+rgb[0]+','+rgb[1]+','+rgb[2]+')';
     }
@@ -103,20 +103,31 @@ function ColorMapService() {
 
     this.generateColorMap = function(results) {
         var colors = {};
+        if (results.geographic_regions.length > 0) {
+            results.geographic_regions.sort(function(a,b) {
+                if (a.region_nam.toLowerCase() < b.region_nam.toLowerCase()) return -1;
+                else if (a.region_nam.toLowerCase() > b.region_nam.toLowerCase()) return 1;
+                else return 0;
+            })
+        }   
         for (var i = 0; i < results.societies.length; i++) {
             var society = results.societies[i];
-            
-            if (society.geographic_regions) {
-                for (var j = 0; j < society.geographic_regions.length; j++) {
-                    var color = this.mapColor(society.geographic_regions[j].tdwg_code, results.geographic_regions.length);
-                    colors[society.society.id] = color;
-                }
+            if (society.society.region) {
+                code = results.geographic_regions.map(function(a) { return a.tdwg_code; }).indexOf(society.society.region.tdwg_code);
+                if (code != -1)
+                    var color = this.mapColor(code, results.geographic_regions.length);
+                else
+                    var color = this.mapColor(society.society.region.tdwg_code, results.geographic_regions.length);
+                colors[society.society.id] = color;
             }
             
-            if (results.languages.length > 0 && society.environmental_values.length == 0 && society.variable_coded_values.length == 0) {
+            if (results.languages.length > 0 && society.environmental_values.length == 0 && society.variable_coded_values.length == 0) {        
+                code = results.classifications.map(function(a) { return a.id; }).indexOf(society.society.language.family.id);
+                if (code != -1)
+                    var color = this.mapColor(code, results.classifications.length);
+                else
                     var color = this.mapColor(society.society.language.family.id, results.classifications.length);
-                    colors[society.society.id] = color;
-                
+                colors[society.society.id] = color;
             }
             
             for (var j = 0; j < society.environmental_values.length; j++) {
@@ -124,7 +135,11 @@ function ColorMapService() {
                     return env_var.id == society.environmental_values[j].variable;
                 });
                 if (variable.length > 0) {
-                    var color = this.tempColor(society.environmental_values[j].value,  variable[0].min, variable[0].max, variable[0].name);
+                    if (variable[0].data_type.toUpperCase() == 'CATEGORICAL') {
+                        var color = this.tempColor(society.environmental_values[j].code_description.id, Math.min.apply(null,variable[0].codes.map(function(c) { return c.id; })), Math.max.apply(null,variable[0].codes.map(function(c) { return c.id; })), variable[0].name);
+                    } else {
+                        var color = this.tempColor(society.environmental_values[j].coded_value_float,  variable[0].min, variable[0].max, variable[0].name);
+                    }
                     colors[society.society.id] = color;
                 }    
             }

@@ -1,13 +1,22 @@
 angular.module('dplace', ['ngRoute', 'dplaceServices', 'ui.bootstrap', 'dplaceFilters', 'dplaceMapDirective', 'languagePhylogenyDirective']) // Should look at ui-router
     .config(dplaceRouter);
 
-function dplaceRouter($routeProvider) {
+function dplaceRouter($routeProvider, $locationProvider) {
     $routeProvider
         .when('/search', {
             templateUrl: '/static/partials/search.html',
             controller: 'SearchCtrl'
         })
+        .when('/societies/search/:name', {
+            templateUrl: '/static/partials/societies.html',
+            controller:'SearchCtrl'
+        })
         .when('/societies', {
+            templateUrl: '/static/partials/societies.html',
+            controller: 'SocietiesCtrl',
+            reloadOnSearch: false
+        })
+        .when('/societies/search', {
             templateUrl: '/static/partials/societies.html',
             controller: 'SocietiesCtrl'
         })
@@ -19,7 +28,7 @@ function dplaceRouter($routeProvider) {
             templateUrl: '/static/partials/info/about.html',
             controller: 'AboutCtrl'
         })
-        .when('/source_info', {
+        .when('/howto', {
             templateUrl:'/static/partials/source_info.html',
             controller:'SourceInfoCtrl'
         })
@@ -50,4 +59,5 @@ function dplaceRouter($routeProvider) {
         .otherwise({
 	        redirectTo: '/home'
 	});
+    $locationProvider.html5Mode(true);
 }

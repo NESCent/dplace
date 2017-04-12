@@ -1,12 +1,29 @@
-function SocietiesCtrl($scope, $timeout, $http, searchModelService, colorMapService) {
+function SocietiesCtrl($scope, $location, $timeout, $http, searchModelService, colorMapService, TreesFromSocieties, FindSocieties) {
+
+    $scope.appendQueryString();
+    
+    var cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            if (    cookie.substring(0, 10) === ('csrftoken=')) {
+                cookieValue = decodeURIComponent(cookie.substring(10));
+                break;
+             }
+        }
+    }
+    $scope.cookieValue = cookieValue;
+    
     $scope.results = searchModelService.getModel().getResults();
     $scope.query = searchModelService.getModel().getQuery();
+    $scope.searchModel = searchModelService.getModel();
+    $scope.csvDownloadButton = {text: 'CSV', disabled: false};
+    $scope.globalTree = false;
     $scope.variables = [];
-    $scope.buttons = [
-        {value:'phylogeny', name:'Phylogenies', description: "Trees derived from discrete data using phylogenetic methods (branch lengths informative)"},
-        {value:'glottolog', name:'Glottolog Trees', description: "Trees derived from Glottolog language family taxonomies (branch lengths uninformative)"},
-        {value:'global', name:'Global Tree', description: "A global language supertree composed from language family taxonomies in Glottolog (branch lengths uninformative)"},
-    ];
+    $scope.buttons = [];
+    $scope.setActive('societies');
+    $scope.columnSort = { sortColumn: 'society.name', reverse: false };
     
     $scope.tabs = [
         { title: "Table", content: "table", active: true},
@@ -14,41 +31,109 @@ function SocietiesCtrl($scope, $timeout, $http, searchModelService, colorMapServ
         { title: "Tree", content: "tree", active: false},
         { title: "Download", content: "download", active: false},
     ];
-        
-    console.log($scope.results);
-    
-    $scope.csvDownloadButton = {text: 'CSV', disabled: false};
 
-    if ($scope.results.variable_descriptions) {
-        $scope.results.variable_descriptions.forEach(function(variable) {
-            $scope.variables.push(variable.variable);
-            variable['svgSize'] = variable.codes.length * 27;
+    
+    var forLegends = function() {
+        if ($scope.results.variable_descriptions) {
+            $scope.results.variable_descriptions.forEach(function(variable) {
+                if (variable.variable.data_type.toUpperCase() == 'CONTINUOUS') {
+                    variable.variable.fill = "/"+window.location.href.split('/').pop()+"#grad1";
+                }
+                $scope.variables.push(variable.variable);
+                variable['svgHeight'] = variable.codes.length * 27;
+                
+            });
+        }
+            
+        if ($scope.query.e) {
+            $scope.variables = $scope.variables.concat($scope.results.environmental_variables);
+            $scope.results.environmental_variables.forEach(function(variable) {
+             if (variable.name == "Annual Mean Precipitation") variable.fill = "/"+window.location.href.split('/').pop()+"#blue";
+                else if (variable.name == "Monthly Mean Net Primary Production" || variable.name == "Mean Growing Season NPP") variable.fill = "/"+window.location.href.split('/').pop()+"#earthy";
+                else variable.fill = "/"+window.location.href.split('/').pop()+"#temp";
+            });
+        }
+        if ($scope.variables.length > 0) {
+            $scope.results.chosenVariable = $scope.variables[0];
+        }
+
+    }
+    
+    
+    var searchCompletedCallback = function() {
+        $scope.results = searchModelService.getCodeIDs($scope.searchModel.results, $scope.searchModel.query);
+        $scope.query = $scope.searchModel.query;
+        searchModelService.assignColors($scope.results);
+        $scope.searchModel.results.searched = true;
+        forLegends();
+    };
+    
+    if (!$scope.searchModel.results.searched && !$scope.searchModel.results.searchedByName) {
+        var queryObject = $location.search();
+        var by_name = false;
+        for (var key in queryObject) {
+            if (key == 'name') {
+                 by_name = true;
+            } else {
+                queryObject[key] = JSON.parse(queryObject[key]);
+
+            }
+            
+        }
+        if (!by_name) {
+            searchModelService.updateSearchQuery(queryObject);
+            $scope.searchModel.results = FindSocieties.find(queryObject, searchCompletedCallback);
+        } else {
+            $scope.results = FindSocieties.find(queryObject);
+            $scope.searchModel.results.searchedByName = true;
+        }
+        
+    } else {
+        forLegends();
+
+    }
+
+       
+    var treeButtons = function() {
+        if ($scope.results.language_trees && $scope.results.language_trees.length > 0) {
+            if ($scope.results.language_trees.phylogenies.length > 0) {
+                $scope.buttons.push({value:'phylogeny', name:'Phylogenies', description: "Trees derived from discrete data using phylogenetic methods (branch lengths informative)"});
+            }
+            if ($scope.results.language_trees.glotto_trees.length > 0) {
+                $scope.buttons.push({value:'glottolog', name:'Glottolog Trees', description: "Trees derived from Glottolog language family taxonomies (branch lengths uninformative)"});
+            }
+            if ($scope.results.language_trees.global_tree) {
+                $scope.buttons.push({value:'global', name:'Global Tree', description: "A global language supertree composed from language family taxonomies in Glottolog (branch lengths uninformative)"});
+            }
+        }
+    }
+    
+    var sortTrees = function() {
+        $scope.results.language_trees.phylogenies = [];
+        $scope.results.language_trees.glotto_trees = [];
+        $scope.results.language_trees.forEach(function(tree) {
+            if (tree.name.indexOf("global") != -1) $scope.results.language_trees.global_tree = tree;
+            else if (tree.name.indexOf("glotto") != -1) {
+                $scope.results.language_trees.glotto_trees.push(tree);
+            }
+            else {
+                $scope.results.language_trees.phylogenies.push(tree);
+            }
+        $scope.results.language_trees.glotto_trees.sort(function(a, b) { return a.name > b.name; });
+        $scope.results.language_trees.phylogenies.sort(function(a, b) { return a.name > b.name; });
         });
-        if ($scope.results.variable_descriptions.length > 0)
-            $scope.results.variable_descriptions[0].hidden = true;
+        treeButtons();
     }
     
-        
-    if ($scope.query.environmental_filters) {
-        $scope.variables = $scope.variables.concat($scope.results.environmental_variables);
-        if ($scope.results.environmental_variables.length > 0 && $scope.results.variable_descriptions.length == 0)
-            $scope.results.environmental_variables[0].hidden = true;
+    $scope.addTrees = function() {
+        if ($scope.results.language_trees && $scope.results.language_trees.length > 0) return;
+        if ($scope.tabs[2].active) {
+            list = $scope.results.societies.map(function(s) { return s.society.id});
+            society_ids = {'s': list};
+            $scope.results.language_trees = TreesFromSocieties.find(society_ids, sortTrees);
     }
-    
-    $scope.setActive('societies');
-    
-    $scope.columnSort = { sortColumn: 'society.name', reverse: false };
-        
-    $scope.disableCSVButton = function () {
-        $scope.csvDownloadButton.disabled = true;
-        $scope.csvDownloadButton.text = 'Downloading...';
-    };
+    }
 
-    $scope.enableCSVButton = function () {
-        $scope.csvDownloadButton.disabled = false;
-        $scope.csvDownloadButton.text = 'CSV';
-    };
-    
     var num_lines = 0;              
     $scope.wrapText = function(text, string) {
         text.each(function() {
@@ -156,7 +241,8 @@ function SocietiesCtrl($scope, $timeout, $http, searchModelService, colorMapServ
 
             }
             var map_svg = map_svg.substring(0, map_svg.indexOf("</svg>"));
-            map_svg = map_svg.concat(legend_svg);
+            // concat legend and remove all relative d-place links from svg's defs urls
+            map_svg = map_svg.concat(legend_svg.replace(/url\(.*?#/, 'url(#'));
             map_svg = map_svg.concat(gradients_svg +"</svg>");
             var filename = $scope.results.chosenVariable.name.replace(/[\W]+/g, "-").toLowerCase()+"-map.svg";
         }
@@ -230,19 +316,82 @@ function SocietiesCtrl($scope, $timeout, $http, searchModelService, colorMapServ
     
     $scope.buttonChanged = function(buttonVal) {
         d3.select('language-phylogeny').html('');
-        $scope.globalTree = false;
         $scope.results.selectedTree = null;
         if (buttonVal.indexOf("global") != -1) {
             $scope.globalTree = true;
             $scope.results.selectedTree = $scope.results.language_trees.global_tree;
+            $scope.results.chosenTVariable = $scope.variables[0];
             $scope.treeSelected();
-        }
-        if (buttonVal.indexOf('phylogeny') != -1) {
+        } else if (buttonVal.indexOf('phylogeny') != -1) {
+            $scope.globalTree = false;
             $scope.trees = $scope.results.language_trees.phylogenies;
         } else {
+            $scope.globalTree = false;
             $scope.trees = $scope.results.language_trees.glotto_trees;
         }
     };
+    
+    $scope.treeDownload = function() {
+        try {
+        var tree_svg = d3.select(".phylogeny")
+            .attr("version", 1.1)
+            .attr("xmlns", "http://www.w3.org/2000/svg")
+            .node().parentNode.innerHTML;
+        }
+        catch(e){
+            return;
+        }
+        var all_legends = {};
+        legends_list = [];
+        var gradients_svg = d3.select("#gradients-div").node().innerHTML;
+        
+        d3.selectAll(".legends").each( function(){
+            leg = d3.select(this);
+            if (leg.attr("var-id") && leg.attr("class").indexOf("hide") == -1) {
+               if ($scope.globalTree) {
+                   if ($scope.results.chosenTVariable.var_id) {
+                       if (leg.attr("var-id") == $scope.results.chosenTVariable.var_id) 
+                        all_legends[leg.attr("var-id")] = leg;
+                    
+                   } else if (parseInt(leg.attr("var-id")) == $scope.results.chosenTVariable.id) {
+                       all_legends[leg.attr("var-id")] = leg;
+                   }
+               } else 
+                    all_legends[leg.attr("var-id")] = leg;
+            }
+        });
+                    
+        for (var i = 0; i < $scope.results.variable_descriptions.length; i++) {
+            id = $scope.results.variable_descriptions[i].variable.id;
+            name = ''
+            if (!all_legends[id]) continue;
+            legend_id = all_legends[id];
+            if ($scope.results.variable_descriptions[i].CID) name += $scope.results.variable_descriptions[i].CID + '-';
+            name += $scope.results.variable_descriptions[i].variable.name;
+            svg_string = legend_id.node().innerHTML;
+            svg_string = svg_string.replace(/url\(.*?#/, 'url(#');
+            svg_string = '<svg version="1.1" xmlns="http://www.w3.org/2000/svg" transform="translate(10, 10)">' + svg_string + gradients_svg + '</svg>';
+            legends_list.push({'name': name.replace(/[\W]+/g, "-")+'-legend.svg', 'svg': svg_string});    
+        }
+                
+        for (var i = 0; i < $scope.results.environmental_variables.length; i++) {
+            id = $scope.results.environmental_variables[i].var_id;
+            name = ''
+            if (!all_legends[id]) continue;
+            legend_id = all_legends[id];
+            if ($scope.results.environmental_variables[i].CID) name += $scope.results.environmenal_variables[i].CID;
+            name += $scope.results.environmental_variables[i].name;
+            svg_string = legend_id.node().innerHTML;
+            svg_string = svg_string.replace(/url\(.*?#/, 'url(#');
+            svg_string = '<svg version="1.1" xmlns="http://www.w3.org/2000/svg" transform="translate(10, 10)">'+svg_string + gradients_svg + '</svg>';
+            legends_list.push({'name': name.replace(/[\W]+/g, "-")+'-legend.svg', 'svg': svg_string});
+        }
+
+        $scope.toSendquery = {'l': legends_list, 't': [tree_svg], 'n': [$scope.results.selectedTree.name+'.svg']};
+         $scope.toSendquery = JSON.stringify($scope.toSendquery);
+        
+    };
+    
     
     $scope.treeSelected = function() {
         $scope.$broadcast('treeSelected', {tree: $scope.results.selectedTree});
@@ -252,28 +401,7 @@ function SocietiesCtrl($scope, $timeout, $http, searchModelService, colorMapServ
             $scope.globalTree = true;
         }
         
-        //for environmental legend
-        if ($scope.results.environmental_variables.length > 0) {
-            if ($scope.results.environmental_variables[0].name == 'Net Primary Production' || $scope.results.environmental_variables[0].name == 'Mean Growing Season NPP') 
-                d3.selectAll(".envVar").attr("fill", "url(#earthy)");
-            else if ($scope.results.environmental_variables[0].name == "Annual Mean Precipitation")
-                d3.selectAll(".envVar").attr("fill", "url(#blue)");
-            else 
-                d3.selectAll(".envVar").attr("fill", "url(#temp)");
-        }
-        
-    };
-    
-    $scope.showOrHide = function(chosenVarId, id) {
-        if (!$scope.globalTree) return false;
-        
-        if (chosenVarId == id) return false;
-        else return true;
-    };
-    
-    $scope.legendArrow = function(code) {
-        if (code.hidden) code.hidden = false;
-        else code.hidden = true;
+        $scope.treeDownload();
     };
     
     $scope.clicked = function(trees) {
@@ -307,82 +435,46 @@ function SocietiesCtrl($scope, $timeout, $http, searchModelService, colorMapServ
         $scope.tabs[2].active = true;
     }
     
-    $scope.treeDownload = function() {
-        var tree_svg = d3.select(".phylogeny")
-            .attr("version", 1.1)
-            .attr("xmlns", "http://www.w3.org/2000/svg")
-            .node().parentNode.innerHTML;
-            
-        //need to do this to remove the time scale
-        tree_svg = tree_svg.substring(0, tree_svg.indexOf("</svg>"));
-        tree_svg = tree_svg.concat("</svg>");
-        var all_legends = {};
-        legends_list = [];
-        var gradients_svg = d3.select("#gradients-div").node().innerHTML;
+    $scope.nexusDownload = function() {
+        var filename = $scope.results.selectedTree.name+"-d-place.NEXUS";
+        string = "#NEXUS\nBEGIN TREES;\nTREE " + $scope.results.selectedTree.name+" = " + $scope.results.selectedTree.newick_string+"\nEND;"
         
-        d3.selectAll(".legends").each( function(){
-            leg = d3.select(this);
-            if (leg.attr("var-id")) {
-               if (leg.attr("class").indexOf("hide") == -1)
-                all_legends[leg.attr("var-id")] = leg;
-            }
-        });
-            
-        for (var i = 0; i < $scope.results.variable_descriptions.length; i++) {
-            id = $scope.results.variable_descriptions[i].variable.id;
-            legend_id = all_legends[id];
-            name = $scope.results.variable_descriptions[i].CID + '-'+ $scope.results.variable_descriptions[i].variable.name;
-            svg_string = legend_id.node().innerHTML;
-            svg_string = '<svg version="1.1" xmlns="http://www.w3.org/2000/svg" transform="translate(10, 10)">' + svg_string + gradients_svg + '</svg>';
-            legends_list.push({'name': name.replace(/[\W]+/g, "-")+'-legend.svg', 'svg': svg_string});    
-        }
-        
-        for (var i = 0; i < $scope.results.environmental_variables.length; i++) {
-            env_svg = d3.select("#e"+$scope.results.environmental_variables[i].id).node().innerHTML;
-            env_svg = '<svg version="1.1" xmlns="http://www.w3.org/2000/svg" transform="translate(10, 10)">'+env_svg.substring(0, env_svg.indexOf("</svg>")) + '</svg>' + gradients_svg + '</svg>';
-            name = $scope.results.environmental_variables[i].CID + '-'+$scope.results.environmental_variables[i].name;
-            legends_list.push({'name': name.replace(/[\W]+/g, "-")+'-legend.svg', 'svg': env_svg});
-        }
+        nexus_file = new Blob([string], {type: 'text/nexus'});
+        saveAs(nexus_file, filename);
+    }
+    
+    
+    $scope.disableCSVButton = function () {
+        $scope.csvDownloadButton.disabled = true;
+        $scope.csvDownloadButton.text = 'Downloading...';
+    };
 
-        query = {"legends": legends_list, "tree": tree_svg, "name": $scope.results.selectedTree.name+'.svg'};
-        var date = new Date();
-        var filename = "dplace-tree-"+date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate()+".zip"
-        $http.post('/api/v1/zip_legends', query, {'responseType': 'arraybuffer'}).then(function(data) {
-            file = new Blob([data.data], {type: 'application/zip'});
-            saveAs(file, filename);
-        });
+    $scope.enableCSVButton = function () {
+        $scope.csvDownloadButton.disabled = false;
+        $scope.csvDownloadButton.text = 'CSV';
     };
     
-    //NEW CSV DOWNLOAD CODE
-    //Sends a POST (rather than GET) request to the server, then constructs a Blob and uses FileSaver.js to trigger the save as dialog
-    //Better because we can send more data to the server using POST request than GET request
     var file;
     $scope.download = function() {
         var date = new Date();
-        var filename = "dplace-societies-"+date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate()+".csv"
+        var filename = "dplace-societies-"+date.toJSON().replace(/T.*$/,'')+".csv"
         if (!file) {
-           $scope.disableCSVButton();
-            var queryObject = searchModelService.getModel().getQuery(); 
-            $http.post('/api/v1/csv_download', queryObject).then(function(data) {
-                file = new Blob([data.data], {type: 'text/csv'});
+            $scope.disableCSVButton();
+            // queryObject is the in-memory JS object representing the chosen search options
+            var queryObject = searchModelService.getModel().getQuery();
+            // the CSV download endpoint is a GET URL, so we must send the query object as a string.
+            var queryString = encodeURIComponent(JSON.stringify(queryObject));
+            // format (csv/svg/etc) should be an argument, and change the endpoint to /api/v1/download
+            var csvDownloadLink = "/api/v1/csv_download?query=" + queryString;
+            $http.get(csvDownloadLink).then(function(data) {
+               file = new Blob([data.data], {type: 'text/csv'});
                 saveAs(file, filename);
-                $scope.enableCSVButton();
-
+                $scope.enableCSVButton(); 
             });
         } else {
+            var filename = "dplace-societies-"+date.toJSON().replace(/T.*$/,'')+".csv"
             saveAs(file, filename);
-        }
+        }    
     };
-    
-    //OLD CSV DOWNLOAD CODE
-    //Keeping just in case we need it in the future, will delete if we do not.
-    /*$scope.generateDownloadLinks = function() {
-        // queryObject is the in-memory JS object representing the chosen search options
-        var queryObject = searchModelService.getModel().getQuery();
-        console.log(queryObject);
-        // the CSV download endpoint is a GET URL, so we must send the query object as a string.
-        var queryString = encodeURIComponent(JSON.stringify(queryObject));
-        // format (csv/svg/etc) should be an argument, and change the endpoint to /api/v1/download
-        $scope.csvDownloadLink = "/api/v1/csv_download?query=" + queryString;
-    };    */
+
 }

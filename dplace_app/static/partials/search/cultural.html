@@ -9,19 +9,30 @@
     <span class="form-inline clearfix">
         <h4 class="pull-left">Search by Cultural Trait</h4>
        <div class="pull-right">
-            <button class="btn btn-primary form-control"
+            <button class="btn search-btn form-control"
+                ng-disabled="searchButton.disabled"
+                ng-click="resetSearch()">Reset
+            </button>
+            <button ng-show="checkIfSelected()" 
+                class="btn search-btn" 
+                ng-disabled="searchButton.disabled"
+                ng-click="showCriteria()">
+                {{ searchCriteria }}
+            </button>
+            <button class="btn btn- search-btn form-control"
                         ng-disabled="searchButton.disabled"
                         ng-click="doSearch()">{{ searchButton.text }}
-            </button>
-            <button class="btn btn-danger form-control"
-                        ng-click="resetSearch()">Reset
             </button>
             <span class="alert alert-danger" ng-show="errors">
                 {{ errors }}
             </span> 
         </div>
+
     </span>
-    <form class="form-inline" role="form" style="margin-top:20px;">
+    <h5  class="pull-left" style="padding-left: 5mm !important; line-height:10px;">Note: Search is limited to 4 cultural variables maximum</h5>
+    <h5 ng-show="count > 0 && !errors" style="padding-right:5mm !important" ng-class="{'text-danger': count > 4}" class="pull-right">Number of variables selected: {{ count }}</h5>
+
+    <form class="form-inline" role="form" style="margin-top:35px;">
         <div class="panel panel-default" ng-repeat="trait in traits">
             <div class="panel-heading">
                 <div class="row">
@@ -36,7 +47,7 @@
                         </select>
                      </div>
                      <div class="form-group col-xs-8">
-                        <div style="padding-left:5mm !important"><small>Choose a cross-cultural dataset to begin your search.<br />For more information, see “<a target="_new" href="#/source">Data Sources</a>” under the “Info” menu.</small></div>
+                        <div style="padding-left:5mm !important"><small>Choose a cross-cultural dataset to begin your search.<br />For more information, see “<a target="_new" href="/source">Data Sources</a>” under the “Info” menu.</small></div>
                      </div>
                  </div>
                 <div class="row row-margin-top" ng-show="trait.selectedSource">
@@ -71,10 +82,10 @@
 	
             <div class="panel-body scrollable">
                 <span class="variable-label" ng-show="trait.codes.length > 1"> Select All
-				<input type="checkbox" class="pull-left" ng-model="trait.codes.isSelected" ng-change="selectAllChanged(trait)" />
+				<input type="checkbox" class="pull-left" ng-model="trait.selected[trait.selectedVariable.id].allSelected" ng-change="selectAllChanged(trait)" />
               </span>
 				<div ng-repeat="code in trait.codes">
-                    <input type="checkbox" class="pull-left" ng-model="code.isSelected" ng-change="traitCodeSelectionChanged(trait)"/>
+                    <input type="checkbox" class="pull-left" ng-model="code.isSelected" ng-change="traitCodeSelectionChanged(trait, code)"/>
                     <span class="variable-label pull-left">{{ code.code }}:</span>
                     <span class="variable-description">{{ code.description }}</span>
                 </div>

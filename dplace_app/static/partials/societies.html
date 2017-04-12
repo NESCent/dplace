@@ -1,7 +1,6 @@
 <div class="container results">
-<!-- NEED A BETTER WAY TO DO THIS -->
- <div id="gradients-div">
-     <svg id="gradients" height="0" width="0">
+<div id="gradients-div" height="0" width="0">
+     <svg height="0" width ="0">
         <defs>
             <linearGradient id="temp" x1="0%" y1="0%" x2="100%" y2="0%">
                 <stop offset="0%" style="stop-color:rgb(51,0,255);stop-opacity:0.7" />
@@ -31,6 +30,7 @@
             <stop offset="100%" style="stop-color:rgb(93,20,20);stop-opacity:1" />
         </linearGradient>
         </defs>
+       
     </svg>
 </div>
     <div class="row">
@@ -41,7 +41,7 @@
 
     <div class="tablead pull-left">RESULT<br>Select a viewing mode<br>for your search results:</div>
     <tabset>
-        <tab ng-repeat="tab in tabs" active="tab.active" select="visible=true" deselect="visible=false">
+        <tab ng-repeat="tab in tabs" active="tab.active" select="visible=true; addTrees()" deselect="visible=false">
             <tab-heading><div class="tabHeading tabHeading_{{tab.content}}"></div><div class="text-center">{{tab.title}}</div></tab-heading>
                 <ng-include src="'/static/partials/societies/' + tab.content + '.html'"></ng-include>
         </tab>

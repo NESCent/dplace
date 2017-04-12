@@ -3,7 +3,7 @@
  * Created by dan on 7/30/14.
  */
 
-function SearchModel(VariableCategory, GeographicRegion, EnvironmentalCategory, LanguageFamily, DatasetSources) {
+function SearchModel(VariableCategory, GeographicRegion, EnvironmentalCategory, LanguageFamily, DatasetSources, Language) {
     this.reset = function() {
         this.results = {}; // Populated after search is run
         this.params = {}; // state for individual controllers
@@ -14,7 +14,7 @@ function SearchModel(VariableCategory, GeographicRegion, EnvironmentalCategory, 
         this.params.culturalTraits = new CulturalTraitModel(VariableCategory, DatasetSources);
         this.params.geographicRegions = new GeographicRegionModel(GeographicRegion);
         this.params.environmentalData = new EnvironmentalDataModel(EnvironmentalCategory);
-        this.params.languageClassifications = new LanguageClassificationModel(LanguageFamily)
+        this.params.languageClassifications = new LanguageClassificationModel(LanguageFamily, Language)
     };
 
     // getters
@@ -57,7 +57,7 @@ function SearchModel(VariableCategory, GeographicRegion, EnvironmentalCategory, 
 function CulturalTraitModel(VariableCategory, DatasetSources) {
     this.categories = VariableCategory.query(); // these objects get annotated with variables
     this.sources = DatasetSources.query();
-    this.selected = [];
+    this.selected = {};
     this.selectedCategory = null;
     this.selectedVariable = null;
     this.badgeValue = 0;
@@ -85,10 +85,11 @@ function EnvironmentalDataModel(EnvironmentalCategory) {
     this.badgeValue = 0;
 }
 
-function LanguageClassificationModel(LanguageFamily) {
+function LanguageClassificationModel(LanguageFamily, Language) {
     
     /* List of all Language Classes - needed for language search */
     this.allClasses = LanguageFamily.query();
-    this.selected = [];
+    this.allLanguages = Language.query();
+    this.selected = {};
     this.badgeValue = 0;
 }

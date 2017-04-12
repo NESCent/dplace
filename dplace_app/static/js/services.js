@@ -4,7 +4,7 @@ angular.module('dplaceServices', ['ngResource'])
         $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
     })
     .service('colorMapService', [ColorMapService])
-    .service('searchModelService',['VariableCategory','GeographicRegion','EnvironmentalCategory', 'LanguageFamily', 'DatasetSources', SearchModelService])
+    .service('searchModelService',['VariableCategory','GeographicRegion','EnvironmentalCategory', 'LanguageFamily', 'DatasetSources', 'Language', 'FindSocieties', 'colorMapService', SearchModelService])
     .factory('LanguageFamily', function($resource) {
         return $resource(
             '/api/v1/language_families/:id',
@@ -13,7 +13,16 @@ angular.module('dplaceServices', ['ngResource'])
                     method: 'GET',
                     isArray: true,
                     transformResponse: function(data, headers) {
-                        return JSON.parse(data).results;
+                        society_count = 0;
+                        results = JSON.parse(data).results;
+                        for (var i = 0; i < results.length; i++) {
+                            society_count += results[i].language_count;
+                        }
+                        list = [{
+                            'name': 'Select All Languages',
+                            'language_count': society_count
+                        }]
+                        return list.concat(results);
                     }
                 }
             }
@@ -156,8 +165,8 @@ angular.module('dplaceServices', ['ngResource'])
     })
     .factory('EnvironmentalCategory', function($resource) {
         return $resource(
-            '/api/v1/environmental_categories/:id',
-            {}, {
+            '/api/v1/categories/:id',
+            {type: "environmental"}, {
                 query: {
                     method: 'GET',
                     isArray: true,
@@ -169,8 +178,8 @@ angular.module('dplaceServices', ['ngResource'])
     })
     .factory('EnvironmentalVariable', function ($resource) {
         return $resource(
-            '/api/v1/environmental_variables/:id',
-            {page_size: 1000}, {
+            '/api/v1/variables/:id',
+            {page_size: 1000, type: "environmental"}, {
                 query: {
                     method: 'GET',
                     isArray: true,
@@ -185,7 +194,7 @@ angular.module('dplaceServices', ['ngResource'])
             '/api/v1/find_societies',
             {},{
                 find: {
-                    method: 'POST'
+                    method: 'GET'
                 }
             }
         )
@@ -203,13 +212,13 @@ angular.module('dplaceServices', ['ngResource'])
                 }
             });
     })
-    //not used at the moment
-    .factory('TreesFromLanguages', function($resource) {
+    
+    .factory('TreesFromSocieties', function($resource) {
         return $resource(
-            '/api/v1/trees_from_languages',
+            '/api/v1/trees_from_societies',
             {},{
                 find: {
-                    method: 'POST',
+                    method: 'GET',
                     isArray: true
                 }
             }

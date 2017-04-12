@@ -9,13 +9,21 @@
     <span class="form-inline clearfix">
         <h4 class="pull-left">Search by Environmental Data</h4>
        <div class="pull-right">
-            <button class="btn btn-primary form-control"
+       <button class="btn search-btn form-control"
+                ng-disabled="searchButton.disabled"
+                ng-click="resetSearch()">Reset
+            </button>
+        <button ng-show="checkIfSelected()"
+            ng-disabled="searchButton.disabled"        
+            class="btn search-btn" 
+            ng-click="showCriteria()">
+                {{ searchCriteria }}
+            </button>
+            <button class="btn search-btn form-control"
                         ng-disabled="searchButton.disabled"
                         ng-click="doSearch()">{{ searchButton.text }}
             </button>
-            <button class="btn btn-danger form-control"
-                        ng-click="resetSearch()">Reset
-            </button>
+            
            <span class="alert alert-danger" ng-show="errors">
             {{ errors }}
             </span> 
@@ -37,7 +45,7 @@
                     </div>
                     
                     <div class="pull-right"> 
-                        <button class="btn btn-default btn-sm" style="margin-right:10px;" ng-show="$index > 0" ng-click="removeVariable(variable)"><span class="glyphicon glyphicon-minus" style="padding-right:3px;" aria-hidden="true"></span>Remove this variable</button>
+                        <button class="btn btn-default btn-sm" style="margin-right:10px;" ng-show="$index > 0" ng-click="removeFromSearch(variable, 'environmental')"><span class="glyphicon glyphicon-minus" style="padding-right:3px;" aria-hidden="true"></span>Remove this variable</button>
                     </div>
                 </div>
 			
@@ -49,11 +57,13 @@
                                 ng-options="environmental.name for environmental in variable.variables"
                                 ng-change="variableChanged(variable)"
                                 ng-show="variable.variables.length > 0"
+                                style="width:100%;"
                                 >
                             <option value="">Select an environmental variable</option>
                         </select>
                     </div>
-                    <div ng-show="variable.selectedVariable">
+                    
+                    <div ng-show="variable.selectedVariable && variable.selectedVariable.data_type == 'Continuous'">
                         <div class="form-group col-xs-2">
                             <div class="dropdown">
                                 <button class="btn btn-default dropdown-toggle form-control">{{ variable.selectedFilter.name }} <span class="caret"></span></button>
@@ -126,6 +136,18 @@
                 </div>
                 <div ng-show="variable.selectedVariable">Further information: {{ variable.selectedVariable.codebook_info }}</div>
             </div>
+            
+            <div class="panel-body scrollable" ng-show="variable.selectedVariable && variable.selectedVariable.data_type == 'Categorical'">
+                <span class="variable-description" ng-show="variable.selectedVariable.codes.length > 1">Select All
+                    <input type="checkbox" class="pull-left" ng-model="variable.selectedVariable.allSelected" ng-change="selectAll(variable.selectedVariable)" />
+                </span>
+                <div ng-repeat="code in variable.selectedVariable.codes">
+                    <input type="checkbox" class="pull-left" ng-model="code.isSelected" ng-change="codeSelected(variable.selectedVariable, code)"/>
+                    <span class="variable-description">{{ code.description }}</span>
+                </div>
+            
+            </div>
+            
         </div>
     </form>
     <div class="pull-right">

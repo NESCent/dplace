@@ -1,14 +1,19 @@
-# D-PLACE  [![Build Status](https://travis-ci.org/D-PLACE/dplace.svg?branch=master)](https://travis-ci.org/D-PLACE/dplace)
+# D-PLACE  
+
+[![Build Status](https://travis-ci.org/D-PLACE/dplace.svg?branch=master)](https://travis-ci.org/D-PLACE/dplace)
+[![codecov](https://codecov.io/gh/D-PLACE/dplace/branch/master/graph/badge.svg)](https://codecov.io/gh/D-PLACE/dplace)
+
 ## Synopsis
 
 This repository contains a [Django](http://djangoproject.com) application for the D-PLACE Project. 
+
 ## Installation
 
 ### Vagrant/Ansible
 
 For development purposes, the [Vagrant+Ansible](https://github.com/dleehr/dplace-vagrant) configuration is recommended. It automates the build of an Ubuntu Linux VM with D-PLACE installed and ready for testing/development.
 
-Additionally, the Anisble playbook creates OS and database users for D-PLACE, installs all software dependencies, and populates the database from the working group's data sets. You can use ansible by itself to provision D-PLACE on a host, or study the [playbooks](https://github.com/dleehr/ansible-postgresql/tree/master/roles/dplace_server/tasks) as a recipe.
+Additionally, the Ansible playbook creates OS and database users for D-PLACE, installs all software dependencies, and populates the database from the working group's data sets. You can use ansible by itself to provision D-PLACE on a host, or study the [playbooks](https://github.com/dleehr/ansible-postgresql/tree/master/roles/dplace_server/tasks) as a recipe.
 
 The rest of the information on this page assumes you are not using the [Vagrant+Ansible](https://github.com/dleehr/dplace-vagrant) configuration.
 
@@ -21,11 +26,9 @@ D-PLACE also requires the following software:
 - Git
 - Python (2.7 preferred)
 - python-psycopg2 (for connecting to Postgres)
-- Postgres with PostGIS (Versions 9.2 and 9.3 are used in development)
+- Postgres with the `unaccent` extension.
 
-D-PLACE has been developed on Mac OS X 10.9 as well as Ubuntu Server 12.04. Efforts to run on Windows have not been successful, but it should be possible.
-
-For information on installing PostGIS, see the [GeoDjango documentation](https://docs.djangoproject.com/en/dev/ref/contrib/gis/install/)
+D-PLACE has been developed on Mac OS X 10.9 as well as Ubuntu Server 12.04.
 
 ### Cloning the repository
 
@@ -60,12 +63,13 @@ Be sure to update the following sections:
 2. `DATABASES`: Connection info and credentials for PostgreSQL host
 3. `TEMPLATE_DIRS`: Absolute local path to `dplace_app/templates`
 4. `STATICFILES_DIRS`: Absolute local path to `dplace_app/static`
+5. `DATASETS`: Names of datasets to install.
 
 #### Database installation
 
 To install the database, run
 
-	python manage.py migrate
+	make install
 
 This requires valid database credentials in `settings.py`, and activation of your virtualenv if enabled.
 
@@ -75,17 +79,13 @@ This requires valid database credentials in `settings.py`, and activation of you
 
 D-PLACE is mainly built with [Django](http://djangoproject.com) and [AngularJS](http://angularjs.org). Django is used to model/query data stored in the relational GIS database, and AngularJS is used to build a JavaScript-based browser application that provides an interface to the data. The [Django REST Framework](http://django-rest-framework.org) is used to build a JSON API between Django and AngularJS.
 
-#### GeoDjango - Data Models
-
-All D-PLACE datasets are represented by classes in `dplace_app/models.py`. These models are subclasses of `django.contrib.gis.db.models.Model`, which provides GIS functionality - point/geometry fields and queryability.
-
 #### Django REST Framework - REST API
 
 The Django REST Framework is a powerful framework for building RESTful web services in Django. API endpoints are created as Django views, and can either be [class-based](https://docs.djangoproject.com/en/1.6/topics/class-based-views/) or [function](https://docs.djangoproject.com/en/1.6/topics/http/views/) views. In either case, the framework provides a lot of the functionality. API views are created in `dplace_app/api_views.py` and connected to URLs in `dplace_app/urls.py`
 
 Most of the Models are exposed as simple `ReadOnlyModelViewSet`s, which means the REST framework creates methods to list all objects and get individual objects.
 
-In order to convert data between JSON (or XML) and Python model objects, the REST framework uses Seriializers. These are classes located in `dplace_app/serializers.py`, and they describe what fields and related objects to include when serializing an object to JSON. Serializers can also represent arbitrary (non-model-backed) objects like search queries or results.
+In order to convert data between JSON (or XML) and Python model objects, the REST framework uses serializers. These are classes located in `dplace_app/serializers.py`, and they describe what fields and related objects to include when serializing an object to JSON. Serializers can also represent arbitrary (non-model-backed) objects like search queries or results.
 
 #### AngularJS - Client Application
 
@@ -99,11 +99,11 @@ As a best practice, avoid putting AngularJS code into Django templates. This cou
 
 ### Loading Data
 
-D-PLACE data is collected/curated by the Working Group, and periodic CSV exports have been stored in a [private Github repository](https://github.com/SimonGreenhill/dplace-data). 
+D-PLACE data is collected/curated by the Working Group, and periodic CSV exports have been stored in a [private Github repository](https://github.com/D-PLACE/dplace-data). 
 
-To load the data, run the `load_all_datasets.sh` script. This scripts clones the repository, and runs `dplace_app/load.py` with appropriate parameters for each of the CSV files we import.  The python files in `dplace_app/load/` are tailored to each CSV file format.
+To load the data, run the `load_all_datasets.sh` script. This scripts clones the [dplace-data](https://github.com/D-PLACE/dplace-data) repository, and installs the latest data.
 
-The [Vagrant+Ansible](https://github.com/dleehr/dplace-vagrant) configuration will perform the first data load, but this step can be repeated to load new data.
+The [Vagrant+Ansible](https://github.com/D-PLACE/dplace-vagrant) configuration will perform the first data load, but this step can be repeated to load new data.
 
 ### Running Tests
 
@@ -111,7 +111,14 @@ D-PLACE uses Django's built-in testing framework, tests can be run with
 
 	python manage.py test
         
-Test scripts located in `dplace_app/tests` and should be kept up-to-date with new functionality. The tests cover model and API functionality, but not yet the AngularJS layer.
+The front-end tests can be run with `node`:
+
+	npm test
+
+All the tests can be run at the same time by running:
+
+	make test
+
 
 ### Running Development Server
 

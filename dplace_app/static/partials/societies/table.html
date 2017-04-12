@@ -1,14 +1,14 @@
 <div class="row">
-    <div ng-show="(results.searched && (results.societies.length == 0))">
+    <div ng-show="((results.searched || results.searchedByName) && (results.societies.length == 0))">
         <p style="margin:20px;">No societies found.</p>
-        </div>
+    </div>
     <table class="table" ng-show="results.societies.length">
         <tr>
             <th><a ng-click="columnSort.sortColumn='society.name';columnSort.reverse=!columnSort.reverse">Name</a></th>
+            <th ng-show="results.searchedByName">Alternate Names</th>
             <th><a ng-click="columnSort.sortColumn='society.source.name';columnSort.reverse=!columnSort.reverse">Dataset</a></th>
             <th><a ng-click="columnSort.sortColumn='society.language.glotto_code';columnSort.reverse=!columnSort.reverse">Glottolog Code</a></th>
             <th><a ng-click="columnSort.sortColumn='society.language.name';columnSort.reverse=!columnSort.reverse">Language</a></th>
-            <th>Trees</th>
             <th ng-repeat="variable in results.variable_descriptions">{{ variable.variable.name }}</th>
             <th ng-repeat="environmental in results.environmental_variables">{{ environmental.name }}</th>
             <th ng-show="results.languages">Language Family</th>
@@ -18,31 +18,41 @@
             <td><span class="circle" ng-style="society_result.society.style"></span>
                 <a ng-href="/society/{{ society_result.society.ext_id }}" target="_blank">{{ society_result.society.name }}</a>
             </td>
+            <td ng-show="results.searchedByName">{{ society_result.society.alternate_names }}
             <td>{{ society_result.society.source.name }}</td>
             <td>{{ society_result.society.language.glotto_code }}</td>
             <td>{{ society_result.society.language | formatLanguageName }}</td>
-            <td><a style="cursor: pointer;" ng-click="clicked(society_result.society.trees)" title="'Trees'">{{ society_result.society.trees | countOrBlank }}</a></td>
             <td ng-repeat="variable in results.variable_descriptions">
-            <div ng-repeat="coded_value in society_result.variable_coded_values|formatVariableCodeValues:variable.variable.id">
-                {{ coded_value|formatValue }}
-                <a ng-show="coded_value.references.length > 0" data-toggle="collapse" data-target="#s{{society_result.society.ext_id}}{{variable.variable.label}}" class="source-link">(Source)</a>
+            <div ng-repeat="coded_value in society_result.variable_coded_values|formatVariableCodeValues:variable.variable" ng-show="coded_value">
+                {{ coded_value|formatValue }} {{ variable.variable.units }}
+                <a ng-show="coded_value.references.length > 0" data-toggle="collapse" data-target="#s{{society_result.society.ext_id}}{{variable.variable.label}}" class="source-link">(Source<span ng-show="coded_value.references.length > 1">s</span>)</a>
                 <a ng-show="coded_value.comment.length > 0 || coded_value.subcase.length > 0 || (coded_value.focal_year.length > 0 && coded_value.focal_year != 'NA')" class="comment-tooltip" tooltip = "{{ coded_value|formatComment }}">
                     <span class="glyphicon glyphicon-comment" aria-hidden="true"></span></a>
                 <div id="s{{society_result.society.ext_id}}{{variable.variable.label}}" class="collapse val-sources">
-                    {{ coded_value | formatValueSources }}
+                    • <span ng-repeat="cv in coded_value.references|orderBy:['author','year']" ><a
+                    popover="{{cv.reference}}" popover-placement="left"
+                    popover-title="{{cv.author}} ({{cv.year}})">{{cv.author}} ({{cv.year}})</a> • </span>
                 </div>
                 <div ng-show="(society_result.variable_coded_values|numValues:variable.variable.id ) > 0" style="font-size:12px;"> {{ society_result.variable_coded_values|numValues:variable.variable.id }} more values for this society</div>
 
             </div>
             </td>
             <td ng-repeat="environmental in results.environmental_variables">
-                {{ society_result.environmental_values | formatEnvironmentalValues:environmental.id }}
-            </td>
+                <div ng-repeat="value in society_result.environmental_values|formatEnvironmentalValues:environmental.id">
+                    {{value.coded_value_float||value.code_description.description}} {{ environmental.units }}
+                    <a ng-show="value.comment.length > 0" class="comment-tooltip" tooltip = "{{ value.comment }}">
+                        <span class="glyphicon glyphicon-comment" aria-hidden="true"></span></a>
+                </div>
+                
             <td ng-show="results.languages">
-                {{ society_result.languages | formatLanguage}}
+                <span ng-hide="society_result.society.language == null">
+                    {{ society_result.society.language | formatLanguage}}
+                </span>
             </td>
             <td ng-show="results.geographic_regions">
-                {{ society_result.geographic_regions | formatGeographicRegion}}
+                <span ng-hide="society_result.society.region == null">
+                    {{ society_result.society.region | formatGeographicRegion}}
+                </span>
             </td>
         </tr>
     </table>

@@ -1,0 +1,4 @@
+category,id,title,definition,type,units,source,changes,notes
+Climate,Rainfall,Rainfall,Precipitation,Continuous,mm,,,
+Climate,Temperature,Temperature,Temperature,Continuous,C,,,
+Ecology,Ecology1,Ecology1,,Continuous,,,,

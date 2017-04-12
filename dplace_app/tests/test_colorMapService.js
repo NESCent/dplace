@@ -57,8 +57,8 @@ describe('Color Map Service Testing', function() {
             'tdwg_code': 24
         };
 
-       society.geographic_regions.push(geographic_region);
-       mockResults.geographic_regions.push(geographic_region);
+        society.society.region = geographic_region;
+        mockResults.geographic_regions.push(geographic_region);
         mockResults.societies.push(society);
         var map = mockColorService.generateColorMap(mockResults);
         expect(map[society.society.id]).toBe('rgb(255,0,0)');
@@ -70,11 +70,13 @@ describe('Color Map Service Testing', function() {
             'max': 29,
             'min': -17,
             'name': "Temperature",
-            'range': 46
+            'range': 46,
+            'data_type': 'Continuous',
+            'type': 'environmental'
         };
         
         var environmental_value = {
-            'value': 18.25,
+            'coded_value_float': 18.25,
             'variable': 317,
         };
         mockResults.environmental_variables.push(environmental_variable);
@@ -215,7 +217,7 @@ describe('Color Map Service Testing', function() {
         ];
         
         var map = mockColorService.generateColorMap(mockResults);
-       expect(map[society.society.id]).toBe("rgb(0,0,255)");
+       expect(map[society.society.id]).toBe("rgb(255,0,0)");
        expect(map[society2.society.id]).toBe("rgb(0,255,0)");
        expect(map[society2.society.id]).toEqual(map[society3.society.id]);
     });
@@ -261,7 +263,7 @@ describe('Color Map Service Testing', function() {
         ];
      mockResults.societies.push(society);
     var map = mockColorService.generateColorMap(mockResults);
-    expect(map[society.society.id]).toEqual("rgb(0,0,255)")
+    expect(map[society.society.id]).toEqual("rgb(255,0,0)")
     });
     
     it('geographic region and cultural variable', function() {

@@ -12,12 +12,86 @@
     $(document).ready(function() {
         $("a.comment-tooltip").tooltip();
         document.title = '{{ society.name }} – ' + document.title;
+
+        $('.collapse').on('shown.bs.collapse', function(){
+            $(this).parent().find(".glyphicon-plus").removeClass("glyphicon-plus").addClass("glyphicon-minus");
+        }).on('hidden.bs.collapse', function(){
+            $(this).parent().find(".glyphicon-minus").removeClass("glyphicon-minus").addClass("glyphicon-plus");
+        });
+
+        $('.navbar-collapse').click(function(){
+            if($(window).width() < 768) {
+                $(".navbar-collapse").collapse('hide');
+            }
+        });
+        $('.navbar-collapse .dropdown-menu').click(function(){
+            if($(window).width() < 768) {
+                $(".navbar-collapse").collapse('hide');
+            }
+        });
     });
 </script>
 
-<div class="container" style="margin-top:-150px;">
-{% if society.location %}
-    <div class="pull-right" style="margin-top:30px;">
+<script>
+$(document).ready(function(){
+    $('[data-toggle="tooltip"]').tooltip(); 
+});
+</script>
+
+<nav class="navbar navbar-default navbar-fixed-top" role = "navigation">
+    <div class="container">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <div id="homeLogo" class="homeNavBarLogo">
+                <a class="navbar-brand" href="/home"><img title="HOME" src="/static/images/D-PLACE_Logo.png"></a>
+            </div>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav navbar-right">
+                <li ng-class="searchActive" class="searchActive">
+                    <a ng-href href="/search">
+                        <img class="navicon" src="/static/images/Search_Icon.png">
+                        <span class="navIsNotCollapsedInline"><br/></span>SEARCH
+                    </a>
+                </li>
+                <li ng-class="sourceInfoActive" class="sourceInfoActive">
+                    <a ng-href href="/howto">
+                        <img class="navicon" src="/static/images/DataSet_Icon.png">
+                        <span class="navIsNotCollapsedInline"><br/></span>HOW-TO
+                    </a>
+                </li>
+                <li ng-class="aboutActive" class="aboutActive">
+                    <a class="dropdown-toggle" data-toggle="dropdown">
+                        <img class="navicon" src="/static/images/About_Icon.png">
+                        <span class="navIsNotCollapsedInline"><br/></span>INFO
+                    </a>
+                    <ul class="dropdown-menu" role="menu">
+                        <li><a ng-href href="/about">ABOUT</a></li>
+                        <li><a ng-href href="mailto:dplace@shh.mpg.de" title="Send email to dplace@shh.mpg.de" data-toggle="tooltip" data-placement="top">CONTACT US</a></li>
+                        <li><a ng-href href="/howtocite">HOW TO CITE</a></li>
+                        <li><a ng-href href="/source">DATA SOURCES</a></li>
+                        <li><a ng-href href="/team">TEAM</a></li>
+                        <li><a ng-href href="/technology">TECHNOLOGY</a></li>
+                        <li><a ng-href href="/publication">PUBLICATIONS</a></li>
+                        <li><a ng-href href="/legal">LEGAL</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+{% if society.location and location.lat and location.lng %}
+    <div class="pull-right socMapCollapsedView" style="margin-top:30px;">
         <div id="society-map" style="width: 150px; height: 150px; vertical-align:right; border:solid 1px black;"></div>
     </div>
 
@@ -64,64 +138,107 @@
     );
   </script>
 {% endif %}
-<h1><img height="60px" title="HOME" src="{% static "images/D-PLACE_Logo.png" %}">Society: {{ society.name }}</h1>
+<div class="navIsNotCollapsed">
+    <h1>Society: {{ society.name }} ({{society.ext_id}})</h1>
+</div>
+<div class="navIsCollapsed">
+    <h1>Society:<br/>{{ society.name }} ({{society.ext_id}})</h1>
+</div>
+    {% if society.original_name %}
+    <h4>Original name and ID in {{society.source.name}}: {{society.original_name}}</h4>
+    {% endif %}
     {% if society.language %}
+        <h4>Language family: {% for classification in language_classification %}{{classification.name}}{% endfor %}</h4>
+
         <h4>Language or dialect: {{ society.language.name }} </h4>
-        <h5>
+        <ul style="line-height:25px;"><h5>
             {% if society.language.glotto_code %}
-            Glottolog ID: <a href="http://glottolog.org/resource/languoid/id/{{society.language.glotto_code}}" target="_blank">{{ society.language.glotto_code }}</a>
+            <li>Glottolog ID: <a href="http://glottolog.org/resource/languoid/id/{{society.language.glotto_code}}" target="_blank">{{ society.language.glotto_code }}</a></li>
             {% endif %}
         </h5>
         <h5>
             {% if society.language.iso_code %}
-            ISO 639-3: <a href="http://www-01.sil.org/iso639-3/documentation.asp?id={{society.language.iso_code}}" target="_blank">{{ society.language.iso_code.iso_code }}</a>
+            <li>ISO 639-3: <a href="http://www-01.sil.org/iso639-3/documentation.asp?id={{society.language.iso_code}}" target="_blank">{{ society.language.iso_code }}</a></li>
             {% endif %}
-        </h5>
-        <h4>Language family: {% for classification in language_classification %}{{classification.name}}{% endfor %}</h4>
+        </h5>        </ul>
     {% endif %}
         <h4>Alternate names: {{ society.alternate_names }}</h4>
         <h4>Principal year to which data refer: {{ society.focal_year }}</h4>
-        {% if xd_id %}<h4>Name and ID in other cross-cultural databases: {% for x in xd_id %} <a href="/society/{{ x.ext_id }}" target="_blank">{{ x.name }} ({{ x.source.name}})</a>{% endfor %}</h4>{% endif %}
-    <h2>Environmental Data</h2>
-    {% for key, value in environmentals.items %}
-        <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
-            <div class="panel panel-default">
-                <div class="panel-heading" role="tab" id="h{{key|cut:" "}}">
-                    <h4 class="panel-title">
-                        <a data-toggle="collapse" data-parent="#accordion" href="#e{{key|cut:" "}}" aria-expanded="true" aria-controls="e{{key|cut:" "}}">
-                            {{key}}
-                        </a>
-                    </h4>
-                </div>
-                <div id="e{{key|cut:" "}}" class="panel-collapse collapse out" role="tabpanel" aria-labelledby="h{{key|cut:" "}}">
-                    <table class="panel-body table table-condensed table-striped table-bordered">
-                        <tr>
-                            <th>Variable</th>
-                            <th>Value</th>
-                        </tr>
-                        {% for v in value %}
-                        <tr>
-                            <td>{{v.name}}</td>
-                            <td>{{v.value}} {{v.units}}</td>
-                        </tr>
-                        {% endfor %}
-                    </table>
+        {% if xd_id %}
+            <h4>Name and ID in other cross-cultural databases:</h4>
+            <h5><ul style="line-height:25px;">
+            {% for x in society.related %}
+                {% if x.source.name %}
+                    <li><a href="/society/{{ x.ext_id }}" target="_blank">{{ x.name }} ({{x.ext_id}}) ({{x.source.name}})</a></li>
+                {% elif x.source.author == 'Murdock' %}
+                   <li> {{ x.original_name }}</li>
+                {% elif x.source.author == 'Jorgensen' %}
+                    <li>{{ x.original_name }} (WNAI)</li>
+                {% endif %}
+            {% endfor %}
+            {% if society.hraf_link %}
+                <li><a href="http://ehrafworldcultures.yale.edu/ehrafe/browseCultures.do?owc={{hraf_link}}" target="_blank">{{ society.hraf_link }} (eHRAF)</a></li>
+            {% endif %}
+            {% if society.chirila_link %}
+                <li><a href="http://www.pamanyungan.net/chirila/" target="_blank">{{ society.chirila_link }} (CHIRILA) </a></li>
+            {% endif %}
+            </ul>
+            </h5>
+            
+        {% endif %}
+    {% if environmentals.items %}
+        <h2>Environmental Data</h2>
+        {% for key, value in environmentals.items %}
+            <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+                <div class="panel panel-default">
+                    <a class="header panel-default" data-toggle="collapse" data-parent="#accordion" href="#e{{key|cut:" "}}" aria-expanded="true" aria-controls="e{{key|cut:" "}}">
+                        <div class="panel-heading" role="tab" id="h{{key|cut:" "}}">
+                            <h4 class="panel-title">
+                                {{key}}
+                                <span class="glyphicon glyphicon-plus pull-right" aria-hidden="true"></span>
+
+                            </h4>
+                        </div>
+                     </a>
+                    <div id="e{{key|cut:" "}}" class="panel-collapse collapse out" role="tabpanel" aria-labelledby="h{{key|cut:" "}}">
+                        <table class="panel-body table table-condensed table-striped table-bordered">
+                            <tr>
+                                <th>Variable</th>
+                                <th>Value</th>
+                            </tr>
+                            {% for v in value %}
+                            <tr>
+                                <td>{{v.name}}</td>
+                                <td>{{v.value}} {{v.units}}</td>
+                                {% if v.comment %}
+                            <td width="10px">
+                                <a class="comment-tooltip" data-toggle="tooltip" title="{{v.comment}}"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span></a>
+                                </td>
+                            {% else %}
+                                <td width="0px"></td>
+                            {% endif %}
+                            </tr>
+                            {% endfor %}
+                        </table>
+                    </div>
                 </div>
             </div>
-        </div>
-    {% endfor %}
-    
+        {% endfor %}
+    {% endif %}
+
+    {% if cultural_traits.items %}
     <h2>Cultural Trait Data</h2>
     {% for key, value in cultural_traits.items %}
         <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
             <div class="panel panel-default">
-                <div class="panel-heading" role="tab" id="h{{key|cut:" "}}">
-                    <h4 class="panel-title">
-                        <a data-toggle="collapse" data-parent="#accordion" href="#c{{key|cut:" "}}" aria-expanded="true" aria-controls="c{{key|cut:" "}}">
+                <a class="panel-default" data-toggle="collapse" data-parent="#accordion" href="#c{{key|cut:" "}}" aria-expanded="true" aria-controls="c{{key|cut:" "}}">
+                    <div class="panel-heading" role="tab" id="h{{key|cut:" "}}">
+                        <h4 class="panel-title">
                             {{key}}
-                        </a>
-                    </h4>
-                </div>
+                            <span class="glyphicon glyphicon-plus pull-right" aria-hidden="true"></span>
+                        </h4>
+                    </div>
+                </a>
                 <div id="c{{key|cut:" "}}" class="panel-collapse collapse out" role="tabpanel" aria-labelledby="h{{key|cut:" "}}">
                     <table class="panel-body table table-condensed table-striped table-bordered">
                         <tr>
@@ -139,10 +256,10 @@
                             <td>{{v.label}}</td>
                             <td>{{v.name}}</td>
                             <td>{{v.code}}</td>
-                            <td>{{v.description}} {% if v.sources %}(<a style="cursor:pointer;" data-toggle="collapse" data-target="#s{{v.label}}" aria-expanded="false" aria-controls="s{{v.label}}">Source</a>) 
-                                <div class="collapse" id="s{{v.label}}" style="padding-left:10px; padding-top:5px;">
+                            <td>{{v.description}} {% if v.sources %}(<a style="cursor:pointer;" data-toggle="collapse" data-target="#s{{key|cut:" "}}{{v.id}}" aria-expanded="false" aria-controls="s{{v.id}}">Source</a>) 
+                                <div class="collapse" id="s{{key|cut:" "}}{{v.id}}" style="padding-left:10px; padding-top:5px;">
                                     {% for s in v.sources %}
-                                        <a href="#r{{s.id}}">{{s}}</a>;
+                                        <a href="society/{{society.ext_id}}#r{{s.id}}" target="_self">{{s}}</a>;
                                     {% endfor %}
                                 </div>{% endif %}
                             </td>
@@ -161,6 +278,8 @@
             </div>
         </div>
     {% endfor %}
+    {% endif %}
+
     {% if references %}
         <h2>References</h2>
         <ul>
@@ -170,4 +289,47 @@
         </ul>
     {% endif %}
 </div>
+
+{% verbatim %}
+<div class="footer navIsNotCollapsed">
+    <center>
+        <table>
+            <tr>
+                <td align="left" style="padding-right:1cm;padding-left:2px">
+                    <a target="_bank" href="http://shh.mpg.de/en" title="Max Planck Institute for the Science of Human Historiy, Jena/Germany"><img width="80" src="/static/images/minerva_white.png" /></a>
+                </td>
+                <td align="left"><br>
+                    <a target="_bank" href="http://nescent.org" title="National Evolutionary Synthesis Center, Durham,NC/USA"><img width="240" src="/static/images/nescent_white.png" /></a>
+                </td>
+                <td align="middle" style="padding-right:1cm;padding-left:1cm">
+                    <a target="_bank" rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">
+                        <img alt="Creative Commons License" style="border-width:0;width:100px" src="/static/images/cclogo.png" />
+                    </a>
+                    <br />
+                    <a target="_bank" rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">
+                        <small>This work is licensed under a<br /> Creative Commons Attribution-NonCommercial 4.0 International License</small>.</a>
+                    </td>
+                    <td align="right" style="padding-right:2px;">
+                        <a target="_bank" title="D-PLACE Source Code" href="https://github.com/D-PLACE/dplace">
+                            <img height="29" src="/static/images/GitHub_Logo_code.png" /></a>
+                        <a target="_bank" title="D-PLACE Data" href="https://github.com/D-PLACE/dplace-data">
+                            <img height="29" src="/static/images/GitHub_Logo_data.png" /></a>
+                    </td>
+                </tr>
+            </table>
+        </center>
+    </div>
+    <div class="footer navIsCollapsed">
+        <center>
+            <a target="_bank" href="http://shh.mpg.de/en" title="Max Planck Institute for the Science of Human Historiy, Jena/Germany"><img width="40" src="/static/images/minerva_white.png" /></a>
+            &nbsp;&nbsp;&nbsp;
+            <a target="_bank" href="http://nescent.org" title="National Evolutionary Synthesis Center, Durham,NC/USA"><img style="margin-top:10px" width="120" src="/static/images/nescent_white.png" /></a>
+            &nbsp;&nbsp;&nbsp;
+            <a target="_bank" rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="margin-top:5px;width:50px" src="/static/images/cclogo.png" /></a>
+            &nbsp;&nbsp;&nbsp;
+            <a target="_bank" href="https://github.com/D-PLACE/dplace"><img style="width:30px" src="/static/images/GitHub_Logo_code.png" /></a>
+            <a target="_bank" href="https://github.com/D-PLACE/dplace-data"><img style="width:30px" src="/static/images/GitHub_Logo_data.png" /></a>
+        </center>
+    </div>
+{% endverbatim %}
 {% endblock %}

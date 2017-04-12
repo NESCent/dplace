@@ -35,6 +35,6 @@ class SiteMapTestCase(TestCase):
         assert self.ea_society.get_absolute_url() in self.response.content
         assert self.binford_society.get_absolute_url() in self.response.content
 
-    def test_language(self):
-        assert self.language1.get_absolute_url() in self.response.content
-        assert self.language2.get_absolute_url() in self.response.content
+    # def test_language(self):
+    #     assert self.language1.get_absolute_url() in self.response.content
+    #     assert self.language2.get_absolute_url() in self.response.content

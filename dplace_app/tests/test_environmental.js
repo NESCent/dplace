@@ -30,9 +30,9 @@ describe('Testing environmental search', function() {
             FindSocieties: mockFindSocieties
         });
         spyOn(searchScope, 'search').and.callThrough();
-        spyOn(searchScope, 'updateSearchQuery');
+        spyOn(mockSearchModelService, 'updateSearchQuery');
         spyOn(searchScope, 'searchSocieties').and.callThrough();
-        spyOn(searchScope, 'getCodeIDs');
+        spyOn(mockSearchModelService, 'getCodeIDs');
 
         envScope = searchScope.$new();
         
@@ -53,13 +53,17 @@ describe('Testing environmental search', function() {
             .respond(200);
         $httpBackend.whenGET('/api/v1/geographic_regions?page_size=1000')
             .respond(200);
-        $httpBackend.whenGET('/api/v1/environmental_categories')
+        $httpBackend.whenGET('/api/v1/categories?type=environmental')
             .respond(200);
         $httpBackend.whenGET('/api/v1/language_families?page_size=1000')
             .respond(200);
         $httpBackend.whenPOST('/api/v1/find_societies')
             .respond(200); //return a result here?
+        $httpBackend.whenGET('/api/v1/languages?page_size=1000')
+            .respond(200);
         $httpBackend.whenGET('/api/v1/environmental_variables?category=7&page_size=1000')
+            .respond(200);
+        $httpBackend.whenGET('/api/v1/codes/?variable=7&page_size=1000')
             .respond(200);
         $httpBackend.whenGET('/api/v1/min_and_max?query=%7B%22environmental_id%22:7%7D')
             .respond(JSON.stringify({
@@ -76,7 +80,8 @@ describe('Testing environmental search', function() {
             'min': 1.111,
             'name': "Precipitation",
             'range': 409.999,
-            'units': 'mm'
+            'units': 'mm',
+            'data_type': 'Continuous'
         };
         var category = {
             'id': 7,
@@ -118,7 +123,7 @@ describe('Testing environmental search', function() {
         expect(envScope.environmentalData.selectedVariables.length).toEqual(2);
         
         //test remove variable
-        envScope.removeVariable(variable);
+        searchScope.removeFromSearch(variable, 'environmental');
         envScope.$digest();
         expect(envScope.environmentalData.selectedVariables.length).toEqual(1);
         expect(envScope.environmentalData.selectedVariables.indexOf(variable)).toEqual(-1);
@@ -132,15 +137,15 @@ describe('Testing environmental search', function() {
         searchScope.$digest();
         
         expected_query = {
-            'environmental_filters': [{
-                'id': variable.id,
-                'operator': envScope.environmentalData.selectedVariables[0].selectedFilter.operator,
-                'params': [1.0, 500]
-            }]
+            'e': [[
+                variable.id,
+                envScope.environmentalData.selectedVariables[0].selectedFilter.operator,
+                [1.0, 500]
+            ]]
         };
         
-        expect(searchScope.updateSearchQuery).toHaveBeenCalled();
-        expect(searchScope.updateSearchQuery).toHaveBeenCalledWith(expected_query);
+        expect(mockSearchModelService.updateSearchQuery).toHaveBeenCalled();
+        expect(mockSearchModelService.updateSearchQuery).toHaveBeenCalledWith(expected_query);
         expect(searchScope.searchSocieties).toHaveBeenCalled();
         expect(mockFindSocieties.find).toHaveBeenCalled();
        

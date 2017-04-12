@@ -46,7 +46,7 @@ describe('Testing routeProvider', function() {
             rootScope.$digest();
             expect(route.current.controller).toBe('AboutCtrl');
             
-            location.path('/source_info');
+            location.path('/howto');
             rootScope.$digest();
             expect(route.current.controller).toBe('SourceInfoCtrl');
             
