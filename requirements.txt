@@ -2,7 +2,7 @@ Django==1.11
 django-appconf==1.0.2
 django-bootstrap3==8.2.2
 django-filter==1.0.2
-djangorestframework==3.6.2
+djangorestframework==3.9.1
 ete3==3.0.0b35
 psycopg2==2.7.1
 python-nexus==1.42
