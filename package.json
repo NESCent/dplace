@@ -6,7 +6,7 @@
     "report-coverage": "codecov"
   },
   "devDependencies": {
-    "codecov": "^2.0.2",
+    "codecov": "^3.6.5",
     "istanbul": "^0.4.5",
     "jasmine-core": "^2.5.2",
     "jasmine-node": "^1.14.5",
